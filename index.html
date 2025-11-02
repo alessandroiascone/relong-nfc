@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long Energia Privata</title>
+  <title>Re Long | Energia Privata</title>
 
   <style>
     * {
@@ -54,7 +54,7 @@
 
     .brand {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .brand-title {
@@ -102,6 +102,7 @@
       margin-top: 10px;
     }
 
+    /* BLOCCO RISPARMIO PRINCIPALE */
     .energy-box {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
@@ -118,14 +119,33 @@
       letter-spacing: -0.03em;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      row-gap: 6px;
+      margin-bottom: 10px;
     }
 
-    .energy-title span.icon {
-      display: inline-block;
+    .energy-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .energy-left .icon {
       font-size: 16px;
       line-height: 1;
+    }
+
+    .tag-today {
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(255,0,0,0.12);
+      color: #ff4d00;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,77,0,0.4);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
     }
 
     .points {
@@ -139,7 +159,7 @@
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .bullet {
@@ -151,6 +171,33 @@
       text-align: center;
     }
 
+    /* BLOCCO PROVA/FEEDBACK CLIENTI */
+    .social-proof {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .proof-line {
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: -0.03em;
+    }
+
+    .proof-strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .proof-accent {
+      color: #ff7b00;
+      font-weight: 600;
+    }
+
+    /* CTA PRINCIPALE */
     .cta-btn {
       display: block;
       width: 100%;
@@ -168,6 +215,7 @@
         0 20px 30px rgba(18,140,126,0.5),
         0 2px 4px rgba(0,0,0,0.6) inset;
       letter-spacing: -0.03em;
+      margin-bottom: 12px;
     }
 
     .cta-btn small {
@@ -179,6 +227,25 @@
       margin-top: 4px;
     }
 
+    /* CTA SECONDARIA */
+    .cta-alt {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: -0.03em;
+    }
+
+    .cta-alt strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* FOOTER */
     .footer {
       text-align: center;
       margin-top: 20px;
@@ -215,61 +282,107 @@
 </head>
 <body>
   <div class="card">
+
+    <!-- badge top -->
     <div class="badge">
       ACCESSO RISERVATO
     </div>
 
+    <!-- brand header -->
     <div class="brand">
       <div class="brand-title">Re Long&nbsp;Informatica</div>
       <div class="brand-sub">Telefonia • Energia • Assistenza PC</div>
     </div>
 
+    <!-- titolo -->
     <div class="headline">
       <h1>
-        Hai sbloccato l'area <span class="accent">Energia Privata</span> 🔥
+        Area <span class="accent">Energia Privata</span> 🔥
       </h1>
       <p class="subtitle">
-        Questa pagina è visibile solo da chi ha toccato il chip NFC in negozio.
-        Mostrala al bancone per ricevere la tua agevolazione dedicata luce.
+        Stai pagando troppo la luce?<br/>
+        Noi abbassiamo la tua bolletta passando con noi a Fastweb / Vodafone Energia.
       </p>
     </div>
 
+    <!-- box risparmio -->
     <div class="energy-box">
+
       <div class="energy-title">
-        <span class="icon">💡</span>
-        <span>Il nostro intervento sul tuo contatore:</span>
+        <div class="energy-left">
+          <span class="icon">💡</span>
+          <span>Il tuo vantaggio oggi</span>
+        </div>
+        <div class="tag-today">valido oggi in negozio</div>
       </div>
 
       <ul class="points">
         <li>
           <span class="bullet">•</span>
-          <span>Sconto immediato sulla bolletta luce attivando con noi Fastweb / Vodafone Energia</span>
+          <span>
+            Analisi gratuita della tua bolletta luce
+            <strong>(foto bolletta e stop)</strong> — zero call center.
+          </span>
         </li>
+
         <li>
           <span class="bullet">•</span>
-          <span>Analisi gratuita dei tuoi consumi: niente call center, parli direttamente con noi</span>
+          <span>
+            Sconto immediato in fattura se attivi con noi
+            <strong>Fastweb / Vodafone Energia</strong>.
+          </span>
         </li>
+
         <li>
           <span class="bullet">•</span>
-          <span>Zero stress burocratico: ci occupiamo noi del passaggio</span>
+          <span>
+            Ci occupiamo noi del passaggio:
+            <strong>nessuna burocrazia per te</strong>.
+          </span>
         </li>
       </ul>
     </div>
 
+    <!-- social proof -->
+    <div class="social-proof">
+      <div class="proof-line">
+        Clienti già seguiti questo mese:
+        <span class="proof-strong">47</span>
+        famiglie hanno richiesto l'analisi.
+      </div>
+      <div class="proof-line" style="margin-top:6px;">
+        Risparmio medio stimato:
+        <span class="proof-accent">-18% luce</span>
+        rispetto alla bolletta attuale.
+      </div>
+      <div class="proof-line" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.45);">
+        Dato interno Re Long • Stima orientativa
+      </div>
+    </div>
+
+    <!-- CTA principale: WhatsApp -->
     <a
       class="cta-btn"
-      href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20sto%20vedendo%20la%20pagina%20Energia%20Privata%20dal%20chip%20NFC.%20Fammi%20vedere%20quanto%20posso%20risparmiare%20in%20bolletta."
+      href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20adesso%20la%20foto%20della%20mia%20bolletta%20luce.%20Fammi%20vedere%20se%20posso%20pagare%20meno."
       target="_blank"
       rel="noopener noreferrer"
     >
-      Scrivici ora su WhatsApp
+      Inviaci la tua bolletta su WhatsApp
       <small>08119578844 • risposta diretta dal negozio</small>
     </a>
 
+    <!-- CTA secondaria: istruzione semplice -->
+    <div class="cta-alt">
+      1. Fai una foto alla tua ultima bolletta luce<br/>
+      2. Inviacela su WhatsApp adesso<br/>
+      3. Ti diciamo se puoi pagare meno <strong>prima di firmare qualsiasi cosa</strong>
+    </div>
+
+    <!-- footer -->
     <div class="footer">
       Mostra questa schermata in negozio per bloccare il tuo vantaggio.
       <div class="legal">
-        Offerta personale e non pubblica. Valida solo oggi.
+        Offerta personale e non pubblica. Valida SOLO oggi, legata al chip NFC interno Re Long.
       </div>
     </div>
 
