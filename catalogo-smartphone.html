@@ -1,13 +1,158 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Catalogo Smartphone</title>
-<style>body{font:16px system-ui;background:#0b0b0b;color:#fff;padding:24px} a{color:#ffd166}</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogo Smartphone | Re Long</title>
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Catalogo smartphone a rate Re Long con simulatore rata, filtri brand e WhatsApp.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{ --bg:#0b0b0b; --bg2:#000; --fg:#fff; --muted:rgba(255,255,255,.72);
+  --card:rgba(22,22,22,.92); --stroke:rgba(255,255,255,.08);
+  --brand1:#ff0000; --brand2:#ff7b00; --wa1:#25D366; --wa2:#128C7E; }
+body{ background:radial-gradient(1200px 700px at 20% 15%,var(--bg),var(--bg2)); color:var(--fg);
+  font-family:system-ui,-apple-system,Inter,Roboto,sans-serif; min-height:100vh; padding:20px }
+h1{ text-align:center; font-size:26px; letter-spacing:-.02em; margin-bottom:6px;
+    background:linear-gradient(90deg,var(--brand1),var(--brand2)); -webkit-background-clip:text; color:transparent; }
+.sub{ text-align:center; color:var(--muted); margin-bottom:16px; font-size:13px }
+.toolbar{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:12px 0 18px }
+.sel, .input{ background:rgba(255,255,255,.06); color:var(--fg); border:1px solid var(--stroke);
+  border-radius:12px; padding:10px 12px; font-weight:700 }
+.grid{ display:grid; grid-template-columns:1fr; gap:14px; max-width:1100px; margin:0 auto }
+@media(min-width:740px){ .grid{ grid-template-columns:1fr 1fr } }
+@media(min-width:1024px){ .grid{ grid-template-columns:1fr 1fr 1fr } }
+.card{ position:relative; background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.5) 100%);
+  border:1px solid var(--stroke); border-radius:16px; padding:14px; display:flex; gap:12px }
+.thumb{ width:98px; height:98px; border-radius:12px; background:linear-gradient(135deg,#333,#111);
+  display:grid; place-items:center; font-weight:900; font-size:12px; color:#aaa; border:1px solid var(--stroke) }
+.info{ flex:1; display:flex; flex-direction:column; gap:6px }
+.badges{ display:flex; gap:6px; flex-wrap:wrap }
+.badge{ background:linear-gradient(90deg,var(--brand1),var(--brand2)); color:#000; font-size:10px; font-weight:900; padding:4px 8px; border-radius:999px }
+.title{ font-weight:900; letter-spacing:-.02em }
+.meta{ color:var(--muted); font-size:12px }
+.controls{ display:flex; gap:8px; flex-wrap:wrap }
+.sel.sm{ padding:8px 10px; font-size:13px }
+.actions{ display:flex; gap:8px; flex-wrap:wrap }
+.btn{ display:inline-block; text-decoration:none; padding:10px 12px; border-radius:12px; font-weight:900; font-size:13px; color:#000; background:linear-gradient(90deg,var(--brand1),var(--brand2)) }
+.btn.wa{ background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2)); color:#fff }
+.copy{ background:#222; color:#fff; border:1px solid var(--stroke) }
+.footer{ text-align:center; color:var(--muted); font-size:12px; margin:20px 0 6px }
+</style>
 </head>
 <body>
-  <h1>Catalogo Smartphone</h1>
-  <p>Catalogo in aggiornamento. Torna all’hub:</p>
-  <p><a href="./relong-hub-v2.html">← Re Long • Hub</a></p>
+<h1>Catalogo Smartphone</h1>
+<p class="sub">Scegli il brand, seleziona i mesi e invia la simulazione su WhatsApp.</p>
+
+<div class="toolbar">
+  <select id="brand" class="sel">
+    <option value="all">Tutti i brand</option>
+    <option>Apple</option>
+    <option>Samsung</option>
+    <option>OPPO</option>
+  </select>
+  <select id="months" class="sel">
+    <option>12</option><option selected>24</option><option>30</option><option>36</option><option>48</option>
+  </select>
+  <input id="search" class="input" placeholder="Cerca modello…" />
+</div>
+
+<section id="list" class="grid" aria-live="polite"></section>
+
+<p class="footer">• Re Long Informatica — 08119578844 — <a href="./relong-hub-v2.html" style="color:#ffd166;text-decoration:none">← Torna all’HUB</a></p>
+
+<script>
+const WA = '3908119578844';
+
+const PRODUCTS = [
+  {id:'ip17pm', brand:'Apple', name:'iPhone 17 Pro Max 256GB', price:1657.8, badge:'Novità'},
+  {id:'zfold7', brand:'Samsung', name:'Samsung Galaxy Z Fold 7 256GB', price:1977, badge:'Top' },
+  {id:'a56', brand:'Samsung', name:'Samsung Galaxy A56 5G', price:483.8},
+  {id:'oppoa5p', brand:'OPPO', name:'OPPO A5 Pro', price:255.9}
+];
+
+const list = document.getElementById('list');
+const brandSel = document.getElementById('brand');
+const monthsSel = document.getElementById('months');
+const search = document.getElementById('search');
+
+function fmtEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR'}); }
+
+function row(p){
+  const m = parseInt(monthsSel.value,10);
+  const rata = p.price / m;
+  const wrap = document.createElement('article');
+  wrap.className = 'card';
+  wrap.innerHTML = `
+    <div class="thumb">${p.brand}</div>
+    <div class="info">
+      <div class="badges">${p.badge ? `<span class="badge">${p.badge}</span>` : ''}</div>
+      <div class="title">${p.name}</div>
+      <div class="meta">Prezzo: <b>${fmtEuro(p.price)}</b> • Simulazione: <b>${m} mesi</b> — Rata stimata <b>${fmtEuro(rata)}</b></div>
+      <div class="controls">
+        <select data-id="${p.id}" class="sel sm months">
+          <option ${m===12?'selected':''}>12</option>
+          <option ${m===24?'selected':''}>24</option>
+          <option ${m===30?'selected':''}>30</option>
+          <option ${m===36?'selected':''}>36</option>
+          <option ${m===48?'selected':''}>48</option>
+        </select>
+        <button class="btn copy" data-id="${p.id}">Copia simulazione</button>
+        <a class="btn wa" target="_blank" rel="noopener" href="#">WhatsApp</a>
+      </div>
+    </div>
+  `;
+  const sel = wrap.querySelector('select.months');
+  const copyBtn = wrap.querySelector('.btn.copy');
+  const waBtn = wrap.querySelector('.btn.wa');
+
+  function buildText(mm){
+    const rataX = (p.price/mm);
+    return `Re Long | ${p.name}
+Prezzo: ${fmtEuro(p.price)}
+Simulazione: ${mm} mesi
+Rata stimata: ${fmtEuro(rataX)}
+Vuoi procedere o valutare una permuta?`;
+  }
+  function updateWA(mm){
+    const text = encodeURIComponent(buildText(mm));
+    waBtn.href = `https://wa.me/${WA}?text=${text}`;
+  }
+  updateWA(m);
+
+  sel.addEventListener('change', (e)=>{
+    const mm = parseInt(e.target.value,10);
+    monthsSel.value = mm; // allinea la toolbar
+    render(); // ridisegna tutto per aggiornare le rate
+  });
+
+  copyBtn.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(buildText(parseInt(sel.value,10)));
+      copyBtn.textContent = 'Copiato!';
+      setTimeout(()=>copyBtn.textContent='Copia simulazione',1200);
+    }catch(err){
+      alert('Copia non riuscita: ' + err);
+    }
+  });
+
+  return wrap;
+}
+
+function render(){
+  list.innerHTML = '';
+  const b = brandSel.value;
+  const q = search.value.trim().toLowerCase();
+  PRODUCTS
+    .filter(p => b==='all' || p.brand===b)
+    .filter(p => !q || p.name.toLowerCase().includes(q))
+    .forEach(p => list.appendChild(row(p)));
+}
+
+brandSel.addEventListener('change', render);
+monthsSel.addEventListener('change', render);
+search.addEventListener('input', render);
+
+render();
+</script>
 </body>
 </html>
