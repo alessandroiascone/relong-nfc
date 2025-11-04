@@ -1,40 +1,86 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Catalogo Link</title>
-  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Offerte Energia, Assistenza PC.">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Re Long | Catalogo Link (FX 3D & Animazioni)</title>
+  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Energia Casa, Assistenza PC.">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;}
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .wrap{width:100%;max-width:860px;display:grid;gap:20px}
-    .head{text-align:center;padding:8px 8px 0}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px}
+    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.7);--muted2:rgba(255,255,255,.45);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E}
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px}
+    .head{text-align:center;padding:8px 8px 0 8px}
+    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
-    .card{background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;position:relative;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px}
-    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45)}
-    .title{font-size:18px;font-weight:800;letter-spacing:-.03em}
-    .desc{font-size:13px;color:var(--muted);line-height:1.45}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;letter-spacing:-.02em;color:#000;background:linear-gradient(90deg,var(--brand1),var(--brand2));box-shadow:0 16px 26px rgba(255,90,0,.35);border:0;transition:transform .15s ease,box-shadow .15s ease;outline:none}
-    .btn + .btn{margin-top:8px}
-    .btn.wa{background:radial-gradient(circle at 0% 0%,var(--wa1) 0%,var(--wa2) 60%);box-shadow:0 18px 30px rgba(18,140,126,.45)}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 18px 30px rgba(255,90,0,.42)}
-    .btn.wa:hover{box-shadow:0 20px 34px rgba(18,140,126,.55)}
-    .btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-    .foot{text-align:center;color:var(--muted2);font-size:11px;margin-top:6px}
-    .foot a{color:var(--muted2)}
+    @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+    .card{background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px;position:relative;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;transform-style:preserve-3d;animation:fadeUp .6s ease both}
+    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
+    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite}
+    .title{font-size:18px;font-weight:800;animation:fadeUp .65s ease both}
+    .desc{font-size:13px;color:var(--muted);line-height:1.45;animation:fadeUp .7s ease both}
+    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d;animation:fadeUp .75s ease both}
+    .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
+    .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
+    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px;animation:fadeUp .8s ease both}
   </style>
 </head>
 <body>
   <main class="wrap">
     <header class="head">
-      <div class="brand">Re Long&nbsp;Informatica – Telefonia, Energia & Assistenza PC</div>
+      <div class="brand">Re Long Informatica – Telefonia, Energia & Assistenza PC</div>
+      <div class="sub">Catalogo rapido: Clicca sulla sezione di interesse</div>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <div class="badge">SMARTPHONE A RATE</div>
+        <div class="title">Prendi oggi il tuo smartphone</div>
+        <p class="desc">Finanziamento Vodafone & Compass senza busta paga con rate flessibili.</p>
+        <a class="btn" href="./catalogo-smartphone-pro-whatsapp-ANIMATED-inline.html">📱 Catalogo Digitale</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Scrivici su WhatsApp</a>
+      </article>
+
+      <article class="card">
+        <div class="badge">OFFERTE BUSINESS</div>
+        <div class="title">Fisso + Mobile TUTTO ILLIMITATO</div>
+        <p class="desc">Soluzioni per Partite IVA e Aziende.</p>
+        <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un consulente Business</a>
+      </article>
+
+      <article class="card">
+        <div class="badge">ENERGIA CASA</div>
+        <div class="title">Accendi l'Energia</div>
+        <p class="desc">Invia la foto della tua bolletta per una verifica immediata.</p>
+        <a class="btn" href="./index.html">Vai all’Area Energia</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Inviaci la tua Bolletta</a>
+      </article>
+
+      <article class="card">
+        <div class="badge">ASSISTENZA PC</div>
+        <div class="title">Riparazioni & Upgrade</div>
+        <p class="desc">Diagnosi immediata e upgrade su misura.</p>
+        <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
+      </article>
+
+      <article class="card">
+        <div class="badge">VODAFONE BUSINESS</div>
+        <div class="title">Offerte Mobili</div>
+        <p class="desc">Piani dedicati ad Aziende e Partite IVA attive.</p>
+        <a class="btn" href="./offerte-mobili-business-ANIMATED.html">📲 Scopri offerte Mobili Business</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
+      </article>
+    </section>
+
+    <p class="footer">Re Long Informatica – Marano di Napoli • 08119578844</p>
+  </main>
+</body>
+</html>      <div class="brand">Re Long&nbsp;Informatica – Telefonia, Energia & Assistenza PC</div>
       <div class="sub">Clicca sulla sezione di interesse</div>
     </header>
 
