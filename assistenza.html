@@ -1,157 +1,89 @@
- <title>Re Long | Assistenza PC</title>
-<style>
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
-    body{
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
-      background:radial-gradient(circle at 20% 20%,#0f0f0f 0%,#000 70%);
-      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;
-      padding:24px;
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long | Assistenza PC</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000;
+      --brand1:#ff0000; --brand2:#ff7b00;
+      --muted:rgba(255,255,255,.8);
+      --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
+      --wa1:#25D366; --wa2:#128C7E;
+      --focus:#ffd166;
     }
+    html, body { height:100%; }
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap{ width:100%; display:flex; justify-content:center; }
+    /* Use fluid width and clamp() to avoid tiny content on mobile */
     .card{
-      width:100%;max-width:400px;background:linear-gradient(150deg,rgba(25,25,25,.9)0%,rgba(0,0,0,.6)100%);
-      border-radius:22px;padding:24px 20px 20px;border:1px solid rgba(255,255,255,.07);
-      box-shadow:0 30px 60px rgba(0,0,0,.9),0 0 60px rgba(255,180,0,.15);position:relative;
+      width:min(92vw, 560px);
+      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);
+      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
+      box-shadow:0 30px 60px rgba(0,0,0,.9);
+      position:relative;
     }
     .badge{
-      position:absolute;top:-12px;left:16px;
-      background:linear-gradient(90deg,#ff7b00 0%,#ff0000 100%);
-      color:#000;font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px;
-      box-shadow:0 10px 20px rgba(255,80,0,.5);letter-spacing:-.03em;text-transform:uppercase;
+      position:absolute; top:-12px; left:16px;
+      background:linear-gradient(90deg,var(--brand1) 0%, var(--brand2) 100%);
+      color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
+      box-shadow:0 12px 22px rgba(255,80,0,.42);
     }
-    .brand{text-align:center;margin-bottom:16px;margin-top:8px;}
-    .brand-title{font-size:22px;font-weight:600;color:#fff;letter-spacing:-.04em;line-height:1.2;}
-    .brand-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;line-height:1.4;}
-    .headline{text-align:center;margin-top:12px;margin-bottom:16px;}
-    .headline h1{font-size:22px;line-height:1.15;font-weight:800;color:#fff;letter-spacing:-.04em;}
-    .accent{
-      background:linear-gradient(90deg,#ff7b00 0%,#ff0000 100%);
-      -webkit-background-clip:text;color:transparent;font-weight:800;
-    }
-    .subtitle{
-      color:rgba(255,255,255,.7);font-size:14px;line-height:1.4;margin-top:10px;text-align:center;
-    }
-    .info-box{
+    h1{ font-size:clamp(22px, 3.8vw, 28px); letter-spacing:-.03em; margin-bottom:8px }
+    p{ opacity:.9; line-height:1.5; font-size:clamp(14px, 2.5vw, 16px) }
+    .info{
+      margin:clamp(14px, 2.5vw, 18px) 0;
+      padding:clamp(12px, 2.2vw, 16px);
+      border-radius:16px; border:1px solid rgba(255,255,255,.1);
       background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:16px;
-      margin-top:20px;
-      margin-bottom:20px;
     }
-    .row{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
-    .icon{font-size:16px;line-height:1;min-width:16px;text-align:center;}
-    .text{font-size:13px;line-height:1.4;color:rgba(255,255,255,.8);}
-    .text strong{color:#fff;font-weight:600;}
-    .cta-btn{
-      display:block;width:100%;text-align:center;font-size:16px;font-weight:700;
-      line-height:1.2;background:radial-gradient(circle at 0% 0%,#25D366 0%,#128C7E 60%);
-      color:#000;text-decoration:none;padding:16px 16px;border-radius:14px;border:0;
-      box-shadow:0 20px 30px rgba(18,140,126,.5),0 2px 4px rgba(0,0,0,.6) inset;
-      letter-spacing:-.03em;margin-bottom:12px;
-    }
-    .cta-btn big{display:block;font-size:15px;line-height:1.3;font-weight:700;color:#000;letter-spacing:-.03em;}
-    .cta-btn small{display:block;font-size:12px;line-height:1.3;font-weight:500;
-      color:rgba(0,0,0,.7);margin-top:4px;}
-    .cta-alt{
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.15);
+    .row{ display:flex; gap:10px; margin:8px 0; font-size:clamp(14px, 2.5vw, 16px) }
+    .cta{
+      display:block; text-align:center; margin-top:clamp(10px,2vw,14px);
+      padding:clamp(12px, 2.2vw, 14px);
       border-radius:14px;
-      padding:14px 16px;
-      text-align:center;
-      font-size:12px;
-      line-height:1.45;
-      color:rgba(255,255,255,.6);
-      letter-spacing:-.03em;
+      background:radial-gradient(circle at 0% 0%, var(--wa1) 0%, var(--wa2) 60%);
+      color:#000; font-weight:900; text-decoration:none;
+      box-shadow:0 18px 30px rgba(18,140,126,.45);
+      font-size:clamp(14px, 2.6vw, 16px);
+      outline:none;
     }
-    .cta-alt strong{color:#fff;font-weight:600;}
-    .footer{
-      text-align:center;margin-top:20px;font-size:11px;line-height:1.4;
-      color:rgba(255,255,255,.4);
+    .cta:focus-visible{ outline:2px solid var(--focus); outline-offset:3px }
+    .small{ font-size:clamp(11px, 2.2vw, 12px); opacity:.6; margin-top:10px; text-align:center }
+    /* Prevent iOS auto-zoom on tap by keeping font-size >= 16px on interactive elements */
+    input, select, textarea { font-size:16px }
+    @media (min-width:1100px){
+      .card{ width:560px }
     }
-    .legal{
-      font-size:10px;line-height:1.4;color:rgba(255,255,255,.28);margin-top:12px;
-    }
-    .glow{
-      position:absolute;left:50%;transform:translateX(-50%);
-      bottom:-40px;width:200px;height:70px;
-      background:radial-gradient(circle,rgba(255,120,0,.45)0%,rgba(0,0,0,0)70%);
-      filter:blur(30px);opacity:.7;pointer-events:none;
-    }
-    @media(min-width:480px){
-      .brand-title{font-size:24px;}
-      .headline h1{font-size:24px;}
+    @supports (font-size: clamp(1px, 1vw, 100px)) {
+      /* already using clamp */
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="badge">ASSISTENZA TECNICA PC</div>
-
-    <div class="brand">
-      <div class="brand-title">Re Long&nbsp;Informatica</div>
-      <div class="brand-sub">Riparazioni • Upgrade • Pulizia PC / Notebook</div>
-    </div>
-
-    <div class="headline">
-      <h1>
-        Il tuo PC è lento? <span class="accent">Risolviamo noi il problema</span> 💻
-      </h1>
-      <p class="subtitle"
-        
-      </p>
-    </div>
-
-    <div class="info-box">
-      <div class="row">
-        <div class="icon">🧪</div>
-        <div class="text">
-          Diagnosi tecnica: controlliamo problemi di lentezza, virus, surriscaldamento o rotture.
-        </div>
+  <main class="wrap" aria-label="Assistenza PC Re Long">
+    <section class="card">
+      <div class="badge">ASSISTENZA TECNICA PC</div>
+      <h1>Non cambiarlo, potenzialo 💻</h1>
+      <p>Da Re Long il tuo PC torna veloce, silenzioso e affidabile — diagnosi immediata e upgrade su misura.</p>
+      <div class="info" role="list">
+        <div class="row" role="listitem">🧪 Diagnosi lentezza / virus / surriscaldamento</div>
+        <div class="row" role="listitem">🚀 Upgrade SSD &amp; RAM</div>
+        <div class="row" role="listitem">🧼 Pulizia interna &amp; pasta termica</div>
       </div>
-
-      <div class="row">
-        <div class="icon">🚀</div>
-        <div class="text">
-          Upgrade SSD / RAM per dare velocità anche ai computer vecchi.
-          <strong>Molte volte non serve cambiarlo.</strong>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="icon">🧼</div>
-        <div class="text">
-          Pulizia interna e pasta termica:
-          <strong>meno caldo, più vita al PC.</strong>
-        </div>
-      </div>
-    </div>
-
-    <a
-      class="cta-btn"
-      href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20o%20notebook%20ha%20un%20problema.%20Ti%20mando%20foto%20%2F%20video%20cos%C3%AC%20mi%20dici%20se%20vale%20la%20pena%20ripararlo."
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <big>MANDACI FOTO / VIDEO SU WHATSAPP</big>
-      <small>Ti diciamo se conviene sistemarlo o cambiarlo 🔧</small>
-    </a>
-
-    <div class="cta-alt">
-      1. Fai una foto o un breve video del problema (schermo, rumore, errore)<br/>
-      2. Inviacelo su WhatsApp<br/>
-      3. Ti diciamo se conviene riparare o no
-      <br/><br/>
-      <strong>Risposta diretta dal laboratorio Re Long.</strong>
-    </div>
-
-    <div class="footer">
-      Porta il PC o notebook in negozio e mostra questa schermata.
-      <div class="legal">
-        Pagina NFC privata Re Long. Nessun call center. Supporto reale in sede.
-      </div>
-    </div>
-
-    <div class="glow"></div>
-  </div>
+      <a class="cta" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20ha%20un%20problema.%20Posso%20inviarvi%20foto%20o%20video%20per%20un%20parere%3F" aria-label="Chatta con l’assistenza tecnica su WhatsApp">
+        💬 Chatta con l’assistenza tecnica
+      </a>
+      <div class="small">Supporto reale in sede. Re Long Informatica — Marano di Napoli.</div>
+    </section>
+  </main>
 </body>
 </html>
