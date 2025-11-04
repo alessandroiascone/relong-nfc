@@ -3,50 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Catalogo Smartphone (Reali)</title>
-  <meta name="description" content="iPhone 17 Pro, iPhone 17, iPhone Air e Galaxy S25 Ultra a rate con Re Long Informatica.">
+  <title>Re Long | Catalogo Smartphone (Standalone)</title>
+  <meta name="description" content="Selezione di smartphone reali a rate con WhatsApp diretto per simulazione.">
+  <meta name="theme-color" content="#0a0a0a">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--wa1:#25D366;--wa2:#128C7E;
-           --muted:rgba(255,255,255,.7);--stroke:rgba(255,255,255,.1)}
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
-         background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);
-         color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.72);--stroke:rgba(255,255,255,.1);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;}
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
     .wrap{width:100%;max-width:1120px;display:grid;gap:20px}
-    .head{text-align:center}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em}
-    .sub{font-size:12px;color:rgba(255,255,255,.7)}
+    header{text-align:center}
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
     @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
-    .card{background:linear-gradient(150deg,rgba(20,20,20,.94) 0%,rgba(0,0,0,.6) 100%);
-           border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px;position:relative;
-           box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
-           display:flex;flex-direction:column;gap:10px}
-    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,#ff0000,#ff7b00);
-            color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px}
+    .card{background:linear-gradient(150deg,rgba(20,20,20,.94) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:16px;position:relative;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px}
+    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45)}
     .photo{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.06);object-fit:contain;background:#0b0b0b;aspect-ratio:1.2/1}
     .model{font-size:18px;font-weight:900;letter-spacing:-.02em}
     .price{font-size:16px}
-    .hint{color:rgba(255,255,255,.7);font-weight:600;font-size:12px;margin-left:6px}
+    .hint{color:var(--muted);font-weight:600;font-size:12px;margin-left:6px}
     .features{display:flex;flex-wrap:wrap;gap:8px 12px;margin:4px 0 4px}
-    .features span{font-size:12px;color:rgba(255,255,255,.7)}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;
-         font-size:14px;font-weight:900;letter-spacing:-.02em;color:#000;
-         background:radial-gradient(circle at 0% 0%,#25D366 0%,#128C7E 60%);
-         box-shadow:0 16px 26px rgba(18,140,126,.45);border:0;margin-top:4px}
-    .foot{text-align:center;color:rgba(255,255,255,.45);font-size:11px;margin-top:4px}
+    .features span{font-size:12px;color:var(--muted)}
+    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:900;letter-spacing:-.02em;color:#000;background:radial-gradient(circle at 0% 0%,var(--wa1) 0%,var(--wa2) 60%);box-shadow:0 16px 26px rgba(18,140,126,.45);border:0;margin-top:4px;outline:none}
     .cta-alt{text-align:center;margin-top:12px}
-    .cta-alt a{display:inline-block;text-decoration:none;padding:12px 16px;border-radius:14px;
-         font-size:14px;font-weight:900;color:#000;background:radial-gradient(circle at 0% 0%,#25D366 0%,#128C7E 60%);
-         box-shadow:0 16px 26px rgba(18,140,126,.45)}
+    .foot{text-align:center;color:rgba(255,255,255,.45);font-size:11px;margin-top:4px}
   </style>
 </head>
 <body>
   <main class="wrap">
-    <header class="head">
-      <div class="brand">Re Long&nbsp;Informatica</div>
-      <div class="sub">Smartphone a rate — Vodafone & Compass (possibile anche senza busta paga) • 08119578844</div>
+    <header>
+      <h1 style="font-size:24px;letter-spacing:-.04em;margin-bottom:6px">Re Long&nbsp;Informatica</h1>
+      <p style="opacity:.8">Smartphone a rate — Vodafone & Compass (possibile anche senza busta paga) • 08119578844</p>
     </header>
 
     <section class="grid">
@@ -56,7 +42,7 @@
         <h3 class="model">iPhone 17 Pro</h3>
         <p class="price">Da <strong>€37/mese</strong> <span class="hint">con Vodafone & Compass</span></p>
         <div class="features"><span>✔️ Possibile senza busta paga</span><span>♻️ Permuta usato</span><span>📦 Verifica pronta consegna</span></div>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%2017%20Pro%20a%2037%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener noreferrer">Richiedi simulazione su WhatsApp</a>
+        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%2017%20Pro%20a%2037%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener">💬 Chatta su WhatsApp</a>
       </article>
 
       <article class="card">
@@ -65,7 +51,7 @@
         <h3 class="model">iPhone 17</h3>
         <p class="price">Da <strong>€23/mese</strong> <span class="hint">con Vodafone & Compass</span></p>
         <div class="features"><span>✔️ Possibile senza busta paga</span><span>♻️ Permuta usato</span><span>📦 Verifica pronta consegna</span></div>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%2017%20a%2023%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener noreferrer">Richiedi simulazione su WhatsApp</a>
+        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%2017%20a%2023%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener">💬 Chatta su WhatsApp</a>
       </article>
 
       <article class="card">
@@ -74,7 +60,7 @@
         <h3 class="model">iPhone Air</h3>
         <p class="price">Da <strong>€34/mese</strong> <span class="hint">con Vodafone & Compass</span></p>
         <div class="features"><span>✔️ Possibile senza busta paga</span><span>♻️ Permuta usato</span><span>📦 Verifica pronta consegna</span></div>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%20Air%20a%2034%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener noreferrer">Richiedi simulazione su WhatsApp</a>
+        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20iPhone%20Air%20a%2034%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener">💬 Chatta su WhatsApp</a>
       </article>
 
       <article class="card">
@@ -83,15 +69,17 @@
         <h3 class="model">Galaxy S25 Ultra</h3>
         <p class="price">Da <strong>€33/mese</strong> <span class="hint">con Vodafone & Compass</span></p>
         <div class="features"><span>✔️ Possibile senza busta paga</span><span>♻️ Permuta usato</span><span>📦 Verifica pronta consegna</span></div>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20Galaxy%20S25%20Ultra%20a%2033%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener noreferrer">Richiedi simulazione su WhatsApp</a>
+        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20mi%20interessa%20Galaxy%20S25%20Ultra%20a%2033%E2%82%AC%2Fmese.%20Fammi%20una%20simulazione%20rapida." target="_blank" rel="noopener">💬 Chatta su WhatsApp</a>
       </article>
     </section>
 
-    <div class="cta-alt" style="text-align:center;margin-top:12px;">
-      <a href="https://wa.me/3908119578844?text=Cerco%20un%20altro%20modello%2C%20mi%20aiutate%20a%20trovarlo%3F" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;padding:12px 16px;border-radius:14px;font-size:14px;font-weight:900;color:#000;background:radial-gradient(circle at 0% 0%,#25D366 0%,#128C7E 60%);box-shadow:0 16px 26px rgba(18,140,126,.45)">Cerchi un altro modello? Scrivici in chat</a>
+    <div class="cta-alt">
+      <a class="btn" href="https://wa.me/3908119578844?text=Cerco%20un%20altro%20modello%2C%20mi%20aiutate%20a%20trovarlo%3F" target="_blank" rel="noopener">
+        Cerchi un altro modello? 💬 Chatta su WhatsApp
+      </a>
     </div>
 
-    <p class="foot">Valutazione usato e condizioni soggette a verifica. Re Long Informatica – Telefonia, Energia & Assistenza PC - Marano di Napoli - 08119578844.</p>
+    <p class="foot">Prezzi indicativi; valutazione usato e condizioni soggette a verifica. Re Long Informatica — Marano di Napoli.</p>
   </main>
 </body>
 </html>
