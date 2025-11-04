@@ -7,7 +7,13 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
   body{font-family:system-ui,-apple-system,BlinkMacSystemFont,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,#0a0a0a 0%,#000 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .card{width:100%;max-width:520px;background:linear-gradient(150deg,rgba(18,18,18,.94)0%,rgba(0,0,0,.6)100%);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:26px;box-shadow:0 30px 60px rgba(0,0,0,.95)}
+ .card{
+      width:min(92vw, 560px);
+      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);
+      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
+      box-shadow:0 30px 60px rgba(0,0,0,.9);
+      position:relative;
   .badge{position:absolute;top:-12px;left:16px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-size:12px;font-weight:800;padding:7px 12px;border-radius:999px}
   h1{font-size:24px;letter-spacing:-.04em;margin-bottom:10px}
   .info{margin:16px 0;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
