@@ -84,7 +84,25 @@
     </p>
   </main>
 
-  <p class="footer">Re Long Informatica – Marano di Napoli • 08119578844</p>
-  </main>
+  <script>
+    // Effetto tilt 3D dolce su .card e .btn (mouse-based)
+    function addTilt(selector, maxTilt=6, scale=1.05){
+      document.querySelectorAll(selector).forEach(el=>{
+        el.style.willChange = 'transform';
+        el.addEventListener('mousemove', e=>{
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - r.left, y = e.clientY - r.top;
+          const rx = ((y/r.height)-.5) * maxTilt;
+          const ry = ((x/r.width)-.5) * -maxTilt;
+          el.style.transform = `perspective(900px) translateZ(10px) scale(${scale}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+        el.addEventListener('mouseleave', ()=>{
+          el.style.transform = '';
+        });
+      });
+    }
+    addTilt('.card', 2, 1.02);  // più leggero sulle card
+    addTilt('.btn', 6, 1.06);   // più evidente sui bottoni
+  </script>
 </body>
 </html>
