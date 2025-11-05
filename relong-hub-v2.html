@@ -21,12 +21,6 @@
   <meta name="twitter:description" content="Soluzioni Re Long: Telefonia, Energia, Business, Assistenza PC.">
   <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-relong.jpg">
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-
   <!-- Favicon (SVG inline) -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
 
@@ -119,10 +113,6 @@
     .lead-legal{font-size:11px;color:rgba(255,255,255,.55);margin-top:10px;line-height:1.3}
     .lead-legal a{color:rgba(255,255,255,.75);text-decoration:underline}
     .lead-close{position:absolute;top:10px;right:12px;background:transparent;border:0;color:#fff;font-weight:900;font-size:18px}
-
-    /* Bottone Installa App (PWA) */
-    .pwa-install{position:fixed;left:16px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:9999;display:none}
-    .pwa-install button{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;font-weight:900;box-shadow:0 16px 32px rgba(255,90,0,.35)}
   </style>
 </head>
 <body>
@@ -142,7 +132,7 @@
       <div class="sub">Clicca sulla sezione di interesse</div>
     </header>
 
-    <section class="grid">
+    <section class="grid" aria-label="Collegamenti rapidi Re Long">
       <article class="card">
         <div class="badge">SMARTPHONE A RATE</div>
         <div class="title">Scegli il tuo smartphone</div>
@@ -239,7 +229,7 @@
     }, false);
   </script>
 
-  <!-- ===== POPUP SMART CONTATTI + PWA ===== -->
+  <!-- ===== POPUP SMART CONTATTI ===== -->
   <div class="lead-overlay" id="leadModal" aria-hidden="true" role="dialog" aria-label="Richiesta contatto">
     <div class="lead-card">
       <button class="lead-close" id="leadClose" aria-label="Chiudi">×</button>
@@ -264,11 +254,6 @@
         <br>WhatsApp: <b>08119578844</b> — <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Come raggiungerci</a>
       </p>
     </div>
-  </div>
-
-  <!-- Bottone “Installa App” -->
-  <div class="pwa-install" id="pwaInstall">
-    <button id="pwaBtn">📲 Installa “Re Long”</button>
   </div>
 
   <script>
@@ -322,35 +307,6 @@
       window.open(url, '_blank');
       hideLead(30);
     });
-
-    // ====== PWA INSTALL ======
-    let deferredPrompt = null;
-    const installWrap = document.getElementById('pwaInstall');
-    const installBtn  = document.getElementById('pwaBtn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installWrap.style.display = 'block';
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installWrap.style.display = 'none';
-    });
-
-    window.addEventListener('appinstalled', () => {
-      deferredPrompt = null;
-      installWrap.style.display = 'none';
-    });
-
-    // ====== Service Worker ======
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(()=>{});
-    }
   })();
   </script>
 
@@ -368,6 +324,36 @@
 
   <!-- Toast container -->
   <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- === WHATSAPP AUTO-MESSAGGIO: aggiunto qui === -->
+  <script>
+  (function(){
+    const WA_BASE = "https://wa.me/3908119578844?text=";
+
+    const templates = {
+      "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
+      "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
+      "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
+      "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
+      "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
+    };
+
+    document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
+      try{
+        const url = new URL(a.href, location.href);
+        if (url.searchParams.has("text")) return;
+
+        const card   = a.closest("article.card");
+        const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+        const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+        
+        let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
+        a.href = WA_BASE + encodeURIComponent(msg);
+        a.setAttribute("rel","noopener");
+      }catch(_){}
+    });
+  })();
+  </script>
 
 </body>
 </html>
