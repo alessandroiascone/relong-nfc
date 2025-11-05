@@ -7,7 +7,7 @@
   <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
   <meta name="theme-color" content="#0a0a0a">
 
-  <!-- Open Graph / WhatsApp / Facebook -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Re Long | Smartphone a rate, Business, Energia & Assistenza">
   <meta property="og:description" content="Prendi oggi il tuo smartphone, prima rata tra 30 giorni. Offerte Business, Energia Casa, Assistenza PC.">
@@ -24,7 +24,7 @@
   <!-- Favicon (SVG inline) -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
 
-  <!-- Preconnect per click istantanei -->
+  <!-- Preconnect -->
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
@@ -43,6 +43,15 @@
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+    /* ===== Parallax BG ===== */
+    .parallax{position:fixed;inset:0;z-index:-1;overflow:hidden;perspective:1000px;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%)}
+    .blob{position:absolute; width:70vw; height:70vw; max-width:1000px; max-height:1000px; border-radius:50%; filter:blur(70px) saturate(130%); opacity:.14; will-change:transform}
+    .blob.red{ background:radial-gradient(circle, #ff3b1a 20%, transparent 60%); top:-18%; left:-12%; transform:translate3d(0,0,-80px) }
+    .blob.orange{ background:radial-gradient(circle, #ff9a1a 18%, transparent 60%); bottom:-22%; right:-18%; transform:translate3d(0,0,-40px) }
+    .grain{position:absolute; inset:-15%;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+      mix-blend-mode:overlay; pointer-events:none}
+
     /* ===== Loader 3D ===== */
     #rl-loader{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);transition:opacity .45s ease, visibility .45s ease}
     #rl-loader.hidden{opacity:0;visibility:hidden}
@@ -56,7 +65,8 @@
     @media (prefers-reduced-motion:reduce){.rl-cube{animation:none}}
     html.rl-lock, body.rl-lock{overflow:hidden}
 
-    body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    /* ===== Layout ===== */
+    body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:transparent;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
     .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
     @media(max-width:480px){.wrap{padding-bottom:130px}}
     .head{text-align:center;padding:8px 8px 0 8px}
@@ -98,24 +108,16 @@
     /* Toast anti-404 */
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
     .toast.show{opacity:1}
-
-    /* ===== POPUP SMART CONTATTI ===== */
-    .lead-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10000}
-    .lead-card{width:min(92vw,420px);background:linear-gradient(160deg, rgba(20,20,20,.98), rgba(0,0,0,.78));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 26px 58px rgba(0,0,0,.75);padding:18px;position:relative}
-    .lead-title{font-weight:900;font-size:20px;letter-spacing:-.02em;margin-bottom:6px}
-    .lead-sub{color:rgba(255,255,255,.65);font-size:13px;margin-bottom:14px}
-    .lead-row{display:grid;gap:8px;margin:10px 0}
-    .lead-row input, .lead-row select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;outline:none;transition:border-color .15s ease; font-size:14px}
-    .lead-row input:focus, .lead-row select:focus{border-color:#ffd166}
-    .lead-actions{display:flex;gap:10px;margin-top:12px}
-    .btn-primary{flex:1;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border:0;border-radius:12px;padding:12px}
-    .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px}
-    .lead-legal{font-size:11px;color:rgba(255,255,255,.55);margin-top:10px;line-height:1.3}
-    .lead-legal a{color:rgba(255,255,255,.75);text-decoration:underline}
-    .lead-close{position:absolute;top:10px;right:12px;background:transparent;border:0;color:#fff;font-weight:900;font-size:18px}
   </style>
 </head>
 <body>
+
+  <!-- Parallax BG -->
+  <div class="parallax" aria-hidden="true">
+    <div class="blob red" id="blobRed"></div>
+    <div class="blob orange" id="blobOrange"></div>
+    <div class="grain"></div>
+  </div>
 
   <!-- Loader 3D -->
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
@@ -181,7 +183,7 @@
     </p>
   </main>
 
-  <!-- Script loader e utility (prima dei pulsanti flottanti) -->
+  <!-- Script base: loader, toast, torna su -->
   <script>
     // Blocca scroll finché il loader è visibile
     document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
@@ -256,57 +258,154 @@
     </div>
   </div>
 
+  <!-- ===== Parallasse avanzata + Haptics + Tracking anonimo + WhatsApp autocompile ===== -->
   <script>
-  (() => {
-    // ====== POPUP SMART ======
-    const overlay = document.getElementById('leadModal');
-    const closeBtn = document.getElementById('leadClose');
-    const laterBtn = document.getElementById('leadLater');
-    const sendBtn  = document.getElementById('leadSend');
-    const nameEl = document.getElementById('leadName');
-    const phoneEl = document.getElementById('leadPhone');
-    const topicEl = document.getElementById('leadTopic');
+  (function(){
+    /* ------------------ PARALLASSE AVANZATA ------------------ */
+    const red = document.getElementById('blobRed');
+    const orange = document.getElementById('blobOrange');
 
-    const LS_KEY = 'rl_lead_dismissed_until';
-
-    function showLead(){
-      const until = Number(localStorage.getItem(LS_KEY) || 0);
-      if (Date.now() < until) return; // non mostrare se appena chiuso
-      overlay.style.display='flex';
-      overlay.setAttribute('aria-hidden','false');
+    function moveParallax(mx, my, sy){
+      const cx = (mx / window.innerWidth) - .5;
+      const cy = (my / window.innerHeight) - .5;
+      const rtx = cx * -40, rty = cy * -40;   // distante
+      const otx = cx *  75, oty = cy *  75;   // vicino
+      red.style.transform    = `translate3d(${rtx}px, calc(${rty}px + ${sy*0.05}px), -80px)`;
+      orange.style.transform = `translate3d(${otx}px, calc(${oty}px + ${sy*0.12}px), -40px)`;
     }
-    function hideLead(days=30){
-      overlay.style.display='none';
-      overlay.setAttribute('aria-hidden','true');
-      localStorage.setItem(LS_KEY, String(Date.now() + days*24*60*60*1000));
+    const pm = {x: window.innerWidth/2, y: window.innerHeight/2};
+    function onMouse(e){ pm.x = e.clientX; pm.y = e.clientY; moveParallax(pm.x, pm.y, window.scrollY||0); }
+    function onScroll(){ moveParallax(pm.x, pm.y, window.scrollY||0); }
+
+    window.addEventListener('mousemove', onMouse, {passive:true});
+    window.addEventListener('scroll', onScroll, {passive:true});
+    moveParallax(pm.x, pm.y, 0);
+
+    // Giroscopio (mobile)
+    function onGyro(e){
+      const beta = (e.beta||0);   // x tilt: -180..180
+      const gamma = (e.gamma||0); // y tilt: -90..90
+      const mx = (gamma + 90) / 180 * window.innerWidth; // 0..1 -> px
+      const my = (beta + 180) / 360 * window.innerHeight;
+      moveParallax(mx, my, window.scrollY||0);
+    }
+    if(window.DeviceOrientationEvent){
+      // su iOS serve permesso
+      if (typeof DeviceOrientationEvent.requestPermission === 'function'){
+        document.addEventListener('click', function once(){
+          DeviceOrientationEvent.requestPermission().catch(()=>{}).finally(()=>{
+            window.addEventListener('deviceorientation', onGyro, true);
+          });
+          document.removeEventListener('click', once);
+        });
+      } else {
+        window.addEventListener('deviceorientation', onGyro, true);
+      }
     }
 
-    // Trigger: 12s oppure scroll > 60% oppure "exit intent" desktop
-    setTimeout(showLead, 12000);
-    let firedScroll=false;
-    window.addEventListener('scroll', () => {
-      if (firedScroll) return;
-      const scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
-      if (scrolled > 0.6){ firedScroll=true; showLead(); }
+    /* ------------------ MICRO HAPTICS ------------------ */
+    function vibrate(ms=18){
+      if (navigator.vibrate) { try{ navigator.vibrate(ms); }catch(_){} }
+    }
+    document.addEventListener('click', (e)=>{
+      const hit = e.target.closest('.btn, .fab-btn, .card .badge');
+      if (hit) vibrate(18);
     }, {passive:true});
-    document.addEventListener('mouseleave', (e) => { if(e.clientY <= 0) showLead(); });
 
-    // Chiudi / Più tardi
-    closeBtn.addEventListener('click', () => hideLead(30));
-    laterBtn.addEventListener('click', () => hideLead(3));
-    overlay.addEventListener('click', (e) => { if(e.target === overlay) hideLead(3); });
+    /* ------------------ TRACKING ANONIMO (NO COOKIE) ------------------ */
+    // Memorizza solo in localStorage/sessionStorage (anonimo, on-device)
+    const RL_SESSION = sessionStorage.getItem('rl_session') || (()=> {
+      const id = 's_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('rl_session', id);
+      return id;
+    })();
+    const RL_STORE_KEY = 'rl_metrics_v1';
 
-    // Invia su WhatsApp
-    sendBtn.addEventListener('click', () => {
-      const name  = nameEl.value.trim();
-      const phone = phoneEl.value.replace(/\D+/g,'');
-      const topic = topicEl.value;
-      if (!name || phone.length < 7){ alert('Inserisci nome e un numero valido.'); return; }
-      const msg = `Ciao Re Long, sono ${name}. Il mio numero è ${phone}. Vorrei info su: ${topic}.`;
-      const url = `https://wa.me/3908119578844?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
-      hideLead(30);
+    function loadStats(){
+      try{ return JSON.parse(localStorage.getItem(RL_STORE_KEY)||'{}'); }catch(_){ return {}; }
+    }
+    function saveStats(obj){
+      try{ localStorage.setItem(RL_STORE_KEY, JSON.stringify(obj)); }catch(_){}
+    }
+    function inc(path){
+      const db = loadStats();
+      const now = new Date().toISOString().slice(0,10);
+      db[now] = db[now] || {};
+      db[now][path] = (db[now][path]||0) + 1;
+      saveStats(db);
+    }
+
+    // Impression delle card
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){
+          const card = en.target;
+          const badge = card.querySelector('.badge')?.textContent?.trim() || 'SEZIONE';
+          inc('impression_' + badge);
+          io.unobserve(card);
+        }
+      });
+    }, {threshold: .5});
+    document.querySelectorAll('article.card').forEach(el=>io.observe(el));
+
+    // Click tracking + aggiunta UTM ai link in uscita
+    function addUTM(href, source, medium, campaign){
+      try{
+        const u = new URL(href, location.href);
+        u.searchParams.set('utm_source', source);
+        u.searchParams.set('utm_medium', medium);
+        u.searchParams.set('utm_campaign', campaign);
+        return u.toString();
+      }catch(_){ return href; }
+    }
+    document.addEventListener('click', (e)=>{
+      const a = e.target.closest('a');
+      if(!a) return;
+      const card = e.target.closest('article.card');
+      const badge = card?.querySelector('.badge')?.textContent?.trim() || 'LINK';
+      const label = (a.textContent||a.getAttribute('aria-label')||'').trim().slice(0,80);
+      inc('click_' + badge + '_' + label.replace(/\s+/g,'-'));
+
+      // Aggiungi UTM ai link in uscita (wa.me, maps, tel escluso)
+      if (/^https?:\/\/wa\.me/i.test(a.href)) {
+        a.href = addUTM(a.href, 'relong-hub', 'whatsapp', badge.toLowerCase().replace(/\s+/g,'-'));
+      } else if (/^https?:\/\/maps\.app\.goo\.gl/i.test(a.href)) {
+        a.href = addUTM(a.href, 'relong-hub', 'maps', 'store');
+      }
+    }, false);
+
+    // Esponi una piccola console per te (digita: RL.debug())
+    window.RL = {
+      session: RL_SESSION,
+      stats: ()=> loadStats(),
+      clear: ()=> localStorage.removeItem(RL_STORE_KEY),
+      debug: ()=> console.table(loadStats())
+    };
+
+    /* ------------------ WHATSAPP: MESSAGGIO AUTO ------------------ */
+    const WA_BASE = "https://wa.me/3908119578844?text=";
+    const templates = {
+      "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
+      "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
+      "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
+      "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
+      "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
+    };
+    document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
+      try{
+        const url = new URL(a.href, location.href);
+        if (url.searchParams.has("text")) return;
+        const card   = a.closest("article.card");
+        const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+        const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+        let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
+        a.href = WA_BASE + encodeURIComponent(msg);
+        a.setAttribute("rel","noopener");
+        // aggiungi UTM di base
+        a.href = addUTM(a.href, 'relong-hub', 'whatsapp', badge.toLowerCase().replace(/\s+/g,'-'));
+      }catch(_){}
     });
+
   })();
   </script>
 
@@ -324,36 +423,6 @@
 
   <!-- Toast container -->
   <div class="toast" role="status" aria-live="polite"></div>
-
-  <!-- === WHATSAPP AUTO-MESSAGGIO: aggiunto qui === -->
-  <script>
-  (function(){
-    const WA_BASE = "https://wa.me/3908119578844?text=";
-
-    const templates = {
-      "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
-      "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
-      "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
-      "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
-      "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
-    };
-
-    document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
-      try{
-        const url = new URL(a.href, location.href);
-        if (url.searchParams.has("text")) return;
-
-        const card   = a.closest("article.card");
-        const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
-        const title  = card?.querySelector(".title")?.textContent?.trim() || "";
-        
-        let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
-        a.href = WA_BASE + encodeURIComponent(msg);
-        a.setAttribute("rel","noopener");
-      }catch(_){}
-    });
-  })();
-  </script>
 
 </body>
 </html>
