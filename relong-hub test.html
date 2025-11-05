@@ -1,18 +1,48 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Catalogo Link (FX 3D & Animazioni)</title>
-  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Energia Casa, Assistenza PC.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Re Long Informatica | Telefonia, Energia & Assistenza PC</title>
+  <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Open Graph / WhatsApp / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Re Long | Smartphone a rate, Business, Energia & Assistenza">
+  <meta property="og:description" content="Prendi oggi il tuo smartphone, prima rata tra 30 giorni. Offerte Business, Energia Casa, Assistenza PC.">
+  <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/">
+  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-relong.jpg">
+  <meta property="og:image:alt" content="Re Long Informatica – Hub servizi">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re Long | Smartphone a rate, Business, Energia & Assistenza">
+  <meta name="twitter:description" content="Soluzioni Re Long: Telefonia, Energia, Business, Assistenza PC.">
+  <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-relong.jpg">
+
+  <!-- Favicon (svg inline consigliata) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Cdefs/%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
+
+  <!-- Preconnect per click istantanei -->
+  <link rel="preconnect" href="https://wa.me">
+  <link rel="preconnect" href="https://maps.app.goo.gl">
+  <link rel="preconnect" href="https://www.google.com">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.7);--muted2:rgba(255,255,255,.45);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166}
+    :root{
+      --bg1:#0a0a0a;--bg2:#000;
+      --brand1:#ff0000;--brand2:#ff7b00;
+      --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
+      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
+      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
+    }
 
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-    /* ===== Loader 3D Re Long ===== */
+    /* ===== Loader 3D ===== */
     #rl-loader{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);transition:opacity .45s ease, visibility .45s ease}
     #rl-loader.hidden{opacity:0;visibility:hidden}
     .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
@@ -26,45 +56,56 @@
     html.rl-lock, body.rl-lock{overflow:hidden}
 
     body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:100px}
-    @media(max-width:480px){.wrap{padding-bottom:120px}}
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
+    @media(max-width:480px){.wrap{padding-bottom:130px}}
     .head{text-align:center;padding:8px 8px 0 8px}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both;will-change:transform}
     .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1 fr 1fr}}
 
-    .card{background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px;position:relative;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;transform-style:preserve-3d;animation:fadeUp .6s ease both}
+    .card{
+      position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);border-radius:18px;padding:18px;
+      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+      display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+      transform-style:preserve-3d;animation:fadeUp .6s ease both;will-change:transform
+    }
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
     .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite}
     .title{font-size:18px;font-weight:800;animation:fadeUp .65s ease both}
     .desc{font-size:13px;color:var(--muted);line-height:1.45;animation:fadeUp .7s ease both}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d;animation:fadeUp .75s ease both}
+    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d;animation:fadeUp .75s ease both;will-change:transform}
     .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
     .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px;animation:fadeUp .8s ease both}
-    .foot a{color:var(--muted2)}
+    .footer a{color:var(--muted2);text-decoration:none}
 
     /* FAB Portami allo Store / Chiamaci */
     .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
-    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
+    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite;will-change:transform}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
     .fab-btn svg{width:18px;height:18px}
     @media(max-width:420px){.fab-btn span{display:none}}
+
+    /* Torna su */
+    .to-top{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9999}
+    .to-top.show{opacity:1;pointer-events:auto}
+    .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
+
+    /* Toast anti-404 */
+    .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
+    .toast.show{opacity:1}
   </style>
 </head>
 <body>
 
-  <!-- Loader 3D Re Long -->
+  <!-- Loader 3D -->
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
     <div class="rl-cube">
-      <span class="face f1"></span>
-      <span class="face f2"></span>
-      <span class="face f3"></span>
-      <span class="face f4"></span>
-      <span class="face f5"></span>
-      <span class="face f6"></span>
+      <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
+      <span class="face f4"></span><span class="face f5"></span><span class="face f6"></span>
     </div>
     <p class="rl-loading-text">Caricamento…</p>
   </div>
@@ -118,15 +159,15 @@
     </section>
 
     <p class="footer">
-      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" style="color: var(--muted2); text-decoration:none;" target="_blank" rel="noopener">📍 Via Casalanno 31, Marano di Napoli</a>
+      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">📍 Via Casalanno 31, Marano di Napoli</a>
       •
-      <a href="tel:+3908119578844" style="color: var(--muted2); text-decoration:none;">☎️ 08119578844</a>
+      <a href="tel:+3908119578844">☎️ 08119578844</a>
     </p>
   </main>
 
-  <!-- === SCRIPT prima dei due tasti (come richiesto) === -->
+  <!-- Script loader e utility (prima dei pulsanti flottanti) -->
   <script>
-    // Loader: blocca scroll finché è visibile e poi rimuovi
+    // Blocca scroll finché il loader è visibile
     document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
     function hideLoader(){
       const ld = document.getElementById('rl-loader');
@@ -135,14 +176,60 @@
       setTimeout(()=>{
         document.documentElement.classList.remove('rl-lock');
         document.body.classList.remove('rl-lock');
-        ld.parentNode && ld.parentNode.removeChild(ld);
+        ld.remove && ld.remove();
       }, 500);
     }
     window.addEventListener('load', hideLoader);
     setTimeout(hideLoader, 3500); // fallback
+
+    // Torna su: mostra dopo 250px
+    const toTop = document.createElement('div');
+    toTop.className = 'to-top';
+    toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
+    document.body.appendChild(toTop);
+    const onScroll = ()=>{
+      (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show');
+    };
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+
+    // Anti-404: intercetta link interni a .html nello stesso host
+    function showToast(msg){
+      let t = document.querySelector('.toast');
+      if(!t){
+        t = document.createElement('div'); t.className='toast'; document.body.appendChild(t);
+      }
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 2200);
+    }
+    document.addEventListener('click', async (e)=>{
+      const a = e.target.closest('a');
+      if(!a) return;
+      const url = new URL(a.href, location.href);
+      const isInternal = url.origin === location.origin && /\.html?$/.test(url.pathname);
+      if(isInternal){
+        e.preventDefault();
+        try{
+          const res = await fetch(url.href, {method:'HEAD', cache:'no-store'});
+          if(res.ok){ location.href = url.href; }
+          else { showToast('Pagina non trovata. Ti riportiamo alla Home.'); setTimeout(()=>location.href='./', 1000); }
+        }catch(_){
+          showToast('Impossibile aprire la pagina. Riprova o torna alla Home.'); setTimeout(()=>location.href='./', 1200);
+        }
+      }
+    }, false);
+
+    // iOS perf: throttling semplice per scroll intensive
+    let ticking = false;
+    window.addEventListener('scroll', ()=>{
+      if(!ticking){
+        window.requestAnimationFrame(()=>{ ticking = false; });
+        ticking = true;
+      }
+    }, {passive:true});
   </script>
 
-  <!-- Due pulsanti verdi flottanti -->
+  <!-- Pulsanti flottanti -->
   <div class="fab-nav" aria-label="Azioni rapide">
     <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
       <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
@@ -153,6 +240,9 @@
       <span>Chiamaci</span>
     </a>
   </div>
+
+  <!-- Toast container -->
+  <div class="toast" role="status" aria-live="polite"></div>
 
 </body>
 </html>
