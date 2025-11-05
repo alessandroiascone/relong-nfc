@@ -3,390 +3,246 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Energia Riservata</title>
-
+  <title>Re Long | Catalogo Link</title>
+  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Offerte Energia, Assistenza PC.">
+  <meta name="theme-color" content="#0a0a0a">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000;
+      --brand1:#ff0000; --brand2:#ff7b00;
+      --muted:rgba(255,255,255,.72); --muted2:rgba(255,255,255,.5);
+      --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
+      --wa1:#25D366; --wa2:#128C7E; --focus:#ffd166;
     }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
-      background: radial-gradient(circle at 20% 20%, #0f0f0f 0%, #000000 70%);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+    /* Animazioni */
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
     }
 
-    .card {
-      width: 100%;
-      max-width: 380px;
-      background: linear-gradient(150deg, rgba(25,25,25,0.9) 0%, rgba(0,0,0,0.6) 100%);
-      border-radius: 20px;
-      padding: 24px 20px 20px;
-      box-shadow:
-        0 30px 60px rgba(0,0,0,0.9),
-        0 0 60px rgba(255,120,0,0.15);
-      border: 1px solid rgba(255,255,255,0.07);
-      position: relative;
+    /* Parallax layers */
+    .parallax{
+      position:fixed; inset:0; overflow:hidden; z-index:-1; perspective:1000px;
+      background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);
+    }
+    .blob{
+      position:absolute; width:60vw; height:60vw; max-width:900px; max-height:900px;
+      border-radius:50%;
+      filter:blur(60px) saturate(130%); opacity:.12; will-change:transform;
+      transform:translate3d(0,0,0);
+    }
+    .blob.red{ background:radial-gradient(circle, #ff3b1a 20%, transparent 60%); top:-10%; left:-10%; }
+    .blob.orange{ background:radial-gradient(circle, #ff9a1a 20%, transparent 60%); bottom:-15%; right:-15%; }
+    .grain{
+      position:absolute; inset:-10%;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+      mix-blend-mode:overlay; pointer-events:none;
     }
 
-    .badge {
-      position: absolute;
-      top: -12px;
-      left: 16px;
-      background: linear-gradient(90deg, #ff7b00 0%, #ff0000 100%);
-      color: #000;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 10px;
-      border-radius: 999px;
-      box-shadow: 0 10px 20px rgba(255, 80, 0, 0.5);
-      letter-spacing: -0.03em;
-      text-transform: uppercase;
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
+      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px
+    }
+    .wrap{width:100%;max-width:860px;display:grid;gap:20px}
+    .head{text-align:center;padding:8px 8px 0}
+    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .45s ease both}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .55s ease both}
+
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
+
+    .card{
+      position:relative;
+      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+      display:flex;flex-direction:column;gap:10px;
+      transform:perspective(900px) rotateX(0) rotateY(0);
+      transform-style:preserve-3d;
+      transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+      animation:fadeUp .6s ease both;
+      will-change:transform;
+    }
+    .card:hover{
+      transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
+      box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
+      border-color:rgba(255,255,255,.18);
     }
 
-    .brand {
-      text-align: center;
-      margin-bottom: 16px;
+    .badge{
+      position:absolute;top:-11px;left:14px;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;
+      box-shadow:0 10px 18px rgba(255,80,0,.45);
+      animation:pulse 2.2s ease-in-out infinite;
+      transform:translateZ(24px);
     }
 
-    .brand-title {
-      font-size: 22px;
-      font-weight: 600;
-      color: #fff;
-      letter-spacing: -0.04em;
-      line-height: 1.2;
-    }
+    .title{font-size:18px;font-weight:800;letter-spacing:-.03em}
+    .desc{font-size:13px;color:var(--muted);line-height:1.45}
 
-    .brand-sub {
-      font-size: 11px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.4;
-      margin-top: 4px;
+    .btn{
+      display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;
+      font-size:14px;font-weight:800;letter-spacing:-.02em;color:#000;border:0;outline:none;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      box-shadow:0 16px 26px rgba(255,90,0,.35);
+      transition:transform .22s ease, box-shadow .22s ease, filter .22s ease;
+      transform-style:preserve-3d;
+      animation:fadeUp .7s ease both;
+      will-change:transform;
     }
+    .btn + .btn{margin-top:8px}
+    .btn:hover{
+      transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);
+      box-shadow:0 28px 44px rgba(255,90,0,.5);
+      filter:brightness(1.05);
+    }
+    .btn.wa{
+      background:radial-gradient(circle at 0% 0%,var(--wa1) 0%,var(--wa2) 60%);
+      box-shadow:0 18px 30px rgba(18,140,126,.45);
+    }
+    .btn.wa:hover{ box-shadow:0 28px 48px rgba(18,140,126,.6) }
+    .btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
 
-    .headline {
-      text-align: center;
-      margin-top: 16px;
-      margin-bottom: 16px;
-    }
+    .foot{text-align:center;color:var(--muted2);font-size:11px;margin-top:6px}
+    .foot a{color:var(--muted2)}
 
-    .headline h1 {
-      font-size: 23px;
-      line-height: 1.15;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.04em;
+    /* Floating WhatsApp buttons (FAB) */
+    .fab-wrap{
+      position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:30;
     }
-
-    .accent {
-      background: linear-gradient(90deg,#ff7b00 0%,#ff0000 100%);
-      -webkit-background-clip: text;
-      color: transparent;
-      font-weight: 800;
+    .fab{
+      display:flex; align-items:center; gap:10px;
+      background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
+      color:#000; text-decoration:none; font-weight:900;
+      border-radius:999px; padding:10px 14px; box-shadow:0 20px 34px rgba(18,140,126,.45);
+      transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+      animation:pulse 3s ease-in-out infinite;
     }
-
-    .subtitle {
-      color: rgba(255,255,255,0.7);
-      font-size: 14px;
-      line-height: 1.4;
-      font-weight: 400;
-      margin-top: 10px;
-    }
-
-    /* BLOCCO RISPARMIO PRINCIPALE */
-    .energy-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-    }
-
-    .energy-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      letter-spacing: -0.03em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      row-gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .energy-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .energy-left .icon {
-      font-size: 16px;
-      line-height: 1;
-    }
-
-    .tag-today {
-      font-size: 10px;
-      font-weight: 600;
-      background: rgba(255,0,0,0.12);
-      color: #ff4d00;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,77,0,0.4);
-      line-height: 1.2;
-      letter-spacing: -0.03em;
-    }
-
-    .points {
-      list-style: none;
-      font-size: 13px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.8);
-    }
-
-    .points li {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .bullet {
-      color: #ff7b00;
-      font-weight: 600;
-      line-height: 1;
-      font-size: 14px;
-      min-width: 14px;
-      text-align: center;
-    }
-
-    /* BLOCCO PROVA/FEEDBACK CLIENTI */
-    .social-proof {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 20px;
-    }
-
-    .proof-line {
-      font-size: 12px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: -0.03em;
-    }
-
-    .proof-strong {
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .proof-accent {
-      color: #ff7b00;
-      font-weight: 600;
-    }
-
-    /* CTA PRINCIPALE */
-    .cta-btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.2;
-      background: radial-gradient(circle at 0% 0%, #25D366 0%, #128C7E 60%);
-      color: #000;
-      text-decoration: none;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 0;
-      box-shadow:
-        0 20px 30px rgba(18,140,126,0.5),
-        0 2px 4px rgba(0,0,0,0.6) inset;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
-    }
-
-    .cta-btn small {
-      display: block;
-      font-size: 12px;
-      line-height: 1.3;
-      font-weight: 500;
-      color: rgba(0,0,0,0.7);
-      margin-top: 4px;
-    }
-
-    /* CTA SECONDARIA */
-    .cta-alt {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 14px;
-      padding: 14px 16px;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.6);
-      letter-spacing: -0.03em;
-    }
-
-    .cta-alt strong {
-      color: #fff;
-      font-weight: 600;
-    }
-
-    /* FOOTER */
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 11px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .legal {
-      font-size: 10px;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.28);
-      margin-top: 12px;
-    }
-
-    .glow {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: -40px;
-      width: 180px;
-      height: 60px;
-      background: radial-gradient(circle, rgba(255,120,0,0.45) 0%, rgba(0,0,0,0) 70%);
-      filter: blur(30px);
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    @media (min-width:480px) {
-      .brand-title { font-size: 24px; }
-      .headline h1 { font-size: 25px; }
-    }
+    .fab:hover{ transform:perspective(700px) translateZ(10px) scale(1.06) rotateX(2deg); filter:brightness(1.05); box-shadow:0 28px 44px rgba(18,140,126,.6) }
+    .fab svg{ width:18px; height:18px; }
+    @media(max-width:420px){ .fab span{ display:none } } /* su schermi piccoli mostra solo l'icona */
   </style>
 </head>
 <body>
-  <div class="card">
-
-    <!-- badge top -->
-    <div class="badge">
-      ACCESSO RISERVATO
-    </div>
-
-    <!-- brand header -->
-    <div class="brand">
-      <div class="brand-title">Re Long&nbsp;Informatica</div>
-      <div class="brand-sub">Telefonia • Energia • Assistenza PC</div>
-    </div>
-
-    <!-- titolo -->
-    <div class="headline">
-      <h1>
-        Area <span class="accent">Energia Riservata</span> 🔥
-      </h1>
-      <p class="subtitle">
-        Stai pagando troppo la CORRENTE?<br/>
-        Noi abbassiamo la tua bolletta passando a Fastweb Vodafone Energia.
-      </p>
-    </div>
-
-    <!-- box risparmio -->
-    <div class="energy-box">
-
-      <div class="energy-title">
-        <div class="energy-left">
-          <span class="icon">💡</span>
-          <span>Il tuo vantaggio</span>
-        </div>
-        <div class="tag-today">Valido in negozio</div>
-      </div>
-
-      <ul class="points">
-        <li>
-          <span class="bullet">•</span>
-          <span>
-            Analisi gratuita della tua bolletta
-            <strong>(Foto Bolletta)</strong> ZERO CALL CENTER.
-          </span>
-        </li>
-
-        <li>
-          <span class="bullet">•</span>
-          <span>
-            Sconto immediato in fattura se attivi con noi
-            <strong>Fastweb Vodafone Energia</strong>.
-          </span>
-        </li>
-
-        <li>
-          <span class="bullet">•</span>
-          <span>
-            Ci occupiamo noi del passaggio:
-            <strong>nessuna burocrazia per te</strong>.
-          </span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- social proof -->
-    <div class="social-proof">
-      <div class="proof-line">
-        Clienti già seguiti questo mese:
-        <span class="proof-strong">47</span>
-        famiglie hanno richiesto l'analisi.
-      </div>
-      <div class="proof-line" style="margin-top:6px;">
-        Risparmio medio stimato:
-        <span class="proof-accent">-18% luce</span>
-        rispetto alla bolletta attuale.
-      </div>
-      <div class="proof-line" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.45);">
-       • Dato interno Re Long •
-      </div>
-    </div>
-
-    <!-- CTA principale: WhatsApp -->
-    <a
-      class="cta-btn"
-      href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20adesso%20la%20foto%20della%20mia%20bolletta%20luce.%20Fammi%20vedere%20se%20posso%20pagare%20meno."
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Inviaci la tua bolletta su WhatsApp
-      <small>08119578844 • Risposta diretta dal Negozio</small>
-    </a>
-
-    <!-- CTA secondaria: istruzione semplice -->
-    <div class="cta-alt">
-      1. Fai una foto alla tua ultima bolletta luce<br/>
-      2. Inviacela su WhatsApp adesso<br/>
-      3. Ti diciamo se puoi pagare meno <strong>prima di firmare qualsiasi contratto</strong>
-    </div>
-
-    <!-- footer -->
-    <div class="footer">
-      Mostra questa schermata in negozio per bloccare il tuo vantaggio.
-      <div class="legal">
-        Offerta legata ai clienti di Re Long Informatica.
-      </div>
-    </div>
-
-    <div class="glow"></div>
+  <!-- Parallax background -->
+  <div class="parallax" aria-hidden="true">
+    <div class="blob red" id="blobRed"></div>
+    <div class="blob orange" id="blobOrange"></div>
+    <div class="grain"></div>
   </div>
+
+  <main class="wrap">
+    <header class="head">
+      <div class="brand">Re Long&nbsp;Informatica – Telefonia, Energia & Assistenza PC</div>
+      <div class="sub">Clicca sulla sezione di interesse</div>
+    </header>
+
+    <section class="grid" aria-label="Collegamenti rapidi Re Long">
+      <!-- Smartphone a rate -->
+      <article class="card" aria-labelledby="h-smartphone">
+        <div class="badge">SMARTPHONE A RATE</div>
+        <h2 id="h-smartphone" class="title">Prendi oggi il tuo smartphone: prima rata tra 30 giorni</h2>
+        <p class="desc">Finanziamento <b>Vodafone & Compass</b> <b>senza busta paga</b>. Paghi con Postepay Evolution o conto corrente. Permuta il tuo usato e abbassi la rata.</p>
+        <a class="btn" href="./catalogo-smartphone-reale-v3.html" aria-label="Apri il catalogo digitale smartphone a rate">📱 Catalogo Digitale</a>
+        <a class="btn" href="./finanziamento.html" aria-label="Dettagli sul finanziamento smartphone">Dettagli Finanziamento</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20informazioni%20per%20prendere%20uno%20smartphone%20a%20rate."
+           aria-label="Scrivi su WhatsApp per smartphone a rate" rel="noopener">💬 Chatta su WhatsApp</a>
+      </article>
+
+      <!-- Offerte Business -->
+      <article class="card" aria-labelledby="h-business">
+        <div class="badge">OFFERTE BUSINESS</div>
+        <h2 id="h-business" class="title">Fisso + Mobile TUTTO ILLIMITATO</h2>
+        <p class="desc">Soluzione per Partite IVA e Aziende. Attiva l’<b>Offerta Business</b> da €30/mese, con energia inclusa.</p>
+        <a class="btn" href="./Business+Energy2.html" aria-label="Vedi i dettagli dell'offerta Business">Vedi Dettagli Offerta</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20sono%20interessato%20alle%20offerte%20Vodafone%20Business.%20Possiamo%20fissare%20un%20appuntamento%3F%20Grazie."
+           aria-label="Chatta su WhatsApp con un consulente Business" rel="noopener">💬 Chatta con un consulente Business</a>
+      </article>
+
+      <!-- Offerte Energia Casa -->
+      <article class="card" aria-labelledby="h-energia">
+        <div class="badge">ENERGIA CASA</div>
+        <h2 id="h-energia" class="title">Accendi l'energia</h2>
+        <p class="desc">Stai pagando troppo la corrente? Inviaci la foto della tua bolletta: verifichiamo subito se puoi risparmiare con Fastweb/Vodafone Energia.</p>
+        <a class="btn" href="./index.html" aria-label="Vai all’area energia">Vedi Area Energia</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20la%20foto%20della%20mia%20bolletta%20luce%20per%20una%20verifica."
+           aria-label="Invia la tua bolletta su WhatsApp" rel="noopener">💬 Invia la tua bolletta</a>
+      </article>
+
+      <!-- Assistenza PC -->
+      <article class="card" aria-labelledby="h-assistenza">
+        <div class="badge">ASSISTENZA PC</div>
+        <h2 id="h-assistenza" class="title">Riparazioni & Upgrade</h2>
+        <p class="desc">Non cambiarlo, potenzialo. Da Re Long il tuo PC torna veloce, silenzioso e affidabile — diagnosi immediata e upgrade su misura.</p>
+        <a class="btn" href="./assistenza.html" aria-label="Vai all’assistenza PC">Vedi Assistenza PC</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20ha%20un%20problema.%20Posso%20inviarvi%20foto%20o%20video%20per%20un%20parere%3F"
+           aria-label="Chatta su WhatsApp con l’assistenza tecnica" rel="noopener">💬 Chatta con l’assistenza tecnica</a>
+      </article>
+    </section>
+
+    <p class="foot">
+      • Re Long Informatica — via Casalanno 31, Marano di Napoli —
+      <a href="tel:+3908119578844" aria-label="Chiama Re Long 08119578844">08119578844</a> •
+      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Apri su Google Maps</a>
+    </p>
+  </main>
+
+  <!-- Floating WhatsApp buttons -->
+  <div class="fab-wrap" aria-label="Azioni rapide WhatsApp">
+    <a class="fab" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20parlare%20con%20il%20reparto%20Vendite%20per%20offerte%20e%20smartphone%20a%20rate." aria-label="WhatsApp Vendite" rel="noopener">
+      <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M19.11 17.43c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.62.14-.19.27-.71.88-.87 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.16-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.41.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.62-1.49-.85-2.03-.22-.53-.45-.46-.62-.46h-.53c-.18 0-.48.07-.73.34s-.96.94-.96 2.29 1 2.66 1.14 2.85c.14.18 1.97 3.01 4.78 4.22.67.29 1.2.46 1.61.59.68.22 1.3.19 1.79.12.54-.08 1.6-.65 1.83-1.27.23-.62.23-1.15.16-1.27-.07-.12-.25-.19-.52-.33z"/><path d="M26.75 5.25A11.9 11.9 0 1 0 6.5 23.14L5 28l4.99-1.47A11.9 11.9 0 1 0 26.75 5.25zm-1.67 19.16a9.87 9.87 0 0 1-13.3 1.28l-.95-.6-2.96.87.85-2.9-.62-.99a9.87 9.87 0 1 1 16.98 2.34z"/></svg>
+      <span>Vendite</span>
+    </a>
+    <a class="fab" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ho%20bisogno%20di%20Assistenza%20Tecnica%20per%20PC%20o%20linee." aria-label="WhatsApp Assistenza" rel="noopener">
+      <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M19.11 17.43c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.62.14-.19.27-.71.88-.87 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.16-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.41.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.62-1.49-.85-2.03-.22-.53-.45-.46-.62-.46h-.53c-.18 0-.48.07-.73.34s-.96.94-.96 2.29 1 2.66 1.14 2.85c.14.18 1.97 3.01 4.78 4.22.67.29 1.2.46 1.61.59.68.22 1.3.19 1.79.12.54-.08 1.6-.65 1.83-1.27.23-.62.23-1.15.16-1.27-.07-.12-.25-.19-.52-.33z"/><path d="M26.75 5.25A11.9 11.9 0 1 0 6.5 23.14L5 28l4.99-1.47A11.9 11.9 0 1 0 26.75 5.25zm-1.67 19.16a9.87 9.87 0 0 1-13.3 1.28l-.95-.6-2.96.87.85-2.9-.62-.99a9.87 9.87 0 1 1 16.98 2.34z"/></svg>
+      <span>Assistenza</span>
+    </a>
+  </div>
+
+  <script>
+    // Tilt 3D delicato su card e bottoni
+    function addTilt(selector, maxTilt=6, scale=1.05){
+      document.querySelectorAll(selector).forEach(el=>{
+        el.style.willChange='transform';
+        el.addEventListener('mousemove', e=>{
+          const r=el.getBoundingClientRect();
+          const x=e.clientX-r.left, y=e.clientY-r.top;
+          const rx=((y/r.height)-.5)*maxTilt;
+          const ry=((x/r.width)-.5)*-maxTilt;
+          el.style.transform=`perspective(900px) translateZ(10px) scale(${scale}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+        el.addEventListener('mouseleave', ()=>{ el.style.transform=''; });
+      });
+    }
+    addTilt('.card', 2, 1.02);
+    addTilt('.btn', 6, 1.06);
+
+    // Parallax: muovi le "blob" in base a scroll + mouse
+    const red = document.getElementById('blobRed');
+    const orange = document.getElementById('blobOrange');
+    function parallax(e){
+      const cx = (e.clientX || window.innerWidth/2) / window.innerWidth - .5;
+      const cy = (e.clientY || window.innerHeight/2) / window.innerHeight - .5;
+      const sy = window.scrollY || 0;
+
+      // layer più lontano (movimento minore)
+      const rtx = cx * -30, rty = cy * -30;
+      // layer più vicino (movimento maggiore)
+      const otx = cx * 60,  oty = cy * 60;
+
+      red.style.transform = `translate3d(${rtx}px, calc(${rty}px + ${sy*0.05}px), 0)`;
+      orange.style.transform = `translate3d(${otx}px, calc(${oty}px + ${sy*0.1}px), 0)`;
+    }
+    window.addEventListener('mousemove', parallax, {passive:true});
+    window.addEventListener('scroll', parallax, {passive:true});
+    parallax({clientX:window.innerWidth/2, clientY:window.innerHeight/2});
+  </script>
 </body>
 </html>
