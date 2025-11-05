@@ -64,7 +64,7 @@
     .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns: 1 fr 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
 
     .card{
       position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
@@ -132,7 +132,7 @@
       <div class="sub">Clicca sulla sezione di interesse</div>
     </header>
 
-    <section class="grid">
+    <section class="grid" aria-label="Collegamenti rapidi Re Long">
       <article class="card">
         <div class="badge">SMARTPHONE A RATE</div>
         <div class="title">Scegli il tuo smartphone</div>
@@ -324,6 +324,36 @@
 
   <!-- Toast container -->
   <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- === WHATSAPP AUTO-MESSAGGIO: aggiunto qui === -->
+  <script>
+  (function(){
+    const WA_BASE = "https://wa.me/3908119578844?text=";
+
+    const templates = {
+      "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
+      "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
+      "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
+      "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
+      "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
+    };
+
+    document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
+      try{
+        const url = new URL(a.href, location.href);
+        if (url.searchParams.has("text")) return;
+
+        const card   = a.closest("article.card");
+        const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+        const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+        
+        let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
+        a.href = WA_BASE + encodeURIComponent(msg);
+        a.setAttribute("rel","noopener");
+      }catch(_){}
+    });
+  })();
+  </script>
 
 </body>
 </html>
