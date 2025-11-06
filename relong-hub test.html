@@ -56,7 +56,8 @@
     /* Card + Spotlight 3D */
     .card{
       position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
-      border:1px solid var(--stroke);border-radius:18px;padding:18px;
+      border:1px solid var(--stroke);border-radius:18px;
+      padding:34px 18px 18px; /* 🔺 Aumentato top padding per non far coprire i testi */
       box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
       display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .2s ease;
       transform-style:preserve-3d;animation:fadeUp .6s ease both;will-change:transform;overflow:hidden
@@ -74,7 +75,11 @@
     @keyframes flash{from{opacity:.6; width:0; height:0} to{opacity:0; width:160px; height:160px}}
 
     /* Badge dinamici */
-    .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite}
+    .badge{
+      position:absolute;top:-22px;left:14px; /* 🔺 Alzato il banner */
+      color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;
+      box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;z-index:2
+    }
     .badge[data-type="SMARTPHONE A RATE"]{background:linear-gradient(90deg,#ff0000,#ff7b00)}
     .badge[data-type="OFFERTE BUSINESS P.IVA"]{background:linear-gradient(90deg,#00e1ff,#0078ff)}
     .badge[data-type="ENERGIA CASA"]{background:linear-gradient(90deg,#8cff00,#00b36b)}
@@ -120,6 +125,12 @@
     /* Carrello WhatsApp */
     .cart-pill{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border-radius:999px;padding:10px 16px;box-shadow:0 18px 36px rgba(255,90,0,.35);z-index:9999;display:none;gap:10px;align-items:center}
     .cart-pill button{background:#000;color:#fff;border:0;border-radius:999px;padding:8px 12px;font-weight:900}
+
+    /* Mobile fine-tuning: badge più piccolo e ancora più in alto */
+    @media(max-width:480px){
+      .badge{top:-26px;font-size:10px;padding:5px 8px}
+      .card{padding-top:36px}
+    }
   </style>
 </head>
 <body>
@@ -252,7 +263,6 @@
       }
       function upd(){
         const d = romeNow(), wd = d.getDay(); // 0 domenica
-        // Orari: Lun-Sab 9-20; Dom chiuso
         const open = (wd>=1 && wd<=6) && (d.getHours()>=9 && (d.getHours()<20 || (d.getHours()===20 && d.getMinutes()===0)));
         el.innerHTML = `Stato negozio: <span class="${open?'open':'closed'}">${open?'🟢 Aperto ora — chiudiamo alle 20:00':'🔴 Chiuso — riapriamo alle 9:00'}</span>`;
       }
@@ -305,7 +315,7 @@
       }
     })();
 
-    /* ===== Popup Offerta Flash quando si apre un link BF ===== */
+    /* ===== Popup Offerta Flash su link BF ===== */
     (function(){
       function flashPopup(topic){
         const modal = document.createElement('div');
@@ -430,7 +440,7 @@
       window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
     })();
 
-    /* ===== Micro-vibrazioni anche su .btn e .fab-btn ===== */
+    /* ===== Micro-vibrazioni ===== */
     (() => {
       const isTouch = window.matchMedia('(pointer: coarse)').matches;
       const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
