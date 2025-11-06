@@ -89,6 +89,19 @@
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
 
+    /* Micro-banner Black Friday inline */
+    .bf-inline{
+      display:none;margin:8px auto 0;gap:10px;align-items:center;justify-content:center;
+      max-width:720px;padding:10px 12px;border-radius:12px;
+      background:linear-gradient(90deg,#1f1f1f,#2a2a2a);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 12px 28px rgba(0,0,0,.45);
+      font-size:13px;color:#fff
+    }
+    .bf-inline .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 0 14px rgba(255,120,0,.6)}
+    .bf-inline .strong{font-weight:900;letter-spacing:.02em;margin:0 6px 0 2px}
+    .bf-inline a{color:#ffd166;text-decoration:none;font-weight:900}
+
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
@@ -119,7 +132,7 @@
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
     article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)} /* SMARTPHONE */
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
-    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia */
+    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia -->
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)} /* Assistenza PC */
     article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#10B981,#84CC16);box-shadow:0 10px 18px rgba(16,185,129,.35)} /* Business Mobili */
 
@@ -146,7 +159,7 @@
 
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
 
-    /* Barra promo minimal elegante */
+    /* Barra promo minimal elegante (top) */
     .bf-bar{
       position:fixed;top:12px;left:50%;transform:translateX(-50%);
       z-index:10000;display:flex;gap:10px;align-items:center;
@@ -161,7 +174,7 @@
   </style>
 </head>
 <body>
-  <!-- Barra promo (Black Friday -> Cyber Monday -> sparisce) -->
+  <!-- Barra promo (Black Friday: 7/11 09:00 → 30/11 23:59) -->
   <div class="bf-bar" id="bfBar" role="status" aria-live="polite">
     <span class="label" id="bfLabel">BLACK FRIDAY</span>
     <span class="timer" id="bfTimer">--:--:--</span>
@@ -207,6 +220,14 @@
         <div class="line" aria-hidden="true"></div>
         <h1>Benvenuti</h1>
         <p>Più valore ad ogni decisione. Seleziona l’area: al resto pensiamo noi<strong> con cura e precisione</strong>.</p>
+      </div>
+
+      <!-- Micro-banner BF inline (visibile solo durante BF) -->
+      <div class="bf-inline" id="bfInline" role="note" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="strong">BLACK FRIDAY</span>
+        <span>Sconti reali su <strong>Smartphone</strong> &amp; <strong>Energia</strong>. Valido fino al <strong>30/11</strong>.</span>
+        <a href="./catalogo-smartphone-reale-v3.html" aria-label="Apri Catalogo Digitale">Guarda ora il catalogo ➜</a>
       </div>
     </header>
 
@@ -308,29 +329,36 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Barra promo: Black Friday -> Cyber Monday -> poi sparisce + padding body */
+    /* Barra promo + micro-banner inline: SOLO Black Friday dal 7 nov ore 09:00 al 30 nov 23:59 (Europe/Rome) */
     (function(){
       const bar   = document.getElementById('bfBar');
       const timer = document.getElementById('bfTimer');
       const label = document.getElementById('bfLabel');
+      const inline = document.getElementById('bfInline');
       if(!bar || !timer || !label) return;
 
-      const BF_START = new Date('2025-11-24T00:00:00+01:00');
-      const BF_END   = new Date('2025-11-30T23:59:59+01:00');
-      const CM_START = new Date('2025-12-01T00:00:00+01:00');
-      const CM_END   = new Date('2025-12-01T23:59:59+01:00');
+      const BF_START = new Date('2025-11-07T09:00:00+01:00'); // domani 09:00
+      const BF_END   = new Date('2025-11-30T23:59:59+01:00'); // fino al 30 incluso
 
       function phase(now){
         if (now >= BF_START && now <= BF_END) return {text:'BLACK FRIDAY', endsAt: BF_END};
-        if (now >= CM_START && now <= CM_END) return {text:'CYBER MONDAY', endsAt: CM_END};
-        return null;
+        return null; // niente Cyber Monday
       }
       function tick(){
         const now = new Date();
         const ph = phase(now);
-        if(!ph){ bar.style.display = 'none'; document.body.classList.remove('has-bf'); return; }
-        bar.style.display = 'flex'; document.body.classList.add('has-bf');
+        if(!ph){
+          bar.style.display = 'none';
+          document.body.classList.remove('has-bf');
+          if(inline) inline.style.display = 'none';
+          return;
+        }
+        bar.style.display = 'flex';
+        document.body.classList.add('has-bf');
         label.textContent = ph.text;
+
+        // Micro-banner inline solo durante BF
+        if(inline) inline.style.display = 'flex';
 
         let diff = ph.endsAt - now;
         if (diff <= 0){ timer.textContent = 'ULTIME ORE!'; return; }
@@ -341,30 +369,6 @@
         timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
       }
       tick(); setInterval(tick, 1000);
-    })();
-
-    /* WhatsApp templates auto per i pulsanti nelle card */
-    (function(){
-      const WA_BASE = "https://wa.me/3908119578844?text=";
-      const templates = {
-        "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
-        "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
-        "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
-        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
-        "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
-      };
-      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
-        try{
-          const url = new URL(a.href, location.href);
-          if (url.searchParams.has("text")) return;
-          const card   = a.closest("article.card");
-          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
-          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
-          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
-          a.href = WA_BASE + encodeURIComponent(msg);
-          a.setAttribute("rel","noopener");
-        }catch(_){}
-      });
     })();
 
     /* Haptic feedback mobile (opzionale) */
