@@ -143,7 +143,7 @@
   </script>
 </head>
 <body>
-  <!-- Barra promo (Black Friday -> Cyber Monday -> sparisce) -->
+  <!-- Barra promo (Black Friday -> Cyber Monday -> poi sparisce) -->
   <div class="bf-bar" id="bfBar" role="status" aria-live="polite">
     <span class="label" id="bfLabel">BLACK FRIDAY</span>
     <span class="timer" id="bfTimer">--:--:--</span>
@@ -347,7 +347,7 @@
   </script>
 
   <script>
-  /* Haptic feedback mobile (opzionale ma carino) */
+  /* Haptic feedback mobile (opzionale) */
   (() => {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
     const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
