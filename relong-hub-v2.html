@@ -276,12 +276,12 @@
       const pill = document.getElementById('storeStatus'); if(!pill) return;
       const HOURS = {
         0: [], // Domenica
-        1: [[9,30,13,30],[16,0,20,30]], // Lunedì
-        2: [[9,30,13,30],[16,0,20,30]], // Martedì
-        3: [[9,30,13,30],[16,0,20,30]], // Mercoledì
-        4: [[9,30,13,30],[16,0,20,30]], // Giovedì
-        5: [[9,30,13,30],[16,0,20,30]], // Venerdì
-        6: [[9,30,13,30]]               // Sabato
+        1: [[9,15,13,00],[16,0,20,00]], // Lunedì
+        2: [[9,15,13,00],[16,0,20,00]], // Martedì
+        3: [[9,15,13,00],[16,0,20,00]], // Mercoledì
+        4: [[9,15,13,00],[16,0,20,00]], // Giovedì
+        5: [[9,15,13,00],[16,0,20,00]], // Venerdì
+        6: [[9,15,13,00]]               // Sabato
       };
       const fmt = (h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
       function compute(){
