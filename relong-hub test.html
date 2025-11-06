@@ -59,7 +59,7 @@
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    /* Badge colorati */
+    /* Badge colorati (default) */
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
     article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)} /* Smartphone */
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
@@ -102,6 +102,29 @@
     .bf-bar .label{font-weight:900;letter-spacing:.02em}
     .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
     .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
+
+    /* ========= OVERRIDE COLORI RICHIESTI =========
+       Primo ban (card 1): viola -> fucsia
+       Ultimo ban (card 5): ciano -> azzurro
+       Applico sia al badge sia ai pulsanti principali (non-WhatsApp) */
+    article.card:nth-of-type(1) .badge{
+      background:linear-gradient(90deg,#8B5CF6,#EC4899) !important; /* viola -> fucsia */
+      box-shadow:0 10px 18px rgba(236,72,153,.35);
+    }
+    article.card:nth-of-type(1) .btn:not(.wa){
+      background:linear-gradient(90deg,#8B5CF6,#EC4899) !important;
+      box-shadow:0 16px 26px rgba(139,92,246,.35);
+    }
+
+    article.card:nth-of-type(5) .badge{
+      background:linear-gradient(90deg,#06B6D4,#0EA5E9) !important; /* ciano -> azzurro */
+      box-shadow:0 10px 18px rgba(14,165,233,.35);
+    }
+    article.card:nth-of-type(5) .btn:not(.wa){
+      background:linear-gradient(90deg,#06B6D4,#0EA5E9) !important;
+      box-shadow:0 16px 26px rgba(6,182,212,.35);
+    }
+    /* ========= FINE OVERRIDE ========= */
   </style>
 </head>
 <body>
@@ -133,14 +156,14 @@
     <section class="grid" aria-label="Collegamenti rapidi Re Long">
       <article class="card" data-anim>
         <div class="badge">SMARTPHONE A RATE</div>
-        <div class="title">Scegli il tuo smartphone</div>
+        <div class="title">Scegli il tuo Smartphone</div>
         <p class="desc">Finanziamento Vodafone & Compass senza busta paga con rate flessibili.</p>
         <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Scrivici su WhatsApp</a>
       </article>
 
       <article class="card" data-anim>
-        <div class="badge">OFFERTE BUSINESS P.IVA</div>
+        <div class="badge">AZIENDE & P.IVA FULL PACK</div>
         <div class="title">Fisso + Mobile con Energia per P.IVA</div>
         <p class="desc">Soluzioni per Partite IVA e Aziende.</p>
         <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
@@ -164,7 +187,7 @@
       </article>
 
       <article class="card" data-anim>
-        <div class="badge">OFFERTE BUSINESS</div>
+        <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title">Offerte Business Mobili</div>
         <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
         <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
@@ -276,12 +299,12 @@
       const pill = document.getElementById('storeStatus'); if(!pill) return;
       const HOURS = {
         0: [], // Domenica
-        1: [[9,30,13,30],[16,0,20,30]], // Lunedì
-        2: [[9,30,13,30],[16,0,20,30]], // Martedì
-        3: [[9,30,13,30],[16,0,20,30]], // Mercoledì
-        4: [[9,30,13,30],[16,0,20,30]], // Giovedì
-        5: [[9,30,13,30],[16,0,20,30]], // Venerdì
-        6: [[9,30,13,30]]               // Sabato
+        1: [[9,15,13,00],[16,0,20,00]], // Lunedì
+        2: [[9,15,13,00],[16,0,20,00]], // Martedì
+        3: [[9,15,13,00],[16,0,20,00]], // Mercoledì
+        4: [[9,15,13,00],[16,0,20,00]], // Giovedì
+        5: [[9,15,13,00],[16,0,20,00]], // Venerdì
+        6: [[9,15,13,00]]               // Sabato
       };
       const fmt = (h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
       function compute(){
