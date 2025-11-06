@@ -3,89 +3,454 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Catalogo Link</title>
-  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Offerte Energia, Assistenza PC.">
+  <title>Re Long Informatica | Telefonia, Energia & Assistenza PC</title>
+  <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
   <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Open Graph / WhatsApp / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Re Long | Smartphone a rate, Business, Energia & Assistenza">
+  <meta property="og:description" content="Prendi oggi il tuo smartphone, prima rata tra 30 giorni. Offerte Business, Energia Casa, Assistenza PC.">
+  <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/">
+  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-relong.jpg">
+  <meta property="og:image:alt" content="Re Long Informatica – Hub servizi">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re Long | Smartphone a rate, Business, Energia & Assistenza">
+  <meta name="twitter:description" content="Soluzioni Re Long: Telefonia, Energia, Business, Assistenza PC.">
+  <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-relong.jpg">
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://wa.me">
+  <link rel="preconnect" href="https://maps.app.goo.gl">
+  <link rel="preconnect" href="https://www.google.com">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;}
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .wrap{width:100%;max-width:860px;display:grid;gap:20px}
-    .head{text-align:center;padding:8px 8px 0}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px}
+    :root{
+      --bg1:#0a0a0a;--bg2:#000;
+      --brand1:#ff0000;--brand2:#ff7b00;
+      --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
+      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
+      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
+    }
+
+    /* Animazioni base */
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    @keyframes bounceIn{0%{opacity:0;transform:translateY(16px) scale(.97)}60%{opacity:1;transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+    @keyframes attnBounce {0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+    /* Loader 3D */
+    #rl-loader{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);transition:opacity .45s ease, visibility .45s ease}
+    #rl-loader.hidden{opacity:0;visibility:hidden}
+    .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
+    .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.6s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
+    .rl-cube .face{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand1),var(--brand2));border:1px solid rgba(255,255,255,.12);border-radius:10px;opacity:.96}
+    .rl-cube .f1{transform:translateZ(42px)} .rl-cube .f2{transform:rotateY(180deg) translateZ(42px)}
+    .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
+    .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
+    @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
+    html.rl-lock, body.rl-lock{overflow:hidden}
+
+    body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
+    @media(max-width:480px){.wrap{padding-bottom:130px}}
+    .head{text-align:center;padding:8px 8px 0 8px}
+    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
+    .status{margin-top:6px;font-size:12px}
+    .status span{font-weight:800}
+    .status .open{color:#7CFC7C} .status .closed{color:#ff7b00}
+
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
-    .card{background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;position:relative;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px}
-    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45)}
-    .title{font-size:18px;font-weight:800;letter-spacing:-.03em}
+    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr}}
+
+    /* Card con Spotlight 3D */
+    .card{
+      position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);border-radius:18px;padding:18px;
+      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+      display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .2s ease;
+      transform-style:preserve-3d;animation:fadeUp .6s ease both;overflow:hidden
+    }
+    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
+    /* spotlight */
+    .card::before{
+      content:""; position:absolute; inset:-40%; background:radial-gradient(300px 300px at var(--mx,50%) var(--my,50%), rgba(255,123,0,.25), transparent 60%);
+      pointer-events:none; transition:opacity .2s ease; opacity:.0; filter:blur(10px)
+    }
+    .card:hover::before{ opacity:.8 }
+    /* flash tap feedback */
+    .tapflash{position:absolute;border-radius:999px;background:radial-gradient(circle, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 60%);pointer-events:none;transform:translate(-50%,-50%);animation:flash .5s ease-out forwards}
+    @keyframes flash{from{opacity:.6; width:0; height:0} to{opacity:0; width:160px; height:160px}}
+
+    /* Badge dinamici (auto-color) */
+    .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite}
+    .badge[data-type="SMARTPHONE A RATE"]{background:linear-gradient(90deg,#ff0000,#ff7b00)}
+    .badge[data-type="OFFERTE BUSINESS"]{background:linear-gradient(90deg,#00E1FF,#0078FF)}
+    .badge[data-type="ENERGIA CASA"]{background:linear-gradient(90deg,#8cff00,#00b36b)}
+    .badge[data-type="ASSISTENZA PC"]{background:linear-gradient(90deg,#b58cff,#6a5acd)}
+    .badge[data-type="VODAFONE BUSINESS"]{background:linear-gradient(90deg,#ff7b00,#ff3b1a)}
+    .badge[data-bf="true"]{background:linear-gradient(90deg,#000,#ff1a1a); color:#fff; box-shadow:0 10px 18px rgba(255,30,30,.45)}
+
+    .title{font-size:18px;font-weight:800}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;letter-spacing:-.02em;color:#000;background:linear-gradient(90deg,var(--brand1),var(--brand2));box-shadow:0 16px 26px rgba(255,90,0,.35);border:0;transition:transform .15s ease,box-shadow .15s ease;outline:none}
+    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d}
     .btn + .btn{margin-top:8px}
-    .btn.wa{background:radial-gradient(circle at 0% 0%,var(--wa1) 0%,var(--wa2) 60%);box-shadow:0 18px 30px rgba(18,140,126,.45)}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 18px 30px rgba(255,90,0,.42)}
-    .btn.wa:hover{box-shadow:0 20px 34px rgba(18,140,126,.55)}
-    .btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-    .foot{text-align:center;color:var(--muted2);font-size:11px;margin-top:6px}
-    .foot a{color:var(--muted2)}
+    .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
+    .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
+    .btn.inview{animation:bounceIn .6s ease both}
+
+    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
+    .footer a{color:var(--muted2);text-decoration:none}
+
+    /* FAB */
+    .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
+    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
+    .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
+    .fab-btn.attn{animation:attnBounce 1.1s ease-in-out 2}
+    .fab-btn svg{width:18px;height:18px}
+    @media(max-width:420px){.fab-btn span{display:none}}
+
+    /* Torna su */
+    .to-top{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9999}
+    .to-top.show{opacity:1;pointer-events:auto}
+    .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
+
+    /* Toast */
+    .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
+    .toast.show{opacity:1}
+
+    /* Black Friday Floating Bar */
+    .bfbar{position:sticky;top:0;z-index:9998;background:linear-gradient(90deg,#000,#ff1a1a);color:#fff;text-align:center;padding:8px 12px;font-weight:900;letter-spacing:.3px;display:none}
+    .bfbar .cd{font-weight:900;margin-left:8px}
+
+    /* Notifica push fake */
+    .pushfake{position:fixed;right:16px;bottom:110px;background:#141414;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;box-shadow:0 18px 36px rgba(0,0,0,.6);display:none;z-index:9999}
+
+    /* Carrello WhatsApp */
+    .cart-pill{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border-radius:999px;padding:10px 16px;box-shadow:0 18px 36px rgba(255,90,0,.35);z-index:9999;display:flex;gap:10px;align-items:center}
+    .cart-pill button{background:#000;color:#fff;border:0;border-radius:999px;padding:8px 12px;font-weight:900}
   </style>
 </head>
 <body>
+
+  <!-- Loader 3D -->
+  <div id="rl-loader" aria-label="Caricamento in corso" role="status">
+    <div class="rl-cube">
+      <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
+      <span class="face f4"></span><span class="face f5"></span><span class="face f6"></span>
+    </div>
+    <p class="rl-loading-text">Caricamento…</p>
+  </div>
+
+  <!-- Black Friday Bar -->
+  <div class="bfbar" id="bfBar">🔥 Black Friday Live – Ultime unità disponibili • Scade tra <span class="cd" id="bfCd">--:--:--</span></div>
+
   <main class="wrap">
     <header class="head">
-      <div class="brand">Re Long&nbsp;Informatica – Telefonia, Energia & Assistenza PC</div>
+      <div class="brand">Re Long Informatica – Telefonia, Energia & Assistenza PC</div>
       <div class="sub">Clicca sulla sezione di interesse</div>
+      <div class="status" id="storeStatus">Stato negozio: <span>—</span></div>
     </header>
 
     <section class="grid" aria-label="Collegamenti rapidi Re Long">
-      <!-- Smartphone a rate -->
+      <!-- Smartphone -->
       <article class="card" aria-labelledby="h-smartphone">
-        <div class="badge">SMARTPHONE A RATE</div>
+        <div class="badge" data-type="SMARTPHONE A RATE" data-bf="true">BLACK FRIDAY • SMARTPHONE A RATE</div>
         <h2 id="h-smartphone" class="title">Prendi oggi il tuo smartphone: prima rata tra 30 giorni</h2>
         <p class="desc">Finanziamento <b>Vodafone & Compass</b> <b>senza busta paga</b>. Paghi con Postepay Evolution o conto corrente. Permuta il tuo usato e abbassi la rata.</p>
-        <a class="btn" href="./catalogo-smartphone-reale-v3.html" aria-label="Apri il catalogo digitale smartphone a rate">📱 Catalogo Digitale</a>
-        <a class="btn" href="./finanziamento.html" aria-label="Dettagli sul finanziamento smartphone">Dettagli Finanziamento</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20informazioni%20per%20prendere%20uno%20smartphone%20a%20rate."
-           aria-label="Scrivi su WhatsApp per smartphone a rate" rel="noopener">💬 Chatta su WhatsApp</a>
+        <a class="btn inview" href="./catalogo-smartphone-reale-v3.html" data-bf-link="true">📱 Catalogo Digitale</a>
+        <a class="btn" href="./finanziamento.html">Dettagli Finanziamento</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">💬 Chatta su WhatsApp</a>
       </article>
 
-      <!-- Offerte Business -->
+      <!-- Business -->
       <article class="card" aria-labelledby="h-business">
-        <div class="badge">OFFERTE BUSINESS</div>
+        <div class="badge" data-type="OFFERTE BUSINESS">OFFERTE BUSINESS</div>
         <h2 id="h-business" class="title">Fisso + Mobile TUTTO ILLIMITATO</h2>
         <p class="desc">Soluzione per Partite IVA e Aziende. Attiva l’<b>Offerta Business</b> da €30/mese, con energia inclusa.</p>
-        <a class="btn" href="./Business+Energy2.html" aria-label="Vedi i dettagli dell'offerta Business">Vedi Dettagli Offerta</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20sono%20interessato%20alle%20offerte%20Vodafone%20Business.%20Possiamo%20fissare%20un%20appuntamento%3F%20Grazie."
-           aria-label="Chatta su WhatsApp con un consulente Business" rel="noopener">💬 Chatta con un consulente Business</a>
+        <a class="btn inview" href="./Business+Energy2.html">Vedi Dettagli Offerta</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">💬 Chatta con un consulente Business</a>
       </article>
 
-      <!-- Offerte Energia Casa -->
+      <!-- Energia -->
       <article class="card" aria-labelledby="h-energia">
-        <div class="badge">ENERGIA CASA</div>
+        <div class="badge" data-type="ENERGIA CASA">ENERGIA CASA</div>
         <h2 id="h-energia" class="title">Accendi l'energia</h2>
         <p class="desc">Stai pagando troppo la corrente? Inviaci la foto della tua bolletta: verifichiamo subito se puoi risparmiare con Fastweb/Vodafone Energia.</p>
-        <a class="btn" href="./index.html" aria-label="Vai all’area energia">Vedi Area Energia</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20la%20foto%20della%20mia%20bolletta%20luce%20per%20una%20verifica."
-           aria-label="Invia la tua bolletta su WhatsApp" rel="noopener">💬 Invia la tua bolletta</a>
+        <a class="btn inview" href="./index.html">Vedi Area Energia</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">💬 Invia la tua bolletta</a>
       </article>
 
-      <!-- Assistenza PC -->
+      <!-- Assistenza -->
       <article class="card" aria-labelledby="h-assistenza">
-        <div class="badge">ASSISTENZA PC</div>
+        <div class="badge" data-type="ASSISTENZA PC">ASSISTENZA PC</div>
         <h2 id="h-assistenza" class="title">Riparazioni & Upgrade</h2>
         <p class="desc">Non cambiarlo, potenzialo. Da Re Long il tuo PC torna veloce, silenzioso e affidabile — diagnosi immediata e upgrade su misura.</p>
-        <a class="btn" href="./assistenza.html" aria-label="Vai all’assistenza PC">Vedi Assistenza PC</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20ha%20un%20problema.%20Posso%20inviarvi%20foto%20o%20video%20per%20un%20parere%3F"
-           aria-label="Chatta su WhatsApp con l’assistenza tecnica" rel="noopener">💬 Chatta con l’assistenza tecnica</a>
+        <a class="btn inview" href="./assistenza.html">Vedi Assistenza PC</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">💬 Chatta con l’assistenza tecnica</a>
+      </article>
+
+      <!-- Mobile Business -->
+      <article class="card" aria-labelledby="h-vfb">
+        <div class="badge" data-type="VODAFONE BUSINESS">VODAFONE BUSINESS</div>
+        <h2 id="h-vfb" class="title">Offerte Business Mobili</h2>
+        <p class="desc">Piani dedicati ad Aziende e Partite IVA.</p>
+        <a class="btn inview" href="./business.html" data-bf-link="true">📲 Scopri offerte Mobili Business</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">💬 Chatta con un Consulente Business</a>
       </article>
     </section>
 
-    <p class="foot">
-      • Re Long Informatica — via Casalanno 31, Marano di Napoli —
-      <a href="tel:+3908119578844" aria-label="Chiama Re Long 08119578844">08119578844</a> •
-      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Apri su Google Maps</a>
+    <p class="footer">
+      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">📍 Via Casalanno 31, Marano di Napoli</a>
+      •
+      <a href="tel:+3908119578844">☎️ 08119578844</a>
     </p>
   </main>
+
+  <!-- FAB -->
+  <div class="fab-nav" aria-label="Azioni rapide">
+    <a class="fab-btn" id="fabStore" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+      <span>Portami allo Store</span>
+    </a>
+    <a class="fab-btn" id="fabCall" href="tel:+3908119578844" aria-label="Chiama il negozio">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
+      <span>Chiamaci</span>
+    </a>
+  </div>
+
+  <!-- Toast + Pushfake + Cart -->
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="pushfake" id="pushFake">🔔 3 clienti stanno chiedendo info su smartphone a rate</div>
+  <div class="cart-pill" id="cartPill" style="display:none">
+    <span id="cartCount">Carrello WhatsApp (0)</span>
+    <button id="cartSend">Invia</button>
+    <button id="cartClear">Svuota</button>
+  </div>
+
+  <script>
+    // ===== Loader =====
+    document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
+    function hideLoader(){
+      const ld = document.getElementById('rl-loader');
+      if(!ld) return;
+      ld.classList.add('hidden');
+      setTimeout(()=>{ document.documentElement.classList.remove('rl-lock'); document.body.classList.remove('rl-lock'); ld.remove && ld.remove(); }, 500);
+    }
+    window.addEventListener('load', hideLoader);
+    setTimeout(hideLoader, 3500);
+
+    // ===== Spotlight 3D + tap flash =====
+    document.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('mousemove', e=>{
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        card.style.setProperty('--mx', (x/r.width*100)+'%');
+        card.style.setProperty('--my', (y/r.height*100)+'%');
+      });
+      card.addEventListener('pointerdown', e=>{
+        const f = document.createElement('span');
+        f.className = 'tapflash';
+        f.style.left = e.offsetX+'px'; f.style.top = e.offsetY+'px';
+        card.appendChild(f);
+        setTimeout(()=>f.remove(), 520);
+        if (navigator.vibrate) navigator.vibrate(12); // micro-vibe
+      }, {passive:true});
+    });
+
+    // ===== Stato negozio live (Europe/Rome) =====
+    (function(){
+      const el = document.getElementById('storeStatus');
+      function romeNow(){
+        try { return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' })); }
+        catch { return new Date(); }
+      }
+      function upd(){
+        const d = romeNow(), wd = d.getDay(); // 0 domenica
+        // Orari: Lun-Sab 9-20; Dom chiuso
+        const open = (wd>=1 && wd<=6) && (d.getHours()>=9 && (d.getHours()<20 || (d.getHours()===20 && d.getMinutes()===0)));
+        el.innerHTML = `Stato negozio: <span class="${open?'open':'closed'}">${open?'🟢 Aperto ora — chiudiamo alle 20:00':'🔴 Chiuso — riapriamo alle 9:00'}</span>`;
+      }
+      upd(); setInterval(upd, 60000);
+    })();
+
+    // ===== InView bounce sulle .btn =====
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('inview'); }});
+    }, {threshold:.2});
+    document.querySelectorAll('.btn').forEach(b=>io.observe(b));
+
+    // ===== Notifica push fake =====
+    setTimeout(()=>{ const n=document.getElementById('pushFake'); n.style.display='block'; setTimeout(()=>n.style.display='none', 5200); }, 30000);
+
+    // ===== FAB attention bounce ogni 10s se scroll>50% =====
+    let attnTimer=null;
+    function checkScroll(){
+      const sc = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+      if(sc>0.5 && !attnTimer){
+        attnTimer = setInterval(()=>{
+          document.getElementById('fabStore').classList.add('attn');
+          document.getElementById('fabCall').classList.add('attn');
+          setTimeout(()=>{
+            document.getElementById('fabStore').classList.remove('attn');
+            document.getElementById('fabCall').classList.remove('attn');
+          }, 1400);
+        }, 10000);
+      }
+    }
+    window.addEventListener('scroll', checkScroll, {passive:true}); checkScroll();
+
+    // ===== BF bar + countdown (attiva tra 25-29 Nov 2025) =====
+    (function(){
+      const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
+      const start = new Date('2025-11-25T00:00:00+01:00');
+      const end   = new Date('2025-11-29T23:59:59+01:00');
+      const bar = document.getElementById('bfBar'), cd = document.getElementById('bfCd');
+      if(now>=start && now<=end){
+        bar.style.display='block';
+        const t = setInterval(()=>{
+          const n = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
+          const diff = end - n;
+          if (diff<=0){ bar.style.display='none'; clearInterval(t); return; }
+          const h = String(Math.floor(diff/3.6e6)).padStart(2,'0');
+          const m = String(Math.floor((diff%3.6e6)/6e4)).padStart(2,'0');
+          const s = String(Math.floor((diff%6e4)/1000)).padStart(2,'0');
+          cd.textContent = `${h}:${m}:${s}`;
+        }, 1000);
+      }
+    })();
+
+    // ===== Popup Offerta Flash quando si apre link BF =====
+    (function(){
+      function flashPopup(topic){
+        const modal = document.createElement('div');
+        modal.className = 'lead-overlay';
+        modal.style.display='flex';
+        modal.innerHTML = `
+          <div class="lead-card" style="text-align:center">
+            <button class="lead-close" aria-label="Chiudi">×</button>
+            <div class="lead-title">Offerta Flash ${topic} ⚡</div>
+            <div class="lead-sub">Questa promo scade oggi alle 23:59 — vuoi bloccarla ora?</div>
+            <div class="lead-actions" style="justify-content:center">
+              <a class="btn" href="https://wa.me/3908119578844?text=${encodeURIComponent('Ciao Re Long, voglio bloccare la promo Black Friday: '+topic)}">Blocca su WhatsApp</a>
+              <button class="btn-ghost" style="margin-left:8px">Continua</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+        const close = ()=>{ modal.remove(); };
+        modal.querySelector('.lead-close').onclick=close;
+        modal.querySelector('.btn-ghost').onclick=close;
+        modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
+      }
+      // trigger su link con data-bf-link
+      document.addEventListener('click', (e)=>{
+        const a = e.target.closest('a[data-bf-link="true"]'); if(!a) return;
+        e.preventDefault();
+        const topic = a.textContent.trim();
+        flashPopup(topic);
+        // naviga dopo 1.2s se l'utente non blocca
+        setTimeout(()=>{ location.href = a.href; }, 1200);
+      });
+    })();
+
+    // ===== Anti-404 (con toast) =====
+    function showToast(msg){
+      let t = document.querySelector('.toast');
+      if(!t){ t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
+      t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+    }
+    document.addEventListener('click', async (e)=>{
+      const a = e.target.closest('a'); if(!a) return;
+      const url = new URL(a.href, location.href);
+      const isInternal = url.origin === location.origin && /\.html?$/.test(url.pathname);
+      if(isInternal && !a.hasAttribute('data-bf-link')){ // lasciamo al gestore BF i suoi
+        e.preventDefault();
+        try{
+          const res = await fetch(url.href, {method:'HEAD', cache:'no-store'});
+          if(res.ok){ location.href = url.href; }
+          else { showToast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href='./', 1000); }
+        }catch(_){
+          showToast('Impossibile aprire la pagina.'); setTimeout(()=>location.href='./', 1200);
+        }
+      }
+    }, false);
+
+    // ===== WA: messaggi precompilati in base alla card =====
+    (function(){
+      const WA_BASE = "https://wa.me/3908119578844?text=";
+      const templates = {
+        "SMARTPHONE A RATE": "Ciao Re Long, vorrei info per smartphone a rate (Vodafone & Compass). 📱",
+        "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Info su Vodafone Business? 🧾",
+        "ENERGIA CASA":      "Ciao Re Long, ti mando la mia bolletta per una verifica risparmio. ⚡",
+        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviare foto/video? 🧰",
+        "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. 📲"
+      };
+      document.querySelectorAll("article.card .btn.wa").forEach(a=>{
+        try{
+          const card = a.closest(".card");
+          const badge = card?.querySelector(".badge")?.getAttribute('data-type') || card?.querySelector(".badge")?.textContent?.trim() || "";
+          const msg = templates[badge] || "Ciao Re Long, vorrei informazioni. Grazie!";
+          a.href = WA_BASE + encodeURIComponent(msg);
+          a.setAttribute("rel","noopener");
+        }catch(_){}
+      });
+    })();
+
+    // ===== CARRELLO WHATSAPP GLOBALE =====
+    (function(){
+      const PILL = document.getElementById('cartPill');
+      const CNT  = document.getElementById('cartCount');
+      const BTN_SEND = document.getElementById('cartSend');
+      const BTN_CLEAR= document.getElementById('cartClear');
+
+      function get(){ try{ return JSON.parse(localStorage.getItem('rl_cart')||'[]'); }catch{return []} }
+      function set(v){ localStorage.setItem('rl_cart', JSON.stringify(v)); upd(); }
+      function upd(){
+        const arr = get(); const n = arr.length;
+        PILL.style.display = n? 'flex':'none';
+        CNT.textContent = `Carrello WhatsApp (${n})`;
+      }
+      // API globale
+      window.RLCart = {
+        add:(item)=>{ const arr=get(); arr.push(item); set(arr); showToast('Aggiunto al carrello: '+(item.name||item.sku)); },
+        remove:(sku)=>{ const arr=get().filter(x=>x.sku!==sku); set(arr); showToast('Rimosso: '+sku); },
+        clear:()=>{ set([]); showToast('Carrello svuotato'); },
+        list:get
+      };
+
+      BTN_CLEAR.onclick = ()=>window.RLCart.clear();
+      BTN_SEND.onclick  = ()=>{
+        const items = get();
+        if(!items.length){ showToast('Carrello vuoto'); return; }
+        const lines = items.map((x,i)=>`${i+1}) ${x.name||x.sku} — €${(x.price??'').toString()}`).join('\n');
+        const msg = `Ciao Re Long, vorrei un preventivo per:\n${lines}\nGrazie!`;
+        const url = `https://wa.me/3908119578844?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
+      upd();
+      window.addEventListener('storage', (e)=>{ if(e.key==='rl_cart') upd(); });
+    })();
+
+    // ===== Torna su =====
+    (function(){
+      const toTop = document.createElement('div');
+      toTop.className = 'to-top';
+      toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
+      document.body.appendChild(toTop);
+      const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
+      window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+    })();
+
+    // ===== Micro-vibrazioni anche sui bottoni principali =====
+    document.querySelectorAll('.btn, .fab-btn').forEach(el=>{
+      el.addEventListener('pointerdown', ()=>{ if(navigator.vibrate) navigator.vibrate(10); }, {passive:true});
+    });
+  </script>
 </body>
 </html>
