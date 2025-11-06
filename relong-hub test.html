@@ -6,30 +6,15 @@
   <title>Re Long Informatica, Telefonia, Energia & Assistenza PC</title>
   <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
   <meta name="theme-color" content="#0a0a0a">
-
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
-
-  <!-- Preconnect -->
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
-
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{
-      --bg1:#0a0a0a;--bg2:#000;
-      --brand1:#ff0000;--brand2:#ff7b00;
-      --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
-      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
-      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
-    }
-
-    /* Animazioni base */
+    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166}
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-    @keyframes bounceIn{0%{opacity:0;transform:translateY(16px) scale(.97)}60%{opacity:1;transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
-    @keyframes attnBounce {0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
     /* Loader */
@@ -43,74 +28,46 @@
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
     @media (prefers-reduced-motion:reduce){.rl-cube{animation:none}}
-    html.rl-lock, body.rl-lock{overflow:hidden}
 
+    html.rl-lock, body.rl-lock{overflow:hidden}
     body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
+
+    /* 3D Spotlight */
+    .spotlight{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.25;background:radial-gradient(600px circle at 50% 50%, rgba(255,123,0,.5), rgba(255,0,0,.15) 40%, transparent 60%)}
+    .spotlight.softer{opacity:.15}
+
+    .wrap{position:relative;z-index:1;width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
     @media(max-width:480px){.wrap{padding-bottom:130px}}
-    .head{text-align:center;padding:8px 8px 0 8px}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both;will-change:transform}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
-    .status{margin-top:6px;font-size:12px}
-    .status span{font-weight:800}
-    .status .open{color:#7CFC7C} .status .closed{color:#ff7b00}
+
+    /* Black Friday floating bar */
+    .bf-bar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;gap:10px;align-items:center;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;padding:10px 14px;border-radius:999px;box-shadow:0 18px 40px rgba(255,90,0,.45);font-weight:900}
+    .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(0,0,0,.08);padding:6px 10px;border-radius:999px}
+    .bf-bar a{color:#000;text-decoration:none;font-weight:900}
+
+    .head{text-align:center;padding:44px 8px 0 8px}
+    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both;will-change:transform}
+    .status-pill{font-size:11px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)}
+    .status-open{background:linear-gradient(90deg,#00d27a,#22c55e);color:#000;border-color:transparent}
+    .status-closed{background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border-color:transparent}
+    .sub{font-size:12px;color:var(--muted);margin-top:6px;animation:fadeUp .6s ease both}
 
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
     @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
 
-    /* CARD FIX: più spazio sopra, badge interni e niente taglio */
-    .card{
-      position:relative;
-      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
-      border:1px solid var(--stroke);
-      border-radius:18px;
-      padding:60px 18px 18px;         /* aria top */
-      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
-      display:flex;flex-direction:column;gap:10px;
-      transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .2s ease;
-      transform-style:preserve-3d;animation:fadeUp .6s ease both;
-      will-change:transform;
-      overflow:visible;
-    }
+    .card{position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;transform-style:preserve-3d;will-change:transform;opacity:0;transform:translateY(18px)}
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
+    .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
 
-    /* Spotlight dinamico */
-    .card::before{
-      content:""; position:absolute; inset:-40%;
-      background:radial-gradient(300px 300px at var(--mx,50%) var(--my,50%), rgba(255,123,0,.25), transparent 60%);
-      pointer-events:none; transition:opacity .2s ease; opacity:.0; filter:blur(10px)
-    }
-    .card:hover::before{ opacity:.8 }
+    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite}
+    .title{font-size:18px;font-weight:800}
+    .desc{font-size:13px;color:var(--muted);line-height:1.45}
 
-    /* Flash tap */
-    .tapflash{position:absolute;border-radius:999px;background:radial-gradient(circle, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 60%);pointer-events:none;transform:translate(-50%,-50%);animation:flash .5s ease-out forwards}
-    @keyframes flash{from{opacity:.6; width:0; height:0} to{opacity:0; width:160px; height:160px}}
-
-    /* Badge dinamici */
-    .badge{
-      position:absolute; top:8px; left:14px;
-      color:#000;font-size:11px;font-weight:800;
-      padding:6px 10px;border-radius:999px;
-      box-shadow:0 10px 18px rgba(255,80,0,.45);
-      animation:pulse 2.2s ease-in-out infinite; z-index:2;
-      background:linear-gradient(90deg,#ff0000,#ff7b00);
-    }
-    .badge[data-type="SMARTPHONE A RATE"]{background:linear-gradient(90deg,#ff0000,#ff7b00)}
-    .badge[data-type="OFFERTE BUSINESS"]{background:linear-gradient(90deg,#00E1FF,#0078FF)}
-    .badge[data-type="ENERGIA CASA"]{background:linear-gradient(90deg,#8cff00,#00b36b)}
-    .badge[data-type="ASSISTENZA PC"]{background:linear-gradient(90deg,#b58cff,#6a5acd)}
-    .badge[data-type="VODAFONE BUSINESS"]{background:linear-gradient(90deg,#ff7b00,#ff3b1a)}
-    .badge[data-bf="true"]{background:linear-gradient(90deg,#000,#ff1a1a); color:#fff; box-shadow:0 10px 18px rgba(255,30,30,.45)}
-
-    .title{font-size:18px;font-weight:800;animation:fadeUp .65s ease both}
-    .desc{font-size:13px;color:var(--muted);line-height:1.45;animation:fadeUp .7s ease both}
-
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d;animation:fadeUp .75s ease both;will-change:transform}
+    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d;will-change:transform}
     .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
-    .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45);animation:bounceIn .6s ease both}
+    .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
 
-    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px;animation:fadeUp .8s ease both}
+    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
     .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
@@ -126,26 +83,33 @@
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
     .toast.show{opacity:1}
 
-    /* Black Friday Floating Bar */
-    .bfbar{position:sticky;top:0;z-index:9998;background:linear-gradient(90deg,#000,#ff1a1a);color:#fff;text-align:center;padding:8px 12px;font-weight:900;letter-spacing:.3px;display:none}
-    .bfbar .cd{font-weight:900;margin-left:8px}
-
-    /* Notifica push fake */
-    .pushfake{position:fixed;right:16px;bottom:110px;background:#141414;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;box-shadow:0 18px 36px rgba(0,0,0,.6);display:none;z-index:9999}
-
-    /* Carrello WhatsApp */
-    .cart-pill{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border-radius:999px;padding:10px 16px;box-shadow:0 18px 36px rgba(255,90,0,.35);z-index:9999;display:flex;gap:10px;align-items:center}
-    .cart-pill button{background:#000;color:#fff;border:0;border-radius:999px;padding:8px 12px;font-weight:900}
-
-    /* Mobile fine-tuning */
-    @media (max-width:480px){
-      .card{ padding-top:66px; }
-      .badge{ top:6px; font-size:10px; padding:5px 8px; }
-    }
+    /* Lead modal */
+    .lead-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10000}
+    .lead-card{width:min(92vw,420px);background:linear-gradient(160deg, rgba(20,20,20,.98), rgba(0,0,0,.78));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 26px 58px rgba(0,0,0,.75);padding:18px;position:relative}
+    .lead-title{font-weight:900;font-size:20px;letter-spacing:-.02em;margin-bottom:6px}
+    .lead-sub{color:rgba(255,255,255,.65);font-size:13px;margin-bottom:14px}
+    .lead-row{display:grid;gap:8px;margin:10px 0}
+    .lead-row input, .lead-row select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;outline:none;transition:border-color .15s ease; font-size:14px}
+    .lead-row input:focus, .lead-row select:focus{border-color:#ffd166}
+    .lead-actions{display:flex;gap:10px;margin-top:12px}
+    .btn-primary{flex:1;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border:0;border-radius:12px;padding:12px}
+    .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px}
+    .lead-legal{font-size:11px;color:rgba(255,255,255,.55);margin-top:10px;line-height:1.3}
+    .lead-legal a{color:rgba(255,255,255,.75);text-decoration:underline}
+    .lead-close{position:absolute;top:10px;right:12px;background:transparent;border:0;color:#fff;font-weight:900;font-size:18px}
   </style>
 </head>
 <body>
-  <!-- Loader -->
+  <!-- 3D dynamic spotlight -->
+  <div class="spotlight" id="spotlight"></div>
+
+  <!-- Black Friday floating bar -->
+  <div class="bf-bar" id="bfBar" role="status" aria-live="polite">
+    <span>BLACK FRIDAY</span>
+    <span class="timer" id="bfTimer">--:--:--</span>
+    <a href="./catalogo-smartphone-reale-v3.html" aria-label="Vai alle offerte Black Friday">Vai alle offerte ➜</a>
+  </div>
+
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
     <div class="rl-cube">
       <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
@@ -154,52 +118,51 @@
     <p class="rl-loading-text">Caricamento…</p>
   </div>
 
-  <!-- Black Friday bar -->
-  <div class="bfbar" id="bfBar">🔥 Black Friday Live – Ultime unità disponibili • Scade tra <span class="cd" id="bfCd">--:--:--</span></div>
-
   <main class="wrap">
     <header class="head">
-      <div class="brand">Re Long Telefonia, Energia & Assistenza PC</div>
+      <div class="brand">
+        Re Long Telefonia, Energia & Assistenza PC
+        <span class="status-pill" id="storeStatus">Verifica orari…</span>
+      </div>
       <div class="sub">Clicca sulla sezione di interesse</div>
-      <div class="status" id="storeStatus">Stato negozio: <span>—</span></div>
     </header>
 
     <section class="grid" aria-label="Collegamenti rapidi Re Long">
-      <article class="card" aria-labelledby="h-smartphone">
-        <div class="badge" data-type="SMARTPHONE A RATE" data-bf="true">BLACK FRIDAY • SMARTPHONE A RATE</div>
-        <div class="title" id="h-smartphone">Scegli il tuo smartphone</div>
+      <article class="card" data-anim>
+        <div class="badge" data-badge>SMARTPHONE A RATE</div>
+        <div class="title">Scegli il tuo smartphone</div>
         <p class="desc">Finanziamento Vodafone & Compass senza busta paga con rate flessibili.</p>
-        <a class="btn" href="./catalogo-smartphone-reale-v3.html" data-bf-link="true">📱 Catalogo Digitale</a>
+        <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Scrivici su WhatsApp</a>
       </article>
 
-      <article class="card" aria-labelledby="h-business">
-        <div class="badge" data-type="OFFERTE BUSINESS">OFFERTE BUSINESS P.IVA</div>
-        <div class="title" id="h-business">Fisso + Mobile con Energia per P.IVA</div>
+      <article class="card" data-anim>
+        <div class="badge" data-badge>OFFERTE BUSINESS P.IVA</div>
+        <div class="title">Fisso + Mobile con Energia per P.IVA</div>
         <p class="desc">Soluzioni per Partite IVA e Aziende.</p>
         <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un consulente Business</a>
       </article>
 
-      <article class="card" aria-labelledby="h-energia">
-        <div class="badge" data-type="ENERGIA CASA">ENERGIA CASA</div>
-        <div class="title" id="h-energia">Accendi la tua Energia</div>
+      <article class="card" data-anim>
+        <div class="badge" data-badge>ENERGIA CASA</div>
+        <div class="title">Accendi la tua Energia</div>
         <p class="desc">Invia la foto della tua bolletta per una verifica immediata.</p>
         <a class="btn" href="./index.html">Vai all’Area Energia</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Inviaci la tua Bolletta</a>
       </article>
 
-      <article class="card" aria-labelledby="h-assistenza">
-        <div class="badge" data-type="ASSISTENZA PC">ASSISTENZA PC</div>
-        <div class="title" id="h-assistenza">Riparazioni & Upgrade</div>
+      <article class="card" data-anim>
+        <div class="badge" data-badge>ASSISTENZA PC</div>
+        <div class="title">Riparazioni & Upgrade</div>
         <p class="desc">Diagnosi immediata e upgrade su misura.</p>
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <article class="card" aria-labelledby="h-vfb">
-        <div class="badge" data-type="VODAFONE BUSINESS">OFFERTE BUSINESS</div>
-        <div class="title" id="h-vfb">Offerte Business Mobili</div>
+      <article class="card" data-anim>
+        <div class="badge" data-badge>OFFERTE BUSINESS</div>
+        <div class="title">Offerte Business Mobili</div>
         <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
         <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
@@ -213,241 +176,274 @@
     </p>
   </main>
 
-  <!-- FAB -->
+  <div class="to-top" id="toTop"><a href="#" aria-label="Torna su">⬆️ Torna su</a></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Lead form modal -->
+  <div class="lead-overlay" id="leadModal" aria-hidden="true" role="dialog" aria-label="Richiesta contatto">
+    <div class="lead-card">
+      <button class="lead-close" id="leadClose" aria-label="Chiudi">×</button>
+      <div class="lead-title">Ti aiutiamo noi? 👋</div>
+      <div class="lead-sub">Lascia un contatto: ti rispondiamo su <b>WhatsApp</b> o chiamata entro poco.</div>
+      <div class="lead-row">
+        <input id="leadName" type="text" placeholder="Nome e Cognome" autocomplete="name">
+        <input id="leadPhone" type="tel" placeholder="Telefono (es. 08119578844)" autocomplete="tel">
+        <select id="leadTopic">
+          <option value="Smartphone a rate">Smartphone a rate</option>
+          <option value="Offerte Vodafone Business">Offerte Vodafone Business</option>
+          <option value="Energia Casa">Energia Casa</option>
+          <option value="Assistenza PC">Assistenza PC</option>
+        </select>
+      </div>
+      <div class="lead-actions">
+        <button class="btn-primary" id="leadSend">Invia su WhatsApp</button>
+        <button class="btn-ghost" id="leadLater">Più tardi</button>
+      </div>
+      <p class="lead-legal">
+        Inviando accetti di essere ricontattato per l’argomento selezionato. Nessuno spam.
+        <br>WhatsApp: <b>08119578844</b> — <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Come raggiungerci</a>
+      </p>
+    </div>
+  </div>
+
   <div class="fab-nav" aria-label="Azioni rapide">
-    <a class="fab-btn" id="fabStore" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
+    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
       <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
       <span>Portami allo Store</span>
     </a>
-    <a class="fab-btn" id="fabCall" href="tel:+3908119578844" aria-label="Chiama il negozio">
+    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
       <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
       <span>Chiamaci</span>
     </a>
   </div>
 
-  <!-- Toast + Push fake + Cart -->
-  <div class="toast" role="status" aria-live="polite"></div>
-  <div class="pushfake" id="pushFake">🔔 3 clienti stanno chiedendo info su smartphone a rate</div>
-  <div class="cart-pill" id="cartPill" style="display:none">
-    <span id="cartCount">Carrello WhatsApp (0)</span>
-    <button id="cartSend">Invia</button>
-    <button id="cartClear">Svuota</button>
-  </div>
-
   <script>
-    // ===== Loader =====
+    // Loader lock
     document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
     function hideLoader(){
       const ld = document.getElementById('rl-loader');
       if(!ld) return;
       ld.classList.add('hidden');
-      setTimeout(()=>{ document.documentElement.classList.remove('rl-lock'); document.body.classList.remove('rl-lock'); ld.remove && ld.remove(); }, 500);
+      setTimeout(()=>{
+        document.documentElement.classList.remove('rl-lock');
+        document.body.classList.remove('rl-lock');
+        ld.remove && ld.remove();
+      }, 500);
     }
     window.addEventListener('load', hideLoader);
     setTimeout(hideLoader, 3500);
 
-    // ===== Spotlight 3D + tap flash =====
-    document.querySelectorAll('.card').forEach(card=>{
-      card.addEventListener('mousemove', e=>{
-        const r = card.getBoundingClientRect();
-        const x = e.clientX - r.left, y = e.clientY - r.top;
-        card.style.setProperty('--mx', (x/r.width*100)+'%');
-        card.style.setProperty('--my', (y/r.height*100)+'%');
-      });
-      card.addEventListener('pointerdown', e=>{
-        const f = document.createElement('span');
-        f.className = 'tapflash';
-        f.style.left = e.offsetX+'px'; f.style.top = e.offsetY+'px';
-        card.appendChild(f);
-        setTimeout(()=>f.remove(), 520);
-        if (navigator.vibrate) navigator.vibrate(12); // micro-vibe
-      }, {passive:true});
-    });
+    // To-top visibility
+    const toTop = document.getElementById('toTop');
+    const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
+    window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-    // ===== Stato negozio live (Europe/Rome) =====
-    (function(){
-      const el = document.getElementById('storeStatus');
-      function romeNow(){
-        try { return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' })); }
-        catch { return new Date(); }
-      }
-      function upd(){
-        const d = romeNow(), wd = d.getDay(); // 0 domenica
-        // Orari: Lun-Sab 9-20; Dom chiuso
-        const open = (wd>=1 && wd<=6) && (d.getHours()>=9 && (d.getHours()<20 || (d.getHours()===20 && d.getMinutes()===0)));
-        el.innerHTML = `Stato negozio: <span class="${open?'open':'closed'}">${open?'🟢 Aperto ora — chiudiamo alle 20:00':'🔴 Chiuso — riapriamo alle 9:00'}</span>`;
-      }
-      upd(); setInterval(upd, 60000);
-    })();
-
-    // ===== InView bounce sulle .btn =====
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('inview'); if(e.target.classList.contains('wa')) e.target.style.animation='bounceIn .6s ease both'; }});
-    }, {threshold:.2});
-    document.querySelectorAll('.btn').forEach(b=>io.observe(b));
-
-    // ===== Notifica push fake =====
-    setTimeout(()=>{ const n=document.getElementById('pushFake'); n.style.display='block'; setTimeout(()=>n.style.display='none', 5200); }, 30000);
-
-    // ===== FAB attention bounce ogni 10s se scroll>50% =====
-    let attnTimer=null;
-    function checkScroll(){
-      const sc = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
-      if(sc>0.5 && !attnTimer){
-        attnTimer = setInterval(()=>{
-          document.getElementById('fabStore').classList.add('attn');
-          document.getElementById('fabCall').classList.add('attn');
-          setTimeout(()=>{ document.getElementById('fabStore').classList.remove('attn'); document.getElementById('fabCall').classList.remove('attn'); }, 1400);
-        }, 10000);
-      }
-    }
-    window.addEventListener('scroll', checkScroll, {passive:true}); checkScroll();
-
-    // ===== BF bar + countdown (attiva tra 25-29 Nov 2025) =====
-    (function(){
-      const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
-      const start = new Date('2025-11-25T00:00:00+01:00');
-      const end   = new Date('2025-11-29T23:59:59+01:00');
-      const bar = document.getElementById('bfBar'), cd = document.getElementById('bfCd');
-      if(now>=start && now<=end){
-        bar.style.display='block';
-        const t = setInterval(()=>{
-          const n = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
-          const diff = end - n;
-          if (diff<=0){ bar.style.display='none'; clearInterval(t); return; }
-          const h = String(Math.floor(diff/3.6e6)).padStart(2,'0');
-          const m = String(Math.floor((diff%3.6e6)/6e4)).padStart(2,'0');
-          const s = String(Math.floor((diff%6e4)/1000)).padStart(2,'0');
-          cd.textContent = `${h}:${m}:${s}`;
-        }, 1000);
-      }
-    })();
-
-    // ===== Popup Offerta Flash quando si apre link BF =====
-    (function(){
-      function flashPopup(topic){
-        const modal = document.createElement('div');
-        modal.className = 'lead-overlay';
-        modal.style.display='flex';
-        modal.innerHTML = `
-          <div class="lead-card" style="text-align:center">
-            <button class="lead-close" aria-label="Chiudi">×</button>
-            <div class="lead-title">Offerta Flash ${topic} ⚡</div>
-            <div class="lead-sub">Questa promo scade oggi alle 23:59 — vuoi bloccarla ora?</div>
-            <div class="lead-actions" style="justify-content:center">
-              <a class="btn" href="https://wa.me/3908119578844?text=${encodeURIComponent('Ciao Re Long, voglio bloccare la promo Black Friday: '+topic)}">Blocca su WhatsApp</a>
-              <button class="btn-ghost" style="margin-left:8px">Continua</button>
-            </div>
-          </div>`;
-        document.body.appendChild(modal);
-        const close = ()=>{ modal.remove(); };
-        modal.querySelector('.lead-close').onclick=close;
-        modal.querySelector('.btn-ghost').onclick=close;
-        modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
-      }
-      // trigger su link con data-bf-link
-      document.addEventListener('click', (e)=>{
-        const a = e.target.closest('a[data-bf-link="true"]'); if(!a) return;
-        e.preventDefault();
-        const topic = a.textContent.trim();
-        flashPopup(topic);
-        // naviga dopo 1.2s se l'utente non blocca
-        setTimeout(()=>{ location.href = a.href; }, 1200);
-      });
-    })();
-
-    // ===== Anti-404 (con toast) =====
     function showToast(msg){
       let t = document.querySelector('.toast');
       if(!t){ t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
+
+    // Internal link guard
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const url = new URL(a.href, location.href);
       const isInternal = url.origin === location.origin && /\.html?$/.test(url.pathname);
-      if(isInternal && !a.hasAttribute('data-bf-link')){ // lasciamo al gestore BF i suoi
+      if(isInternal){
         e.preventDefault();
         try{
           const res = await fetch(url.href, {method:'HEAD', cache:'no-store'});
           if(res.ok){ location.href = url.href; }
-          else { showToast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href='./', 1000); }
+          else { showToast('Pagina non trovata. Ti riportiamo alla Home.'); setTimeout(()=>location.href='./', 1000); }
         }catch(_){
-          showToast('Impossibile aprire la pagina.'); setTimeout(()=>location.href='./', 1200);
+          showToast('Impossibile aprire la pagina. Riprova o torna alla Home.'); setTimeout(()=>location.href='./', 1200);
         }
       }
     }, false);
 
-    // ===== WA: messaggi precompilati in base alla card =====
+    // 3D Spotlight follow
+    (function(){
+      const sp = document.getElementById('spotlight');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!sp) return;
+      const move = (x,y)=>{
+        sp.style.background = `radial-gradient(600px circle at ${x}px ${y}px, rgba(255,123,0,.5), rgba(255,0,0,.15) 40%, transparent 60%)`;
+      };
+      window.addEventListener('pointermove', (e)=>{ if(reduce) return; move(e.clientX, e.clientY); }, {passive:true});
+      window.addEventListener('scroll', ()=>{ sp.classList.toggle('softer', window.scrollY>60); }, {passive:true});
+    })();
+
+    // On-scroll animations (IntersectionObserver)
+    (function(){
+      const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
+      }, {threshold: .18});
+      document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
+    })();
+
+    // Black Friday countdown (to Nov 28, 2025 23:59:59 Europe/Rome)
+    (function(){
+      const timer = document.getElementById('bfTimer');
+      const bar = document.getElementById('bfBar');
+      if(!timer || !bar) return;
+      // target date in local time (Europe/Rome). Adjust if needed.
+      const target = new Date('2025-11-28T23:59:59+01:00');
+      const tick = ()=>{
+        const now = new Date();
+        let diff = (target - now);
+        if(diff <= 0){ timer.textContent = 'ULTIME ORE!'; bar.style.filter='brightness(1.05)'; return; }
+        const d = Math.floor(diff/86400000); diff -= d*86400000;
+        const h = Math.floor(diff/3600000); diff -= h*3600000;
+        const m = Math.floor(diff/60000); diff -= m*60000;
+        const s = Math.floor(diff/1000);
+        timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      };
+      tick(); setInterval(tick, 1000);
+    })();
+
+    // Store live status (configurable hours Europe/Rome)
+    (function(){
+      const pill = document.getElementById('storeStatus'); if(!pill) return;
+      // Orari tipici (modifica se necessario): Lun-Sab 9:00–13:30, 15:30–20:00. Domenica chiuso.
+      const HOURS = {
+        0: [], // Domenica
+        1: [[9,0,13,30],[15,30,20,0]], // Lunedì
+        2: [[9,0,13,30],[15,30,20,0]], // Martedì
+        3: [[9,0,13,30],[15,30,20,0]], // Mercoledì
+        4: [[9,0,13,30],[15,30,20,0]], // Giovedì
+        5: [[9,0,13,30],[15,30,20,0]], // Venerdì
+        6: [[9,0,13,30],[15,30,20,0]], // Sabato
+      };
+      const fmt = (h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      const now = new Date();
+      const day = now.getDay();
+      const segs = HOURS[day]||[];
+      const mins = now.getHours()*60 + now.getMinutes();
+      let open=false, nextOpen=null, closeAt=null;
+      // Today
+      for(const [sh,sm,eh,em] of segs){
+        const s = sh*60+sm, e = eh*60+em;
+        if(mins>=s && mins<e){ open=true; closeAt=[eh,em]; break; }
+        if(mins < s && !nextOpen){ nextOpen=[sh,sm]; }
+      }
+      // Next day search if closed for today
+      if(!open && !nextOpen){
+        for(let i=1;i<=7;i++){
+          const d=(day+i)%7; const arr=HOURS[d]; if(arr && arr.length){ nextOpen=[arr[0][0],arr[0][1]]; break; }
+        }
+      }
+      if(open){
+        pill.textContent = `Aperto • chiude alle ${fmt(...closeAt)}`;
+        pill.classList.add('status-open'); pill.classList.remove('status-closed');
+      } else if(nextOpen){
+        pill.textContent = `Chiuso • apre alle ${fmt(...nextOpen)}`;
+        pill.classList.add('status-closed'); pill.classList.remove('status-open');
+      } else {
+        pill.textContent = 'Chiuso'; pill.classList.add('status-closed');
+      }
+    })();
+
+    // Lead modal triggers
+    (() => {
+      const overlay = document.getElementById('leadModal');
+      const closeBtn = document.getElementById('leadClose');
+      const laterBtn = document.getElementById('leadLater');
+      const sendBtn  = document.getElementById('leadSend');
+      const nameEl = document.getElementById('leadName');
+      const phoneEl = document.getElementById('leadPhone');
+      const topicEl = document.getElementById('leadTopic');
+      const LS_KEY = 'rl_lead_dismissed_until';
+      function showLead(){
+        const until = Number(localStorage.getItem(LS_KEY) || 0);
+        if (Date.now() < until) return;
+        overlay.style.display='flex';
+        overlay.setAttribute('aria-hidden','false');
+      }
+      function hideLead(days=30){
+        overlay.style.display='none';
+        overlay.setAttribute('aria-hidden','true');
+        localStorage.setItem(LS_KEY, String(Date.now() + days*24*60*60*1000));
+      }
+      setTimeout(showLead, 12000);
+      let firedScroll=false;
+      window.addEventListener('scroll', () => {
+        if (firedScroll) return;
+        const scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+        if (scrolled > 0.6){ firedScroll=true; showLead(); }
+      }, {passive:true});
+      document.addEventListener('mouseleave', (e) => { if(e.clientY <= 0) showLead(); });
+      closeBtn.addEventListener('click', () => hideLead(30));
+      laterBtn.addEventListener('click', () => hideLead(3));
+      overlay.addEventListener('click', (e) => { if(e.target === overlay) hideLead(3); });
+      sendBtn.addEventListener('click', () => {
+        const name  = nameEl.value.trim();
+        const phone = phoneEl.value.replace(/\D+/g,'');
+        const topic = topicEl.value;
+        if (!name || phone.length < 7){ alert('Inserisci nome e un numero valido.'); return; }
+        const msg = `Ciao Re Long, sono ${name}. Il mio numero è ${phone}. Vorrei info su: ${topic}.`;
+        const url = `https://wa.me/3908119578844?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+        hideLead(30);
+      });
+    })();
+
+    // Enrich WhatsApp buttons with dynamic templates
     (function(){
       const WA_BASE = "https://wa.me/3908119578844?text=";
       const templates = {
-        "SMARTPHONE A RATE": "Ciao Re Long, vorrei info per smartphone a rate (Vodafone & Compass). 📱",
-        "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Info su Vodafone Business? 🧾",
-        "ENERGIA CASA":      "Ciao Re Long, ti mando la mia bolletta per una verifica risparmio. ⚡",
-        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviare foto/video? 🧰",
-        "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. 📲"
+        "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
+        "OFFERTE BUSINESS P.IVA": "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
+        "ENERGIA CASA": "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
+        "ASSISTENZA PC": "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
+        "OFFERTE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
       };
-      document.querySelectorAll("article.card .btn.wa").forEach(a=>{
+      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
         try{
-          const card = a.closest("article.card");
-          const badge = card?.querySelector(".badge")?.getAttribute('data-type') || card?.querySelector(".badge")?.textContent?.trim() || "";
-          const msg = templates[badge] || "Ciao Re Long, vorrei informazioni. Grazie!";
+          const card   = a.closest("article.card");
+          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
           a.href = WA_BASE + encodeURIComponent(msg);
           a.setAttribute("rel","noopener");
         }catch(_){}
       });
     })();
 
-    // ===== CARRELLO WHATSAPP GLOBALE =====
-    (function(){
-      const PILL = document.getElementById('cartPill');
-      const CNT  = document.getElementById('cartCount');
-      const BTN_SEND = document.getElementById('cartSend');
-      const BTN_CLEAR= document.getElementById('cartClear');
-
-      function get(){ try{ return JSON.parse(localStorage.getItem('rl_cart')||'[]'); }catch{return []} }
-      function set(v){ localStorage.setItem('rl_cart', JSON.stringify(v)); upd(); }
-      function upd(){
-        const arr = get(); const n = arr.length;
-        PILL.style.display = n? 'flex':'none';
-        CNT.textContent = `Carrello WhatsApp (${n})`;
-      }
-      // API globale
-      window.RLCart = {
-        add:(item)=>{ const arr=get(); arr.push(item); set(arr); showToast('Aggiunto al carrello: '+(item.name||item.sku)); },
-        remove:(sku)=>{ const arr=get().filter(x=>x.sku!==sku); set(arr); showToast('Rimosso: '+sku); },
-        clear:()=>{ set([]); showToast('Carrello svuotato'); },
-        list:get
-      };
-
-      BTN_CLEAR.onclick = ()=>window.RLCart.clear();
-      BTN_SEND.onclick  = ()=>{
-        const items = get();
-        if(!items.length){ showToast('Carrello vuoto'); return; }
-        const lines = items.map((x,i)=>`${i+1}) ${x.name||x.sku} — €${(x.price??'').toString()}`).join('\n');
-        const msg = `Ciao Re Long, vorrei un preventivo per:\n${lines}\nGrazie!`;
-        const url = `https://wa.me/3908119578844?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
-      };
-      upd();
-      window.addEventListener('storage', (e)=>{ if(e.key==='rl_cart') upd(); });
+    // Gentle haptics for touch
+    (() => {
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isTouch || !canVibrate) return;
+      const SELECTOR = 'a, button, .btn, .fab-btn';
+      const VIB_TAP = [10];
+      const VIB_STRONG = [14, 30, 12];
+      document.addEventListener('pointerdown', (e) => {
+        const el = e.target.closest(SELECTOR);
+        if (!el) return;
+        if (el.classList.contains('fab-btn')) { navigator.vibrate(VIB_STRONG); } else { navigator.vibrate(VIB_TAP); }
+      }, { passive: true });
     })();
 
-    // ===== Torna su =====
+    // Dynamic badges (rotate messaging, emphasize BF week)
     (function(){
-      const toTop = document.createElement('div');
-      toTop.className = 'to-top';
-      toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
-      document.body.appendChild(toTop);
-      const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
-      window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+      const now = new Date();
+      const bfStart = new Date('2025-11-24T00:00:00+01:00');
+      const bfEnd   = new Date('2025-11-30T23:59:59+01:00');
+      const isBF = now >= bfStart && now <= bfEnd;
+      const cycles = [
+        'BLACK FRIDAY', 'LIMITED', '🔥 HOT', 'NUOVO', 'MIGLIOR PREZZO'
+      ];
+      const badges = Array.from(document.querySelectorAll('[data-badge]'));
+      if(!badges.length) return;
+      let i=0;
+      setInterval(()=>{
+        badges.forEach((b)=>{
+          if(isBF){ b.textContent = 'BLACK FRIDAY'; }
+          else { b.textContent = cycles[i % cycles.length]; }
+        });
+        i++;
+      }, 2600);
     })();
-
-    // ===== Micro-vibrazioni anche sui bottoni principali =====
-    document.querySelectorAll('.btn, .fab-btn').forEach(el=>{
-      el.addEventListener('pointerdown', ()=>{ if(navigator.vibrate) navigator.vibrate(10); }, {passive:true});
-    });
   </script>
 </body>
 </html>
