@@ -40,10 +40,16 @@
       100%{text-shadow:none;opacity:1}
     }
     @keyframes strokeDash {from{stroke-dashoffset:150;opacity:.8} to{stroke-dashoffset:0;opacity:1}}
+    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-    /* Loader */
-    #rl-loader{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);transition:opacity .45s ease, visibility .45s ease}
+    /* Loader (con auto-hide CSS) */
+    #rl-loader{
+      position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      transition:opacity .45s ease, visibility .45s ease;
+      animation: loaderAutoHide 0s linear 3.2s forwards; /* auto-hide anche se JS fallisce */
+    }
     #rl-loader.hidden{opacity:0;visibility:hidden}
     .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
     .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.6s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
@@ -52,8 +58,6 @@
     .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
-    @media (prefers-reduced-motion:reduce){.rl-cube{animation:none}}
-    html.rl-lock, body.rl-lock{overflow:hidden}
 
     /* Background + lightspot */
     body{
@@ -155,31 +159,6 @@
     .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
     .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
   </style>
-
-  <!-- LocalBusiness JSON-LD (SEO) -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"ElectronicsStore",
-    "name":"Re Long Informatica",
-    "url":"https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html",
-    "telephone":"+39 08119578844",
-    "address":{
-      "@type":"PostalAddress",
-      "streetAddress":"Via Casalanno 31",
-      "addressLocality":"Marano di Napoli",
-      "addressRegion":"NA",
-      "postalCode":"80016",
-      "addressCountry":"IT"
-    },
-    "sameAs":["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"],
-    "openingHoursSpecification":[
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:30","closes":"13:30"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"16:00","closes":"20:30"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:30","closes":"13:30"}
-    ]
-  }
-  </script>
 </head>
 <body>
   <!-- Barra promo (Black Friday -> Cyber Monday -> sparisce) -->
@@ -193,11 +172,23 @@
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
     <div class="rl-cube">
       <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
-      <span class="face f4"></span><span class="face f5"></span>
-      <span class="face f6"></span>
+      <span class="face f4"></span><span class="face f5"></span><span class="face f6"></span>
     </div>
     <p class="rl-loading-text">Caricamento…</p>
   </div>
+
+  <!-- FAILSAFE: nascondi loader comunque dopo 3.2s -->
+  <script>
+    (function(){
+      function hideNow(){
+        var ld = document.getElementById('rl-loader');
+        if(ld){ ld.classList.add('hidden'); setTimeout(function(){ try{ ld.remove(); }catch(e){} }, 600); }
+      }
+      if(document.readyState!=='loading'){ hideNow(); }
+      window.addEventListener('load', hideNow, {once:true});
+      setTimeout(hideNow, 3200);
+    })();
+  </script>
 
   <main class="wrap">
     <header class="head">
@@ -205,7 +196,8 @@
         <!-- Mini logo SVG animato -->
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
           <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
-        <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         Re Long Telefonia, Energia & Assistenza PC
       </div>
       <div class="sub">Clicca sulla sezione di interesse</div>
@@ -270,24 +262,15 @@
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    /* Loader solido + to-top */
-    document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
-    function hideLoader(){
-      const ld = document.getElementById('rl-loader');
-      if(!ld) return;
-      ld.classList.add('hidden');
-      setTimeout(()=>{document.documentElement.classList.remove('rl-lock');document.body.classList.remove('rl-lock');ld.remove&&ld.remove();},500);
-    }
-    window.addEventListener('load', hideLoader);
-    document.addEventListener('DOMContentLoaded', ()=> setTimeout(hideLoader, 0));
-    setTimeout(hideLoader, 3000); // fallback
-
-    const toTop = document.createElement('div');
-    toTop.className = 'to-top';
-    toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
-    document.body.appendChild(toTop);
-    const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
-    window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+    /* to-top */
+    (function(){
+      const toTop = document.createElement('div');
+      toTop.className = 'to-top';
+      toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
+      document.body.appendChild(toTop);
+      const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
+      window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+    })();
 
     function showToast(msg){
       let t = document.querySelector('.toast');
@@ -345,4 +328,78 @@
       function tick(){
         const now = new Date();
         const ph = phase(now);
-        if(!ph){ bar.style.di
+        if(!ph){ bar.style.display = 'none'; document.body.classList.remove('has-bf'); return; }
+        bar.style.display = 'flex'; document.body.classList.add('has-bf');
+        label.textContent = ph.text;
+
+        let diff = ph.endsAt - now;
+        if (diff <= 0){ timer.textContent = 'ULTIME ORE!'; return; }
+        const d = Math.floor(diff/86400000); diff -= d*86400000;
+        const h = Math.floor(diff/3600000);  diff -= h*3600000;
+        const m = Math.floor(diff/60000);    diff -= m*60000;
+        const s = Math.floor(diff/1000);
+        timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+
+    /* WhatsApp templates auto per i pulsanti nelle card */
+    (function(){
+      const WA_BASE = "https://wa.me/3908119578844?text=";
+      const templates = {
+        "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
+        "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
+        "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
+        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
+        "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
+      };
+      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
+        try{
+          const url = new URL(a.href, location.href);
+          if (url.searchParams.has("text")) return;
+          const card   = a.closest("article.card");
+          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
+          a.href = WA_BASE + encodeURIComponent(msg);
+          a.setAttribute("rel","noopener");
+        }catch(_){}
+      });
+    })();
+
+    /* Haptic feedback mobile (opzionale) */
+    (() => {
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isTouch || !canVibrate) return;
+      const SELECTOR = 'a, button, .btn, .fab-btn';
+      const VIB_TAP = [10];
+      const VIB_STRONG = [14, 30, 12];
+      document.addEventListener('pointerdown', (e) => {
+        const el = e.target.closest(SELECTOR);
+        if (!el) return;
+        if (el.classList.contains('fab-btn')) {
+          navigator.vibrate(VIB_STRONG);
+        } else {
+          navigator.vibrate(VIB_TAP);
+        }
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- FAB -->
+  <div class="fab-nav" aria-label="Azioni rapide">
+    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+      <span>Portami allo Store</span>
+    </a>
+    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
+      <span>Chiamaci</span>
+    </a>
+  </div>
+
+  <!-- Noscript: se JS disattivato, nascondi loader -->
+  <noscript><style>#rl-loader{display:none!important}</style></noscript>
+</body>
+</html>
