@@ -43,11 +43,6 @@
     .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
     .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
 
-    /* Stato negozio */
-    .status-pill{font-size:11px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
-    .status-open{background:linear-gradient(90deg,#00d27a,#22c55e);color:#000;border-color:transparent}
-    .status-closed{background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border-color:transparent}
-
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
@@ -59,13 +54,13 @@
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    /* Badge colorati (default) */
+    /* Badge colorati */
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
-    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)} /* Smartphone */
+    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#8B5CF6,#EC4899)} /* viola -> fucsia (solo badge) */
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia */
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)} /* Assistenza PC */
-    article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#22c55e,#16a34a)} /* Offerte Business */
+    article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#06B6D4,#0EA5E9)} /* ciano -> azzurro (solo badge) */
 
     .title{font-size:18px;font-weight:800}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
@@ -88,7 +83,6 @@
     .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
 
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
-    .toast.show{opacity:1}
 
     /* Barra promo minimal elegante */
     .bf-bar{
@@ -102,29 +96,6 @@
     .bf-bar .label{font-weight:900;letter-spacing:.02em}
     .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
     .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
-
-    /* ========= OVERRIDE COLORI RICHIESTI =========
-       Primo ban (card 1): viola -> fucsia
-       Ultimo ban (card 5): ciano -> azzurro
-       Applico sia al badge sia ai pulsanti principali (non-WhatsApp) */
-    article.card:nth-of-type(1) .badge{
-      background:linear-gradient(90deg,#8B5CF6,#EC4899) !important; /* viola -> fucsia */
-      box-shadow:0 10px 18px rgba(236,72,153,.35);
-    }
-    article.card:nth-of-type(1) .btn:not(.wa){
-      background:linear-gradient(90deg,#8B5CF6,#EC4899) !important;
-      box-shadow:0 16px 26px rgba(139,92,246,.35);
-    }
-
-    article.card:nth-of-type(5) .badge{
-      background:linear-gradient(90deg,#06B6D4,#0EA5E9) !important; /* ciano -> azzurro */
-      box-shadow:0 10px 18px rgba(14,165,233,.35);
-    }
-    article.card:nth-of-type(5) .btn:not(.wa){
-      background:linear-gradient(90deg,#06B6D4,#0EA5E9) !important;
-      box-shadow:0 16px 26px rgba(6,182,212,.35);
-    }
-    /* ========= FINE OVERRIDE ========= */
   </style>
 </head>
 <body>
@@ -146,10 +117,7 @@
 
   <main class="wrap">
     <header class="head">
-      <div class="brand">
-        Re Long Telefonia, Energia & Assistenza PC
-        <span class="status-pill" id="storeStatus">Verifica orari…</span>
-      </div>
+      <div class="brand">Re Long Telefonia, Energia & Assistenza PC</div>
       <div class="sub">Clicca sulla sezione di interesse</div>
     </header>
 
@@ -203,17 +171,13 @@
   </main>
 
   <script>
-    /* Blocco base: loader, to-top, link interni con fallback */
+    /* Loader + to-top + link interni */
     document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
     function hideLoader(){
       const ld = document.getElementById('rl-loader');
       if(!ld) return;
       ld.classList.add('hidden');
-      setTimeout(()=>{
-        document.documentElement.classList.remove('rl-lock');
-        document.body.classList.remove('rl-lock');
-        ld.remove && ld.remove();
-      }, 500);
+      setTimeout(()=>{document.documentElement.classList.remove('rl-lock');document.body.classList.remove('rl-lock');ld.remove&&ld.remove();},500);
     }
     window.addEventListener('load', hideLoader);
     setTimeout(hideLoader, 3500);
@@ -262,10 +226,8 @@
       const label = document.getElementById('bfLabel');
       if(!bar || !timer || !label) return;
 
-      // BLACK FRIDAY: 24-30 novembre 2025
       const BF_START = new Date('2025-11-24T00:00:00+01:00');
       const BF_END   = new Date('2025-11-30T23:59:59+01:00');
-      // CYBER MONDAY: 1 dicembre 2025
       const CM_START = new Date('2025-12-01T00:00:00+01:00');
       const CM_END   = new Date('2025-12-01T23:59:59+01:00');
 
@@ -274,7 +236,6 @@
         if (now >= CM_START && now <= CM_END) return {text:'CYBER MONDAY', endsAt: CM_END};
         return null;
       }
-
       function tick(){
         const now = new Date();
         const ph = phase(now);
@@ -290,52 +251,7 @@
         const s = Math.floor(diff/1000);
         timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
       }
-
       tick(); setInterval(tick, 1000);
-    })();
-
-    /* Stato negozio LIVE (Lun–Ven 09:30–13:30 / 16:00–20:30; Sab 09:30–13:30; Dom chiuso) */
-    (function(){
-      const pill = document.getElementById('storeStatus'); if(!pill) return;
-      const HOURS = {
-        0: [], // Domenica
-        1: [[9,15,13,00],[16,0,20,00]], // Lunedì
-        2: [[9,15,13,00],[16,0,20,00]], // Martedì
-        3: [[9,15,13,00],[16,0,20,00]], // Mercoledì
-        4: [[9,15,13,00],[16,0,20,00]], // Giovedì
-        5: [[9,15,13,00],[16,0,20,00]], // Venerdì
-        6: [[9,15,13,00]]               // Sabato
-      };
-      const fmt = (h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-      function compute(){
-        const now = new Date();
-        const day = now.getDay();
-        const segs = HOURS[day]||[];
-        const mins = now.getHours()*60 + now.getMinutes();
-        let open=false, nextOpen=null, closeAt=null;
-        for(const [sh,sm,eh,em] of segs){
-          const s = sh*60+sm, e = eh*60+em;
-          if(mins>=s && mins<e){ open=true; closeAt=[eh,em]; break; }
-          if(mins < s && !nextOpen){ nextOpen=[sh,sm]; }
-        }
-        if(!open && !nextOpen){
-          for(let i=1;i<=7;i++){
-            const d=(day+i)%7; const arr=HOURS[d]; if(arr && arr.length){ nextOpen=[arr[0][0],arr[0][1]]; break; }
-          }
-        }
-        if(open){
-          pill.textContent = `Aperto • chiude alle ${fmt(...closeAt)}`;
-          pill.classList.add('status-open'); pill.classList.remove('status-closed');
-        } else if(nextOpen){
-          pill.textContent = `Chiuso • apre alle ${fmt(...nextOpen)}`;
-          pill.classList.add('status-closed'); pill.classList.remove('status-open');
-        } else {
-          pill.textContent = 'Chiuso';
-          pill.classList.add('status-closed'); pill.classList.remove('status-open');
-        }
-      }
-      compute();
-      setInterval(compute, 60*1000);
     })();
   </script>
 
