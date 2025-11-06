@@ -83,10 +83,6 @@
     }
     .card:hover::before{ opacity:.8 }
 
-    /* Flash tap */
-    .tapflash{position:absolute;border-radius:999px;background:radial-gradient(circle, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 60%);pointer-events:none;transform:translate(-50%,-50%);animation:flash .5s ease-out forwards}
-    @keyframes flash{from{opacity:.6; width:0; height:0} to{opacity:0; width:160px; height:160px}}
-
     /* Badge dinamici */
     .badge{
       position:absolute; top:8px; left:14px;
@@ -133,11 +129,7 @@
     /* Notifica push fake */
     .pushfake{position:fixed;right:16px;bottom:110px;background:#141414;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;box-shadow:0 18px 36px rgba(0,0,0,.6);display:none;z-index:9999}
 
-    /* Carrello WhatsApp */
-    .cart-pill{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-weight:900;border-radius:999px;padding:10px 16px;box-shadow:0 18px 36px rgba(255,90,0,.35);z-index:9999;display:flex;gap:10px;align-items:center}
-    .cart-pill button{background:#000;color:#fff;border:0;border-radius:999px;padding:8px 12px;font-weight:900}
-
-    /* Mobile fine-tuning */
+      /* Mobile fine-tuning */
     @media (max-width:480px){
       .card{ padding-top:66px; }
       .badge{ top:6px; font-size:10px; padding:5px 8px; }
@@ -323,36 +315,6 @@
       }
     })();
 
-    // ===== Popup Offerta Flash quando si apre link BF =====
-    (function(){
-      function flashPopup(topic){
-        const modal = document.createElement('div');
-        modal.className = 'lead-overlay';
-        modal.style.display='flex';
-        modal.innerHTML = `
-          <div class="lead-card" style="text-align:center">
-            <button class="lead-close" aria-label="Chiudi">×</button>
-            <div class="lead-title">Offerta Flash ${topic} ⚡</div>
-            <div class="lead-sub">Questa promo scade oggi alle 23:59 — vuoi bloccarla ora?</div>
-            <div class="lead-actions" style="justify-content:center">
-              <a class="btn" href="https://wa.me/3908119578844?text=${encodeURIComponent('Ciao Re Long, voglio bloccare la promo Black Friday: '+topic)}">Blocca su WhatsApp</a>
-              <button class="btn-ghost" style="margin-left:8px">Continua</button>
-            </div>
-          </div>`;
-        document.body.appendChild(modal);
-        const close = ()=>{ modal.remove(); };
-        modal.querySelector('.lead-close').onclick=close;
-        modal.querySelector('.btn-ghost').onclick=close;
-        modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
-      }
-      // trigger su link con data-bf-link
-      document.addEventListener('click', (e)=>{
-        const a = e.target.closest('a[data-bf-link="true"]'); if(!a) return;
-        e.preventDefault();
-        const topic = a.textContent.trim();
-        flashPopup(topic);
-        // naviga dopo 1.2s se l'utente non blocca
-        setTimeout(()=>{ location.href = a.href; }, 1200);
       });
     })();
 
@@ -399,26 +361,6 @@
       });
     })();
 
-    // ===== CARRELLO WHATSAPP GLOBALE =====
-    (function(){
-      const PILL = document.getElementById('cartPill');
-      const CNT  = document.getElementById('cartCount');
-      const BTN_SEND = document.getElementById('cartSend');
-      const BTN_CLEAR= document.getElementById('cartClear');
-
-      function get(){ try{ return JSON.parse(localStorage.getItem('rl_cart')||'[]'); }catch{return []} }
-      function set(v){ localStorage.setItem('rl_cart', JSON.stringify(v)); upd(); }
-      function upd(){
-        const arr = get(); const n = arr.length;
-        PILL.style.display = n? 'flex':'none';
-        CNT.textContent = `Carrello WhatsApp (${n})`;
-      }
-      // API globale
-      window.RLCart = {
-        add:(item)=>{ const arr=get(); arr.push(item); set(arr); showToast('Aggiunto al carrello: '+(item.name||item.sku)); },
-        remove:(sku)=>{ const arr=get().filter(x=>x.sku!==sku); set(arr); showToast('Rimosso: '+sku); },
-        clear:()=>{ set([]); showToast('Carrello svuotato'); },
-        list:get
       };
 
       BTN_CLEAR.onclick = ()=>window.RLCart.clear();
