@@ -6,10 +6,24 @@
   <title>Re Long Informatica, Telefonia, Energia & Assistenza PC</title>
   <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
   <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Re Long Informatica – Telefonia, Energia & Assistenza PC">
+  <meta property="og:description" content="Smartphone a rate, Offerte Business, Energia Casa e Assistenza PC. Tel: 08119578844.">
+  <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
+  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re Long Informatica">
+  <meta name="twitter:description" content="Smartphone a rate, Energia, Business, Assistenza PC.">
+  <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+
+  <!-- Favicon inline -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
@@ -37,6 +51,8 @@
 
     /* Pagina */
     body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    body.has-bf{padding-top:64px}
+    @media(max-width:480px){body.has-bf{padding-top:74px}}
     .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px}
     @media(max-width:480px){.wrap{padding-bottom:130px}}
     .head{text-align:center;padding:8px 8px 0 8px}
@@ -54,14 +70,14 @@
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    /* Badge colorati (Versione A con badge 5 non-blu) */
+    /* Badge (solo i piccoli) */
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
-    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)} /* rosso -> oro */
+    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)} /* rosso -> oro (SMARTPHONE) */
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia */
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)} /* Assistenza PC */
     article.card:nth-of-type(5) .badge{
-      background:linear-gradient(90deg,#10B981,#84CC16); /* verde smeraldo -> lime */
+      background:linear-gradient(90deg,#10B981,#84CC16); /* verde smeraldo -> lime (BUSINESS MOBILI) */
       box-shadow:0 10px 18px rgba(16,185,129,.35);
     }
 
@@ -100,6 +116,31 @@
     .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
     .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
   </style>
+
+  <!-- LocalBusiness JSON-LD (SEO) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"ElectronicsStore",
+    "name":"Re Long Informatica",
+    "url":"https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html",
+    "telephone":"+39 08119578844",
+    "address":{
+      "@type":"PostalAddress",
+      "streetAddress":"Via Casalanno 31",
+      "addressLocality":"Marano di Napoli",
+      "addressRegion":"NA",
+      "postalCode":"80016",
+      "addressCountry":"IT"
+    },
+    "sameAs":["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"],
+    "openingHoursSpecification":[
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:30","closes":"13:30"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"16:00","closes":"20:30"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:30","closes":"13:30"}
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- Barra promo (Black Friday -> Cyber Monday -> sparisce) -->
@@ -174,7 +215,7 @@
   </main>
 
   <script>
-    /* Loader + to-top + link interni */
+    /* Loader solido + to-top */
     document.documentElement.classList.add('rl-lock'); document.body.classList.add('rl-lock');
     function hideLoader(){
       const ld = document.getElementById('rl-loader');
@@ -183,7 +224,8 @@
       setTimeout(()=>{document.documentElement.classList.remove('rl-lock');document.body.classList.remove('rl-lock');ld.remove&&ld.remove();},500);
     }
     window.addEventListener('load', hideLoader);
-    setTimeout(hideLoader, 3500);
+    document.addEventListener('DOMContentLoaded', ()=> setTimeout(hideLoader, 0));
+    setTimeout(hideLoader, 3000); // fallback
 
     const toTop = document.createElement('div');
     toTop.className = 'to-top';
@@ -198,14 +240,20 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
+    /* Link interni sicuri: GET (non HEAD) per pre-check. Ignora schemi speciali (tel, wa.me, maps...) */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
-      const url = new URL(a.href, location.href);
-      const isInternal = url.origin === location.origin && /\.html?$/.test(url.pathname);
+      const href = a.getAttribute('href')||'';
+      const isSpecial = /^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href) || href.includes('wa.me');
+      if(isSpecial) return; // lascia al browser
+
+      let url;
+      try{ url = new URL(a.href, location.href); }catch(_){ return; }
+      const isInternal = (url.protocol==='http:'||url.protocol==='https:') && url.origin===location.origin && /\.html?$/.test(url.pathname);
       if(isInternal){
         e.preventDefault();
         try{
-          const res = await fetch(url.href, {method:'HEAD', cache:'no-store'});
+          const res = await fetch(url.href, {method:'GET', cache:'no-store', redirect:'follow'});
           if(res.ok){ location.href = url.href; }
           else { showToast('Pagina non trovata. Ti riportiamo alla Home.'); setTimeout(()=>location.href='./', 1000); }
         }catch(_){
@@ -222,7 +270,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Barra promo: Black Friday -> Cyber Monday -> poi sparisce (Europe/Rome) */
+    /* Barra promo: Black Friday -> Cyber Monday -> poi sparisce + padding body */
     (function(){
       const bar   = document.getElementById('bfBar');
       const timer = document.getElementById('bfTimer');
@@ -242,8 +290,8 @@
       function tick(){
         const now = new Date();
         const ph = phase(now);
-        if(!ph){ bar.style.display = 'none'; return; }
-        bar.style.display = 'flex';
+        if(!ph){ bar.style.display = 'none'; document.body.classList.remove('has-bf'); return; }
+        bar.style.display = 'flex'; document.body.classList.add('has-bf');
         label.textContent = ph.text;
 
         let diff = ph.endsAt - now;
@@ -273,6 +321,7 @@
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
+  /* WhatsApp templates auto */
   (function(){
     const WA_BASE = "https://wa.me/3908119578844?text=";
     const templates = {
@@ -298,6 +347,7 @@
   </script>
 
   <script>
+  /* Haptic feedback mobile (opzionale ma carino) */
   (() => {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
     const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
