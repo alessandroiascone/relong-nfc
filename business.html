@@ -7,6 +7,13 @@
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+
+    /* ✅ Gradient brand come nel resto del sito */
+    :root{
+      --brand1:#ff0000; /* rosso */
+      --brand2:#ff7b00; /* arancione */
+    }
+
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
       background:radial-gradient(circle at 20% 20%,#0f0f0f 0%,#000 70%);
@@ -14,20 +21,22 @@
       padding:24px;
     }
     .card{
-  width:100%;
-  max-width:520px;
-  background:linear-gradient(150deg,rgba(25,25,25,.92)0%,rgba(0,0,0,.6)100%);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:22px;
-  padding:48px 24px 24px; /* ✅ aggiunto spazio sopra per il badge */
-  box-shadow:0 30px 60px rgba(0,0,0,.95);
-  position:relative; /* ✅ necessario per il badge */
+      width:100%;
+      max-width:520px;
+      background:linear-gradient(150deg,rgba(25,25,25,.92)0%,rgba(0,0,0,.6)100%);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:22px;
+      padding:48px 24px 24px; /* spazio sopra per il badge */
+      box-shadow:0 30px 60px rgba(0,0,0,.95);
+      position:relative; /* necessario per il badge */
     }
-   .badge{
+    .badge{
       position:absolute; top:-12px; left:16px;
       background:linear-gradient(90deg,var(--brand1) 0%, var(--brand2) 100%);
       color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
       box-shadow:0 12px 22px rgba(255,80,0,.42);
+      border:1px solid rgba(0,0,0,.06);
+      letter-spacing:.02em;
     }
     .brand{text-align:center;margin-bottom:16px;margin-top:8px;}
     .brand-title{font-size:22px;font-weight:600;color:#fff;letter-spacing:-.04em;line-height:1.2;}
@@ -142,7 +151,7 @@
       target="_blank"
       rel="noopener noreferrer"
     >
-      <big>SCRIVICI SUBITO SU WHATSApp</big>
+      <big>SCRIVICI SUBITO SU WHATSAPP</big>
       <small>Dimmi che attività hai e ti preparo l'offerta Business 📂</small>
     </a>
 
