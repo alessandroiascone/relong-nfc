@@ -39,10 +39,7 @@
       60%{text-shadow:0 0 18px rgba(255,122,0,.35),0 0 34px rgba(255,80,0,.18);opacity:1}
       100%{text-shadow:none;opacity:1}
     }
-    @keyframes strokeDash {
-      from { stroke-dashoffset: 150; opacity:.8 }
-      to   { stroke-dashoffset: 0;   opacity:1 }
-    }
+    @keyframes strokeDash {from{stroke-dashoffset:150;opacity:.8} to{stroke-dashoffset:0;opacity:1}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
     /* Loader */
@@ -77,24 +74,13 @@
 
     /* Header / brand con mini-logo SVG animato */
     .head{text-align:center;padding:8px 8px 0 8px}
-    .brand{
-      display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;
-      letter-spacing:-.04em;animation:fadeUp .5s ease both
-    }
-    .brand .logo{
-      width:24px;height:24px;display:inline-block
-    }
-    .brand .logo path{
-      stroke-dasharray:150;stroke-dashoffset:150;animation:strokeDash .6s ease forwards .15s
-    }
-    .sub{
-      font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both, titleGlow 1.2s ease .9s 1
-    }
+    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .brand .logo{width:24px;height:24px;display:inline-block}
+    .brand .logo path{stroke-dasharray:150;stroke-dashoffset:150;animation:strokeDash .6s ease forwards .15s}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both, titleGlow 1.2s ease .9s 1}
 
     /* Hero minimal */
-    .hero{
-      margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center
-    }
+    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
@@ -140,16 +126,6 @@
     .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
     .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
 
-    /* Help veloce */
-    .help{
-      margin-top:2px;padding:16px;border:1px solid var(--stroke);border-radius:16px;background:linear-gradient(150deg,rgba(18,18,18,.92),rgba(8,8,8,.7));
-      display:grid;gap:12px
-    }
-    .help h3{font-size:14px;letter-spacing:.02em}
-    .help ul{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted)}
-    .help ul li{list-style:none;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04)}
-    .help .cta{max-width:320px;margin:4px auto 0}
-
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
@@ -178,23 +154,6 @@
     .bf-bar .label{font-weight:900;letter-spacing:.02em}
     .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
     .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
-
-    /* QR floating (desktop) */
-    .qr-fab{position:fixed;right:16px;bottom:108px;z-index:9999;display:none}
-    @media(min-width:980px){.qr-fab{display:block}}
-    .qr-fab button{
-      cursor:pointer;border:none;display:flex;align-items:center;gap:8px;
-      background:linear-gradient(135deg,#1f1f1f,#2a2a2a);color:#fff;
-      padding:10px 14px;border-radius:999px;box-shadow:0 16px 28px rgba(0,0,0,.5);
-      border:1px solid rgba(255,255,255,.08);font-weight:900
-    }
-    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10001}
-    .qr-modal.open{display:flex}
-    .qr-card{background:#121212;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;max-width:320px;text-align:center;box-shadow:0 26px 64px rgba(0,0,0,.7)}
-    .qr-card h4{margin-bottom:8px}
-    .qr-card img{display:block;margin:10px auto 0;border-radius:8px}
-    .qr-card .hint{font-size:12px;color:var(--muted);margin-top:8px}
-    .qr-close{margin-top:12px;background:linear-gradient(90deg,#ff0000,#ff7b00);border:none;color:#000;font-weight:900;padding:10px 12px;border-radius:12px;cursor:pointer}
   </style>
 
   <!-- LocalBusiness JSON-LD (SEO) -->
@@ -234,7 +193,8 @@
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
     <div class="rl-cube">
       <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
-      <span class="face f4"></span><span class="face f5"></span><span class="face f6"></span>
+      <span class="face f4"></span><span class="face f5"></span>
+      <span class="face f6"></span>
     </div>
     <p class="rl-loading-text">Caricamento…</p>
   </div>
@@ -244,13 +204,8 @@
       <div class="brand">
         <!-- Mini logo SVG animato -->
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/>
-            </linearGradient>
-          </defs>
-          <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
+        <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Re Long Telefonia, Energia & Assistenza PC
       </div>
       <div class="sub">Clicca sulla sezione di interesse</div>
@@ -305,37 +260,12 @@
       </article>
     </section>
 
-    <!-- Help veloce -->
-    <section class="help" aria-label="Hai bisogno di aiuto?">
-      <h3>Hai bisogno di aiuto?</h3>
-      <ul>
-        <li>📱 Smartphone a rate</li>
-        <li>⚡ Energia Casa</li>
-        <li>🧾 Aziende & P.IVA</li>
-        <li>🧰 Assistenza PC</li>
-      </ul>
-      <a class="btn wa cta" href="https://wa.me/3908119578844">Apri chat WhatsApp</a>
-    </section>
-
     <p class="footer">
       <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">📍 Via Casalanno 31, Marano di Napoli</a>
       •
       <a href="tel:+3908119578844">☎️ 08119578844</a>
     </p>
   </main>
-
-  <!-- QR floating (desktop) -->
-  <div class="qr-fab" aria-hidden="false">
-    <button id="qrOpen" aria-haspopup="dialog" aria-controls="qrModal" aria-label="Mostra QR per aprire WhatsApp su telefono">🔳 Apri su telefono</button>
-  </div>
-  <div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
-    <div class="qr-card">
-      <h4 id="qrTitle">Scansiona per chattare su WhatsApp</h4>
-      <img id="qrImg" src="" width="220" height="220" alt="QR WhatsApp Re Long 08119578844"/>
-      <p class="hint">Inquadra il QR con la fotocamera del telefono per aprire la chat.</p>
-      <button class="qr-close" id="qrClose">Chiudi</button>
-    </div>
-  </div>
 
   <div class="toast" role="status" aria-live="polite"></div>
 
@@ -415,100 +345,4 @@
       function tick(){
         const now = new Date();
         const ph = phase(now);
-        if(!ph){ bar.style.display = 'none'; document.body.classList.remove('has-bf'); return; }
-        bar.style.display = 'flex'; document.body.classList.add('has-bf');
-        label.textContent = ph.text;
-
-        let diff = ph.endsAt - now;
-        if (diff <= 0){ timer.textContent = 'ULTIME ORE!'; return; }
-        const d = Math.floor(diff/86400000); diff -= d*86400000;
-        const h = Math.floor(diff/3600000);  diff -= h*3600000;
-        const m = Math.floor(diff/60000);    diff -= m*60000;
-        const s = Math.floor(diff/1000);
-        timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      }
-      tick(); setInterval(tick, 1000);
-    })();
-
-    /* WhatsApp templates auto per i pulsanti nelle card */
-    (function(){
-      const WA_BASE = "https://wa.me/3908119578844?text=";
-      const templates = {
-        "SMARTPHONE A RATE": "Ciao Re Long, vorrei informazioni per prendere uno smartphone a rate (Vodafone & Compass). Mi aiuti? 📱",
-        "OFFERTE BUSINESS":  "Ciao Re Long, sono un'azienda/Partita IVA. Vorrei info sulle offerte Vodafone Business. Possiamo sentirci? 🧾",
-        "ENERGIA CASA":      "Ciao Re Long, ti invio la mia bolletta luce per una verifica risparmio. Mi consigli l’offerta migliore? ⚡",
-        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza per il mio PC. Posso inviarti foto/video del problema? 🧰",
-        "VODAFONE BUSINESS": "Ciao Re Long, vorrei scoprire le offerte Mobili Business per Partite IVA. Grazie! 📲"
-      };
-      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
-        try{
-          const url = new URL(a.href, location.href);
-          if (url.searchParams.has("text")) return;
-          const card   = a.closest("article.card");
-          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
-          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
-          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
-          a.href = WA_BASE + encodeURIComponent(msg);
-          a.setAttribute("rel","noopener");
-        }catch(_){}
-      });
-    })();
-
-    /* QR modal logic (desktop button) — genera un QR via Google Charts */
-    (function(){
-      const open = document.getElementById('qrOpen');
-      const modal = document.getElementById('qrModal');
-      const img = document.getElementById('qrImg');
-      const close = document.getElementById('qrClose');
-
-      if(!open || !modal || !img || !close) return;
-
-      const waLink = "https://wa.me/3908119578844";
-      const url = "https://chart.googleapis.com/chart?cht=qr&chs=220x220&chld=M|0&chl=" + encodeURIComponent(waLink);
-
-      function show(){
-        img.src = url;
-        modal.classList.add('open');
-      }
-      function hide(){ modal.classList.remove('open'); }
-
-      open.addEventListener('click', show);
-      close.addEventListener('click', hide);
-      modal.addEventListener('click', (e)=>{ if(e.target === modal) hide(); });
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hide(); });
-    })();
-
-    /* Haptic feedback mobile (opzionale) */
-    (() => {
-      const isTouch = window.matchMedia('(pointer: coarse)').matches;
-      const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!isTouch || !canVibrate) return;
-      const SELECTOR = 'a, button, .btn, .fab-btn';
-      const VIB_TAP = [10];
-      const VIB_STRONG = [14, 30, 12];
-      document.addEventListener('pointerdown', (e) => {
-        const el = e.target.closest(SELECTOR);
-        if (!el) return;
-        if (el.classList.contains('fab-btn')) {
-          navigator.vibrate(VIB_STRONG);
-        } else {
-          navigator.vibrate(VIB_TAP);
-        }
-      }, { passive: true });
-    })();
-  </script>
-
-  <!-- FAB -->
-  <div class="fab-nav" aria-label="Azioni rapide">
-    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
-      <span>Portami allo Store</span>
-    </a>
-    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
-      <span>Chiamaci</span>
-    </a>
-  </div>
-
-</body>
-</html>
+        if(!ph){ bar.style.di
