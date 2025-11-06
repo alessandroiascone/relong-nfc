@@ -18,11 +18,19 @@
   <meta name="twitter:description" content="Smartphone a rate, Energia, Business, Assistenza PC.">
   <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
 
+  <!-- SEO extras -->
+  <link rel="canonical" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+
   <!-- Favicon inline -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
+  <!-- Performance hints -->
+  <link rel="dns-prefetch" href="https://alessandroiascone.github.io">
+  <link rel="prefetch" href="./catalogo-smartphone-reale-v3.html" as="document" crossorigin>
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -34,21 +42,21 @@
     }
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-    @keyframes titleGlow{
-      0%{text-shadow:none;opacity:.85}
-      60%{text-shadow:0 0 18px rgba(255,122,0,.35),0 0 34px rgba(255,80,0,.18);opacity:1}
-      100%{text-shadow:none;opacity:1}
-    }
+    @keyframes titleGlow{0%{text-shadow:none;opacity:.85}60%{text-shadow:0 0 18px rgba(255,122,0,.35),0 0 34px rgba(255,80,0,.18);opacity:1}100%{text-shadow:none;opacity:1}}
     @keyframes strokeDash {from{stroke-dashoffset:150;opacity:.8} to{stroke-dashoffset:0;opacity:1}}
     @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-    /* Loader (con auto-hide CSS) */
+    /* Focus ring accessibile */
+    :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
+    a.btn:focus-visible,.fab-btn:focus-visible{filter:brightness(1.08)}
+
+    /* Loader (auto-hide CSS failsafe) */
     #rl-loader{
       position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
       background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
       transition:opacity .45s ease, visibility .45s ease;
-      animation: loaderAutoHide 0s linear 3.2s forwards; /* auto-hide anche se JS fallisce */
+      animation: loaderAutoHide 0s linear 3.2s forwards;
     }
     #rl-loader.hidden{opacity:0;visibility:hidden}
     .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
@@ -128,11 +136,11 @@
     }
     .card:hover::after{opacity:1}
 
-    /* Badge (solo i piccoli) */
+    /* Badge piccoli (solo badge, non i bottoni arancio) */
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
     article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)} /* SMARTPHONE */
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
-    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia -->
+    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia */
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)} /* Assistenza PC */
     article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#10B981,#84CC16);box-shadow:0 10px 18px rgba(16,185,129,.35)} /* Business Mobili */
 
@@ -299,12 +307,12 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
-    /* Link interni sicuri: GET (non HEAD) per pre-check. Ignora schemi speciali (tel, wa.me, maps...) */
+    /* Link interni sicuri: GET (non HEAD). Ignora tel/wa/maps... */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
       const isSpecial = /^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href) || href.includes('wa.me');
-      if(isSpecial) return; // lascia al browser
+      if(isSpecial) return;
 
       let url;
       try{ url = new URL(a.href, location.href); }catch(_){ return; }
@@ -329,7 +337,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Barra promo + micro-banner inline: SOLO Black Friday dal 7 nov ore 09:00 al 30 nov 23:59 (Europe/Rome) */
+    /* Barra promo + micro-banner inline: SOLO Black Friday 7 nov 09:00 → 30 nov 23:59 (Europe/Rome) */
     (function(){
       const bar   = document.getElementById('bfBar');
       const timer = document.getElementById('bfTimer');
@@ -337,8 +345,8 @@
       const inline = document.getElementById('bfInline');
       if(!bar || !timer || !label) return;
 
-      const BF_START = new Date('2025-11-07T09:00:00+01:00'); // domani 09:00
-      const BF_END   = new Date('2025-11-30T23:59:59+01:00'); // fino al 30 incluso
+      const BF_START = new Date('2025-11-07T09:00:00+01:00');
+      const BF_END   = new Date('2025-11-30T23:59:59+01:00');
 
       function phase(now){
         if (now >= BF_START && now <= BF_END) return {text:'BLACK FRIDAY', endsAt: BF_END};
@@ -357,7 +365,7 @@
         document.body.classList.add('has-bf');
         label.textContent = ph.text;
 
-        // Micro-banner inline solo durante BF
+        // Micro-banner inline soltanto durante BF
         if(inline) inline.style.display = 'flex';
 
         let diff = ph.endsAt - now;
@@ -369,6 +377,31 @@
         timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
       }
       tick(); setInterval(tick, 1000);
+    })();
+
+    /* WhatsApp templates auto con UTM per tracciamento base */
+    (function(){
+      const WA_BASE = "https://wa.me/3908119578844?text=";
+      const UTM = "&utm_source=hub&utm_medium=cta&utm_campaign=bf25";
+      const templates = {
+        "SMARTPHONE A RATE": "Ciao Re Long, vorrei info su smartphone a rate (Vodafone & Compass). 📱",
+        "OFFERTE BUSINESS":  "Ciao Re Long, sono P.IVA: info offerte Business. 🧾",
+        "ENERGIA CASA":      "Ciao Re Long, ti invio la bolletta per verifica risparmio. ⚡",
+        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza/upgrade PC. 🧰",
+        "VODAFONE BUSINESS": "Ciao Re Long, info su offerte Mobili Business. 📲"
+      };
+      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
+        try{
+          const url = new URL(a.href, location.href);
+          if (url.searchParams.has("text")) return;
+          const card   = a.closest("article.card");
+          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
+          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
+          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
+          a.href = WA_BASE + encodeURIComponent(msg) + UTM;
+          a.setAttribute("rel","noopener");
+        }catch(_){}
+      });
     })();
 
     /* Haptic feedback mobile (opzionale) */
@@ -389,6 +422,13 @@
         }
       }, { passive: true });
     })();
+
+    /* Logger click minimale (console) */
+    document.addEventListener('click',(e)=>{
+      const a=e.target.closest('a'); if(!a) return;
+      const where = a.textContent.trim().slice(0,60) || a.getAttribute('aria-label') || a.href;
+      console.log('[click]', where);
+    });
   </script>
 
   <!-- FAB -->
@@ -402,6 +442,31 @@
       <span>Chiamaci</span>
     </a>
   </div>
+
+  <!-- Structured Data: LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Re Long Informatica",
+    "image": "https://alessandroiascone.github.io/relong-nfc/og-cover.jpg",
+    "url": "https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html",
+    "telephone": "+39 08119578844",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Via Casalanno 31",
+      "addressLocality": "Marano di Napoli",
+      "postalCode": "80016",
+      "addressCountry": "IT"
+    },
+    "sameAs": ["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"],
+    "openingHoursSpecification": [
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:30","closes":"13:30"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"16:00","closes":"20:30"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:30","closes":"13:30"}
+    ]
+  }
+  </script>
 
   <!-- Noscript: se JS disattivato, nascondi loader -->
   <noscript><style>#rl-loader{display:none!important}</style></noscript>
