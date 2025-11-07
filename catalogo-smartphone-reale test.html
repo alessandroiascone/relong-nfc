@@ -61,6 +61,7 @@
   .tag--best{background:linear-gradient(90deg,#06B6D4,#0EA5E9)}
   .tag--limitata{background:linear-gradient(90deg,#F59E0B,#EF4444)}
   .tag--sconto{background:linear-gradient(90deg,#000,#222);color:#ffd166;border-color:rgba(255,255,255,.22)}
+  .tag--top{background:linear-gradient(90deg,#f97316,#ef4444)}
   .photo{width:100%;border-radius:12px;aspect-ratio:1/1;object-fit:contain;background:#000}
   .model{font-size:18px;font-weight:900;margin-top:6px;letter-spacing:-.01em}
   .price{font-size:13px;margin-bottom:8px;color:var(--muted)}
@@ -123,47 +124,68 @@ async function loadProdotti(){
       else if(b==='honor') p.brand='Honor';
     }
   });
+
+  // === Aggiungi BADGE a tutti i prodotti (senza toccare il file sorgente) ===
+  prodotti.forEach(p=>{
+    p.badges = Array.isArray(p.badges) ? [...p.badges] : [];
+
+    // dal nome del modello
+    const nome = (p.nome || p.name || "").toLowerCase();
+    if (/(^|\s)(17|s25|fold\s*7|z\s*fold\s*7|17\s*pro|17\s*air)(\s|$)/i.test(p.nome||"")) {
+      p.badges.push("Novità");
+    }
+    if (/\b(pro|max|ultra|plus)\b/i.test(p.nome||"")) {
+      p.badges.push("Best Seller");
+    }
+
+    // dal prezzo
+    const prezzo = Number(p.prezzo ?? p.price ?? 0);
+    if (prezzo >= 1000) p.badges.push("Top di gamma");
+
+    // dallo sconto
+    if (typeof p.sconto === 'number' && isFinite(p.sconto) && p.sconto > 0) {
+      p.badges.push("Offerta");
+    }
+
+    // flag legacy
+    if (p.novita)  p.badges.push("Novità");
+    if (p.offerta) p.badges.push("Offerta");
+    if (p.best)    p.badges.push("Best Seller");
+    if (p.limitata)p.badges.push("Limited");
+
+    // deduplica
+    const seen = new Set();
+    p.badges = p.badges.filter(b=>{const k=b.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true;});
+  });
+
   return prodotti;
 }
 
-/* ===== Badge dinamici =====
-   - p.badges: array di stringhe (es. ["Novità","Offerta","Best Seller"])
-   - Oppure flag: p.novita, p.offerta, p.best, p.limitata, p.sconto (numero %)
-*/
+/* ===== Badge → chip colorati ===== */
 function buildBadges(p){
   const out = [];
-
-  // Brand sempre presente
   if(p.brand){ out.push({text: p.brand, cls: 'tag--brand'}); }
 
-  // Da array esplicito
-  if (Array.isArray(p.badges)){
-    p.badges.forEach(b=>{
-      const key = String(b).toLowerCase();
-      if(key.includes('nov')) out.push({text:'Novità', cls:'tag--novita'});
-      else if(key.includes('offer')||key.includes('promo')) out.push({text:'Offerta', cls:'tag--offerta'});
-      else if(key.includes('best')) out.push({text:'Best Seller', cls:'tag--best'});
-      else if(key.includes('limit')) out.push({text:'Limited', cls:'tag--limitata'});
-      else out.push({text:b, cls:''});
-    });
-  }
+  (p.badges||[]).forEach(b=>{
+    const key = String(b).toLowerCase();
+    if(key.includes('nov')) out.push({text:'Novità', cls:'tag--novita'});
+    else if(key.includes('offer')||key.includes('promo')) out.push({text:'Offerta', cls:'tag--offerta'});
+    else if(key.includes('best')) out.push({text:'Best Seller', cls:'tag--best'});
+    else if(key.includes('limit')) out.push({text:'Limited', cls:'tag--limitata'});
+    else if(key.includes('top')) out.push({text:'Top di gamma', cls:'tag--top'});
+    else out.push({text:b, cls:''});
+  });
 
-  // Da flag
-  if (p.novita) out.push({text:'Novità', cls:'tag--novita'});
-  if (p.offerta) out.push({text:'Offerta', cls:'tag--offerta'});
-  if (p.best) out.push({text:'Best Seller', cls:'tag--best'});
-  if (p.limitata) out.push({text:'Limited', cls:'tag--limitata'});
-
-  // Sconto percentuale
   if (typeof p.sconto === 'number' && isFinite(p.sconto) && p.sconto>0){
     out.push({text: `-${Math.round(p.sconto)}%`, cls:'tag--sconto'});
   }
 
-  // Deduplica mantenendo l’ordine
-  const seen = new Set(); 
-  return out.filter(b => { const k=b.cls+'|'+b.text; if(seen.has(k)) return false; seen.add(k); return true; });
+  // Deduplica finale
+  const seen = new Set();
+  return out.filter(b => {const k=b.cls+'|'+b.text; if(seen.has(k)) return false; seen.add(k); return true;});
 }
 
+/* ===== Card ===== */
 function cardHTML(p){
   const brand = p.brand||'—';
   const nome  = p.nome || p.name || '—';
@@ -172,7 +194,6 @@ function cardHTML(p){
   const badges = buildBadges(p);
   const badgeHTML = badges.map(b=>`<span class="tag ${b.cls}">${escapeHtml(b.text)}</span>`).join('');
 
-  // WhatsApp link (verrà aggiornato con la rata scelta)
   const waBase = `https://wa.me/${WA_NUM}?text=`;
   const waMsg  = `Ciao Re Long, voglio info su ${nome}.`;
   const waUrl  = waBase + encodeURIComponent(waMsg);
@@ -230,7 +251,6 @@ function renderGrid(prodotti, filter="all"){
       const r = calcolaRata(prezzo, mesi, a);
       rataOut.textContent = r ? ("€ " + formatEuro(r)) : "—";
 
-      // aggiorna messaggio WA con la simulazione corrente
       const parts = [`Ciao Re Long, vorrei info su ${nome}.`];
       if(mesi){ parts.push(`Durata: ${mesi} mesi`); }
       if(a>0){ parts.push(`Anticipo: € ${formatEuro(a)}`); }
