@@ -114,7 +114,7 @@
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
-    /* rimosso nth-of-type(5/6) e usiamo ID per sicurezza */
+    /* Badge via ID per le ultime card */
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px}
@@ -146,11 +146,11 @@
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    /* ✅ Quando c’è la barra BF, alza FAB e ToTop per non sovrapporre */
+    /* Offset quando la barra stagionale è presente (no sovrapposizione) */
     body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
     body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
 
-    /* Badge forzati per card con ID (robusti al riordino) */
+    /* Badge forzati via ID */
     #biz-mobile .badge{
       background:linear-gradient(90deg,#10B981,#84CC16);
       box-shadow:0 10px 18px rgba(16,185,129,.35);
@@ -184,13 +184,14 @@
 
   <main class="wrap">
     <header class="head">
-      <div class="brand">
+      <!-- Brand cliccabile verso la Home dell'hub -->
+      <a class="brand" href="./relong-hub-v2.html" rel="home">
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
           <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
           <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Re Long Telefonia, Energia & Assistenza PC
-      </div>
+      </a>
       <div class="sub">Clicca sulla sezione di interesse</div>
 
       <div class="hero" aria-hidden="false">
@@ -233,7 +234,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <!-- ✅ BUSINESS MOBILI (ripristinata) -->
+      <!-- BUSINESS MOBILI (ripristinata) -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
@@ -242,7 +243,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
       </article>
 
-      <!-- ✅ SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
+      <!-- SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
@@ -262,6 +263,9 @@
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
+    // URL della Home corretta dell'hub
+    const HOME_PAGE = './relong-hub-v2.html';
+
     /* to-top */
     (function(){
       const toTop = document.createElement('div');
@@ -278,7 +282,7 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
-    /* Navigazione interna sicura */
+    /* Navigazione interna sicura + fallback sempre alla Home dell’hub */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
@@ -292,12 +296,22 @@
         try{
           const res = await fetch(url.href, {method:'GET', cache:'no-store', redirect:'follow'});
           if(res.ok){ location.href = url.href; }
-          else { showToast('Pagina non trovata. Ti riportiamo alla Home.'); setTimeout(()=>location.href='./', 1000); }
+          else { showToast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 800); }
         }catch(_){
-          showToast('Impossibile aprire la pagina. Riprova o torna alla Home.'); setTimeout(()=>location.href='./', 1200);
+          showToast('Impossibile aprire la pagina. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 1000);
         }
       }
     }, false);
+
+    // Normalizza link root per puntare sempre alla home dell’hub
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
+      document.querySelectorAll('a[rel~="home"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
+    });
 
     /* Animazioni on-scroll */
     (function(){
@@ -307,7 +321,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Switch automatico testo card + barra in base alla stagione */
+    /* Switch automatico testo card + barra stagionale */
     (function(){
       const now = new Date();
       const m = now.getMonth()+1, d = now.getDate();
@@ -363,7 +377,7 @@
     })();
   </script>
 
-  <!-- ✅ Unica barra in basso (Black Friday/Natale/Flash) -->
+  <!-- Barra in basso stagionale -->
   <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
     <span class="seasonbar__icon">⚡</span>
     <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
@@ -371,7 +385,7 @@
   </a>
   <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
 
-  <!-- ✅ FAB (ripristinate) -->
+  <!-- FAB -->
   <div class="fab-nav" aria-label="Azioni rapide">
     <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
       <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
@@ -383,7 +397,7 @@
     </a>
   </div>
 
-  <!-- ✅ Attiva offset quando la barra è presente (no sovrapposizione) -->
+  <!-- Attiva offset quando la barra è presente -->
   <script>
     (function(){
       const bar = document.getElementById('seasonBar');
