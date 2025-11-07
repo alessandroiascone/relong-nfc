@@ -103,7 +103,7 @@
       <div style="display:flex;align-items:center;gap:10px;font-weight:800">
         <span class="logo"></span> <span id="nav-season">Black Friday ReLong</span>
       </div>
-      <a class="back" href="./">← Torna alla Home</a>
+      <a class="back" href="./relong-hub-v2.html" rel="home">← Torna alla Home</a>
     </nav>
   </header>
 
@@ -231,5 +231,15 @@
     document.querySelectorAll("[data-badge]").forEach(el=>el.textContent=c.badge);
   })();
   </script>
+
+  <script>
+    // Home corretta dell’hub
+    const HOME_PAGE = './relong-hub-v2.html';
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
+      document.querySelectorAll('a[rel~="home"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
+    });
+  </script>
+
 </body>
 </html>
