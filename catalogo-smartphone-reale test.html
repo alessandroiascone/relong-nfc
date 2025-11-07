@@ -1,316 +1,271 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Re Long | Catalogo Smartphone (3D Clean)</title>
-<meta name="description" content="Catalogo smartphone Re Long: filtri per brand, ricerca live, badge dinamici, pulsante WhatsApp, hover 3D. Tel 08119578844.">
-<meta name="theme-color" content="#0a0a0a">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
-
+<title>Catalogo 3D – Re Long</title>
+<meta name="theme-color" content="#0a0a0a" />
 <style>
-  :root{
-    --bg1:#0a0a0a; --bg2:#000;
-    --brand1:#ff0000; --brand2:#ff7b00;
-    --muted:rgba(255,255,255,.70); --muted2:rgba(255,255,255,.5);
-    --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
-    --ok:#22c55e; --warn:#f59e0b; --hot:#ef4444; --chip:#1f1f1f;
-    --wa1:#25D366; --wa2:#128C7E;
-  }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  :root{
+    --bg1:#0a0a0a;--bg2:#000;
+    --brand1:#ff0000;--brand2:#ff7b00;
+    --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
+    --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.10);
+    --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
+  }
   body{
     font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
     background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
-    color:#fff; min-height:100vh; padding:22px;
+    color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:24px;position:relative
   }
-  .wrap{max-width:1100px;margin:0 auto; display:grid; gap:18px}
-  .head{
-    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between
+  body::before{
+    content:"";position:fixed;left:50%;top:40%;transform:translateX(-50%);
+    width:1200px;height:1200px;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
+    filter:blur(6px);pointer-events:none;z-index:0
   }
-  .brand{
-    display:flex;gap:10px;align-items:center;font-weight:900;font-size:20px;letter-spacing:-.02em;text-decoration:none;color:#fff
-  }
-  .brand .logo{width:22px;height:22px}
-  .brand .logo path{stroke:#ff5400}
-  .sub{color:var(--muted);font-size:12px}
-  .toolbar{
-    display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);
-    border:1px solid var(--stroke);padding:10px;border-radius:14px
-  }
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{
-    background:var(--chip); border:1px solid var(--stroke); color:#fff; font-weight:700;
-    padding:8px 12px; border-radius:999px; cursor:pointer; transition:.2s;
-  }
-  .chip[data-active="1"]{outline:2px solid #ff7b00; outline-offset:0}
-  .searchRow{display:flex;gap:8px;align-items:center}
-  .searchRow input, .searchRow select{
-    background:#121212;border:1px solid var(--stroke);color:#fff;border-radius:10px;padding:10px 12px
-  }
-  .counter{font-size:12px;color:var(--muted)}
-  /* grid */
-  .grid{display:grid;grid-template-columns: repeat(2,1fr); gap:14px}
-  @media(min-width:1000px){ .grid{ grid-template-columns: repeat(3,1fr)} }
-  /* card */
+  .wrap{width:100%;max-width:1120px;display:grid;gap:18px;padding-bottom:40px;position:relative;z-index:1}
+  .head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  .title{display:flex;gap:10px;align-items:center;font-size:20px;font-weight:900;letter-spacing:-.02em}
+  .title .logo{width:22px;height:22px}
+  .controls{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{padding:10px 14px;border-radius:14px;border:1px solid var(--stroke);
+    background:rgba(255,255,255,.06);color:#fff;font-weight:800;cursor:pointer}
+  .btn.active{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;border-color:transparent;box-shadow:0 16px 26px rgba(255,90,0,.35)}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+  @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr}}
   .card{
     position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
-    border:1px solid var(--stroke); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px;
-    box-shadow:0 18px 40px rgba(0,0,0,.85), 0 0 40px rgba(255,0,0,.12);
-    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, filter .25s ease;
-    transform-style:preserve-3d;
+    padding:16px;border-radius:18px;border:1px solid var(--stroke);
+    box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+    transform:perspective(800px) rotateX(0) rotateY(0);
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease
   }
   .card:hover{
-    transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
-    box-shadow:0 28px 80px rgba(0,0,0,.95), 0 0 90px rgba(255,59,0,.2); border-color:rgba(255,255,255,.14)
+    transform:perspective(800px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
+    box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
+    border-color:rgba(255,255,255,.18)
   }
-  .thumb{
-    height:210px; display:grid; place-items:center; background:linear-gradient(180deg,#151515,#0a0a0a);
-    border:1px solid var(--stroke); border-radius:14px; overflow:hidden
+  .badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px}
+  .tag{
+    font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;
+    background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;
+    box-shadow:0 10px 18px rgba(255,80,0,.45);border:1px solid rgba(0,0,0,.06)
   }
-  .thumb img{max-width:82%; max-height:82%; display:block; filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
-  .badges{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap}
-  .b{font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px;border:1px solid rgba(0,0,0,.2); color:#000}
-  .b.new{background:linear-gradient(90deg,#ff7b00,#ffd166)}
-  .b.hot{background:linear-gradient(90deg,#ff2a2a,#ff7b00)}
-  .b.best{background:linear-gradient(90deg,#00e095,#22c55e)}
-  .title{font-weight:900;font-size:16px; letter-spacing:-.02em}
-  .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}
-  .price{font-weight:900;font-size:18px}
-  .btns{display:grid; gap:8px; margin-top:6px}
-  .btn{
-    text-decoration:none;text-align:center;padding:10px 12px;border-radius:12px;font-weight:900;color:#000;
+  .tag--brand{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
+  .tag--novita{background:linear-gradient(90deg,#8B5CF6,#EC4899)}
+  .tag--offerta{background:linear-gradient(90deg,#22C55E,#16A34A)}
+  .tag--best{background:linear-gradient(90deg,#06B6D4,#0EA5E9)}
+  .tag--limitata{background:linear-gradient(90deg,#F59E0B,#EF4444)}
+  .tag--sconto{background:linear-gradient(90deg,#000,#222);color:#ffd166;border-color:rgba(255,255,255,.22)}
+  .photo{width:100%;border-radius:12px;aspect-ratio:1/1;object-fit:contain;background:#000}
+  .model{font-size:18px;font-weight:900;margin-top:6px;letter-spacing:-.01em}
+  .price{font-size:13px;margin-bottom:8px;color:var(--muted)}
+  .sim{display:grid;gap:8px;margin-top:10px;padding:12px;border:1px solid var(--stroke);
+    border-radius:12px;background:rgba(255,255,255,.05)}
+  .sim .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .sim label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .sim input,.sim select{width:100%;padding:10px;border-radius:12px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
+  .sim .out{font-weight:900;color:#ffd166;margin-top:4px}
+  .btn-primary{
+    display:block;margin-top:10px;text-align:center;padding:12px 14px;border-radius:14px;
     background:linear-gradient(90deg,var(--brand1),var(--brand2));
-    box-shadow:0 16px 26px rgba(255,90,0,.35); transition:.2s;
+    color:#000;font-weight:800;text-decoration:none;box-shadow:0 16px 26px rgba(255,90,0,.35);
+    transition: transform .22s ease, box-shadow .22s ease, filter .22s ease
   }
-  .btn:hover{filter:brightness(1.05); transform:translateY(-1px)}
-  .btn.ghost{
-    background:rgba(255,255,255,.04); color:#fff; border:1px solid var(--stroke); box-shadow:none
-  }
-  .wa{
-    background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));
-    color:#000; box-shadow:0 18px 30px rgba(18,140,126,.45)
-  }
-  .empty{padding:32px; text-align:center; color:var(--muted)}
-  /* quick view modal */
-  .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.6); z-index:999}
-  .modal.show{display:grid}
-  .modal-card{width:min(920px,92vw); background:#111; border:1px solid var(--stroke); border-radius:18px; padding:18px; display:grid; gap:14px}
-  .modal-head{display:flex;justify-content:space-between;align-items:center}
-  .x{background:#222;border:1px solid var(--stroke);color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+  .btn-primary:hover{transform:perspective(700px) translateZ(12px) scale(1.05) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
 </style>
 </head>
 <body>
 <main class="wrap">
   <header class="head">
-    <a class="brand" href="./relong-hub-v2.html">
+    <div class="title">
       <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 18L12 6l8 12" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
+        <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Re Long – Catalogo 3D
-    </a>
-    <div class="sub">Filtri live, hover 3D, WhatsApp già compilato</div>
-  </header>
-
-  <!-- Toolbar -->
-  <section class="toolbar" aria-label="Filtri e ricerca">
-    <div class="chips" id="brandChips"></div>
-    <div class="searchRow">
-      <input id="q" type="search" placeholder="Cerca modello…" aria-label="Cerca modello">
-      <select id="sort" aria-label="Ordina">
-        <option value="pop">Ordina: Popolari</option>
-        <option value="priceAsc">Prezzo ↑</option>
-        <option value="priceDesc">Prezzo ↓</option>
-        <option value="nameAsc">Nome A→Z</option>
-      </select>
-      <span class="counter" id="count">—</span>
+      Catalogo 3D – Smartphone a Rate
     </div>
-  </section>
-
-  <!-- Grid -->
-  <section class="grid" id="grid" aria-live="polite"></section>
-  <div class="empty" id="empty" hidden>Nessun risultato. Prova a rimuovere qualche filtro.</div>
+    <div class="controls">
+      <button class="btn active" data-filter="all">Tutti</button>
+      <button class="btn" data-filter="Apple">Apple</button>
+      <button class="btn" data-filter="Samsung">Samsung</button>
+      <button class="btn" data-filter="OPPO">OPPO</button>
+      <button class="btn" data-filter="Honor">Honor</button>
+    </div>
+  </header>
+  <section class="grid" id="grid"></section>
 </main>
 
-<!-- Quick View Modal -->
-<div class="modal" id="modal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div style="font-weight:900" id="mvTitle">Modello</div>
-      <button class="x" id="mvClose">Chiudi ✕</button>
-    </div>
-    <div class="meta" id="mvMeta"></div>
-    <div class="thumb" style="height:280px"><img id="mvImg" alt="Anteprima"></div>
-    <div class="price" id="mvPrice"></div>
-    <div class="btns">
-      <a class="btn" id="mvGo" href="#">Apri in WhatsApp</a>
-      <button class="btn ghost" id="mvCopy">Copia richiesta</button>
-    </div>
-  </div>
-</div>
-
 <script>
-/* --------- DATI (modifica qui) --------- */
-const PRODUCTS = [
-  // Esempi reali tuoi (puoi sostituire le immagini)
-  { id:"sga17", brand:"Samsung", name:"Galaxy A17 256GB", price:315.00, badge:["new"], img:"", popularity:9 },
-  { id:"ip17pro1tb", brand:"Apple", name:"iPhone 17 Pro 1TB", price:1993.00, badge:["hot"], img:"", popularity:10 },
-  { id:"hon400lite", brand:"Honor", name:"Honor 400 Lite 256GB", price:159.90, badge:["best"], img:"", popularity:7 },
-  { id:"op14f", brand:"OPPO", name:"OPPO 14F 256GB", price:255.90, badge:["new"], img:"", popularity:6 },
-  { id:"s25fe", brand:"Samsung", name:"Galaxy S25 FE 256GB", price:773.90, badge:["hot"], img:"", popularity:8 },
+const WA_NUM = "3908119578844";
+const SOURCE_FILE = "./catalogo-smartphone-reale-v3-lite.html";
 
-  // Altri che avevamo citato
-  { id:"sga56", brand:"Samsung", name:"Galaxy A56 5G", price:483.80, badge:["best"], img:"", popularity:6 },
-  { id:"opA5pro", brand:"OPPO", name:"OPPO A5 Pro", price:255.90, badge:["new"], img:"", popularity:5 },
-  { id:"ip17pm256", brand:"Apple", name:"iPhone 17 Pro Max 256GB", price:1657.80, badge:["hot"], img:"", popularity:9 },
-  { id:"zfold7", brand:"Samsung", name:"Galaxy Z Fold 7 256GB", price:1977.00, badge:["hot"], img:"", popularity:8 },
+/* ===== Loader prodotti dall’array esistente ===== */
+async function loadProdotti(){
+  const res = await fetch(SOURCE_FILE, {cache:'no-store'});
+  const txt = await res.text();
+  const m = txt.match(/const\s+prodotti\s*=\s*\[([\s\S]*?)\];/);
+  if(!m) throw new Error("Array 'prodotti' non trovato");
+  const body = '[' + m[1] + ']';
+  const prodotti = (new Function('return ' + body))();
 
-  // Esempi placeholder—puoi cancellarli
-  { id:"ip17air", brand:"Apple", name:"iPhone 17 Air 256GB", price:1299.00, badge:["new"], img:"", popularity:7 },
-  { id:"honMagic", brand:"Honor", name:"Honor Magic V5", price:1499.00, badge:["best"], img:"", popularity:6 }
-];
-// Se non hai le immagini subito, lascia img:"" (verrà usata un’icona SVG).
-
-/* --------- UTILS --------- */
-const tel = "+3908119578844"; // WhatsApp e telefono Re Long
-const grid = document.getElementById('grid');
-const empty = document.getElementById('empty');
-const q = document.getElementById('q');
-const sortSel = document.getElementById('sort');
-const countEl = document.getElementById('count');
-const brandChips = document.getElementById('brandChips');
-
-let activeBrand = "Tutti";
-let query = "";
-let sort = "pop";
-
-const brands = ["Tutti", ...Array.from(new Set(PRODUCTS.map(p=>p.brand)))].sort((a,b)=> a==="Tutti"?-1: a.localeCompare(b));
-
-function €(n){ return n.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:2}) }
-
-function waLink(p){
-  const msg = `Ciao Re Long, vorrei info per questo smartphone:\n- Modello: ${p.name}\n- Brand: ${p.brand}\n- Prezzo indicativo: ${€(p.price)}\n\nMi aiuti a bloccarlo o a fare la miglior offerta?`;
-  return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
-}
-
-function svgPlaceholder(){
-  return `
-  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-    <rect x="10" y="10" width="100" height="100" rx="16" fill="#0f0f0f" stroke="rgba(255,255,255,.08)"/>
-    <rect x="36" y="18" width="48" height="84" rx="10" fill="#1a1a1a" stroke="rgba(255,255,255,.08)"/>
-    <circle cx="60" cy="26" r="3" fill="#2a2a2a"/>
-  </svg>`;
-}
-
-function badgeHTML(arr){
-  if(!arr) return "";
-  return arr.map(b=>{
-    if(b==="new") return `<span class="b new">NOVITÀ</span>`;
-    if(b==="hot") return `<span class="b hot">HOT</span>`;
-    if(b==="best") return `<span class="b best">BESTSELLER</span>`;
-    return "";
-  }).join("");
-}
-
-/* --------- RENDER --------- */
-function renderBrands(){
-  brandChips.innerHTML = "";
-  brands.forEach(b=>{
-    const bt = document.createElement('button');
-    bt.className = 'chip';
-    bt.textContent = b;
-    bt.dataset.brand = b;
-    if(b===activeBrand) bt.dataset.active="1";
-    bt.addEventListener('click', ()=>{
-      activeBrand = b;
-      renderBrands(); render();
-    });
-    brandChips.appendChild(bt);
+  // Normalizza brand
+  prodotti.forEach(p=>{
+    if(p.brand){
+      const b = String(p.brand).toLowerCase();
+      if(b==='apple'||b==='iphone') p.brand='Apple';
+      else if(b==='samsung') p.brand='Samsung';
+      else if(b==='oppo') p.brand='OPPO';
+      else if(b==='honor') p.brand='Honor';
+    }
   });
+  return prodotti;
 }
 
-function getFiltered(){
-  let list = PRODUCTS.slice();
-  if(activeBrand!=="Tutti") list = list.filter(p=>p.brand===activeBrand);
-  if(query.trim()) {
-    const t = query.trim().toLowerCase();
-    list = list.filter(p=> (p.name+" "+p.brand).toLowerCase().includes(t));
+/* ===== Badge dinamici =====
+   - p.badges: array di stringhe (es. ["Novità","Offerta","Best Seller"])
+   - Oppure flag: p.novita, p.offerta, p.best, p.limitata, p.sconto (numero %)
+*/
+function buildBadges(p){
+  const out = [];
+
+  // Brand sempre presente
+  if(p.brand){ out.push({text: p.brand, cls: 'tag--brand'}); }
+
+  // Da array esplicito
+  if (Array.isArray(p.badges)){
+    p.badges.forEach(b=>{
+      const key = String(b).toLowerCase();
+      if(key.includes('nov')) out.push({text:'Novità', cls:'tag--novita'});
+      else if(key.includes('offer')||key.includes('promo')) out.push({text:'Offerta', cls:'tag--offerta'});
+      else if(key.includes('best')) out.push({text:'Best Seller', cls:'tag--best'});
+      else if(key.includes('limit')) out.push({text:'Limited', cls:'tag--limitata'});
+      else out.push({text:b, cls:''});
+    });
   }
-  // sort
-  if(sort==="priceAsc") list.sort((a,b)=> a.price-b.price);
-  else if(sort==="priceDesc") list.sort((a,b)=> b.price-a.price);
-  else if(sort==="nameAsc") list.sort((a,b)=> a.name.localeCompare(b.name,'it'));
-  else list.sort((a,b)=> (b.popularity??0)-(a.popularity??0)); // pop
-  return list;
+
+  // Da flag
+  if (p.novita) out.push({text:'Novità', cls:'tag--novita'});
+  if (p.offerta) out.push({text:'Offerta', cls:'tag--offerta'});
+  if (p.best) out.push({text:'Best Seller', cls:'tag--best'});
+  if (p.limitata) out.push({text:'Limited', cls:'tag--limitata'});
+
+  // Sconto percentuale
+  if (typeof p.sconto === 'number' && isFinite(p.sconto) && p.sconto>0){
+    out.push({text: `-${Math.round(p.sconto)}%`, cls:'tag--sconto'});
+  }
+
+  // Deduplica mantenendo l’ordine
+  const seen = new Set(); 
+  return out.filter(b => { const k=b.cls+'|'+b.text; if(seen.has(k)) return false; seen.add(k); return true; });
 }
 
-function productCard(p){
-  const imgHTML = p.img
-    ? `<img loading="lazy" decoding="async" src="${p.img}" alt="${p.name}">`
-    : svgPlaceholder();
+function cardHTML(p){
+  const brand = p.brand||'—';
+  const nome  = p.nome || p.name || '—';
+  const prezzo = (p.prezzo ?? p.price) || 0;
+  const img   = p.img || p.immagine || p.image || "";
+  const badges = buildBadges(p);
+  const badgeHTML = badges.map(b=>`<span class="tag ${b.cls}">${escapeHtml(b.text)}</span>`).join('');
+
+  // WhatsApp link (verrà aggiornato con la rata scelta)
+  const waBase = `https://wa.me/${WA_NUM}?text=`;
+  const waMsg  = `Ciao Re Long, voglio info su ${nome}.`;
+  const waUrl  = waBase + encodeURIComponent(waMsg);
+
   return `
-  <article class="card" data-id="${p.id}">
-    <div class="badges">${badgeHTML(p.badge)}</div>
-    <div class="thumb">${imgHTML}</div>
-    <div class="title">${p.brand} • ${p.name}</div>
-    <div class="meta"><span class="price">${€(p.price)}</span> <span>·</span> <span>Disponibile su richiesta</span></div>
-    <div class="btns">
-      <a class="btn" href="${waLink(p)}" target="_blank" rel="noopener">Apri WhatsApp</a>
-      <button class="btn ghost" data-quick>Dettagli rapidi</button>
+  <article class="card" data-brand="${escapeHtml(brand)}" data-prezzo="${Number(prezzo)}" data-nome="${escapeHtml(nome)}">
+    <div class="badges">${badgeHTML}</div>
+    <img class="photo" src="${img}" alt="${escapeHtml(nome)}">
+    <div class="model">${escapeHtml(nome)}</div>
+    <p class="price">Prezzo totale: € ${formatEuro(prezzo)}</p>
+
+    <div class="sim">
+      <div class="row">
+        <label>Durata (mesi)
+          <select class="durata">
+            <option value="">—</option>
+            <option>12</option><option>24</option><option>30</option>
+            <option>36</option><option>48</option>
+          </select>
+        </label>
+        <label>Anticipo (€)
+          <input class="anticipo" type="number" min="0" step="1" placeholder="0">
+        </label>
+      </div>
+      <div class="out">Rata mensile: <span class="rata">—</span></div>
     </div>
+
+    <a class="btn-primary wa" href="${waUrl}" target="_blank" rel="noopener">📩 Invia simulazione su WhatsApp</a>
   </article>`;
 }
 
-function render(){
-  const list = getFiltered();
-  countEl.textContent = `${list.length} modelli`;
-  if(list.length===0){ grid.innerHTML=""; empty.hidden=false; return; }
-  empty.hidden = true;
-  grid.innerHTML = list.map(productCard).join("");
+/* ===== Calcolo rata SOLO sul prezzo totale impostato ===== */
+function calcolaRata(prezzo, mesi, anticipo){
+  if(!mesi||mesi<=0) return null;
+  const base = Math.max(Number(prezzo) - Number(anticipo||0), 0);
+  return base / mesi;
+}
 
-  // quick handlers
-  grid.querySelectorAll('[data-quick]').forEach(btn=>{
-    btn.addEventListener('click',(e)=>{
-      const card = e.target.closest('.card');
-      const id = card?.dataset.id;
-      const p = PRODUCTS.find(x=>x.id===id);
-      if(p) openModal(p);
-    })
+/* ===== Render e interazioni ===== */
+function renderGrid(prodotti, filter="all"){
+  const grid = document.getElementById('grid'); grid.innerHTML="";
+  prodotti.filter(p=>filter==="all"||p.brand===filter)
+          .forEach(p=>grid.insertAdjacentHTML('beforeend', cardHTML(p)));
+
+  grid.querySelectorAll('.card').forEach(card=>{
+    const durata = card.querySelector('.durata');
+    const anticipo = card.querySelector('.anticipo');
+    const rataOut = card.querySelector('.rata');
+    const prezzo = Number(card.dataset.prezzo||0);
+    const nome = card.dataset.nome||'';
+
+    const update = ()=>{
+      const mesi = parseInt(durata.value||"");
+      const a = parseFloat(anticipo.value||"0");
+      const r = calcolaRata(prezzo, mesi, a);
+      rataOut.textContent = r ? ("€ " + formatEuro(r)) : "—";
+
+      // aggiorna messaggio WA con la simulazione corrente
+      const parts = [`Ciao Re Long, vorrei info su ${nome}.`];
+      if(mesi){ parts.push(`Durata: ${mesi} mesi`); }
+      if(a>0){ parts.push(`Anticipo: € ${formatEuro(a)}`); }
+      if(r){ parts.push(`Rata: € ${formatEuro(r)}`); }
+      const msg = parts.join("\n");
+      const link = card.querySelector('.btn-primary.wa');
+      link.href = "https://wa.me/"+WA_NUM+"?text="+encodeURIComponent(msg);
+    };
+
+    [durata, anticipo].forEach(el=>el.addEventListener('input', update));
+    update();
   });
 }
 
-/* --------- MODAL --------- */
-const $modal = document.getElementById('modal');
-const $mvTitle = document.getElementById('mvTitle');
-const $mvMeta = document.getElementById('mvMeta');
-const $mvImg = document.getElementById('mvImg');
-const $mvPrice = document.getElementById('mvPrice');
-const $mvGo = document.getElementById('mvGo');
-const $mvCopy = document.getElementById('mvCopy');
-const $mvClose = document.getElementById('mvClose');
+/* ===== Filtri brand ===== */
+document.addEventListener('click',(e)=>{
+  const b=e.target.closest('.btn[data-filter]'); if(!b) return;
+  document.querySelectorAll('.btn[data-filter]').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); const filter=b.dataset.filter;
+  if(window._PRODOTTI) renderGrid(window._PRODOTTI, filter);
+});
 
-function openModal(p){
-  $mvTitle.textContent = `${p.brand} • ${p.name}`;
-  $mvMeta.textContent = `Richiedi disponibilità, colori e tempi. Assistenza Re Long reale.`;
-  if(p.img){ $mvImg.src = p.img; $mvImg.alt = p.name; }
-  else { $mvImg.removeAttribute('src'); $mvImg.alt=""; $mvImg.outerHTML = svgPlaceholder(); }
-  $mvPrice.textContent = `Prezzo indicativo: ${€(p.price)}`;
-  $mvGo.href = waLink(p);
-  $mvCopy.onclick = ()=> {
-    const text = decodeURIComponent(waLink(p).split('text=')[1]||"");
-    navigator.clipboard?.writeText(text);
-    alert('Richiesta copiata. Incolla in WhatsApp!');
-  };
-  $modal.classList.add('show');
-}
-$mvClose.addEventListener('click', ()=> $modal.classList.remove('show'));
-$modal.addEventListener('click', (e)=>{ if(e.target===$modal) $modal.classList.remove('show') });
+/* ===== Utils ===== */
+function formatEuro(n){ return Number(n).toLocaleString('it-IT',{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
 
-/* --------- EVENTS --------- */
-q.addEventListener('input', (e)=>{ query = e.target.value; render(); });
-sortSel.addEventListener('change',(e)=>{ sort = e.target.value; render(); });
-
-/* --------- BOOT --------- */
-renderBrands(); render();
+/* ===== Init ===== */
+(async()=>{
+  try{
+    const prodotti=await loadProdotti(); window._PRODOTTI=prodotti; renderGrid(prodotti,"all");
+  }catch(err){
+    console.error(err);
+    document.getElementById('grid').innerHTML="<p style='opacity:.85'>Impossibile caricare i prodotti dal file sorgente.</p>";
+  }
+})();
 </script>
 </body>
 </html>
