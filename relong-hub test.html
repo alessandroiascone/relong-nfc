@@ -2,90 +2,191 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long | Catalogo Link</title>
-  <meta name="description" content="Hub Re Long: Smartphone a rate, Offerte Business, Offerte Energia, Assistenza PC.">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Re Long Informatica, Telefonia, Energia & Assistenza PC</title>
+  <meta name="description" content="Re Long: Smartphone a rate, Offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844." />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <!-- Favicon minimal (SVG inline) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Re Long | Telefonia, Energia, Assistenza" />
+  <meta property="og:description" content="Scopri offerte smartphone, business e energia. Contattaci su WhatsApp: 08119578844." />
+  <meta property="og:type" content="website" />
+
   <style>
+    /* ===== Reset & Tokens ===== */
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-    :root{--bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);--card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;}
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .wrap{width:100%;max-width:860px;display:grid;gap:20px}
-    .head{text-align:center;padding:8px 8px 0}
-    .brand{font-size:24px;font-weight:900;letter-spacing:-.04em}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
-    .card{background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);border:1px solid var(--stroke);border-radius:18px;padding:18px;position:relative;box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);display:flex;flex-direction:column;gap:10px}
-    .badge{position:absolute;top:-11px;left:14px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45)}
-    .title{font-size:18px;font-weight:800;letter-spacing:-.03em}
-    .desc{font-size:13px;color:var(--muted);line-height:1.45}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;letter-spacing:-.02em;color:#000;background:linear-gradient(90deg,var(--brand1),var(--brand2));box-shadow:0 16px 26px rgba(255,90,0,.35);border:0;transition:transform .15s ease,box-shadow .15s ease;outline:none}
-    .btn + .btn{margin-top:8px}
-    .btn.wa{background:radial-gradient(circle at 0% 0%,var(--wa1) 0%,var(--wa2) 60%);box-shadow:0 18px 30px rgba(18,140,126,.45)}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 18px 30px rgba(255,90,0,.42)}
-    .btn.wa:hover{box-shadow:0 20px 34px rgba(18,140,126,.55)}
-    .btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-    .foot{text-align:center;color:var(--muted2);font-size:11px;margin-top:6px}
-    .foot a{color:var(--muted2)}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000; --card:rgba(20,20,20,.92); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(255,255,255,.72); --muted2:rgba(255,255,255,.5);
+      --brand1:#ff3b1a; --brand2:#ff7b00; --ok:#2fd27a; --ring:rgba(255,59,26,.35);
+    }
+    html,body{height:100%}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial;
+      color:#fff; background:
+        radial-gradient(1200px 1200px at 15% -10%, rgba(255,59,26,.15), transparent 40%),
+        radial-gradient(900px 900px at 85% -15%, rgba(255,123,0,.12), transparent 45%),
+        radial-gradient(1600px 900px at 50% 120%, rgba(255,59,26,.10), transparent 45%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* ===== Header / Nav (essenziale) ===== */
+    header{border-bottom:1px solid var(--stroke); position:sticky; top:0; z-index:40; background:rgba(10,10,10,.7); backdrop-filter: blur(8px)}
+    .nav{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--brand1),var(--brand2))}
+    .menu{display:flex;gap:12px}
+    .chip{padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.03)}
+
+    /* ===== Hero ===== */
+    .hero{position:relative}
+    .hero__inner{max-width:1100px;margin:0 auto;padding:44px 16px 28px}
+    .eyebrow{color:var(--muted2);letter-spacing:.14em;font-size:12px;text-transform:uppercase}
+    h1{font-size:clamp(32px,5.5vw,56px);line-height:1.05;letter-spacing:-.02em;margin-top:10px}
+    .sub{color:var(--muted);margin-top:10px;font-size:clamp(14px,2vw,18px)}
+
+    /* ===== Cards grid (anteprima contenuti) ===== */
+    .section{max-width:1100px;margin:26px auto;padding:0 16px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{grid-column:span 12;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border-radius:18px;overflow:hidden;position:relative;transition:transform .2s ease,box-shadow .2s ease}
+    @media(min-width:700px){.card{grid-column:span 6}}
+    @media(min-width:980px){.card{grid-column:span 4}}
+    .card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.26)}
+    .card__media{aspect-ratio:16/10;background:#0f0f0f;display:grid;place-items:center}
+    .card__body{padding:14px}
+    .brandtxt{color:var(--muted2);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+    .title{font-size:18px;margin-top:6px;line-height:1.25}
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{flex:1;min-width:160px;text-align:center;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:var(--card);transition:transform .15s ease, box-shadow .15s ease}
+    .btn:hover{transform:translateY(-1px); box-shadow:0 0 0 6px var(--ring)}
+    .btn--accent{background:linear-gradient(180deg, rgba(255,59,26,.18), rgba(255,123,0,.12))}
+
+    /* ===== Bottom Seasonal Bar (unica barra visibile) ===== */
+    .seasonbar{
+      position:fixed; left:0; right:0; bottom:0; z-index:90;
+      display:flex; align-items:center; gap:.75rem; justify-content:center;
+      padding:.85rem 1rem; background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));
+      color:#fff; text-decoration:none; font-weight:700; border-top:1px solid rgba(255,255,255,.18);
+      backdrop-filter:saturate(1.2) blur(6px);
+    }
+    .seasonbar__icon{ animation:pulse 1.2s infinite }
+    .seasonbar__text{ font-weight:600 }
+    .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
+    @keyframes pulse{0%,60%{opacity:1}61%,90%{opacity:.6}91%,100%{opacity:1}}
+    body{ padding-bottom: clamp(56px, 7vh, 72px); }
+
+    /* ===== Footer ===== */
+    footer{ color:var(--muted2); font-size:12px; text-align:center; padding:22px 16px; border-top:1px solid var(--stroke); margin-top:28px }
+
+    /* ===== IMPORTANT: NON visualizzare eventuale vecchia pillola bf ===== */
+    .pill--blackfriday, #bfPill, .blackfriday-pill{ display:none !important }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <header class="head">
-      <div class="brand">Re Long&nbsp;Informatica – Telefonia, Energia & Assistenza PC</div>
-      <div class="sub">Clicca sulla sezione di interesse</div>
-    </header>
+  <!-- HEADER / NAV -->
+  <header>
+    <nav class="nav" aria-label="Principale">
+      <div class="brand"><span class="logo" aria-hidden="true"></span> Re Long Informatica</div>
+      <div class="menu">
+        <a class="chip" href="#smartphone">Smartphone a rate</a>
+        <a class="chip" href="#energia">Energia</a>
+        <a class="chip" href="#business">Business</a>
+        <a class="chip" href="#assistenza">Assistenza PC</a>
+        <a class="chip" href="tel:08119578844">08119578844</a>
+      </div>
+    </nav>
+  </header>
 
-    <section class="grid" aria-label="Collegamenti rapidi Re Long">
-      <!-- Smartphone a rate -->
-      <article class="card" aria-labelledby="h-smartphone">
-        <div class="badge">SMARTPHONE A RATE</div>
-        <h2 id="h-smartphone" class="title">Prendi oggi il tuo smartphone: prima rata tra 30 giorni</h2>
-        <p class="desc">Finanziamento <b>Vodafone & Compass</b> <b>senza busta paga</b>. Paghi con Postepay Evolution o conto corrente. Permuta il tuo usato e abbassi la rata.</p>
-        <a class="btn" href="./catalogo-smartphone-reale-v3.html" aria-label="Apri il catalogo digitale smartphone a rate">📱 Catalogo Digitale</a>
-        <a class="btn" href="./finanziamento.html" aria-label="Dettagli sul finanziamento smartphone">Dettagli Finanziamento</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20informazioni%20per%20prendere%20uno%20smartphone%20a%20rate."
-           aria-label="Scrivi su WhatsApp per smartphone a rate" rel="noopener">💬 Chatta su WhatsApp</a>
-      </article>
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero__inner">
+      <div class="eyebrow">Marano di Napoli</div>
+      <h1>Hub Re Long — Telefonia, Energia & Assistenza</h1>
+      <p class="sub">Scegli lo smartphone, l'offerta e i servizi su misura. Ti seguiamo noi, sempre. Contatto diretto: <b>08119578844</b>.</p>
+    </div>
+  </section>
 
-      <!-- Offerte Business -->
-      <article class="card" aria-labelledby="h-business">
-        <div class="badge">OFFERTE BUSINESS</div>
-        <h2 id="h-business" class="title">Fisso + Mobile TUTTO ILLIMITATO</h2>
-        <p class="desc">Soluzione per Partite IVA e Aziende. Attiva l’<b>Offerta Business</b> da €30/mese, con energia inclusa.</p>
-        <a class="btn" href="./Business+Energy2.html" aria-label="Vedi i dettagli dell'offerta Business">Vedi Dettagli Offerta</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20sono%20interessato%20alle%20offerte%20Vodafone%20Business.%20Possiamo%20fissare%20un%20appuntamento%3F%20Grazie."
-           aria-label="Chatta su WhatsApp con un consulente Business" rel="noopener">💬 Chatta con un consulente Business</a>
-      </article>
-
-      <!-- Offerte Energia Casa -->
-      <article class="card" aria-labelledby="h-energia">
-        <div class="badge">ENERGIA CASA</div>
-        <h2 id="h-energia" class="title">Accendi l'energia</h2>
-        <p class="desc">Stai pagando troppo la corrente? Inviaci la foto della tua bolletta: verifichiamo subito se puoi risparmiare con Fastweb/Vodafone Energia.</p>
-        <a class="btn" href="./index.html" aria-label="Vai all’area energia">Vedi Area Energia</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20la%20foto%20della%20mia%20bolletta%20luce%20per%20una%20verifica."
-           aria-label="Invia la tua bolletta su WhatsApp" rel="noopener">💬 Invia la tua bolletta</a>
-      </article>
-
-      <!-- Assistenza PC -->
-      <article class="card" aria-labelledby="h-assistenza">
-        <div class="badge">ASSISTENZA PC</div>
-        <h2 id="h-assistenza" class="title">Riparazioni & Upgrade</h2>
-        <p class="desc">Non cambiarlo, potenzialo. Da Re Long il tuo PC torna veloce, silenzioso e affidabile — diagnosi immediata e upgrade su misura.</p>
-        <a class="btn" href="./assistenza.html" aria-label="Vai all’assistenza PC">Vedi Assistenza PC</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20ha%20un%20problema.%20Posso%20inviarvi%20foto%20o%20video%20per%20un%20parere%3F"
-           aria-label="Chatta su WhatsApp con l’assistenza tecnica" rel="noopener">💬 Chatta con l’assistenza tecnica</a>
-      </article>
-    </section>
-
-    <p class="foot">
-      • Re Long Informatica — via Casalanno 31, Marano di Napoli —
-      <a href="tel:+3908119578844" aria-label="Chiama Re Long 08119578844">08119578844</a> •
-      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Apri su Google Maps</a>
-    </p>
+  <!-- SEZIONI (placeholder essenziali) -->
+  <main>
+    <div class="section" id="smartphone">
+      <div class="grid">
+        <article class="card">
+          <div class="card__media"><!-- immagine o logo smartphone --></div>
+          <div class="card__body">
+            <div class="brandtxt">Smartphone</div>
+            <div class="title">Catalogo & Rate senza busta paga</div>
+            <div class="cta-row">
+              <a class="btn btn--accent" href="/catalogo-smartphone.html">Apri il catalogo</a>
+              <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20una%20simulazione%20smartphone">Scrivi su WhatsApp</a>
+            </div>
+          </div>
+        </article>
+        <article class="card" id="energia">
+          <div class="card__media"><!-- immagine energia --></div>
+          <div class="card__body">
+            <div class="brandtxt">Energia</div>
+            <div class="title">Fastweb Vodafone Energia — sconto immediato</div>
+            <div class="cta-row">
+              <a class="btn btn--accent" href="/energia.html">Scopri l'energia</a>
+              <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Info%20su%20Fastweb%20Vodafone%20Energia">Parla con noi</a>
+            </div>
+          </div>
+        </article>
+        <article class="card" id="business">
+          <div class="card__media"><!-- immagine business --></div>
+          <div class="card__body">
+            <div class="brandtxt">Business</div>
+            <div class="title">Linee e soluzioni per Partita IVA</div>
+            <div class="cta-row">
+              <a class="btn btn--accent" href="/business.html">Soluzioni Business</a>
+              <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Offerte%20Business">Contattaci</a>
+            </div>
+          </div>
+        </article>
+        <article class="card" id="assistenza">
+          <div class="card__media"><!-- immagine assistenza --></div>
+          <div class="card__body">
+            <div class="brandtxt">Assistenza PC</div>
+            <div class="title">Riparazioni, upgrade, pulizia, backup</div>
+            <div class="cta-row">
+              <a class="btn btn--accent" href="/assistenza-pc.html">Vedi servizi</a>
+              <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Ho%20bisogno%20di%20assistenza%20PC">Richiedi assistenza</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
   </main>
+
+  <footer>
+    © Re Long Informatica — 08119578844 — Marano di Napoli
+  </footer>
+
+  <!-- ===== Unica BOTTOM BAR stagionale ===== -->
+  <!-- OGGI: Black Friday (link NON al catalogo, ma alla sezione offerte dedicate) -->
+  <a id="seasonBar" class="seasonbar" href="/black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
+    <span class="seasonbar__icon" aria-hidden="true">⚡</span>
+    <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
+    <span class="seasonbar__cta">Scopri ora</span>
+  </a>
+
+  <script>
+    // Helper: facile switch di stagione via JS (da usare in futuro)
+    // Esempi:
+    // setSeason({ label:"Offerte di Natale 🎄", href:"/natale.html" });
+    // setSeason({ label:"Offerte Flash ⚡", href:"/offerte-flash.html" });
+    function setSeason({label, href}){
+      const bar = document.getElementById('seasonBar');
+      if(!bar) return;
+      bar.href = href || bar.href;
+      const text = bar.querySelector('.seasonbar__text');
+      if(text && label){ text.innerHTML = '<b>'+label+'</b>'; }
+    }
+  </script>
 </body>
 </html>
