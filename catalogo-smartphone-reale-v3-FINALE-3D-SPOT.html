@@ -30,7 +30,7 @@ body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radi
 .card:hover{transform:perspective(800px) rotateX(2deg) rotateY(-2deg);box-shadow:0 40px 90px rgba(0,0,0,.9), 0 0 80px rgba(255,0,0,.18)}
 .photo{width:100%;border-radius:12px;aspect-ratio:1/1;object-fit:contain;background:#000}
 .model{font-size:18px;font-weight:900;margin-top:6px}
-.price{font-size:15px;margin-bottom:8px;color:var(--muted)}
+.price{font-size:15px;margin-bottom:8px;color:#muted}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px}
 .tag{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;backdrop-filter:blur(6px)}
 .tag.brand{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000}
@@ -40,35 +40,9 @@ body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radi
 .btn{display:block;margin-top:10px;text-align:center;padding:12px;border-radius:12px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;font-weight:900;text-decoration:none;box-shadow:0 18px 30px rgba(18,140,126,.45)}
 .btn.secondary{background:linear-gradient(90deg,#ffd166,#ff7b00);color:#000;box-shadow:0 14px 24px rgba(255,123,0,.35)}
 .simulatore{margin-top:12px;padding:12px;border:1px solid var(--stroke);border-radius:12px;background:rgba(255,255,255,.05)}
-.sim-label{font-size:14px;color:var(--muted)}
+.sim-label{font-size:14px;color:#muted}
 .sim-select{width:100%;margin-top:6px;padding:8px;border-radius:10px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
 .sim-output{margin-top:8px;font-size:15px;font-weight:700;color:#ffd166}
-
-/* Dark mode toggle */
-
-
-/* ===== WhatsApp Cart — Style C (pill + centered modal) ===== */
-#rl-cart-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9999}
-#rl-cart-fab button{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:999px;padding:12px 16px;font-weight:900;box-shadow:0 18px 30px rgba(255,90,0,.35)}
-#rl-cart-fab .badge{background:#000;color:#fff;border-radius:999px;padding:6px 10px;font-weight:900}
-#rl-cart-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:10000}
-#rl-cart-modal .card{width:min(92vw,520px);background:linear-gradient(160deg, rgba(20,20,20,.98), rgba(0,0,0,.82));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 26px 58px rgba(0,0,0,.75);padding:16px}
-#rl-cart-modal .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#rl-cart-modal h3{font-size:18px;font-weight:900;margin:0}
-#rl-cart-modal .list{max-height:52vh;overflow:auto;margin:6px 0 12px 0;border:1px solid rgba(255,255,255,.08);border-radius:12px}
-#rl-cart-modal .row{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
-#rl-cart-modal .row:last-child{border-bottom:0}
-#rl-cart-modal .name{font-weight:700}
-#rl-cart-modal .price{opacity:.9}
-#rl-cart-modal .act{display:flex;gap:8px;justify-content:flex-end}
-#rl-cart-modal .btn{background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:12px;padding:10px 12px;font-weight:900;cursor:pointer}
-#rl-cart-modal .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.16)}
-.addcart-btn{display:inline-block;margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}
-.addcart-btn:hover{filter:brightness(1.08)}
-@media (max-width:480px){
-  #rl-cart-fab button span.txt{display:none}
-}
-
 
 /* === FX: Light 3D & Reveal === */
 .card{transform-style:preserve-3d;will-change:transform, box-shadow}
@@ -80,7 +54,6 @@ body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radi
 @media (prefers-reduced-motion: reduce){
   .card,.card .photo,.card .badges,.card .model,.card .price,.card .btn,.card .simulatore{transform:none !important;transition:none !important}
 }
-
 
 /* === FX: Spotlight on cards & micro hover === */
 .card{position:relative;overflow:hidden}
@@ -102,7 +75,6 @@ body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radi
   .btn:hover,.btn.secondary:hover{transform:none;box-shadow:none;filter:none}
   .badges .tag:hover{transform:none}
 }
-
 </style>
 </head>
 <body>
@@ -124,8 +96,6 @@ body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radi
 
 <script>
 const WA = "3908119578844";
-
-// Dati centralizzati (iPhone 17 e iPhone Air aggiornati)
 const prodotti = [{brand:"Samsung", nome:"Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:[]},
   {brand:"Apple", nome:"iPhone 17 Pro 1TB", prezzo:1993.8, img:"imgcatalogo/apple-iphone-17-pro-1tb.webp", tags:[]},
   {brand:"HONOR", nome:"400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:[]},
@@ -173,9 +143,6 @@ render();
 
 // Filtri cliccabili
 document.querySelectorAll(".btn-filter").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".btn-filter").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); render(btn.dataset.filter); }); });
-
-// Toggle Dark 3D
-});
 
 // Simulatore
 function calcolaRata(select, prezzo){ const mesi=parseInt(select.value); const out=select.parentElement.querySelector('.sim-output'); if(!mesi){ out.textContent="Rata mensile: —"; return; } out.textContent="Rata mensile: € "+(prezzo/mesi).toFixed(2); }
@@ -225,8 +192,80 @@ function inviaSimulazione(btn, nome, prezzo){ const card = btn.closest('.card');
   });
 })();
 
+// === Smart image fallback + diagnostics ===
+(function(){
+  const exts = ["webp","jpg","png","jpeg","JPG","PNG","JPEG","Webp","WEBP"];
+  const folders = ["imgcatalogo/","./imgcatalogo/","../imgcatalogo/","docs/imgcatalogo/"];
+  const loaded = [], failed = [];
 
-// === FX: Spotlight tracking per card ===
+  function tryLoad(img, basePath){
+    const base = basePath.replace(/\/g,"/");
+    const m = base.match(/^(.*\/)?([^\/]+)\.([A-Za-z0-9]+)$/);
+    const folder = m && m[1] ? m[1] : "";
+    const name = m ? m[2] : basePath;
+    let idx = 0, jdx = 0;
+
+    function next(){
+      if (idx >= folders.length){ fail(); return; }
+      const f = folders[idx];
+      const src = f + name + "." + exts[jdx];
+      img.onerror = ()=>{
+        jdx++;
+        if (jdx >= exts.length){ jdx=0; idx++; }
+        next();
+      };
+      img.onload = ()=>{
+        loaded.push(src);
+      };
+      img.src = src;
+    }
+    function fail(){
+      failed.push(basePath);
+      img.removeAttribute("onerror");
+    }
+    next();
+  }
+
+  function boot(){
+    document.querySelectorAll("img.photo").forEach(img=>{
+      const orig = img.getAttribute("src") || "";
+      // prime with original; if it fails, try variants
+      const tester = new Image();
+      tester.onload = ()=>{ loaded.push(orig); };
+      tester.onerror = ()=>{ tryLoad(img, orig); };
+      tester.src = orig;
+    });
+
+    // Diagnostics pill
+    const pill = document.createElement("button");
+    pill.textContent = "Diag immagini";
+    pill.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9999;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;cursor:pointer";
+    pill.onclick = ()=>{
+      const msg = [
+        "IMMAGINI CARICATE ("+loaded.length+")",
+        ...loaded.map(s=>"  ✓ "+s),
+        "",
+        "IMMAGINI NON TROVATE ("+failed.length+")",
+        ...failed.map(s=>"  ✗ "+s),
+        "",
+        "Suggerimento: carica i file mancanti in imgcatalogo/ o rinominali per combaciare."
+      ].join("
+");
+      alert(msg);
+      console.log("[DIAG] Loaded:", loaded);
+      console.log("[DIAG] Failed:", failed);
+    };
+    document.body.appendChild(pill);
+  }
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+
+// === Spotlight tracking per card ===
 (function(){
   const cards = Array.from(document.querySelectorAll('.card'));
   cards.forEach(card=>{
@@ -245,17 +284,12 @@ function inviaSimulazione(btn, nome, prezzo){ const card = btn.closest('.card');
     card.addEventListener('mouseleave', ()=>{
       card.style.removeProperty('--mx'); card.style.removeProperty('--my');
     });
-    // Touch: spotlight centers briefly
     card.addEventListener('touchstart', ()=>{
       card.style.setProperty('--mx','50%'); card.style.setProperty('--my','40%');
       setTimeout(()=>{ card.style.removeProperty('--mx'); card.style.removeProperty('--my'); }, 600);
     }, {passive:true});
   });
 })();
-
 </script>
-
-
-
 </body>
 </html>
