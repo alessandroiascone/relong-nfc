@@ -11,8 +11,8 @@
     --bg1:#0a0a0a; --bg2:#000; --card:#151515; --stroke:#2b2b2b;
     --grad:linear-gradient(90deg,#ff0000,#ff7b00);
     --muted:rgba(255,255,255,.72);
-    --wa1:#25D366; --wa2:#128C7E;
-    --focus:#ffd166;
+    --wa1:#ff0000; --wa2:#ff7b00; --wa3:#ffd166;
+    --focus:#ffd166; --yellow:#ffd166;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -22,7 +22,7 @@
     overflow-x:hidden;
   }
 
-  /* spotlight mouse */
+  /* spotlight */
   .spotlight{
     position:fixed; inset:auto; left:var(--x,50%); top:var(--y,40%);
     width:1100px; height:1100px; transform:translate(-50%,-50%);
@@ -31,113 +31,138 @@
     filter:blur(8px);
   }
 
+  /* 3D title */
   header{
-    position:relative; z-index:1; text-align:center; padding:18px 16px 6px;
+    position:relative; z-index:1; text-align:center; padding:22px 16px 10px;
   }
-  h1{font-size:22px; letter-spacing:-.02em; margin:0 0 6px; font-weight:900}
+  h1{
+    margin:0 0 6px;
+    font-size:26px; letter-spacing:-.02em; font-weight:900;
+    text-shadow:
+      0 1px 0 rgba(0,0,0,.5),
+      0 2px 0 rgba(0,0,0,.45),
+      0 3px 0 rgba(0,0,0,.4),
+      0 12px 28px rgba(0,0,0,.55),
+      0 0 24px rgba(255,90,0,.12);
+    background:var(--grad); -webkit-background-clip:text; color:transparent;
+  }
   .sub{font-size:13px; color:var(--muted)}
   .wrap{position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:10px 14px 40px}
 
-  /* promo bar (puoi togliere display con .hidden) */
-  .promo{
-    position:sticky; top:0; z-index:20;
-    display:flex; gap:10px; align-items:center; justify-content:center;
-    padding:10px 12px; background:linear-gradient(90deg,#1f1f1f,#2a2a2a);
-    border-bottom:1px solid rgba(255,255,255,.08);
-    box-shadow:0 12px 26px rgba(0,0,0,.45);
+  /* FILTRI BRAND (sticky) */
+  .filters-wrap{
+    position:sticky; top:8px; z-index:10;
+    background:rgba(10,10,10,.6); backdrop-filter:saturate(1.1) blur(6px);
+    border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px;
   }
-  .promo .label{font-weight:900}
-  .promo .timer{
-    font-variant-numeric:tabular-nums;
-    background:rgba(255,255,255,.10); padding:6px 10px; border-radius:999px
-  }
-  .promo a{color:#ffd166; font-weight:900; text-decoration:none}
-  .promo .close{
-    margin-left:8px; background:#000; color:#fff; border:1px solid rgba(255,255,255,.18);
-    padding:4px 8px; border-radius:999px; cursor:pointer; font-weight:800
-  }
-
-  /* barra comandi */
-  .toolbar{
-    position:sticky; top:52px; z-index:10;
-    display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center;
-    padding:10px; margin-top:10px; background:rgba(10,10,10,.75);
-    border:1px solid rgba(255,255,255,.08); border-radius:14px; backdrop-filter:saturate(1.1) blur(6px)
-  }
-  @media(max-width:880px){ .toolbar{ grid-template-columns:1fr 1fr; } }
-  @media(max-width:520px){ .toolbar{ grid-template-columns:1fr; } }
-
-  .search input{
-    width:100%; padding:10px 12px; border-radius:12px; border:1px solid #333; background:#000; color:#fff;
-  }
-  .sort select{
-    width:100%; padding:10px 12px; border-radius:12px; border:1px solid #333; background:#000; color:#fff;
-  }
-
-  /* filtri brand */
   .filters{display:flex; gap:10px; overflow-x:auto; padding:2px}
   .filters button{
-    background:#111; border:1px solid #333; color:#fff; padding:8px 14px; border-radius:999px;
-    font-weight:800; white-space:nowrap; cursor:pointer
+    background:#111; border:1px solid #333; color:#fff; padding:10px 16px; border-radius:999px;
+    font-weight:900; white-space:nowrap; cursor:pointer;
+    text-shadow:0 1px 0 rgba(0,0,0,.5);
   }
-  .filters button.active{background:var(--grad); color:#000; border-color:transparent}
+  .filters button.active{
+    background:linear-gradient(90deg,#ff0000,#ff7b00);
+    color:#000; border-color:transparent;
+    box-shadow:0 14px 30px rgba(255,90,0,.35);
+  }
 
-  /* griglia */
+  /* GRID */
   .grid{
-    display:grid; gap:18px; margin-top:16px;
+    display:grid; gap:20px; margin-top:18px;
     grid-template-columns:repeat(auto-fill,minmax(240px,1fr))
   }
 
-  /* card */
+  /* CARD 3D */
   .card{
-    background:linear-gradient(150deg, rgba(20,20,20,.94), rgba(0,0,0,.60));
+    position:relative;
+    background:linear-gradient(150deg, rgba(20,20,20,.96), rgba(0,0,0,.62));
     border:1px solid var(--stroke); border-radius:16px; padding:14px;
-    box-shadow:0 24px 56px rgba(0,0,0,.85), 0 0 60px rgba(255,0,0,.12);
+    box-shadow:
+      0 26px 60px rgba(0,0,0,.9),
+      0 0 60px rgba(255,0,0,.12);
     border-top:1px solid rgba(255,255,255,.06);
     transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
-    position:relative; transform-style:preserve-3d; will-change:transform, box-shadow;
+    transform-style:preserve-3d; will-change:transform, box-shadow;
     opacity:0; transform:translateY(14px);
   }
   .card.in{opacity:1; transform:none}
+  .card::after{ /* sheen */
+    content:""; position:absolute; inset:-1px; border-radius:16px; pointer-events:none;
+    background:radial-gradient(800px 180px at 50% -10%, rgba(255,140,0,.17), transparent 60%);
+    opacity:.0; transition:opacity .2s ease; filter:blur(8px);
+  }
   .card:hover{
-    transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(4px);
-    box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
+    transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(5px);
+    box-shadow:0 38px 90px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
     border-color:rgba(255,255,255,.18);
   }
-  .img{width:100%; aspect-ratio:4/5; border-radius:12px; background:#000; object-fit:cover; margin-bottom:10px}
+  .card:hover::after{opacity:1}
 
-  /* badge */
+  .img{
+    width:100%; aspect-ratio:4/5; border-radius:12px; background:#000; object-fit:cover; margin-bottom:12px;
+    box-shadow:0 14px 30px rgba(0,0,0,.6) inset;
+  }
+
+  /* BRAND RIBBON */
+  .brand-tag{
+    position:absolute; top:12px; left:-6px;
+    padding:6px 12px 6px 16px; border-radius:0 10px 10px 0;
+    background:linear-gradient(90deg,#ff0000,#ff7b00);
+    color:#000; font-weight:900; font-size:11px; letter-spacing:.02em;
+    box-shadow:0 10px 24px rgba(255,90,0,.35);
+    text-shadow:0 1px 0 rgba(255,255,255,.4);
+    border:1px solid rgba(0,0,0,.15);
+  }
+
+  /* BADGE (novità/promo/top) */
   .badge{
     position:absolute; top:-10px; right:12px; padding:6px 10px; border-radius:999px;
     font-size:11px; font-weight:900; color:#000; border:1px solid rgba(0,0,0,.06);
-    box-shadow:0 10px 18px rgba(255,80,0,.35)
+    box-shadow:0 10px 18px rgba(255,80,0,.35);
   }
   .badge.novita{background:linear-gradient(90deg,#ff006e,#ffbe0b)}
   .badge.promo {background:linear-gradient(90deg,#00b4d8,#0077b6)}
   .badge.top   {background:linear-gradient(90deg,#7209b7,#4361ee)}
 
-  .name{font-weight:900; letter-spacing:-.01em}
+  /* TEXT 3D */
+  .name{
+    font-weight:900; letter-spacing:-.01em;
+    text-shadow:
+      0 1px 0 rgba(0,0,0,.55),
+      0 12px 26px rgba(0,0,0,.45);
+  }
   .brand{font-size:12px; color:var(--muted); margin:2px 0 6px}
-  .price{font-size:20px; font-weight:900; background:var(--grad); -webkit-background-clip:text; color:transparent; margin:6px 0 0}
+  .price{
+    font-size:20px; font-weight:900; background:var(--grad); -webkit-background-clip:text; color:transparent; margin:6px 0 0;
+    text-shadow:0 10px 22px rgba(255,90,0,.12);
+  }
 
+  /* RATE */
   .rate{margin-top:10px; background:#101010; border:1px solid #2b2b2b; border-radius:12px; padding:10px}
   .rate label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
   .rate select{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #3a3a3a; background:#000; color:#fff}
-  .rata{font-size:14px; margin-top:8px}
+  .rata{
+    font-size:14px; margin-top:8px; font-weight:900;
+    color:var(--yellow); /* ✅ giallo evidente */
+    text-shadow:0 0 18px rgba(255,209,102,.18);
+  }
 
+  /* CTA aggressivo rosso→arancio→giallo */
   .wa{
     display:block; margin-top:12px; text-align:center; padding:12px; border-radius:12px;
     font-weight:900; text-decoration:none; color:#000;
-    background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));
-    box-shadow:0 18px 30px rgba(18,140,126,.45)
+    background:linear-gradient(45deg, var(--wa1), var(--wa2) 55%, var(--wa3));
+    box-shadow:0 18px 34px rgba(255,120,0,.45), 0 2px 6px rgba(0,0,0,.6) inset;
+    text-shadow:0 1px 0 rgba(255,255,255,.7);
+    border:1px solid rgba(0,0,0,.15);
   }
 
-  /* messaggi */
-  .status{margin-top:8px; font-size:13px; color:var(--muted); text-align:center}
+  /* INFO */
+  .status{margin-top:12px; font-size:13px; color:var(--muted); text-align:center}
   .error{max-width:900px; margin:16px auto 0; background:#161616; border:1px solid #333; padding:14px; border-radius:12px}
   .error b{color:#fff}
 
-  /* focus */
   :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:10px}
 </style>
 </head>
@@ -151,29 +176,10 @@
   <div class="sub">Scegli, calcola la rata e invia il preventivo su WhatsApp</div>
 </header>
 
-<!-- promo bar (Black Friday fino al 30 novembre alle 23:59) -->
-<div id="promo" class="promo" role="status" aria-live="polite">
-  <span class="label">BLACK FRIDAY</span>
-  <span class="timer" id="timer">--:--:--</span>
-  <a href="./catalogo-3d.html" aria-label="Resta nel catalogo">Offerte a tempo • scopri ora</a>
-  <button class="close" type="button" id="promoClose" aria-label="Chiudi barra promozionale">×</button>
-</div>
-
 <div class="wrap">
-  <!-- toolbar -->
-  <div class="toolbar">
-    <div class="search">
-      <input id="q" type="search" placeholder="Cerca modello o brand…" aria-label="Cerca">
-    </div>
-    <div class="sort">
-      <select id="order" aria-label="Ordina">
-        <option value="default">Ordina: predefinito</option>
-        <option value="prezzo-asc">Prezzo crescente</option>
-        <option value="prezzo-desc">Prezzo decrescente</option>
-        <option value="nome-asc">Nome A→Z</option>
-        <option value="nome-desc">Nome Z→A</option>
-      </select>
-    </div>
+
+  <!-- SOLO FILTRO BRAND -->
+  <div class="filters-wrap">
     <div id="filters" class="filters" aria-label="Filtri brand"></div>
   </div>
 
@@ -185,7 +191,6 @@
 /* ===== Config ===== */
 const WA = "https://wa.me/3908119578844?text=";
 const DATA_URL = "./prodotti.json";
-const PROMO_END = new Date("2025-11-30T23:59:59+01:00"); // modifica a piacere
 
 /* ===== Util ===== */
 const money = n => Number(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -205,28 +210,6 @@ const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/
   upd({clientX: innerWidth/2, clientY: innerHeight*0.4});
 })();
 
-/* ===== Promo countdown ===== */
-(function(){
-  const bar = document.getElementById('promo');
-  const tEl = document.getElementById('timer');
-  const close = document.getElementById('promoClose');
-  if(!bar || !tEl) return;
-
-  close.addEventListener('click', ()=> bar.style.display='none');
-
-  function tick(){
-    const now = new Date();
-    let diff = PROMO_END - now;
-    if(diff<=0){ tEl.textContent = "Termina a breve"; return; }
-    const d = Math.floor(diff/86400000); diff-=d*86400000;
-    const h = Math.floor(diff/3600000); diff-=h*3600000;
-    const m = Math.floor(diff/60000); diff-=m*60000;
-    const s = Math.floor(diff/1000);
-    tEl.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }
-  tick(); setInterval(tick, 1000);
-})();
-
 /* ===== Render Card ===== */
 function renderCard(p, idx){
   const badge =
@@ -241,7 +224,9 @@ function renderCard(p, idx){
 
   return `
   <article class="card" data-brand="${p.brand}" data-name="${norm(p.nome)}" data-price="${Number(p.prezzo)}">
+    <span class="brand-tag">${p.brand}</span>
     ${badge ? `<span class="badge ${badge}">${badge.toUpperCase()}</span>` : ``}
+
     <img class="img" src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35;this.title='Immagine non trovata: ${p.img}'">
 
     <div class="name">${p.nome}</div>
@@ -292,9 +277,9 @@ function onRateChange(sel, prezzo, nomeEnc, waId){
   btn.href = WA + encodeURIComponent(msg);
 }
 
-/* ===== Stato globale in memoria ===== */
-let ALL = [];      // tutti i prodotti
-let VIEW = [];     // vista filtrata/ordinata
+/* ===== Stato ===== */
+let ALL = [];
+let CURRENT_BRAND = 'all';
 
 /* ===== Init ===== */
 (async function init(){
@@ -315,11 +300,7 @@ let VIEW = [];     // vista filtrata/ordinata
     filters.innerHTML = brands.map(b=>`
       <button data-b="${b}" onclick="filterBrand('${b}')">${b==='all'?'Tutti':b}</button>
     `).join('');
-    filters.querySelector('button').classList.add('active');
-
-    // search + sort
-    document.getElementById('q').addEventListener('input', applySearchSort);
-    document.getElementById('order').addEventListener('change', applySearchSort);
+    const first = filters.querySelector('button'); if(first) first.classList.add('active');
 
   }catch(err){
     document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
@@ -330,7 +311,7 @@ let VIEW = [];     // vista filtrata/ordinata
     status.textContent = 'Errore caricamento';
   }
 
-  // on-scroll fade-in
+  // fade-in on scroll
   const obs = new IntersectionObserver((entries)=>{
     entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
   }, {threshold:.16});
@@ -342,48 +323,26 @@ let VIEW = [];     // vista filtrata/ordinata
     const r = card.getBoundingClientRect();
     const cx = (e.clientX - r.left)/r.width - .5;
     const cy = (e.clientY - r.top)/r.height - .5;
-    card.style.transform = `perspective(900px) rotateX(${(-cy*4).toFixed(2)}deg) rotateY(${(cx*4).toFixed(2)}deg) translateZ(4px)`;
+    card.style.transform = `perspective(900px) rotateX(${(-cy*4).toFixed(2)}deg) rotateY(${(cx*4).toFixed(2)}deg) translateZ(5px)`;
   });
   grid.addEventListener('pointerleave', ()=>{
     grid.querySelectorAll('.card').forEach(c=>c.style.transform='');
   });
 })();
 
-/* ===== Render grid helper ===== */
+/* ===== Helpers ===== */
 function renderGrid(list){
   const grid = document.getElementById('grid');
   grid.innerHTML = list.map((p,i)=>renderCard(p,i)).join('');
-  VIEW = list.slice();
 }
-
-/* ===== Filtri / Ricerca / Ordina ===== */
-let CURRENT_BRAND = 'all';
 
 function filterBrand(b){
   CURRENT_BRAND = b;
   document.querySelectorAll('.filters button').forEach(btn=>btn.classList.remove('active'));
   const cur = document.querySelector(`.filters button[data-b="${b}"]`);
   if(cur) cur.classList.add('active');
-  applySearchSort();
-}
 
-function applySearchSort(){
-  const q = norm(document.getElementById('q').value || '');
-  const order = document.getElementById('order').value;
-
-  let list = ALL.filter(p=>{
-    const byBrand = (CURRENT_BRAND==='all' || p.brand===CURRENT_BRAND);
-    const byText = !q || norm(p.nome).includes(q) || norm(p.brand).includes(q);
-    return byBrand && byText;
-  });
-
-  switch(order){
-    case 'prezzo-asc':  list.sort((a,b)=>a.prezzo-b.prezzo); break;
-    case 'prezzo-desc': list.sort((a,b)=>b.prezzo-a.prezzo); break;
-    case 'nome-asc':    list.sort((a,b)=>a.nome.localeCompare(b.nome,'it')); break;
-    case 'nome-desc':   list.sort((a,b)=>b.nome.localeCompare(a.nome,'it')); break;
-  }
-
+  const list = (b==='all') ? ALL : ALL.filter(p=>p.brand===b);
   renderGrid(list);
 }
 </script>
