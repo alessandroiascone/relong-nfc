@@ -16,26 +16,15 @@
       --brand1:#ff3b1a;--brand2:#ff7b00;
       --wa1:#2fd27a;--wa2:#10936d;
     }
-    /* Theme overrides by season */
     body[data-season="christmas"]{ --brand1:#16a34a; --brand2:#ef4444; }
     body[data-season="flash"]{ --brand1:#ff3b1a; --brand2:#ff7b00; }
 
-    body{
-      font-family:system-ui,-apple-system,Inter,Roboto,Helvetica,Arial;
-      color:#fff;background:linear-gradient(180deg,var(--bg1),var(--bg2));
-      overflow-x:hidden;padding-bottom:40px
-    }
+    body{font-family:system-ui,-apple-system,Inter,Roboto,Helvetica,Arial;color:#fff;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));overflow-x:hidden;padding-bottom:40px}
     a{color:inherit;text-decoration:none}
 
-    header{
-      position:sticky;top:0;z-index:50;
-      background:rgba(10,10,10,.75);backdrop-filter:blur(8px);
-      border-bottom:1px solid var(--stroke);
-    }
-    .nav{
-      max-width:1100px;margin:0 auto;padding:14px 16px;
-      display:flex;align-items:center;justify-content:space-between
-    }
+    header{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.75);backdrop-filter:blur(8px);border-bottom:1px solid var(--stroke)}
+    .nav{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
     .logo{width:28px;height:28px;border-radius:8px;display:inline-block;background:linear-gradient(135deg,var(--brand1),var(--brand2))}
     .back{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);font-size:14px}
 
@@ -46,21 +35,15 @@
     .section{max-width:1100px;margin:22px auto;padding:0 16px}
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 
-    .card{
-      grid-column:span 12;border:1px solid var(--stroke);
-      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-      border-radius:18px;overflow:hidden;transition:all .2s ease;
-    }
+    .card{grid-column:span 12;border:1px solid var(--stroke);
+      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border-radius:18px;overflow:hidden;transition:all .2s ease}
     @media(min-width:700px){.card{grid-column:span 6}}
     @media(min-width:980px){.card{grid-column:span 4}}
     .card:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(0,0,0,.28)}
 
     .media{aspect-ratio:16/12;background:#0f0f0f;position:relative;display:grid;place-items:center}
     .img{width:100%;height:100%;object-fit:cover}
-    .badge{
-      position:absolute;top:10px;left:10px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2));
-    }
+    .badge{position:absolute;top:10px;left:10px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;background:linear-gradient(90deg,var(--brand1),var(--brand2))}
 
     .body{padding:14px}
     .ey{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
@@ -68,22 +51,12 @@
     .price{margin-top:8px;font-size:20px;font-weight:800}
 
     .cta-row{margin-top:12px;display:flex;gap:10px}
-    .btn{
-      flex:1; padding:10px 12px; text-align:center;
-      border-radius:12px;border:1px solid var(--stroke);
-      background:var(--card);transition:.2s;
-    }
+    .btn{flex:1;padding:10px 12px;text-align:center;border-radius:12px;border:1px solid var(--stroke);background:var(--card);transition:.2s}
     .btn:hover{box-shadow:0 0 0 6px var(--ring);transform:translateY(-2px)}
-    .btn--wa{
-      background:linear-gradient(180deg,rgba(47,210,122,.18),rgba(47,210,122,.12));
-      border-color:rgba(47,210,122,.3);color:#0b2318;font-weight:800;
-    }
+    .btn--wa{background:linear-gradient(180deg,rgba(47,210,122,.18),rgba(47,210,122,.12));border-color:rgba(47,210,122,.3);color:#0b2318;font-weight:800}
     .btn--accent{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900}
 
-    footer{
-      margin-top:40px;text-align:center;color:rgba(255,255,255,.55);
-      font-size:12px;padding:20px 16px;border-top:1px solid var(--stroke);
-    }
+    footer{margin-top:40px;text-align:center;color:rgba(255,255,255,.55);font-size:12px;padding:20px 16px;border-top:1px solid var(--stroke)}
   </style>
 </head>
 
@@ -119,7 +92,7 @@
           <div class="title">Samsung QLED 4K • 55"</div>
           <div class="price">€449,99</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20TV%20Samsung%2055%20a%20449,99€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20TV%20Samsung%2055%20a%20449%2C99%E2%82%AC" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -135,7 +108,7 @@
           <div class="title">PlayStation 5</div>
           <div class="price">€419,99</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20PS5%20a%20419,99€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20PS5%20a%20419%2C99%E2%82%AC" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -151,7 +124,7 @@
           <div class="title">Samsung Galaxy S25 Ultra</div>
           <div class="price">€985,90</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20S25%20Ultra%20a%20985,90€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20S25%20Ultra%20a%20985%2C90%E2%82%AC" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -167,7 +140,23 @@
           <div class="title">Fastweb + Vodafone Energia</div>
           <div class="price">€35/mese</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Info%20attivazione%20Energia%20a%2035€%2Fmese" target="_blank" rel="noopener">Chiedi info su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Info%20attivazione%20Energia%20a%2035%E2%82%AC%2Fmese" target="_blank" rel="noopener">Chiedi info su WhatsApp</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ✅ NUOVO: Vodafone Casa 25,95€/mese -->
+      <article class="card">
+        <div class="media">
+          <img class="img" src="promo%20casa%2025.95%E2%82%AC.jpeg" alt="Vodafone Casa 25,95€">
+          <span class="badge" data-badge>FLASH</span>
+        </div>
+        <div class="body">
+          <div class="ey">Fisso Casa</div>
+          <div class="title">Vodafone Casa (clienti mobile)</div>
+          <div class="price">€25,95/mese</div>
+          <div class="cta-row">
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20attivare%20Vodafone%20Casa%20a%2025%2C95%E2%82%AC%2Fmese" target="_blank" rel="noopener">Attiva su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -196,36 +185,19 @@
     document.body.setAttribute('data-season', season);
 
     const map = {
-      blackfriday: {
-        nav: 'Black Friday ReLong',
-        h1:  'Offerte Black Friday',
-        sub: 'Prodotti reali. Blocca l\'offerta su WhatsApp: 08119578844.',
-        badge: 'FLASH'
-      },
-      christmas: {
-        nav: 'Christmas Promo 🎄',
-        h1:  'Offerte di Natale 🎄',
-        sub: 'Regali tech & risparmio. Scrivici su WhatsApp: 08119578844.',
-        badge: 'NATALE'
-      },
-      flash: {
-        nav: 'Offerte Flash ⚡',
-        h1:  'Offerte Flash ⚡',
-        sub: 'Promo rapide fino ad esaurimento scorte. WhatsApp: 08119578844.',
-        badge: 'FLASH'
-      }
+      blackfriday: { nav:'Black Friday ReLong', h1:'Offerte Black Friday', sub:'Prodotti reali. Blocca l\'offerta su WhatsApp: 08119578844.', badge:'FLASH' },
+      christmas:   { nav:'Christmas Promo 🎄',   h1:'Offerte di Natale 🎄', sub:'Regali tech & risparmio. Scrivici su WhatsApp: 08119578844.',   badge:'NATALE' },
+      flash:       { nav:'Offerte Flash ⚡',      h1:'Offerte Flash ⚡',      sub:'Promo rapide fino ad esaurimento scorte. WhatsApp: 08119578844.', badge:'FLASH' }
     };
 
     const c = map[season];
     const $nav = document.getElementById('nav-season');
     const $h1  = document.getElementById('season-h1');
     const $sub = document.getElementById('season-sub');
-
     if($nav) $nav.textContent = c.nav;
     if($h1)  $h1.textContent  = c.h1;
     if($sub) $sub.textContent  = c.sub;
 
-    // Aggiorna tutti i badge in pagina
     document.querySelectorAll('[data-badge]').forEach(el => { el.textContent = c.badge; });
   })();
   </script>
