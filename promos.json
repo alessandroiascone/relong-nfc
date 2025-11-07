@@ -1,0 +1,16 @@
+{
+  "products": [
+    {
+      "id": "tv55",
+      "name": "Samsung QLED 55",
+      "price": "449.99",
+      "image": "img/promo-tv55.jpg"
+    },
+    {
+      "id": "ps5",
+      "name": "PlayStation 5",
+      "price": "419.99",
+      "image": "img/promo-ps5.jpg"
+    }
+  ]
+}
