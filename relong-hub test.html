@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -113,8 +114,7 @@
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
-    article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#10B981,#84CC16);box-shadow:0 10px 18px rgba(16,185,129,.35)}
-    article.card:nth-of-type(6) .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)} /* BLACK FRIDAY */
+    /* rimosso nth-of-type(5/6) e usiamo ID per sicurezza */
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px}
@@ -149,6 +149,15 @@
     /* ✅ Quando c’è la barra BF, alza FAB e ToTop per non sovrapporre */
     body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
     body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+
+    /* Badge forzati per card con ID (robusti al riordino) */
+    #biz-mobile .badge{
+      background:linear-gradient(90deg,#10B981,#84CC16);
+      box-shadow:0 10px 18px rgba(16,185,129,.35);
+    }
+    #season-card .badge{
+      background:linear-gradient(90deg,#ff0000,#ff7b00);
+    }
   </style>
 </head>
 <body>
@@ -224,7 +233,16 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <!-- ✅ SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH (la pagina di destinazione è dinamica) -->
+      <!-- ✅ BUSINESS MOBILI (ripristinata) -->
+      <article class="card" data-anim id="biz-mobile">
+        <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
+        <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
+        <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
+        <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
+        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
+      </article>
+
+      <!-- ✅ SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
