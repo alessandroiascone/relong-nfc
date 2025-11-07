@@ -21,12 +21,8 @@ h1{
   font-weight:900;
   letter-spacing:-.03em;
 }
-.status{
-  text-align:center;
-  font-size:13px;
-  color:rgba(255,255,255,.7);
-  margin-top:6px;
-}
+.status{ text-align:center; font-size:13px; color:rgba(255,255,255,.7); margin-top:6px; }
+
 .filters{
   display:flex;
   gap:10px;
@@ -47,6 +43,7 @@ h1{
   background:linear-gradient(90deg,#ff0000,#ff7b00);
   color:#000;
 }
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -83,17 +80,11 @@ h1{
   font-weight:800;
   color:#000;
 }
-.badge.novita{
-  background:linear-gradient(90deg,#ff006e,#ffbe0b);
-}
-.badge.promo{
-  background:linear-gradient(90deg,#00b4d8,#0077b6);
-}
-.badge.top{
-  background:linear-gradient(90deg,#7209b7,#4361ee);
-}
+.badge.novita{ background:linear-gradient(90deg,#ff006e,#ffbe0b); }
+.badge.promo{  background:linear-gradient(90deg,#00b4d8,#0077b6); }
+.badge.top{    background:linear-gradient(90deg,#7209b7,#4361ee); }
 
-.name{font-weight:700;}
+.name{font-weight:700}
 .price{
   font-size:20px;
   font-weight:900;
@@ -110,6 +101,7 @@ h1{
   border-radius:12px;
   margin-top:12px;
 }
+.rate-box label{display:block; font-size:13px; margin-bottom:6px; color:rgba(255,255,255,.8)}
 .rate-box select{
   width:100%;
   padding:8px;
@@ -117,6 +109,10 @@ h1{
   color:#fff;
   border:1px solid #555;
   border-radius:8px;
+}
+.rate-box .rata{
+  margin-top:8px;
+  font-size:14px;
 }
 
 .btn-wa{
@@ -130,11 +126,7 @@ h1{
   font-weight:800;
   text-decoration:none;
 }
-.error{
-  max-width:720px;margin:24px auto 0;
-  background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:12px;
-  font-size:14px;line-height:1.45
-}
+.error{max-width:720px;margin:24px auto 0;background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:12px;font-size:14px;line-height:1.45}
 .error code{background:#000;padding:2px 6px;border-radius:6px}
 .hint{opacity:.7;font-size:12px;margin-top:6px}
 </style>
@@ -152,42 +144,29 @@ h1{
 <div class="grid" id="grid"></div>
 
 <script>
-/* ===========================================================
-   LOADER PRODOTTI ROBUSTO con 3 sorgenti in fallback:
-   1) catalogo-smartphone-reale-v3-lite.html (HTML con <script>)
-   2) prodotti.json (JSON puro)
-   3) prodotti.js   (ES module: window.prodotti = [...])
-   =========================================================== */
+const WA_BASE = "https://wa.me/3908119578844?text=";
 
+/* ====== DATA LOADING (Lite → JSON → JS) ====== */
 async function loadFromLite(){
-  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html?v=" + Date.now(), {cache:"no-store"});
+  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html?v="+Date.now(), {cache:"no-store"});
   if(!res.ok) throw new Error("Lite non trovato ("+res.status+")");
   const text = await res.text();
 
-  // Prova a estrarre direttamente l’array (senza parser) se presente
+  // Prova a leggere un array literal: const prodotti = [ ... ];
   const m = text.match(/const\s+prodotti\s*=\s*(\[[\s\S]*?\])\s*;/);
   if(m){
     try{
-      // Trasformo in JSON valido: virgolette doppie e true/false/null ok
-      let jsonish = m[1]
-        .replace(/(\w+)\s*:/g, '"$1":')      // chiavi senza virgolette -> "chiavi":
-        .replace(/'/g, '"');                 // singole -> doppie (se presenti)
+      let jsonish = m[1].replace(/(\w+)\s*:/g, '"$1":').replace(/'/g, '"');
       return JSON.parse(jsonish);
-    }catch(e){
-      // fallback al DOMParser + eval
-    }
+    }catch(e){}
   }
 
-  // Parser DOM + recupero <script> + eval protetto
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(text, "text/html");
+  // Fallback: esegui lo <script>
+  const doc = new DOMParser().parseFromString(text,"text/html");
   const script = doc.querySelector("script");
   if(!script) throw new Error("Lite trovato ma senza <script> prodotti");
-
-  // sandbox minimo per catturare la const
   let prodotti = [];
   try{
-    // Creiamo una funzione che esegue il contenuto e poi ritorna la variabile
     const fn = new Function(`
       ${script.textContent || ""}
       try { return prodotti; } catch(e){ return (typeof window!=='undefined' && window.prodotti) || []; }
@@ -201,7 +180,7 @@ async function loadFromLite(){
 }
 
 async function loadFromJson(){
-  const res = await fetch("./prodotti.json?v=" + Date.now(), {cache:"no-store"});
+  const res = await fetch("./prodotti.json?v="+Date.now(), {cache:"no-store"});
   if(!res.ok) throw new Error("JSON non trovato ("+res.status+")");
   const arr = await res.json();
   if(!Array.isArray(arr)) throw new Error("JSON ok ma non è un array");
@@ -209,81 +188,95 @@ async function loadFromJson(){
 }
 
 async function loadFromJs(){
-  await import("./prodotti.js?v=" + Date.now());
+  await import("./prodotti.js?v="+Date.now());
   if(!Array.isArray(window.prodotti)) throw new Error("JS ok ma window.prodotti non è un array");
   return window.prodotti;
 }
 
 async function loadProdotti(){
   const errors = [];
-  try{ return await loadFromLite(); }
-  catch(e){ errors.push("Lite: " + e.message); }
-  try{ return await loadFromJson(); }
-  catch(e){ errors.push("JSON: " + e.message); }
-  try{ return await loadFromJs(); }
-  catch(e){ errors.push("JS: " + e.message); }
-
-  const msg = `
-    <div class="error">
-      <strong>Impossibile caricare i prodotti.</strong><br>
-      Ho provato queste sorgenti, ma tutte fallite:
-      <ul>
-        ${errors.map(x=>`<li>${x}</li>`).join("")}
-      </ul>
-      <div class="hint">
-        Verifica che <code>catalogo-smartphone-reale-v3-lite.html</code> (o <code>prodotti.json</code>/<code>prodotti.js</code>) sia
-        <b>nella stessa cartella</b> di questa pagina e che le immagini esistano in <code>/imgcatalogo/</code>.
-      </div>
-    </div>`;
+  try{ return await loadFromLite(); }catch(e){ errors.push("Lite: "+e.message); }
+  try{ return await loadFromJson(); }catch(e){ errors.push("JSON: "+e.message); }
+  try{ return await loadFromJs(); }catch(e){ errors.push("JS: "+e.message); }
+  const msg = `<div class="error"><strong>Impossibile caricare i prodotti.</strong><br>Ho provato queste sorgenti, ma tutte fallite:<ul>${errors.map(x=>`<li>${x}</li>`).join("")}</ul><div class="hint">Verifica che <code>catalogo-smartphone-reale-v3-lite.html</code> (o <code>prodotti.json</code>/<code>prodotti.js</code>) sia nella stessa cartella e che le immagini esistano in <code>/imgcatalogo/</code>.</div></div>`;
   document.getElementById("grid").insertAdjacentHTML("beforebegin", msg);
   throw new Error("Nessuna sorgente disponibile");
 }
 
-/* ===========================
-   RENDERING CARDS
-   =========================== */
+/* ====== UI ====== */
+function itMoney(num){
+  return Number(num).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
 
-function creaCard(p){
+function creaCard(p, idx){
   const badge = p.novita ? "novita"
               : p.promo ? "promo"
               : p.top   ? "top"
               : null;
 
-  // onerror per vedere se manca un file immagine (non blocca tutto)
   const img = `<img src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35; this.title='Immagine non trovata: ${p.img}'">`;
+
+  const selId = `rate-${idx}`;
+  const btnId = `wa-${idx}`;
+
+  // Messaggio base iniziale (senza rate)
+  const baseMsg = `Preventivo per ${p.nome}\nPrezzo totale: € ${itMoney(p.prezzo)}`;
 
   return `
   <div class="card" data-brand="${p.brand}">
     ${badge ? `<div class="badge ${badge}">${badge.toUpperCase()}</div>` : ""}
     ${img}
     <div class="name">${p.nome}</div>
-    <div class="price">€ ${Number(p.prezzo).toFixed(2)}</div>
+    <div class="price">€ ${itMoney(p.prezzo)}</div>
 
     <div class="rate-box">
-      <label>Seleziona le rate:</label>
-      <select onchange="calcolaRata(this, ${Number(p.prezzo)})">
+      <label for="${selId}">Seleziona le rate:</label>
+      <select id="${selId}" onchange="calcolaRata(this, ${Number(p.prezzo)}, '${encodeURIComponent(p.nome)}', '${btnId}')">
         <option value="">Scegli rate</option>
         <option value="12">12 mesi</option>
-        <option value="20">20 mesi</option>
+        <option value="24">24 mesi</option>
         <option value="30">30 mesi</option>
+        <option value="36">36 mesi</option>
+        <option value="48">48 mesi</option>
       </select>
-      <div class="rata" style="margin-top:8px;font-size:14px;"></div>
+      <div class="rata"></div>
     </div>
 
-    <a class="btn-wa"
-       href="https://wa.me/3908119578844?text=Vorrei%20il%20preventivo%20per%20${encodeURIComponent(p.nome)}"
+    <a id="${btnId}" class="btn-wa"
+       href="${WA_BASE + encodeURIComponent(baseMsg)}"
        target="_blank" rel="noopener">
        Invia Preventivo 📲
     </a>
   </div>`;
 }
 
-function calcolaRata(sel, prezzo){
+function calcolaRata(sel, prezzo, nomeEncoded, btnId){
   const mesi = parseInt(sel.value);
-  const box = sel.parentElement.querySelector(".rata");
-  if(!mesi){ box.innerHTML=""; return; }
+  const box  = sel.parentElement.querySelector(".rata");
+  const btn  = document.getElementById(btnId);
+  const nome = decodeURIComponent(nomeEncoded);
+
+  // Messaggio base sempre presente
+  let msg = `Preventivo per ${nome}\nPrezzo totale: € ${itMoney(prezzo)}`;
+
+  if(!mesi){
+    // Nessuna rata selezionata → reset alla base
+    if (box) box.textContent = "";
+    if (btn) btn.href = WA_BASE + encodeURIComponent(msg);
+    return;
+  }
+
   const rata = Number(prezzo) / mesi;
-  box.innerHTML = `≈ € ${rata.toFixed(2)}/mese`;
+  if (box)
+    box.textContent = `Rata mensile: € ${itMoney(rata)} / mese (${mesi} mesi)`;
+
+  // Messaggio completo con nome + rate + rata
+  msg += `\n\nRate: ${mesi} mesi`;
+  msg += `\nRata mensile: € ${itMoney(rata)}/mese`;
+  msg += `\n\nRichiedo un preventivo dettagliato.`;
+
+  if (btn)
+    btn.href = WA_BASE + encodeURIComponent(msg);
 }
 
 function filtra(brand){
@@ -295,20 +288,20 @@ function filtra(brand){
   if(btn) btn.classList.add("active");
 }
 
-/* ===========================
-   BOOTSTRAP
-   =========================== */
-
+/* ====== BOOT ====== */
 (async ()=>{
   const status = document.getElementById("status");
   const grid   = document.getElementById("grid");
   const filters= document.getElementById("filters");
-
   try{
-    const prodotti = await loadProdotti();
-    status.textContent = `Prodotti caricati: ${prodotti.length}`;
+    const prodotti = await (async ()=>{
+      try { return await loadFromLite(); } catch(e){}
+      try { return await loadFromJson(); } catch(e){}
+      return await loadFromJs();
+    })();
 
-    grid.innerHTML = prodotti.map(creaCard).join("");
+    status.textContent = `Prodotti caricati: ${prodotti.length}`;
+    grid.innerHTML = prodotti.map((p,i)=>creaCard(p,i)).join("");
 
     const marchi = ["all", ...new Set(prodotti.map(p=>p.brand))];
     filters.innerHTML = marchi.map(b=>`
