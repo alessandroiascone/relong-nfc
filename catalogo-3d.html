@@ -1,238 +1,110 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Catalogo Smartphone 3D | Re Long</title>
-
 <style>
-body{
-  margin:0;
-  font-family:system-ui,Inter,sans-serif;
-  background:#0a0a0a;
-  color:#fff;
-}
-header{
-  text-align:center;
-  padding:20px 10px;
-}
-h1{
-  font-size:22px;
-  font-weight:900;
-  letter-spacing:-.03em;
-}
-.status{ text-align:center; font-size:13px; color:rgba(255,255,255,.7); margin-top:6px; }
+  :root{
+    --bg:#0a0a0a; --card:#141414; --stroke:#2a2a2a;
+    --grad:linear-gradient(90deg,#ff0000,#ff7b00);
+    --muted:rgba(255,255,255,.72);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Inter,Roboto,sans-serif;background:var(--bg);color:#fff}
+  header{padding:18px 16px;text-align:center}
+  h1{font-size:22px;letter-spacing:-.02em;margin:0 0 6px;font-weight:900}
+  .sub{font-size:13px;color:var(--muted)}
+  .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 40px}
 
-.filters{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding:12px;
-}
-.filters button{
-  background:#111;
-  border:1px solid #333;
-  color:#fff;
-  padding:8px 16px;
-  border-radius:30px;
-  font-weight:600;
-  white-space:nowrap;
-  cursor:pointer;
-}
-.filters button.active{
-  background:linear-gradient(90deg,#ff0000,#ff7b00);
-  color:#000;
-}
+  /* filtri */
+  .filters{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 2px}
+  .filters button{
+    background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:999px;
+    font-weight:700;white-space:nowrap;cursor:pointer
+  }
+  .filters button.active{background:var(--grad);color:#000;border-color:transparent}
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:22px;
-  padding:20px;
-}
+  /* griglia */
+  .grid{display:grid;gap:18px;margin-top:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .card{
+    background:linear-gradient(150deg,rgba(20,20,20,.92),rgba(0,0,0,.65));
+    border:1px solid var(--stroke);border-radius:16px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.85);
+    transition:transform .18s ease,box-shadow .18s ease;border-top:1px solid rgba(255,255,255,.06);position:relative
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 28px 70px rgba(0,0,0,.9)}
+  .img{width:100%;aspect-ratio:4/5;border-radius:12px;background:#000;object-fit:cover;margin-bottom:10px}
 
-.card{
-  background:linear-gradient(160deg,rgba(20,20,20,.9),rgba(0,0,0,.6));
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-  padding:16px;
-  position:relative;
-  box-shadow:0 20px 45px rgba(0,0,0,.8);
-  transition:.25s;
-}
-.card:hover{
-  transform:translateY(-6px) scale(1.03);
-}
-.card img{
-  width:100%;
-  border-radius:12px;
-  margin-bottom:12px;
-  background:#000;
-}
+  .badge{position:absolute;top:-10px;right:12px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;color:#000}
+  .badge.novita{background:linear-gradient(90deg,#ff006e,#ffbe0b)}
+  .badge.promo {background:linear-gradient(90deg,#00b4d8,#0077b6)}
+  .badge.top   {background:linear-gradient(90deg,#7209b7,#4361ee)}
 
-.badge{
-  position:absolute;
-  top:-10px;
-  right:14px;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:800;
-  color:#000;
-}
-.badge.novita{ background:linear-gradient(90deg,#ff006e,#ffbe0b); }
-.badge.promo{  background:linear-gradient(90deg,#00b4d8,#0077b6); }
-.badge.top{    background:linear-gradient(90deg,#7209b7,#4361ee); }
+  .name{font-weight:800;margin-top:2px}
+  .brand{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .price{font-size:20px;font-weight:900;background:var(--grad);-webkit-background-clip:text;color:transparent;margin:6px 0 0}
 
-.name{font-weight:700}
-.price{
-  font-size:20px;
-  font-weight:900;
-  margin:6px 0;
-  background:linear-gradient(90deg,#ff0000,#ff7b00);
-  -webkit-background-clip:text;
-  color:transparent;
-}
+  .rate{margin-top:10px;background:#101010;border:1px solid #2b2b2b;border-radius:12px;padding:10px}
+  .rate label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .rate select{width:100%;padding:8px;border-radius:10px;border:1px solid #3a3a3a;background:#000;color:#fff}
+  .rata{font-size:14px;margin-top:8px}
 
-.rate-box{
-  background:#111;
-  border:1px solid #333;
-  padding:12px;
-  border-radius:12px;
-  margin-top:12px;
-}
-.rate-box label{display:block; font-size:13px; margin-bottom:6px; color:rgba(255,255,255,.8)}
-.rate-box select{
-  width:100%;
-  padding:8px;
-  background:#000;
-  color:#fff;
-  border:1px solid #555;
-  border-radius:8px;
-}
-.rate-box .rata{
-  margin-top:8px;
-  font-size:14px;
-}
+  .wa{
+    display:block;margin-top:12px;text-align:center;padding:12px;border-radius:12px;
+    font-weight:900;text-decoration:none;color:#000;
+    background:radial-gradient(circle at 0% 0%,#25D366,#128C7E)
+  }
 
-.btn-wa{
-  margin-top:14px;
-  display:block;
-  text-align:center;
-  padding:12px;
-  background:radial-gradient(circle at 0% 0%,#25D366,#128C7E);
-  color:#000;
-  border-radius:12px;
-  font-weight:800;
-  text-decoration:none;
-}
-.error{max-width:720px;margin:24px auto 0;background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:12px;font-size:14px;line-height:1.45}
-.error code{background:#000;padding:2px 6px;border-radius:6px}
-.hint{opacity:.7;font-size:12px;margin-top:6px}
+  /* avvisi */
+  .status{margin-top:8px;font-size:13px;color:var(--muted);text-align:center}
+  .error{max-width:800px;margin:16px auto 0;background:#161616;border:1px solid #333;padding:14px;border-radius:12px}
+  .error b{color:#fff}
 </style>
 </head>
-
 <body>
-
 <header>
   <h1>Catalogo Smartphone 3D</h1>
-  <p class="status" id="status">Carico i prodotti…</p>
+  <div class="sub">Scegli, calcola la rata e invia il preventivo su WhatsApp</div>
 </header>
 
-<div class="filters" id="filters"></div>
-
-<div class="grid" id="grid"></div>
+<div class="wrap">
+  <div id="status" class="status">Carico i prodotti…</div>
+  <div id="filters" class="filters"></div>
+  <div id="grid" class="grid"></div>
+</div>
 
 <script>
-const WA_BASE = "https://wa.me/3908119578844?text=";
+const WA = "https://wa.me/3908119578844?text=";
 
-/* ====== DATA LOADING (Lite → JSON → JS) ====== */
-async function loadFromLite(){
-  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html?v="+Date.now(), {cache:"no-store"});
-  if(!res.ok) throw new Error("Lite non trovato ("+res.status+")");
-  const text = await res.text();
+/* util */
+const money = n => Number(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // Prova a leggere un array literal: const prodotti = [ ... ];
-  const m = text.match(/const\s+prodotti\s*=\s*(\[[\s\S]*?\])\s*;/);
-  if(m){
-    try{
-      let jsonish = m[1].replace(/(\w+)\s*:/g, '"$1":').replace(/'/g, '"');
-      return JSON.parse(jsonish);
-    }catch(e){}
-  }
-
-  // Fallback: esegui lo <script>
-  const doc = new DOMParser().parseFromString(text,"text/html");
-  const script = doc.querySelector("script");
-  if(!script) throw new Error("Lite trovato ma senza <script> prodotti");
-  let prodotti = [];
-  try{
-    const fn = new Function(`
-      ${script.textContent || ""}
-      try { return prodotti; } catch(e){ return (typeof window!=='undefined' && window.prodotti) || []; }
-    `);
-    prodotti = fn() || [];
-  }catch(e){
-    throw new Error("Errore eval lite: " + e.message);
-  }
-  if(!Array.isArray(prodotti)) throw new Error("Lite caricato ma 'prodotti' non è un array");
-  return prodotti;
-}
-
-async function loadFromJson(){
-  const res = await fetch("./prodotti.json?v="+Date.now(), {cache:"no-store"});
-  if(!res.ok) throw new Error("JSON non trovato ("+res.status+")");
-  const arr = await res.json();
-  if(!Array.isArray(arr)) throw new Error("JSON ok ma non è un array");
-  return arr;
-}
-
-async function loadFromJs(){
-  await import("./prodotti.js?v="+Date.now());
-  if(!Array.isArray(window.prodotti)) throw new Error("JS ok ma window.prodotti non è un array");
-  return window.prodotti;
-}
-
-async function loadProdotti(){
-  const errors = [];
-  try{ return await loadFromLite(); }catch(e){ errors.push("Lite: "+e.message); }
-  try{ return await loadFromJson(); }catch(e){ errors.push("JSON: "+e.message); }
-  try{ return await loadFromJs(); }catch(e){ errors.push("JS: "+e.message); }
-  const msg = `<div class="error"><strong>Impossibile caricare i prodotti.</strong><br>Ho provato queste sorgenti, ma tutte fallite:<ul>${errors.map(x=>`<li>${x}</li>`).join("")}</ul><div class="hint">Verifica che <code>catalogo-smartphone-reale-v3-lite.html</code> (o <code>prodotti.json</code>/<code>prodotti.js</code>) sia nella stessa cartella e che le immagini esistano in <code>/imgcatalogo/</code>.</div></div>`;
-  document.getElementById("grid").insertAdjacentHTML("beforebegin", msg);
-  throw new Error("Nessuna sorgente disponibile");
-}
-
-/* ====== UI ====== */
-function itMoney(num){
-  return Number(num).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
-}
-
-function creaCard(p, idx){
-  const badge = p.novita ? "novita"
-              : p.promo ? "promo"
-              : p.top   ? "top"
-              : null;
-
-  const img = `<img src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35; this.title='Immagine non trovata: ${p.img}'">`;
+/* render card */
+function renderCard(p, idx){
+  const badge =
+    p.novita ? 'novita' :
+    p.promo  ? 'promo'  :
+    p.top    ? 'top'    : '';
 
   const selId = `rate-${idx}`;
-  const btnId = `wa-${idx}`;
+  const waId  = `wa-${idx}`;
 
-  // Messaggio base iniziale (senza rate)
-  const baseMsg = `Preventivo per ${p.nome}\nPrezzo totale: € ${itMoney(p.prezzo)}`;
+  // messaggio base (senza rate)
+  const baseMsg = `Preventivo per ${p.nome}%0A`+
+                  `Prezzo totale: € ${money(p.prezzo)}`;
 
   return `
-  <div class="card" data-brand="${p.brand}">
-    ${badge ? `<div class="badge ${badge}">${badge.toUpperCase()}</div>` : ""}
-    ${img}
+  <article class="card" data-brand="${p.brand}">
+    ${badge ? `<span class="badge ${badge}">${badge.toUpperCase()}</span>` : ``}
+    <img class="img" src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35;this.title='Immagine non trovata: ${p.img}'">
     <div class="name">${p.nome}</div>
-    <div class="price">€ ${itMoney(p.prezzo)}</div>
+    <div class="brand">${p.brand}</div>
+    <div class="price">€ ${money(p.prezzo)}</div>
 
-    <div class="rate-box">
-      <label for="${selId}">Seleziona le rate:</label>
-      <select id="${selId}" onchange="calcolaRata(this, ${Number(p.prezzo)}, '${encodeURIComponent(p.nome)}', '${btnId}')">
-        <option value="">Scegli rate</option>
+    <div class="rate">
+      <label for="${selId}">Rate mensili</label>
+      <select id="${selId}" onchange="onRateChange(this, ${Number(p.prezzo)}, '${encodeURIComponent(p.nome)}', '${waId}')">
+        <option value="">— seleziona —</option>
         <option value="12">12 mesi</option>
         <option value="24">24 mesi</option>
         <option value="30">30 mesi</option>
@@ -242,81 +114,82 @@ function creaCard(p, idx){
       <div class="rata"></div>
     </div>
 
-    <a id="${btnId}" class="btn-wa"
-       href="${WA_BASE + encodeURIComponent(baseMsg)}"
-       target="_blank" rel="noopener">
-       Invia Preventivo 📲
+    <a id="${waId}" class="wa" href="${WA + baseMsg}" target="_blank" rel="noopener">
+      Invia preventivo 📲
     </a>
-  </div>`;
+  </article>`;
 }
 
-function calcolaRata(sel, prezzo, nomeEncoded, btnId){
-  const mesi = parseInt(sel.value);
-  const box  = sel.parentElement.querySelector(".rata");
-  const btn  = document.getElementById(btnId);
-  const nome = decodeURIComponent(nomeEncoded);
+/* update rata + link WA */
+function onRateChange(sel, prezzo, nomeEnc, waId){
+  const mesi = parseInt(sel.value || 0, 10);
+  const box  = sel.parentElement.querySelector('.rata');
+  const btn  = document.getElementById(waId);
+  const nome = decodeURIComponent(nomeEnc);
 
-  // Messaggio base sempre presente
-  let msg = `Preventivo per ${nome}\nPrezzo totale: € ${itMoney(prezzo)}`;
+  // base
+  let msg = `Preventivo per ${nome}\nPrezzo totale: € ${money(prezzo)}`;
 
   if(!mesi){
-    // Nessuna rata selezionata → reset alla base
-    if (box) box.textContent = "";
-    if (btn) btn.href = WA_BASE + encodeURIComponent(msg);
+    box.textContent = '';
+    btn.href = WA + encodeURIComponent(msg);
     return;
   }
 
-  const rata = Number(prezzo) / mesi;
-  if (box)
-    box.textContent = `Rata mensile: € ${itMoney(rata)} / mese (${mesi} mesi)`;
+  const rata = prezzo / mesi;
+  box.textContent = `Rata mensile: € ${money(rata)} / mese (${mesi} mesi)`;
 
-  // Messaggio completo con nome + rate + rata
   msg += `\n\nRate: ${mesi} mesi`;
-  msg += `\nRata mensile: € ${itMoney(rata)}/mese`;
+  msg += `\nRata mensile: € ${money(rata)}/mese`;
   msg += `\n\nRichiedo un preventivo dettagliato.`;
 
-  if (btn)
-    btn.href = WA_BASE + encodeURIComponent(msg);
+  btn.href = WA + encodeURIComponent(msg);
 }
 
-function filtra(brand){
-  document.querySelectorAll(".card").forEach(c=>{
-    c.style.display = (brand==="all" || c.dataset.brand===brand) ? "block":"none";
-  });
-  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-  const btn = document.querySelector(`.filters button[data-brand='${brand}']`);
-  if(btn) btn.classList.add("active");
-}
+/* load prodotti.json */
+(async function init(){
+  const status = document.getElementById('status');
+  const grid   = document.getElementById('grid');
+  const filters= document.getElementById('filters');
 
-/* ====== BOOT ====== */
-(async ()=>{
-  const status = document.getElementById("status");
-  const grid   = document.getElementById("grid");
-  const filters= document.getElementById("filters");
   try{
-    const prodotti = await (async ()=>{
-      try { return await loadFromLite(); } catch(e){}
-      try { return await loadFromJson(); } catch(e){}
-      return await loadFromJs();
-    })();
+    const res = await fetch('./prodotti.json?v=' + Date.now(), {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const prodotti = await res.json();
 
-    status.textContent = `Prodotti caricati: ${prodotti.length}`;
-    grid.innerHTML = prodotti.map((p,i)=>creaCard(p,i)).join("");
+    // render grid
+    grid.innerHTML = prodotti.map((p,i)=>renderCard(p,i)).join('');
+    status.textContent = `Prodotti: ${prodotti.length}`;
 
-    const marchi = ["all", ...new Set(prodotti.map(p=>p.brand))];
-    filters.innerHTML = marchi.map(b=>`
-      <button data-brand="${b}" onclick="filtra('${b}')">
-        ${b==="all"?"Tutti":b}
-      </button>
-    `).join("");
+    // filtri brand
+    const brands = ['all', ...new Set(prodotti.map(p=>p.brand))];
+    filters.innerHTML = brands.map(b=>`
+      <button data-b="${b}" onclick="filterBrand('${b}')">${b==='all'?'Tutti':b}</button>
+    `).join('');
+    document.querySelector('.filters button').classList.add('active');
 
-    filtra("all");
-  }catch(e){
-    console.error(e);
-    status.textContent = "Errore nel caricamento prodotti";
+    // salva elenco per filtro
+    window.__ALL_CARDS__ = Array.from(document.querySelectorAll('.card'));
+  }catch(err){
+    document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
+      `<div class="error"><b>Impossibile caricare i prodotti.</b><br>
+       Assicurati che <code>prodotti.json</code> sia nello stesso percorso e che le immagini esistano in <code>/imgcatalogo/</code>.<br>
+       Errore: ${err.message}</div>`
+    );
+    status.textContent = 'Errore caricamento';
   }
 })();
-</script>
 
+/* filtro brand */
+function filterBrand(b){
+  (window.__ALL_CARDS__||[]).forEach(card=>{
+    const show = (b==='all' || card.dataset.brand===b);
+    card.style.display = show ? '' : 'none';
+  });
+  document.querySelectorAll('.filters button').forEach(btn=>btn.classList.remove('active'));
+  const cur = document.querySelector(`.filters button[data-b="${b}"]`);
+  if(cur) cur.classList.add('active');
+}
+</script>
 </body>
 </html>
