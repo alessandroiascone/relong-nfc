@@ -183,16 +183,16 @@
 
   <script>
     const WA = "3908119578844";
-    const DIAG = true; // metti a false per rimuovere il pulsante Diagnostica
-    const prodotti = [{brand:"Samsung", nome:"Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:["Promo"]},
+    const DIAG = false; // metti a false per rimuovere il pulsante Diagnostica
+    const prodotti = [{brand:"Samsung", nome:"Samsung Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:["Promo"]},
   {brand:"Apple", nome:"iPhone 17 Pro 1TB", prezzo:1993.8, img:"imgcatalogo/apple-iphone-17-pro-1tb.webp", tags:["Bestseller"]},
-  {brand:"HONOR", nome:"400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:["Convenienza"]},
-  {brand:"OPPO", nome:"14F 256GB", prezzo:255.9, img:"imgcatalogo/oppo-14f-256gb.webp", tags:["Promo"]},
-  {brand:"Samsung", nome:"Galaxy S25 FE 256GB", prezzo:773.9, img:"imgcatalogo/samsung-galaxy-s25-fe-256gb.webp", tags:["Novità"]},
-  {brand:"Samsung", nome:"Galaxy A56 5G", prezzo:483.8, img:"imgcatalogo/samsung-galaxy-a56-5g.webp", tags:["Novità"]},
-  {brand:"OPPO", nome:"A5 Pro", prezzo:255.9, img:"imgcatalogo/oppo-a5-pro.webp", tags:["Promo"]},
+  {brand:"HONOR", nome:"Honor 400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:["Convenienza"]},
+  {brand:"OPPO", nome:"Oppo 14F 256GB", prezzo:255.9, img:"imgcatalogo/oppo-14f-256gb.webp", tags:["Promo"]},
+  {brand:"Samsung", nome:"Samsung Galaxy S25 FE 256GB", prezzo:773.9, img:"imgcatalogo/samsung-galaxy-s25-fe-256gb.webp", tags:["Novità"]},
+  {brand:"Samsung", nome:"Samsung Galaxy A56 5G", prezzo:483.8, img:"imgcatalogo/samsung-galaxy-a56-5g.webp", tags:["Novità"]},
+  {brand:"OPPO", nome:"Oppo A5 Pro", prezzo:255.9, img:"imgcatalogo/oppo-a5-pro.webp", tags:["Promo"]},
   {brand:"Apple", nome:"iPhone 17 Pro Max 256GB", prezzo:1657.8, img:"imgcatalogo/apple-iphone-17-pro-max-256gb.webp", tags:["Novità"]},
-  {brand:"Samsung", nome:"Galaxy Z Fold 7 256GB", prezzo:1977.0, img:"imgcatalogo/samsung-galaxy-z-fold-7-256gb.webp", tags:["Novità"]}];
+  {brand:"Samsung", nome:"Samsung Galaxy Z Fold 7 256GB", prezzo:1977.0, img:"imgcatalogo/samsung-galaxy-z-fold-7-256gb.webp", tags:["Novità"]}];
 
     function badgeClass(tag){ if(tag==="Novità") return "tag new"; if(tag==="Promo") return "tag hot"; if(tag==="Ultimi pezzi") return "tag stock"; if(tag==="Bestseller") return "tag hot"; if(tag==="Premium") return "tag brand"; if(tag==="Convenienza") return "tag stock"; return "tag"; }
 
