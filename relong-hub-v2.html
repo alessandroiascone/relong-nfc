@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -114,10 +113,9 @@
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
-    /* Badge via ID per le ultime card */
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
-    .title .ico{font-size:18px}
+    .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
     .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d}
     .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
@@ -158,24 +156,10 @@
     #season-card .badge{
       background:linear-gradient(90deg,#ff0000,#ff7b00);
     }
-  
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
 
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style>
+    /* brand link sempre bianco */
+    .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
+  </style>
 </head>
 <body>
 
@@ -235,6 +219,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un consulente Business</a>
       </article>
 
+      <!-- ENERGIA CASA (allineata come le altre) -->
       <article class="card" data-anim>
         <div class="badge">ENERGIA CASA</div>
         <div class="title"><span class="ico">⚡</span><span>Accendi la tua Energia</span></div>
@@ -251,7 +236,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <!-- BUSINESS MOBILI (ripristinata) -->
+      <!-- BUSINESS MOBILI -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
@@ -260,7 +245,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
       </article>
 
-      <!-- SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
+      <!-- SEZIONE STAGIONALE -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
@@ -280,7 +265,6 @@
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // URL della Home corretta dell'hub
     const HOME_PAGE = './relong-hub-v2.html';
 
     /* to-top */
@@ -400,24 +384,7 @@
     <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
     <span class="seasonbar__cta">Scopri ora</span>
   </a>
-  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
-
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style>
+  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
 
   <!-- FAB -->
   <div class="fab-nav" aria-label="Azioni rapide">
@@ -466,23 +433,6 @@
   </script>
 
   <!-- Noscript -->
-  <noscript><style>#rl-loader{display:none!important}
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
-
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style></noscript>
+  <noscript><style>#rl-loader{display:none!important}</style></noscript>
 </body>
 </html>
