@@ -21,6 +21,12 @@ h1{
   font-weight:900;
   letter-spacing:-.03em;
 }
+.status{
+  text-align:center;
+  font-size:13px;
+  color:rgba(255,255,255,.7);
+  margin-top:6px;
+}
 .filters{
   display:flex;
   gap:10px;
@@ -35,6 +41,7 @@ h1{
   border-radius:30px;
   font-weight:600;
   white-space:nowrap;
+  cursor:pointer;
 }
 .filters button.active{
   background:linear-gradient(90deg,#ff0000,#ff7b00);
@@ -86,6 +93,7 @@ h1{
   background:linear-gradient(90deg,#7209b7,#4361ee);
 }
 
+.name{font-weight:700;}
 .price{
   font-size:20px;
   font-weight:900;
@@ -122,6 +130,13 @@ h1{
   font-weight:800;
   text-decoration:none;
 }
+.error{
+  max-width:720px;margin:24px auto 0;
+  background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:12px;
+  font-size:14px;line-height:1.45
+}
+.error code{background:#000;padding:2px 6px;border-radius:6px}
+.hint{opacity:.7;font-size:12px;margin-top:6px}
 </style>
 </head>
 
@@ -129,7 +144,7 @@ h1{
 
 <header>
   <h1>Catalogo Smartphone 3D</h1>
-  <p>Scegli, calcola la rata, invia il preventivo su WhatsApp</p>
+  <p class="status" id="status">Carico i prodotti…</p>
 </header>
 
 <div class="filters" id="filters"></div>
@@ -137,21 +152,96 @@ h1{
 <div class="grid" id="grid"></div>
 
 <script>
+/* ===========================================================
+   LOADER PRODOTTI ROBUSTO con 3 sorgenti in fallback:
+   1) catalogo-smartphone-reale-v3-lite.html (HTML con <script>)
+   2) prodotti.json (JSON puro)
+   3) prodotti.js   (ES module: window.prodotti = [...])
+   =========================================================== */
 
-// Carica dinamicamente il file LITE
-async function loadProdotti(){
-  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html");
+async function loadFromLite(){
+  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html?v=" + Date.now(), {cache:"no-store"});
+  if(!res.ok) throw new Error("Lite non trovato ("+res.status+")");
   const text = await res.text();
 
+  // Prova a estrarre direttamente l’array (senza parser) se presente
+  const m = text.match(/const\s+prodotti\s*=\s*(\[[\s\S]*?\])\s*;/);
+  if(m){
+    try{
+      // Trasformo in JSON valido: virgolette doppie e true/false/null ok
+      let jsonish = m[1]
+        .replace(/(\w+)\s*:/g, '"$1":')      // chiavi senza virgolette -> "chiavi":
+        .replace(/'/g, '"');                 // singole -> doppie (se presenti)
+      return JSON.parse(jsonish);
+    }catch(e){
+      // fallback al DOMParser + eval
+    }
+  }
+
+  // Parser DOM + recupero <script> + eval protetto
   const parser = new DOMParser();
   const doc = parser.parseFromString(text, "text/html");
   const script = doc.querySelector("script");
+  if(!script) throw new Error("Lite trovato ma senza <script> prodotti");
 
+  // sandbox minimo per catturare la const
   let prodotti = [];
-  eval(script.innerText); // => carica const prodotti = [...]
-
+  try{
+    // Creiamo una funzione che esegue il contenuto e poi ritorna la variabile
+    const fn = new Function(`
+      ${script.textContent || ""}
+      try { return prodotti; } catch(e){ return (typeof window!=='undefined' && window.prodotti) || []; }
+    `);
+    prodotti = fn() || [];
+  }catch(e){
+    throw new Error("Errore eval lite: " + e.message);
+  }
+  if(!Array.isArray(prodotti)) throw new Error("Lite caricato ma 'prodotti' non è un array");
   return prodotti;
 }
+
+async function loadFromJson(){
+  const res = await fetch("./prodotti.json?v=" + Date.now(), {cache:"no-store"});
+  if(!res.ok) throw new Error("JSON non trovato ("+res.status+")");
+  const arr = await res.json();
+  if(!Array.isArray(arr)) throw new Error("JSON ok ma non è un array");
+  return arr;
+}
+
+async function loadFromJs(){
+  await import("./prodotti.js?v=" + Date.now());
+  if(!Array.isArray(window.prodotti)) throw new Error("JS ok ma window.prodotti non è un array");
+  return window.prodotti;
+}
+
+async function loadProdotti(){
+  const errors = [];
+  try{ return await loadFromLite(); }
+  catch(e){ errors.push("Lite: " + e.message); }
+  try{ return await loadFromJson(); }
+  catch(e){ errors.push("JSON: " + e.message); }
+  try{ return await loadFromJs(); }
+  catch(e){ errors.push("JS: " + e.message); }
+
+  const msg = `
+    <div class="error">
+      <strong>Impossibile caricare i prodotti.</strong><br>
+      Ho provato queste sorgenti, ma tutte fallite:
+      <ul>
+        ${errors.map(x=>`<li>${x}</li>`).join("")}
+      </ul>
+      <div class="hint">
+        Verifica che <code>catalogo-smartphone-reale-v3-lite.html</code> (o <code>prodotti.json</code>/<code>prodotti.js</code>) sia
+        <b>nella stessa cartella</b> di questa pagina e che le immagini esistano in <code>/imgcatalogo/</code>.
+      </div>
+    </div>`;
+  document.getElementById("grid").insertAdjacentHTML("beforebegin", msg);
+  throw new Error("Nessuna sorgente disponibile");
+}
+
+/* ===========================
+   RENDERING CARDS
+   =========================== */
 
 function creaCard(p){
   const badge = p.novita ? "novita"
@@ -159,16 +249,19 @@ function creaCard(p){
               : p.top   ? "top"
               : null;
 
+  // onerror per vedere se manca un file immagine (non blocca tutto)
+  const img = `<img src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35; this.title='Immagine non trovata: ${p.img}'">`;
+
   return `
   <div class="card" data-brand="${p.brand}">
     ${badge ? `<div class="badge ${badge}">${badge.toUpperCase()}</div>` : ""}
-    <img src="${p.img}" alt="${p.nome}">
+    ${img}
     <div class="name">${p.nome}</div>
-    <div class="price">€ ${p.prezzo.toFixed(2)}</div>
+    <div class="price">€ ${Number(p.prezzo).toFixed(2)}</div>
 
     <div class="rate-box">
       <label>Seleziona le rate:</label>
-      <select onchange="calcolaRata(this, ${p.prezzo})">
+      <select onchange="calcolaRata(this, ${Number(p.prezzo)})">
         <option value="">Scegli rate</option>
         <option value="12">12 mesi</option>
         <option value="20">20 mesi</option>
@@ -179,7 +272,7 @@ function creaCard(p){
 
     <a class="btn-wa"
        href="https://wa.me/3908119578844?text=Vorrei%20il%20preventivo%20per%20${encodeURIComponent(p.nome)}"
-       target="_blank">
+       target="_blank" rel="noopener">
        Invia Preventivo 📲
     </a>
   </div>`;
@@ -189,7 +282,7 @@ function calcolaRata(sel, prezzo){
   const mesi = parseInt(sel.value);
   const box = sel.parentElement.querySelector(".rata");
   if(!mesi){ box.innerHTML=""; return; }
-  const rata = prezzo / mesi;
+  const rata = Number(prezzo) / mesi;
   box.innerHTML = `≈ € ${rata.toFixed(2)}/mese`;
 }
 
@@ -197,28 +290,38 @@ function filtra(brand){
   document.querySelectorAll(".card").forEach(c=>{
     c.style.display = (brand==="all" || c.dataset.brand===brand) ? "block":"none";
   });
-
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-  document.querySelector(`.filters button[data-brand='${brand}']`).classList.add("active");
+  const btn = document.querySelector(`.filters button[data-brand='${brand}']`);
+  if(btn) btn.classList.add("active");
 }
 
+/* ===========================
+   BOOTSTRAP
+   =========================== */
+
 (async ()=>{
-  const grid = document.getElementById("grid");
-  const filters = document.getElementById("filters");
+  const status = document.getElementById("status");
+  const grid   = document.getElementById("grid");
+  const filters= document.getElementById("filters");
 
-  const prodotti = await loadProdotti();
+  try{
+    const prodotti = await loadProdotti();
+    status.textContent = `Prodotti caricati: ${prodotti.length}`;
 
-  grid.innerHTML = prodotti.map(creaCard).join("");
+    grid.innerHTML = prodotti.map(creaCard).join("");
 
-  const marchi = ["all", ...new Set(prodotti.map(p=>p.brand))];
+    const marchi = ["all", ...new Set(prodotti.map(p=>p.brand))];
+    filters.innerHTML = marchi.map(b=>`
+      <button data-brand="${b}" onclick="filtra('${b}')">
+        ${b==="all"?"Tutti":b}
+      </button>
+    `).join("");
 
-  filters.innerHTML = marchi.map(b=>`
-    <button data-brand="${b}" onclick="filtra('${b}')">
-      ${b==="all"?"Tutti":b}
-    </button>
-  `).join("");
-
-  filtra("all");
+    filtra("all");
+  }catch(e){
+    console.error(e);
+    status.textContent = "Errore nel caricamento prodotti";
+  }
 })();
 </script>
 
