@@ -1,5 +1,4 @@
-<script>
-const prodotti = [
+[
   {
     "id": "iphone17pro1tb",
     "brand": "Apple",
@@ -77,5 +76,4 @@ const prodotti = [
     "img": "imgcatalogo/zfold7_256.webp",
     "top": true
   }
-];
-</script>
+]

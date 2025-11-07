@@ -1,5 +1,4 @@
-<script>
-const prodotti = [
+window.prodotti = [
   {
     "id": "iphone17pro1tb",
     "brand": "Apple",
@@ -78,4 +77,3 @@ const prodotti = [
     "top": true
   }
 ];
-</script>
