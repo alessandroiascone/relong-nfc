@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang='it'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Re Long | Catalogo Pro (Filtri • Badge • Dark 3D • WhatsApp)</title>
+<meta name='theme-color' content='#0a0a0a'>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{
+  --bg1:#0a0a0a;--bg2:#000;
+  --card:rgba(25,25,25,.92);
+  --stroke:rgba(255,255,255,.08);
+  --wa1:#25D366;--wa2:#128C7E;
+  --muted:rgba(255,255,255,.7);
+  --brand1:#ff0000;--brand2:#ff7b00;
+}
+body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1),var(--bg2));color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;transition:background .3s ease}
+.wrap{width:100%;max-width:1240px;display:grid;gap:18px}
+.head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.title{font-weight:900;letter-spacing:-.03em;font-size:24px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn-filter{padding:10px 14px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:#fff;font-weight:800;cursor:pointer;transition:transform .15s, box-shadow .2s}
+.btn-filter.active{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;border-color:transparent;box-shadow:0 10px 24px rgba(255,90,0,.35)}
+.toggle{padding:10px 14px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+@media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
+.card{position:relative;background:var(--card);padding:16px;border-radius:18px;border:1px solid var(--stroke);box-shadow:0 28px 60px rgba(0,0,0,.85), 0 0 50px rgba(255,0,0,.12);transform:perspective(800px) rotateX(0) rotateY(0);transition:transform .25s ease, box-shadow .25s ease, background .3s}
+.card:hover{transform:perspective(800px) rotateX(2deg) rotateY(-2deg);box-shadow:0 40px 90px rgba(0,0,0,.9), 0 0 80px rgba(255,0,0,.18)}
+.photo{width:100%;border-radius:12px;aspect-ratio:1/1;object-fit:contain;background:#000}
+.model{font-size:18px;font-weight:900;margin-top:6px}
+.price{font-size:15px;margin-bottom:8px;color:var(--muted)}
+.badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;backdrop-filter:blur(6px)}
+.tag.brand{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000}
+.tag.new{background:linear-gradient(90deg,#00e1ff,#0078ff);}
+.tag.stock{background:linear-gradient(90deg,#aaff00,#27ae60);}
+.tag.hot{background:linear-gradient(90deg,#ffd500,#ff7b00);color:#000}
+.btn{display:block;margin-top:10px;text-align:center;padding:12px;border-radius:12px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;font-weight:900;text-decoration:none;box-shadow:0 18px 30px rgba(18,140,126,.45)}
+.btn.secondary{background:linear-gradient(90deg,#ffd166,#ff7b00);color:#000;box-shadow:0 14px 24px rgba(255,123,0,.35)}
+.simulatore{margin-top:12px;padding:12px;border:1px solid var(--stroke);border-radius:12px;background:rgba(255,255,255,.05)}
+.sim-label{font-size:14px;color:var(--muted)}
+.sim-select{width:100%;margin-top:6px;padding:8px;border-radius:10px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
+.sim-output{margin-top:8px;font-size:15px;font-weight:700;color:#ffd166}
+
+/* Dark mode toggle */
+
+
+/* ===== WhatsApp Cart — Style C (pill + centered modal) ===== */
+#rl-cart-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9999}
+#rl-cart-fab button{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:999px;padding:12px 16px;font-weight:900;box-shadow:0 18px 30px rgba(255,90,0,.35)}
+#rl-cart-fab .badge{background:#000;color:#fff;border-radius:999px;padding:6px 10px;font-weight:900}
+#rl-cart-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:10000}
+#rl-cart-modal .card{width:min(92vw,520px);background:linear-gradient(160deg, rgba(20,20,20,.98), rgba(0,0,0,.82));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 26px 58px rgba(0,0,0,.75);padding:16px}
+#rl-cart-modal .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#rl-cart-modal h3{font-size:18px;font-weight:900;margin:0}
+#rl-cart-modal .list{max-height:52vh;overflow:auto;margin:6px 0 12px 0;border:1px solid rgba(255,255,255,.08);border-radius:12px}
+#rl-cart-modal .row{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+#rl-cart-modal .row:last-child{border-bottom:0}
+#rl-cart-modal .name{font-weight:700}
+#rl-cart-modal .price{opacity:.9}
+#rl-cart-modal .act{display:flex;gap:8px;justify-content:flex-end}
+#rl-cart-modal .btn{background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:12px;padding:10px 12px;font-weight:900;cursor:pointer}
+#rl-cart-modal .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.16)}
+.addcart-btn{display:inline-block;margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}
+.addcart-btn:hover{filter:brightness(1.08)}
+@media (max-width:480px){
+  #rl-cart-fab button span.txt{display:none}
+}
+
+
+/* === FX: Light 3D & Reveal === */
+.card{transform-style:preserve-3d;will-change:transform, box-shadow}
+.card .photo{transform:translateZ(16px);will-change:transform}
+.card .badges{transform:translateZ(24px)}
+.card .model,.card .price,.card .btn,.card .simulatore{transform:translateZ(8px)}
+.card.reveal{opacity:0;transform:translateY(12px);}
+.card.revealed{opacity:1;transform:translateY(0);transition:opacity .4s ease, transform .4s ease}
+@media (prefers-reduced-motion: reduce){
+  .card,.card .photo,.card .badges,.card .model,.card .price,.card .btn,.card .simulatore{transform:none !important;transition:none !important}
+}
+
+
+/* === FX: Spotlight on cards & micro hover === */
+.card{position:relative;overflow:hidden}
+.card::before{
+  content:"";
+  position:absolute;inset:-30%;
+  background:radial-gradient(180px 180px at var(--mx,50%) var(--my,50%), rgba(255,255,255,.10), rgba(255,255,255,0) 70%);
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+  mix-blend-mode:screen;
+}
+.card:hover::before{opacity:.9}
+.btn,.btn.secondary{transition:transform .15s ease, box-shadow .2s ease, filter .2s ease}
+.btn:hover{transform:translateY(-2px); box-shadow:0 22px 38px rgba(18,140,126,.55); filter:brightness(1.06)}
+.btn.secondary:hover{transform:translateY(-2px); box-shadow:0 22px 38px rgba(255,123,0,.45); filter:brightness(1.06)}
+.badges .tag{transition:transform .2s ease}
+.badges .tag:hover{transform:translateZ(26px) scale(1.05)}
+@media (prefers-reduced-motion: reduce){
+  .card::before{display:none}
+  .btn:hover,.btn.secondary:hover{transform:none;box-shadow:none;filter:none}
+  .badges .tag:hover{transform:none}
+}
+
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div class="title">Catalogo Smartphone a Rate - Assicurazione Kasko ed Accessori Inclusi</div>
+    <div class="controls">
+      <button class="btn-filter active" data-filter="all">Tutti</button>
+      <button class="btn-filter" data-filter="Apple">Apple</button>
+      <button class="btn-filter" data-filter="Samsung">Samsung</button>
+      <button class="btn-filter" data-filter="OPPO">OPPO</button>
+      <button class="btn-filter" data-filter="HONOR">HONOR</button>
+      
+    </div>
+  </div>
+
+  <section class="grid" id="grid"></section>
+</main>
+
+<script>
+const WA = "3908119578844";
+
+// Dati centralizzati (iPhone 17 e iPhone Air aggiornati)
+const prodotti = [{brand:"Samsung", nome:"Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:[]},
+  {brand:"Apple", nome:"iPhone 17 Pro 1TB", prezzo:1993.8, img:"imgcatalogo/apple-iphone-17-pro-1tb.webp", tags:[]},
+  {brand:"HONOR", nome:"400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:[]},
+  {brand:"OPPO", nome:"14F 256GB", prezzo:255.9, img:"imgcatalogo/oppo-14f-256gb.webp", tags:[]},
+  {brand:"Samsung", nome:"Galaxy S25 FE 256GB", prezzo:773.9, img:"imgcatalogo/samsung-galaxy-s25-fe-256gb.webp", tags:["Novità"]},
+  {brand:"Samsung", nome:"Galaxy A56 5G", prezzo:483.8, img:"imgcatalogo/samsung-galaxy-a56-5g.webp", tags:[]},
+  {brand:"OPPO", nome:"A5 Pro", prezzo:255.9, img:"imgcatalogo/oppo-a5-pro.webp", tags:[]},
+  {brand:"Apple", nome:"iPhone 17 Pro Max 256GB", prezzo:1657.8, img:"imgcatalogo/apple-iphone-17-pro-max-256gb.webp", tags:["Novità"]},
+  {brand:"Samsung", nome:"Galaxy Z Fold 7 256GB", prezzo:1977.0, img:"imgcatalogo/samsung-galaxy-z-fold-7-256gb.webp", tags:["Novità"]}];
+
+function badgeClass(tag){ if(tag==="Novità") return "tag new"; if(tag==="Ultimi pezzi") return "tag stock"; if(tag==="Bestseller") return "tag hot"; if(tag==="Premium") return "tag brand"; if(tag==="Convenienza") return "tag stock"; return "tag"; }
+
+function cardHTML(p){
+  const waUrl = "https://wa.me/"+WA+"?text="+encodeURIComponent("Ciao Re Long, voglio info su "+p.nome+"!");
+  const badges = p.tags.map(t => `<span class="${badgeClass(t)}">${t}</span>`).join("");
+  return `
+    <article class="card" data-brand="${p.brand}">
+      <div class="badges">
+        <span class="tag brand">${p.brand}</span>
+        ${badges}
+      </div>
+      <img class="photo" src="${p.img}" alt="${p.nome}">
+      <div class="model">${p.nome}</div>
+      <p class="price">Prezzo totale: € ${p.prezzo}</p>
+      <div class="simulatore">
+        <label class="sim-label">Simula la tua rata:</label>
+        <select class="sim-select" onchange="calcolaRata(this, ${p.prezzo})">
+          <option value="">Seleziona durata</option>
+          <option value="12">12 mesi</option>
+          <option value="24">24 mesi</option>
+          <option value="30">30 mesi</option>
+          <option value="36">36 mesi</option>
+          <option value="48">48 mesi</option>
+        </select>
+        <div class="sim-output">Rata mensile: —</div>
+      </div>
+      <a class="btn" href="${waUrl}" target="_blank" rel="noopener">💬 Chatta su WhatsApp</a>
+      <button class="btn secondary" onclick="inviaSimulazione(this, '${p.nome}', ${p.prezzo})">📤 Invia simulazione su WhatsApp</button>
+    </article>
+  `;
+}
+
+function render(filter="all"){ const grid=document.getElementById("grid"); grid.innerHTML=""; prodotti.filter(p => filter==="all" ? true : p.brand===filter).forEach(p => grid.innerHTML += cardHTML(p)); }
+render();
+
+// Filtri cliccabili
+document.querySelectorAll(".btn-filter").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".btn-filter").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); render(btn.dataset.filter); }); });
+
+// Toggle Dark 3D
+});
+
+// Simulatore
+function calcolaRata(select, prezzo){ const mesi=parseInt(select.value); const out=select.parentElement.querySelector('.sim-output'); if(!mesi){ out.textContent="Rata mensile: —"; return; } out.textContent="Rata mensile: € "+(prezzo/mesi).toFixed(2); }
+
+// Invia simulazione su WhatsApp
+function inviaSimulazione(btn, nome, prezzo){ const card = btn.closest('.card'); const select = card.querySelector('.sim-select'); const mesi = parseInt(select?.value || ""); if(!mesi){ alert("Seleziona la durata (12/24/30/36/48 mesi) prima di inviare la simulazione."); return; } const rata = (prezzo/mesi).toFixed(2); const msg = `Ciao Re Long, ho simulato ${nome}: prezzo € ${prezzo}, durata ${mesi} mesi, rata € ${rata}/mese. Mi confermi disponibilità?`; const url = "https://wa.me/"+WA+"?text="+encodeURIComponent(msg); window.open(url, "_blank"); }
+
+// === FX: Light 3D tilt + Reveal on scroll ===
+(function(){
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+  const cards = Array.from(document.querySelectorAll('.card'));
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('revealed');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.08, rootMargin:"0px 0px -5% 0px"});
+  cards.forEach(c=>{ c.classList.add('reveal'); io.observe(c); });
+
+  // Tilt on hover (very light)
+  cards.forEach(card=>{
+    let raf = 0;
+    const maxDeg = 5; // max 3D tilt
+    const handle = (e)=>{
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rotY = clamp((px - .5) * (maxDeg*2), -maxDeg, maxDeg);
+      const rotX = clamp((.5 - py) * (maxDeg*2), -maxDeg, maxDeg);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=>{
+        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      });
+    };
+    const reset = ()=>{
+      cancelAnimationFrame(raf);
+      card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
+    };
+    card.addEventListener('mousemove', handle);
+    card.addEventListener('mouseleave', reset);
+    // Touch: subtle pop on tap
+    card.addEventListener('touchstart', ()=>{ card.style.transform="perspective(800px) translateZ(8px)"; }, {passive:true});
+    card.addEventListener('touchend', ()=>{ card.style.transform="perspective(800px)"; }, {passive:true});
+  });
+})();
+
+
+// === FX: Spotlight tracking per card ===
+(function(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  cards.forEach(card=>{
+    let raf = 0;
+    function onMove(e){
+      const r = card.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * 100;
+      const y = ((e.clientY - r.top) / r.height) * 100;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=>{
+        card.style.setProperty('--mx', x.toFixed(2) + '%');
+        card.style.setProperty('--my', y.toFixed(2) + '%');
+      });
+    }
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', ()=>{
+      card.style.removeProperty('--mx'); card.style.removeProperty('--my');
+    });
+    // Touch: spotlight centers briefly
+    card.addEventListener('touchstart', ()=>{
+      card.style.setProperty('--mx','50%'); card.style.setProperty('--my','40%');
+      setTimeout(()=>{ card.style.removeProperty('--mx'); card.style.removeProperty('--my'); }, 600);
+    }, {passive:true});
+  });
+})();
+
+</script>
+
+
+
+</body>
+</html>
