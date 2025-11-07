@@ -126,6 +126,7 @@
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
+    /* FAB & Torna su */
     .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
     .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
@@ -137,6 +138,17 @@
     .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
 
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
+
+    /* ===== Bottom Seasonal Bar ===== */
+    .seasonbar{
+      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px)
+    }
+    .seasonbar__icon{ animation:pulse 1.2s infinite }
+    .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
+
+    /* ✅ Quando c’è la barra BF, alza FAB e ToTop per non sovrapporre */
+    body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
   </style>
 </head>
 <body>
@@ -212,21 +224,13 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <article class="card" data-anim>
-        <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
-        <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
-        <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
-        <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
-      </article>
-
-      <!-- ✅ NUOVA SEZIONE: BLACK FRIDAY RELONG -->
-      <article class="card" data-anim>
-        <div class="badge">BLACK FRIDAY</div>
-        <div class="title"><span class="ico">⚡</span><span>Black Friday ReLong</span></div>
-        <p class="desc">Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!</p>
-        <a class="btn" href="./black-friday.html" aria-label="Vai alla pagina Black Friday ReLong">Vai alle Offerte Black Friday</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long!%20Ho%20visto%20le%20offerte%20Black%20Friday%20e%20vorrei%20bloccane%20una.">Blocca ora su WhatsApp</a>
+      <!-- ✅ SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH (la pagina di destinazione è dinamica) -->
+      <article class="card" data-anim id="season-card">
+        <div class="badge" id="season-badge">BLACK FRIDAY</div>
+        <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
+        <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!</p>
+        <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long!%20Ho%20visto%20le%20offerte%20Black%20Friday%20e%20vorrei%20bloccarne%20una.">Blocca ora su WhatsApp</a>
       </article>
     </section>
 
@@ -284,18 +288,96 @@
       }, {threshold:.18});
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
+
+    /* Switch automatico testo card + barra in base alla stagione */
+    (function(){
+      const now = new Date();
+      const m = now.getMonth()+1, d = now.getDate();
+      let season = "blackfriday";
+      if (m === 12 && d >= 8) season = "christmas";
+      if (m === 1) season = "flash";
+
+      const copy = {
+        blackfriday:{
+          badge:"BLACK FRIDAY",
+          title:"Black Friday ReLong",
+          desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",
+          btn:"Vai alle Offerte Black Friday",
+          href:"./black-friday.html",
+          bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",
+          barHref:"./black-friday.html"
+        },
+        christmas:{
+          badge:"NATALE",
+          title:"Christmas Promo 🎄",
+          desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",
+          btn:"Scopri le Offerte di Natale",
+          href:"./black-friday.html?season=christmas",
+          bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",
+          barHref:"./black-friday.html?season=christmas"
+        },
+        flash:{
+          badge:"FLASH",
+          title:"Offerte Flash ⚡",
+          desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",
+          btn:"Vedi le Offerte Flash",
+          href:"./black-friday.html?season=flash",
+          bar:"<b>Offerte Flash ⚡</b> — sconti lampo",
+          barHref:"./black-friday.html?season=flash"
+        }
+      };
+
+      const c = copy[season];
+      const $badge = document.getElementById('season-badge');
+      const $title = document.getElementById('season-title');
+      const $desc  = document.getElementById('season-desc');
+      const $link  = document.getElementById('season-link');
+      const $bar   = document.getElementById('seasonBar');
+      if($badge) $badge.textContent = c.badge;
+      if($title) $title.textContent = c.title;
+      if($desc)  $desc.textContent  = c.desc;
+      if($link){ $link.textContent = c.btn; $link.href = c.href; $link.setAttribute('aria-label', c.btn); }
+      if($bar){
+        const textEl = $bar.querySelector('.seasonbar__text');
+        if(textEl) textEl.innerHTML = c.bar;
+        $bar.href = c.barHref;
+      }
+    })();
   </script>
 
-  <!-- ✅ Unica barra in basso (Black Friday) -->
-  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong" style="
-      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;
-      background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;
-      border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px);">
-    <span class="seasonbar__icon" style="animation:pulse 1.2s infinite">⚡</span>
+  <!-- ✅ Unica barra in basso (Black Friday/Natale/Flash) -->
+  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
+    <span class="seasonbar__icon">⚡</span>
     <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
-    <span class="seasonbar__cta" style="margin-left:.5rem;padding:.35rem .6rem;border-radius:.6rem;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.28);font-weight:800">Scopri ora</span>
+    <span class="seasonbar__cta">Scopri ora</span>
   </a>
   <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
+
+  <!-- ✅ FAB (ripristinate) -->
+  <div class="fab-nav" aria-label="Azioni rapide">
+    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+      <span>Portami allo Store</span>
+    </a>
+    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
+      <span>Chiamaci</span>
+    </a>
+  </div>
+
+  <!-- ✅ Attiva offset quando la barra è presente (no sovrapposizione) -->
+  <script>
+    (function(){
+      const bar = document.getElementById('seasonBar');
+      if(!bar) return;
+      document.body.classList.add('has-seasonbar');
+      const obs = new IntersectionObserver((entries)=>{
+        const show = entries[0].isIntersecting;
+        document.body.classList.toggle('has-seasonbar', show);
+      }, {threshold: 0});
+      obs.observe(bar);
+    })();
+  </script>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
