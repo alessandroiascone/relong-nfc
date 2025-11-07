@@ -1,6 +1,0 @@
-[
-  { "nome": "iPhone 17 Pro Max 256GB", "brand": "Apple",   "prezzo": 1657.80, "img": "iphone17promax-256.jpg", "top": true },
-  { "nome": "Samsung Galaxy S25 Ultra 256GB", "brand": "Samsung", "prezzo": 1499.90, "img": "s25ultra-256.jpg", "novita": true },
-  { "nome": "Honor 400 Lite 256GB", "brand": "Honor", "prezzo": 159.90, "img": "honor400lite.jpg", "promo": true },
-  { "nome": "OPPO A5 Pro 256GB", "brand": "OPPO", "prezzo": 255.90, "img": "oppo-a5pro.jpg" }
-]
