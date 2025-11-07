@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Re Long | Catalogo Pro (Filtri • Badge • WhatsApp)</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{--bg1:#0a0a0a;--bg2:#000;--card:rgba(25,25,25,.92);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--muted:rgba(255,255,255,.7);--brand1:#ff0000;--brand2:#ff7b00}
+    body{font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1),var(--bg2));color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .wrap{width:100%;max-width:1240px;display:grid;gap:18px}
+    .head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+    .title{font-weight:900;letter-spacing:-.03em;font-size:24px}
+    .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .btn-filter{padding:10px 14px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:#fff;font-weight:800;cursor:pointer;transition:transform .15s, box-shadow .2s}
+    .btn-filter.active{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;border-color:transparent;box-shadow:0 10px 24px rgba(255,90,0,.35)}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
+    .card{position:relative;background:var(--card);padding:16px;border-radius:18px;border:1px solid var(--stroke);box-shadow:0 28px 60px rgba(0,0,0,.85),0 0 50px rgba(255,0,0,.12);transform:perspective(800px) rotateX(0) rotateY(0);transition:transform .25s ease,box-shadow .25s ease,background .3s;transform-style:preserve-3d;overflow:hidden}
+    .card .photo{width:100%;border-radius:24px;aspect-ratio:1/1;object-fit:contain;background:#000;transform:translateZ(16px)}
+    .model{font-size:18px;font-weight:900;margin-top:6px;transform:translateZ(8px)}
+    .price{font-size:15px;margin-bottom:8px;color:var(--muted);transform:translateZ(8px)}
+    .badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px;transform:translateZ(24px)}
+    .tag{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;backdrop-filter:blur(6px)}
+    .tag.brand{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000}
+    .tag.new{background:linear-gradient(90deg,#00e1ff,#0078ff)}
+    .tag.stock{background:linear-gradient(90deg,#aaff00,#27ae60)}
+    .tag.hot{background:linear-gradient(90deg,#ffd500,#ff7b00);color:#000}
+    .btn{display:block;margin-top:10px;text-align:center;padding:12px;border-radius:24px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;font-weight:900;text-decoration:none;box-shadow:0 18px 30px rgba(18,140,126,.45);transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;transform:translateZ(8px)}
+    .btn.secondary{ text-align:center; font-size:18px; width:88%; margin:0 auto;background:linear-gradient(90deg,#ffd166,#ff7b00);color:#000;box-shadow:0 14px 24px rgba(255,123,0,.35)}
+    .btn:hover{transform:translateY(-2px) translateZ(8px); box-shadow:0 22px 38px rgba(18,140,126,.55); filter:brightness(1.06)}
+    .btn.secondary:hover{transform:translateY(-2px) translateZ(8px); box-shadow:0 22px 38px rgba(255,123,0,.45); filter:brightness(1.06)}
+    .simulatore{margin-top:12px;padding:12px;border:1px solid var(--stroke);border-radius:24px;background:rgba(255,255,255,.05);transform:translateZ(8px)}
+    .sim-label{font-size:14px;color:var(--muted)}
+    .sim-select{width:100%;margin-top:6px;padding:8px;border-radius:10px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
+    .sim-output{margin-top:8px;font-size:15px;font-weight:700;color:#ffd166}
+    .card.reveal{opacity:0;transform:translateY(12px)}
+    .card.revealed{opacity:1;transform:translateY(0);transition:opacity .4s ease, transform .4s ease}
+    .card::before{content:""; position:absolute; inset:-30%; background:radial-gradient(180px 180px at var(--mx,50%) var(--my,50%), rgba(255,255,255,.10), rgba(255,255,255,0) 70%); opacity:0; pointer-events:none; transition:opacity .25s ease; mix-blend-mode:screen}
+    .card:hover::before{opacity:.9}
+    @media (prefers-reduced-motion: reduce){ .card,.card .photo,.card .badges,.card .model,.card .price,.card .btn,.card .simulatore{transform:none !important;transition:none !important} .card::before{display:none} }
+    /* Diag pill */
+    .diag-pill{position:fixed;left:12px;bottom:12px;z-index:9999;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.55);color:#fff;cursor:pointer}
+  
+/* === FIX: badge layering & ribbons === */
+.card{position:relative;overflow:hidden}
+.photo{position:relative;z-index:1}
+.badges{position:absolute;top:10px;left:10px;z-index:3}
+.card::before{z-index:2}
+/* Corner ribbon */
+
+
+
+
+
+
+/* === CTA Aggressive (no Chat, no Ribbons) === */
+@keyframes grad-flow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes neon-breathe { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.25)} }
+@keyframes pulse-2s { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-1px) scale(1.02)} }
+@keyframes vibra-ico { 0%,100%{transform:translateZ(0) rotate(0)} 20%{transform:translateX(-1px) rotate(-4deg)} 40%{transform:translateX(1px) rotate(4deg)} 60%{transform:translateX(-1px) rotate(-3deg)} 80%{transform:translateX(1px) rotate(3deg)} }
+@keyframes shadow-flow { 0%{box-shadow:0 0 18px rgba(0,255,120,.55), 0 0 38px rgba(0,255,120,.35)} 50%{box-shadow:0 0 30px rgba(0,255,140,.85), 0 0 70px rgba(0,255,140,.55)} 100%{box-shadow:0 0 18px rgba(0,255,120,.55), 0 0 38px rgba(0,255,120,.35)} }
+
+.btn.secondary{ text-align:center; font-size:18px; width:88%; margin:0 auto;
+  width:100%;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:14px 16px; font-size:16px; font-weight:900; letter-spacing:.2px;
+  color:#000; border-radius:24px;
+  border:1px solid rgba(0,255,140,.35);
+  background:linear-gradient(90deg,#00ff88,#00d977,#00c56a,#00ff88); background-size:200% 200%;
+  animation: grad-flow 4s ease-in-out infinite, pulse-2s 2s ease-in-out infinite, neon-breathe 2s ease-in-out infinite, shadow-flow 2.2s ease-in-out infinite;
+  box-shadow:0 0 18px rgba(0,255,120,.55), 0 0 38px rgba(0,255,120,.35);
+  transition:transform .2s ease, box-shadow .3s ease, filter .2s ease;
+  isolation:isolate;
+}
+.btn.secondary:hover{ transform:translateY(-3px) scale(1.07); filter:brightness(1.18) }
+.btn.secondary .wa-ico{ display:inline-flex; width:18px; height:18px; margin-right:2px; animation:vibra-ico .8s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce){
+  .btn.secondary{ text-align:center; font-size:18px; width:88%; margin:0 auto; animation:none }
+  .btn.secondary .wa-ico{ animation:none }
+}
+
+.btn.secondary .txt{ font-size:18px; font-weight:900; }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="head">
+      <div class="title">Catalogo Smartphone a Rate - Assicurazione Kasko ed Accessori Inclusi</div>
+      <div class="controls" id="brandFilters"></div>
+    </div>
+    <section class="grid" id="grid"></section>
+  </main>
+
+  <script>
+    const WA = "3908119578844";
+    const DIAG = true; // metti a false per rimuovere il pulsante Diagnostica
+    const prodotti = [{brand:"Samsung", nome:"Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:["Promo"]},
+  {brand:"Apple", nome:"iPhone 17 Pro 1TB", prezzo:1993.8, img:"imgcatalogo/apple-iphone-17-pro-1tb.webp", tags:["Bestseller"]},
+  {brand:"HONOR", nome:"400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:["Convenienza"]},
+  {brand:"OPPO", nome:"14F 256GB", prezzo:255.9, img:"imgcatalogo/oppo-14f-256gb.webp", tags:["Promo"]},
+  {brand:"Samsung", nome:"Galaxy S25 FE 256GB", prezzo:773.9, img:"imgcatalogo/samsung-galaxy-s25-fe-256gb.webp", tags:["Novità"]},
+  {brand:"Samsung", nome:"Galaxy A56 5G", prezzo:483.8, img:"imgcatalogo/samsung-galaxy-a56-5g.webp", tags:["Novità"]},
+  {brand:"OPPO", nome:"A5 Pro", prezzo:255.9, img:"imgcatalogo/oppo-a5-pro.webp", tags:["Promo"]},
+  {brand:"Apple", nome:"iPhone 17 Pro Max 256GB", prezzo:1657.8, img:"imgcatalogo/apple-iphone-17-pro-max-256gb.webp", tags:["Novità"]},
+  {brand:"Samsung", nome:"Galaxy Z Fold 7 256GB", prezzo:1977.0, img:"imgcatalogo/samsung-galaxy-z-fold-7-256gb.webp", tags:["Novità"]}];
+
+    function badgeClass(tag){ if(tag==="Novità") return "tag new"; if(tag==="Promo") return "tag hot"; if(tag==="Ultimi pezzi") return "tag stock"; if(tag==="Bestseller") return "tag hot"; if(tag==="Premium") return "tag brand"; if(tag==="Convenienza") return "tag stock"; return "tag"; }
+
+    function cardHTML(p){
+      const waUrl = "https://wa.me/"+WA+"?text="+encodeURIComponent("Ciao Re Long, voglio info su "+p.nome+"!");
+      const _tags = (p.tags||[]);
+      const badges = _tags.map(t => `<span class="${badgeClass(t)}">${t}</span>`).join("");
+      
+      return `
+        <article class="card" data-brand="${p.brand}">
+          <div class="badges">
+            <span class="tag brand">${p.brand}</span>
+            ${badges}
+          </div>
+          <img class="photo" src="${p.img}" alt="${p.nome}">
+          <div class="model">${p.nome}</div>
+          <p class="price">Prezzo totale: € ${p.prezzo}</p>
+          <div class="simulatore">
+            <label class="sim-label">Simula la tua rata:</label>
+            <select class="sim-select" onchange="calcolaRata(this, ${p.prezzo})">
+              <option value="">Seleziona durata</option>
+              <option value="12">12 mesi</option>
+              <option value="24">24 mesi</option>
+              <option value="30">30 mesi</option>
+              <option value="36">36 mesi</option>
+              <option value="48">48 mesi</option>
+            </select>
+            <div class="sim-output">Rata mensile: —</div>
+          </div>
+          
+          <button class="btn secondary" onclick="inviaSimulazione(this, '${p.nome}', ${p.prezzo})"><span class="wa-ico"></span><span class="txt">💬 Invia simulazione su WhatsApp</span></button>
+        </article>
+      `;
+    }
+
+    function buildFilters(){
+      const wrap = document.getElementById("brandFilters");
+      const brands = ["Tutti", ...Array.from(new Set(prodotti.map(p => p.brand)))];
+      wrap.innerHTML = brands.map(b => `<button class="btn-filter ${b==='all'?'active':''}" data-b="${b}">${b}</button>`).join("");
+      wrap.addEventListener("click",(e)=>{
+        const b = e.target.dataset.b; if(!b) return;
+        document.querySelectorAll(".btn-filter").forEach(x=>x.classList.toggle("active", x.dataset.b===b));
+        render(b);
+      });
+    }
+
+    function render(filter="Tutti"){
+      const grid=document.getElementById("grid");
+      const list = filter==="Tutti" ? prodotti : prodotti.filter(p => p.brand===filter);
+      grid.innerHTML = list.map(cardHTML).join("");
+    }
+
+    // Simulatore
+    function calcolaRata(select, prezzo){ const mesi=parseInt(select.value); const out=select.parentElement.querySelector('.sim-output'); if(!mesi){ out.textContent="Rata mensile: —"; return; } out.textContent="Rata mensile: € "+(prezzo/mesi).toFixed(2); }
+    function inviaSimulazione(btn, nome, prezzo){ const card = btn.closest('.card'); const select = card.querySelector('.sim-select'); const mesi = parseInt(select?.value || ""); if(!mesi){ alert("Seleziona la durata (12/24/30/36/48 mesi) prima di inviare la simulazione."); return; } const rata = (prezzo/mesi).toFixed(2); const msg = `Ciao Re Long, ho simulato ${nome}: prezzo € ${prezzo}, durata ${mesi} mesi, rata € ${rata}/mese. Mi confermi disponibilità?`; const url = "https://wa.me/"+WA+"?text="+encodeURIComponent(msg); window.open(url, "_blank"); }
+
+    // Render iniziale
+    buildFilters(); render("Tutti");
+
+    // FX: reveal on scroll + tilt + spotlight
+    (function(){
+      const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+      const cards = Array.from(document.querySelectorAll('.card'));
+      const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); } }); },{threshold:.08, rootMargin:"0px 0px -5% 0px"});
+      function armCard(card){
+        card.classList.add('reveal'); io.observe(card);
+        let raf = 0; const maxDeg = 5;
+        function onMove(e){ const r = card.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width; const py = (e.clientY - r.top) / r.height; const rotY = clamp((px - .5) * (maxDeg*2), -maxDeg, maxDeg); const rotX = clamp((.5 - py) * (maxDeg*2), -maxDeg, maxDeg); cancelAnimationFrame(raf); raf = requestAnimationFrame(()=>{ card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`; }); }
+        function reset(){ cancelAnimationFrame(raf); card.style.transform = "perspective(800px) rotateX(0) rotateY(0)"; }
+        card.addEventListener('mousemove', onMove); card.addEventListener('mouseleave', reset);
+        card.addEventListener('touchstart', ()=>{ card.style.transform="perspective(800px) translateZ(8px)"; }, {passive:true});
+        card.addEventListener('touchend', ()=>{ card.style.transform="perspective(800px)"; }, {passive:true});
+        // spotlight vars
+        card.addEventListener('mousemove', (e)=>{ const r=card.getBoundingClientRect(); card.style.setProperty('--mx', (((e.clientX-r.left)/r.width)*100).toFixed(2)+'%'); card.style.setProperty('--my', (((e.clientY-r.top)/r.height)*100).toFixed(2)+'%'); });
+        card.addEventListener('mouseleave', ()=>{ card.style.removeProperty('--mx'); card.style.removeProperty('--my'); });
+      }
+      function armAll(){ document.querySelectorAll('.card').forEach(armCard); }
+      armAll();
+      // Re-arm on grid changes (filters)
+      const mo = new MutationObserver(armAll);
+      mo.observe(document.getElementById('grid'), {childList:true, subtree:true});
+    })();
+
+    // Smart image fallback + (optional) diagnosi
+    (function(){
+      const exts = ["webp","jpg","png","jpeg","JPG","PNG","JPEG","Webp","WEBP"];
+      const folders = ["imgcatalogo/","./imgcatalogo/","../imgcatalogo/","docs/imgcatalogo/"];
+      const loaded = [], failed = [];
+
+      function tryLoad(img, basePath){
+        const m = (basePath||"").match(/^(.*\/)?([^\/]+)\.([A-Za-z0-9]+)$/);
+        const name = m ? m[2] : basePath;
+        let fi = 0, ei = 0;
+        function attempt(){
+          if (fi >= folders.length){ fail(); return; }
+          const f = folders[fi], src = f + name + "." + exts[ei];
+          img.onerror = () => { ei++; if (ei>=exts.length){ ei=0; fi++; } attempt(); };
+          img.onload = () => { loaded.push(src); img.onerror = null; };
+          img.src = src;
+        }
+        function fail(){ failed.push(basePath); img.onerror = null; }
+        attempt();
+      }
+
+      function hook(img){
+        const orig = img.getAttribute("src") || "";
+        const test = new Image();
+        test.onload = ()=>{ loaded.push(orig); };
+        test.onerror = ()=>{ tryLoad(img, orig); };
+        test.src = orig;
+      }
+
+      function scan(){
+        document.querySelectorAll('#grid img.photo:not([data-diag])').forEach(img=>{
+          img.setAttribute('data-diag','1');
+          hook(img);
+        });
+      }
+
+      const grid = document.getElementById('grid');
+      const mo = new MutationObserver(scan);
+      mo.observe(grid, {childList:true, subtree:true});
+      scan();
+
+      if (DIAG) {
+        const pill = document.createElement("button");
+        pill.textContent = "Diag immagini";
+        pill.className = "diag-pill";
+        pill.onclick = ()=>{
+          const msg = [
+            "IMMAGINI CARICATE ("+loaded.length+")",
+            ...loaded.map(s=>"  ✓ "+s),
+            "",
+            "IMMAGINI NON TROVATE ("+failed.length+")",
+            ...failed.map(s=>"  ✗ "+s),
+            "",
+            "Suggerimento: verifica nomi/estensioni in imgcatalogo/ e la posizione della cartella."
+          ].join("\n");
+          alert(msg);
+          console.log("[DIAG] Loaded:", loaded);
+          console.log("[DIAG] Failed:", failed);
+        };
+        document.body.appendChild(pill);
+      }
+    })();
+  </script>
+</body>
+</html>
