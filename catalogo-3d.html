@@ -4,82 +4,230 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Catalogo Smartphone 3D | Re Long</title>
+<meta name="theme-color" content="#0a0a0a" />
+
 <style>
   :root{
-    --bg:#0a0a0a; --card:#141414; --stroke:#2a2a2a;
+    --bg1:#0a0a0a; --bg2:#000; --card:#151515; --stroke:#2b2b2b;
     --grad:linear-gradient(90deg,#ff0000,#ff7b00);
     --muted:rgba(255,255,255,.72);
+    --wa1:#25D366; --wa2:#128C7E;
+    --focus:#ffd166;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,Inter,Roboto,sans-serif;background:var(--bg);color:#fff}
-  header{padding:18px 16px;text-align:center}
-  h1{font-size:22px;letter-spacing:-.02em;margin:0 0 6px;font-weight:900}
-  .sub{font-size:13px;color:var(--muted)}
-  .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 40px}
-
-  /* filtri */
-  .filters{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 2px}
-  .filters button{
-    background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:999px;
-    font-weight:700;white-space:nowrap;cursor:pointer
+  html,body{height:100%}
+  body{
+    margin:0; font-family:system-ui,Inter,Roboto,sans-serif; color:#fff;
+    background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+    overflow-x:hidden;
   }
-  .filters button.active{background:var(--grad);color:#000;border-color:transparent}
+
+  /* spotlight mouse */
+  .spotlight{
+    position:fixed; inset:auto; left:var(--x,50%); top:var(--y,40%);
+    width:1100px; height:1100px; transform:translate(-50%,-50%);
+    pointer-events:none; z-index:0; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(255,120,0,.10), rgba(0,0,0,0) 65%);
+    filter:blur(8px);
+  }
+
+  header{
+    position:relative; z-index:1; text-align:center; padding:18px 16px 6px;
+  }
+  h1{font-size:22px; letter-spacing:-.02em; margin:0 0 6px; font-weight:900}
+  .sub{font-size:13px; color:var(--muted)}
+  .wrap{position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:10px 14px 40px}
+
+  /* promo bar (puoi togliere display con .hidden) */
+  .promo{
+    position:sticky; top:0; z-index:20;
+    display:flex; gap:10px; align-items:center; justify-content:center;
+    padding:10px 12px; background:linear-gradient(90deg,#1f1f1f,#2a2a2a);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    box-shadow:0 12px 26px rgba(0,0,0,.45);
+  }
+  .promo .label{font-weight:900}
+  .promo .timer{
+    font-variant-numeric:tabular-nums;
+    background:rgba(255,255,255,.10); padding:6px 10px; border-radius:999px
+  }
+  .promo a{color:#ffd166; font-weight:900; text-decoration:none}
+  .promo .close{
+    margin-left:8px; background:#000; color:#fff; border:1px solid rgba(255,255,255,.18);
+    padding:4px 8px; border-radius:999px; cursor:pointer; font-weight:800
+  }
+
+  /* barra comandi */
+  .toolbar{
+    position:sticky; top:52px; z-index:10;
+    display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center;
+    padding:10px; margin-top:10px; background:rgba(10,10,10,.75);
+    border:1px solid rgba(255,255,255,.08); border-radius:14px; backdrop-filter:saturate(1.1) blur(6px)
+  }
+  @media(max-width:880px){ .toolbar{ grid-template-columns:1fr 1fr; } }
+  @media(max-width:520px){ .toolbar{ grid-template-columns:1fr; } }
+
+  .search input{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid #333; background:#000; color:#fff;
+  }
+  .sort select{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid #333; background:#000; color:#fff;
+  }
+
+  /* filtri brand */
+  .filters{display:flex; gap:10px; overflow-x:auto; padding:2px}
+  .filters button{
+    background:#111; border:1px solid #333; color:#fff; padding:8px 14px; border-radius:999px;
+    font-weight:800; white-space:nowrap; cursor:pointer
+  }
+  .filters button.active{background:var(--grad); color:#000; border-color:transparent}
 
   /* griglia */
-  .grid{display:grid;gap:18px;margin-top:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .card{
-    background:linear-gradient(150deg,rgba(20,20,20,.92),rgba(0,0,0,.65));
-    border:1px solid var(--stroke);border-radius:16px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.85);
-    transition:transform .18s ease,box-shadow .18s ease;border-top:1px solid rgba(255,255,255,.06);position:relative
+  .grid{
+    display:grid; gap:18px; margin-top:16px;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr))
   }
-  .card:hover{transform:translateY(-4px);box-shadow:0 28px 70px rgba(0,0,0,.9)}
-  .img{width:100%;aspect-ratio:4/5;border-radius:12px;background:#000;object-fit:cover;margin-bottom:10px}
 
-  .badge{position:absolute;top:-10px;right:12px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;color:#000}
+  /* card */
+  .card{
+    background:linear-gradient(150deg, rgba(20,20,20,.94), rgba(0,0,0,.60));
+    border:1px solid var(--stroke); border-radius:16px; padding:14px;
+    box-shadow:0 24px 56px rgba(0,0,0,.85), 0 0 60px rgba(255,0,0,.12);
+    border-top:1px solid rgba(255,255,255,.06);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+    position:relative; transform-style:preserve-3d; will-change:transform, box-shadow;
+    opacity:0; transform:translateY(14px);
+  }
+  .card.in{opacity:1; transform:none}
+  .card:hover{
+    transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(4px);
+    box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
+    border-color:rgba(255,255,255,.18);
+  }
+  .img{width:100%; aspect-ratio:4/5; border-radius:12px; background:#000; object-fit:cover; margin-bottom:10px}
+
+  /* badge */
+  .badge{
+    position:absolute; top:-10px; right:12px; padding:6px 10px; border-radius:999px;
+    font-size:11px; font-weight:900; color:#000; border:1px solid rgba(0,0,0,.06);
+    box-shadow:0 10px 18px rgba(255,80,0,.35)
+  }
   .badge.novita{background:linear-gradient(90deg,#ff006e,#ffbe0b)}
   .badge.promo {background:linear-gradient(90deg,#00b4d8,#0077b6)}
   .badge.top   {background:linear-gradient(90deg,#7209b7,#4361ee)}
 
-  .name{font-weight:800;margin-top:2px}
-  .brand{font-size:12px;color:var(--muted);margin-bottom:6px}
-  .price{font-size:20px;font-weight:900;background:var(--grad);-webkit-background-clip:text;color:transparent;margin:6px 0 0}
+  .name{font-weight:900; letter-spacing:-.01em}
+  .brand{font-size:12px; color:var(--muted); margin:2px 0 6px}
+  .price{font-size:20px; font-weight:900; background:var(--grad); -webkit-background-clip:text; color:transparent; margin:6px 0 0}
 
-  .rate{margin-top:10px;background:#101010;border:1px solid #2b2b2b;border-radius:12px;padding:10px}
-  .rate label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-  .rate select{width:100%;padding:8px;border-radius:10px;border:1px solid #3a3a3a;background:#000;color:#fff}
-  .rata{font-size:14px;margin-top:8px}
+  .rate{margin-top:10px; background:#101010; border:1px solid #2b2b2b; border-radius:12px; padding:10px}
+  .rate label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+  .rate select{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #3a3a3a; background:#000; color:#fff}
+  .rata{font-size:14px; margin-top:8px}
 
   .wa{
-    display:block;margin-top:12px;text-align:center;padding:12px;border-radius:12px;
-    font-weight:900;text-decoration:none;color:#000;
-    background:radial-gradient(circle at 0% 0%,#25D366,#128C7E)
+    display:block; margin-top:12px; text-align:center; padding:12px; border-radius:12px;
+    font-weight:900; text-decoration:none; color:#000;
+    background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));
+    box-shadow:0 18px 30px rgba(18,140,126,.45)
   }
 
-  /* avvisi */
-  .status{margin-top:8px;font-size:13px;color:var(--muted);text-align:center}
-  .error{max-width:800px;margin:16px auto 0;background:#161616;border:1px solid #333;padding:14px;border-radius:12px}
+  /* messaggi */
+  .status{margin-top:8px; font-size:13px; color:var(--muted); text-align:center}
+  .error{max-width:900px; margin:16px auto 0; background:#161616; border:1px solid #333; padding:14px; border-radius:12px}
   .error b{color:#fff}
+
+  /* focus */
+  :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:10px}
 </style>
 </head>
 <body>
+
+<!-- spotlight -->
+<div class="spotlight" aria-hidden="true"></div>
+
 <header>
   <h1>Catalogo Smartphone 3D</h1>
   <div class="sub">Scegli, calcola la rata e invia il preventivo su WhatsApp</div>
 </header>
 
+<!-- promo bar (Black Friday fino al 30 novembre alle 23:59) -->
+<div id="promo" class="promo" role="status" aria-live="polite">
+  <span class="label">BLACK FRIDAY</span>
+  <span class="timer" id="timer">--:--:--</span>
+  <a href="./catalogo-3d.html" aria-label="Resta nel catalogo">Offerte a tempo • scopri ora</a>
+  <button class="close" type="button" id="promoClose" aria-label="Chiudi barra promozionale">×</button>
+</div>
+
 <div class="wrap">
+  <!-- toolbar -->
+  <div class="toolbar">
+    <div class="search">
+      <input id="q" type="search" placeholder="Cerca modello o brand…" aria-label="Cerca">
+    </div>
+    <div class="sort">
+      <select id="order" aria-label="Ordina">
+        <option value="default">Ordina: predefinito</option>
+        <option value="prezzo-asc">Prezzo crescente</option>
+        <option value="prezzo-desc">Prezzo decrescente</option>
+        <option value="nome-asc">Nome A→Z</option>
+        <option value="nome-desc">Nome Z→A</option>
+      </select>
+    </div>
+    <div id="filters" class="filters" aria-label="Filtri brand"></div>
+  </div>
+
   <div id="status" class="status">Carico i prodotti…</div>
-  <div id="filters" class="filters"></div>
-  <div id="grid" class="grid"></div>
+  <div id="grid" class="grid" aria-live="polite"></div>
 </div>
 
 <script>
+/* ===== Config ===== */
 const WA = "https://wa.me/3908119578844?text=";
+const DATA_URL = "./prodotti.json";
+const PROMO_END = new Date("2025-11-30T23:59:59+01:00"); // modifica a piacere
 
-/* util */
+/* ===== Util ===== */
 const money = n => Number(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"");
 
-/* render card */
+/* ===== Spotlight mouse ===== */
+(function(){
+  const sp = document.querySelector('.spotlight');
+  if(!sp) return;
+  const upd = (e)=>{
+    const x = e.clientX || innerWidth/2;
+    const y = e.clientY || innerHeight*0.4;
+    sp.style.setProperty('--x', x+'px');
+    sp.style.setProperty('--y', y+'px');
+  };
+  window.addEventListener('mousemove', upd, {passive:true});
+  upd({clientX: innerWidth/2, clientY: innerHeight*0.4});
+})();
+
+/* ===== Promo countdown ===== */
+(function(){
+  const bar = document.getElementById('promo');
+  const tEl = document.getElementById('timer');
+  const close = document.getElementById('promoClose');
+  if(!bar || !tEl) return;
+
+  close.addEventListener('click', ()=> bar.style.display='none');
+
+  function tick(){
+    const now = new Date();
+    let diff = PROMO_END - now;
+    if(diff<=0){ tEl.textContent = "Termina a breve"; return; }
+    const d = Math.floor(diff/86400000); diff-=d*86400000;
+    const h = Math.floor(diff/3600000); diff-=h*3600000;
+    const m = Math.floor(diff/60000); diff-=m*60000;
+    const s = Math.floor(diff/1000);
+    tEl.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* ===== Render Card ===== */
 function renderCard(p, idx){
   const badge =
     p.novita ? 'novita' :
@@ -89,14 +237,13 @@ function renderCard(p, idx){
   const selId = `rate-${idx}`;
   const waId  = `wa-${idx}`;
 
-  // messaggio base (senza rate)
-  const baseMsg = `Preventivo per ${p.nome}%0A`+
-                  `Prezzo totale: € ${money(p.prezzo)}`;
+  const baseMsg = `Preventivo per ${p.nome}\nPrezzo totale: € ${money(p.prezzo)}`;
 
   return `
-  <article class="card" data-brand="${p.brand}">
+  <article class="card" data-brand="${p.brand}" data-name="${norm(p.nome)}" data-price="${Number(p.prezzo)}">
     ${badge ? `<span class="badge ${badge}">${badge.toUpperCase()}</span>` : ``}
     <img class="img" src="${p.img}" alt="${p.nome}" onerror="this.style.opacity=.35;this.title='Immagine non trovata: ${p.img}'">
+
     <div class="name">${p.nome}</div>
     <div class="brand">${p.brand}</div>
     <div class="price">€ ${money(p.prezzo)}</div>
@@ -111,23 +258,22 @@ function renderCard(p, idx){
         <option value="36">36 mesi</option>
         <option value="48">48 mesi</option>
       </select>
-      <div class="rata"></div>
+      <div class="rata" aria-live="polite"></div>
     </div>
 
-    <a id="${waId}" class="wa" href="${WA + baseMsg}" target="_blank" rel="noopener">
+    <a id="${waId}" class="wa" href="${WA + encodeURIComponent(baseMsg)}" target="_blank" rel="noopener">
       Invia preventivo 📲
     </a>
   </article>`;
 }
 
-/* update rata + link WA */
+/* ===== Update rata + link WA ===== */
 function onRateChange(sel, prezzo, nomeEnc, waId){
   const mesi = parseInt(sel.value || 0, 10);
   const box  = sel.parentElement.querySelector('.rata');
   const btn  = document.getElementById(waId);
   const nome = decodeURIComponent(nomeEnc);
 
-  // base
   let msg = `Preventivo per ${nome}\nPrezzo totale: € ${money(prezzo)}`;
 
   if(!mesi){
@@ -146,49 +292,99 @@ function onRateChange(sel, prezzo, nomeEnc, waId){
   btn.href = WA + encodeURIComponent(msg);
 }
 
-/* load prodotti.json */
+/* ===== Stato globale in memoria ===== */
+let ALL = [];      // tutti i prodotti
+let VIEW = [];     // vista filtrata/ordinata
+
+/* ===== Init ===== */
 (async function init(){
   const status = document.getElementById('status');
   const grid   = document.getElementById('grid');
   const filters= document.getElementById('filters');
 
   try{
-    const res = await fetch('./prodotti.json?v=' + Date.now(), {cache:'no-store'});
+    const res = await fetch(DATA_URL + '?v=' + Date.now(), {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP ' + res.status);
-    const prodotti = await res.json();
+    ALL = await res.json();
 
-    // render grid
-    grid.innerHTML = prodotti.map((p,i)=>renderCard(p,i)).join('');
-    status.textContent = `Prodotti: ${prodotti.length}`;
+    renderGrid(ALL);
+    status.textContent = `Prodotti: ${ALL.length}`;
 
     // filtri brand
-    const brands = ['all', ...new Set(prodotti.map(p=>p.brand))];
+    const brands = ['all', ...new Set(ALL.map(p=>p.brand))];
     filters.innerHTML = brands.map(b=>`
       <button data-b="${b}" onclick="filterBrand('${b}')">${b==='all'?'Tutti':b}</button>
     `).join('');
-    document.querySelector('.filters button').classList.add('active');
+    filters.querySelector('button').classList.add('active');
 
-    // salva elenco per filtro
-    window.__ALL_CARDS__ = Array.from(document.querySelectorAll('.card'));
+    // search + sort
+    document.getElementById('q').addEventListener('input', applySearchSort);
+    document.getElementById('order').addEventListener('change', applySearchSort);
+
   }catch(err){
     document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
       `<div class="error"><b>Impossibile caricare i prodotti.</b><br>
-       Assicurati che <code>prodotti.json</code> sia nello stesso percorso e che le immagini esistano in <code>/imgcatalogo/</code>.<br>
+       Assicurati che <code>prodotti.json</code> sia nella stessa cartella di questa pagina e che le immagini esistano in <code>/imgcatalogo/</code>.<br>
        Errore: ${err.message}</div>`
     );
     status.textContent = 'Errore caricamento';
   }
+
+  // on-scroll fade-in
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
+  }, {threshold:.16});
+  grid.querySelectorAll('.card').forEach(el=>obs.observe(el));
+
+  // micro tilt
+  grid.addEventListener('pointermove', (e)=>{
+    const card = e.target.closest('.card'); if(!card) return;
+    const r = card.getBoundingClientRect();
+    const cx = (e.clientX - r.left)/r.width - .5;
+    const cy = (e.clientY - r.top)/r.height - .5;
+    card.style.transform = `perspective(900px) rotateX(${(-cy*4).toFixed(2)}deg) rotateY(${(cx*4).toFixed(2)}deg) translateZ(4px)`;
+  });
+  grid.addEventListener('pointerleave', ()=>{
+    grid.querySelectorAll('.card').forEach(c=>c.style.transform='');
+  });
 })();
 
-/* filtro brand */
+/* ===== Render grid helper ===== */
+function renderGrid(list){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = list.map((p,i)=>renderCard(p,i)).join('');
+  VIEW = list.slice();
+}
+
+/* ===== Filtri / Ricerca / Ordina ===== */
+let CURRENT_BRAND = 'all';
+
 function filterBrand(b){
-  (window.__ALL_CARDS__||[]).forEach(card=>{
-    const show = (b==='all' || card.dataset.brand===b);
-    card.style.display = show ? '' : 'none';
-  });
+  CURRENT_BRAND = b;
   document.querySelectorAll('.filters button').forEach(btn=>btn.classList.remove('active'));
   const cur = document.querySelector(`.filters button[data-b="${b}"]`);
   if(cur) cur.classList.add('active');
+  applySearchSort();
+}
+
+function applySearchSort(){
+  const q = norm(document.getElementById('q').value || '');
+  const order = document.getElementById('order').value;
+
+  let list = ALL.filter(p=>{
+    const byBrand = (CURRENT_BRAND==='all' || p.brand===CURRENT_BRAND);
+    const byText = !q || norm(p.nome).includes(q) || norm(p.brand).includes(q);
+    return byBrand && byText;
+  });
+
+  switch(order){
+    case 'prezzo-asc':  list.sort((a,b)=>a.prezzo-b.prezzo); break;
+    case 'prezzo-desc': list.sort((a,b)=>b.prezzo-a.prezzo); break;
+    case 'nome-asc':    list.sort((a,b)=>a.nome.localeCompare(b.nome,'it')); break;
+    case 'nome-desc':   list.sort((a,b)=>b.nome.localeCompare(a.nome,'it')); break;
+  }
+
+  renderGrid(list);
 }
 </script>
 </body>
