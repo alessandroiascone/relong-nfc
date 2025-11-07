@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -47,11 +48,10 @@
     @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-    /* Focus ring accessibile */
     :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
     a.btn:focus-visible,.fab-btn:focus-visible{filter:brightness(1.08)}
 
-    /* Loader (auto-hide CSS failsafe) */
+    /* Loader */
     #rl-loader{
       position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
       background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
@@ -67,7 +67,6 @@
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
 
-    /* Background + lightspot */
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
       background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
@@ -79,43 +78,26 @@
       background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
       filter:blur(6px);pointer-events:none;z-index:0
     }
-    body.has-bf{padding-top:64px}
-    @media(max-width:480px){body.has-bf{padding-top:74px}}
     .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
     @media(max-width:480px){.wrap{padding-bottom:130px}}
 
-    /* Header / brand con mini-logo SVG animato */
     .head{text-align:center;padding:8px 8px 0 8px}
     .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
     .brand .logo{width:24px;height:24px;display:inline-block}
     .brand .logo path{stroke-dasharray:150;stroke-dashoffset:150;animation:strokeDash .6s ease forwards .15s}
     .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both, titleGlow 1.2s ease .9s 1}
 
-    /* Hero minimal */
     .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
-
-    /* Micro-banner Black Friday inline */
-    .bf-inline{
-      display:none;margin:8px auto 0;gap:10px;align-items:center;justify-content:center;
-      max-width:720px;padding:10px 12px;border-radius:12px;
-      background:linear-gradient(90deg,#1f1f1f,#2a2a2a);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:0 12px 28px rgba(0,0,0,.45);
-      font-size:13px;color:#fff
-    }
-    .bf-inline .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 0 14px rgba(255,120,0,.6)}
-    .bf-inline .strong{font-weight:900;letter-spacing:.02em;margin:0 6px 0 2px}
-    .bf-inline a{color:#ffd166;text-decoration:none;font-weight:900}
 
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
     @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
 
-    /* Card + animazioni + glow premium */
+    /* Card */
     .card{
       position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
       border:1px solid var(--stroke);border-radius:18px;padding:18px;
@@ -123,26 +105,16 @@
       display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
       transform-style:preserve-3d
     }
-    .card::after{
-      content:"";position:absolute;inset:-1px;border-radius:18px;
-      background:radial-gradient(1200px 300px at 50% -10%, rgba(255,120,0,.18), transparent 60%);
-      opacity:0;transition:opacity .28s ease;pointer-events:none;filter:blur(8px)
-    }
     .card[data-anim]{opacity:0;transform:translateY(18px)}
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
-    .card:hover{
-      transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
-      box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)
-    }
-    .card:hover::after{opacity:1}
+    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    /* Badge piccoli (solo badge, non i bottoni arancio) */
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
-    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)} /* SMARTPHONE */
-    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)} /* Business P.IVA */
-    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)} /* Energia */
-    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)} /* Assistenza PC */
-    article.card:nth-of-type(5) .badge{background:linear-gradient(90deg,#10B981,#84CC16);box-shadow:0 10px 18px rgba(16,185,129,.35)} /* Business Mobili */
+    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
+    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
+    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
+    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+    /* Badge via ID per le ultime card */
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px}
@@ -154,7 +126,7 @@
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
-    /* FAB & altri elementi */
+    /* FAB & Torna su */
     .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
     .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
@@ -167,27 +139,45 @@
 
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
 
-    /* Barra promo minimal elegante (top) */
-    .bf-bar{
-      position:fixed;top:12px;left:50%;transform:translateX(-50%);
-      z-index:10000;display:flex;gap:10px;align-items:center;
-      background:linear-gradient(90deg,#1f1f1f,#2a2a2a);
-      border:1px solid rgba(255,255,255,.08);
-      color:#fff;padding:10px 14px;border-radius:999px;
-      box-shadow:0 18px 40px rgba(0,0,0,.5)
+    /* ===== Bottom Seasonal Bar ===== */
+    .seasonbar{
+      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px)
     }
-    .bf-bar .label{font-weight:900;letter-spacing:.02em}
-    .bf-bar .timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
-    .bf-bar a{color:#ffd166;text-decoration:none;font-weight:900}
-  </style>
+    .seasonbar__icon{ animation:pulse 1.2s infinite }
+    .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
+
+    /* Offset quando la barra stagionale è presente (no sovrapposizione) */
+    body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+    body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
+
+    /* Badge forzati via ID */
+    #biz-mobile .badge{
+      background:linear-gradient(90deg,#10B981,#84CC16);
+      box-shadow:0 10px 18px rgba(16,185,129,.35);
+    }
+    #season-card .badge{
+      background:linear-gradient(90deg,#ff0000,#ff7b00);
+    }
+  
+.brand {
+  color: #ffffff !important;
+}
+.brand:visited {
+  color: #ffffff !important;
+}
+.brand:hover {
+  color: #ffffff !important;
+  opacity: .9;
+}
+
+
+.brand, .brand:visited, .brand:hover {
+  text-decoration: none !important;
+}
+
+</style>
 </head>
 <body>
-  <!-- Barra promo (Black Friday: 7/11 09:00 → 30/11 23:59) -->
-  <div class="bf-bar" id="bfBar" role="status" aria-live="polite">
-    <span class="label" id="bfLabel">BLACK FRIDAY</span>
-    <span class="timer" id="bfTimer">--:--:--</span>
-    <a href="./catalogo-smartphone-reale-v3.html" aria-label="Vai alle offerte">Vai alle offerte ➜</a>
-  </div>
 
   <!-- Loader -->
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
@@ -197,8 +187,6 @@
     </div>
     <p class="rl-loading-text">Caricamento…</p>
   </div>
-
-  <!-- FAILSAFE: nascondi loader comunque dopo 3.2s -->
   <script>
     (function(){
       function hideNow(){
@@ -213,29 +201,20 @@
 
   <main class="wrap">
     <header class="head">
-      <div class="brand">
-        <!-- Mini logo SVG animato -->
+      <!-- Brand cliccabile verso la Home dell'hub -->
+      <a class="brand" href="./relong-hub-v2.html" rel="home">
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
           <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
           <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Re Long Telefonia, Energia & Assistenza PC
-      </div>
+      </a>
       <div class="sub">Clicca sulla sezione di interesse</div>
 
-      <!-- Hero minimal -->
       <div class="hero" aria-hidden="false">
         <div class="line" aria-hidden="true"></div>
         <h1>Benvenuti</h1>
         <p>Più valore ad ogni decisione. Seleziona l’area: al resto pensiamo noi<strong> con cura e precisione</strong>.</p>
-      </div>
-
-      <!-- Micro-banner BF inline (visibile solo durante BF) -->
-      <div class="bf-inline" id="bfInline" role="note" aria-live="polite">
-        <span class="dot" aria-hidden="true"></span>
-        <span class="strong">BLACK FRIDAY</span>
-        <span>Sconti reali su <strong>Smartphone</strong> &amp; <strong>Energia</strong>. Valido fino al <strong>30/11</strong>.</span>
-        <a href="./catalogo-smartphone-reale-v3.html" aria-label="Apri Catalogo Digitale">Guarda ora il catalogo ➜</a>
       </div>
     </header>
 
@@ -272,12 +251,22 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <article class="card" data-anim>
+      <!-- BUSINESS MOBILI (ripristinata) -->
+      <article class="card" data-anim id="biz-mobile">
         <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
         <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
         <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
+      </article>
+
+      <!-- SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
+      <article class="card" data-anim id="season-card">
+        <div class="badge" id="season-badge">BLACK FRIDAY</div>
+        <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
+        <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!</p>
+        <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long!%20Ho%20visto%20le%20offerte%20Black%20Friday%20e%20vorrei%20bloccarne%20una.">Blocca ora su WhatsApp</a>
       </article>
     </section>
 
@@ -291,6 +280,9 @@
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
+    // URL della Home corretta dell'hub
+    const HOME_PAGE = './relong-hub-v2.html';
+
     /* to-top */
     (function(){
       const toTop = document.createElement('div');
@@ -307,13 +299,12 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
-    /* Link interni sicuri: GET (non HEAD). Ignora tel/wa/maps... */
+    /* Navigazione interna sicura + fallback sempre alla Home dell’hub */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
       const isSpecial = /^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href) || href.includes('wa.me');
       if(isSpecial) return;
-
       let url;
       try{ url = new URL(a.href, location.href); }catch(_){ return; }
       const isInternal = (url.protocol==='http:'||url.protocol==='https:') && url.origin===location.origin && /\.html?$/.test(url.pathname);
@@ -322,14 +313,24 @@
         try{
           const res = await fetch(url.href, {method:'GET', cache:'no-store', redirect:'follow'});
           if(res.ok){ location.href = url.href; }
-          else { showToast('Pagina non trovata. Ti riportiamo alla Home.'); setTimeout(()=>location.href='./', 1000); }
+          else { showToast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 800); }
         }catch(_){
-          showToast('Impossibile aprire la pagina. Riprova o torna alla Home.'); setTimeout(()=>location.href='./', 1200);
+          showToast('Impossibile aprire la pagina. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 1000);
         }
       }
     }, false);
 
-    /* Animazioni on-scroll (fade-in una volta) */
+    // Normalizza link root per puntare sempre alla home dell’hub
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
+      document.querySelectorAll('a[rel~="home"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
+    });
+
+    /* Animazioni on-scroll */
     (function(){
       const obs = new IntersectionObserver((entries)=>{
         entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
@@ -337,99 +338,86 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Barra promo + micro-banner inline: SOLO Black Friday 7 nov 09:00 → 30 nov 23:59 (Europe/Rome) */
+    /* Switch automatico testo card + barra stagionale */
     (function(){
-      const bar   = document.getElementById('bfBar');
-      const timer = document.getElementById('bfTimer');
-      const label = document.getElementById('bfLabel');
-      const inline = document.getElementById('bfInline');
-      if(!bar || !timer || !label) return;
+      const now = new Date();
+      const m = now.getMonth()+1, d = now.getDate();
+      let season = "blackfriday";
+      if (m === 12 && d >= 8) season = "christmas";
+      if (m === 1) season = "flash";
 
-      const BF_START = new Date('2025-11-07T09:00:00+01:00');
-      const BF_END   = new Date('2025-11-30T23:59:59+01:00');
-
-      function phase(now){
-        if (now >= BF_START && now <= BF_END) return {text:'BLACK FRIDAY', endsAt: BF_END};
-        return null; // niente Cyber Monday
-      }
-      function tick(){
-        const now = new Date();
-        const ph = phase(now);
-        if(!ph){
-          bar.style.display = 'none';
-          document.body.classList.remove('has-bf');
-          if(inline) inline.style.display = 'none';
-          return;
+      const copy = {
+        blackfriday:{
+          badge:"BLACK FRIDAY",
+          title:"Black Friday ReLong",
+          desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",
+          btn:"Vai alle Offerte Black Friday",
+          href:"./black-friday.html",
+          bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",
+          barHref:"./black-friday.html"
+        },
+        christmas:{
+          badge:"NATALE",
+          title:"Christmas Promo 🎄",
+          desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",
+          btn:"Scopri le Offerte di Natale",
+          href:"./black-friday.html?season=christmas",
+          bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",
+          barHref:"./black-friday.html?season=christmas"
+        },
+        flash:{
+          badge:"FLASH",
+          title:"Offerte Flash ⚡",
+          desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",
+          btn:"Vedi le Offerte Flash",
+          href:"./black-friday.html?season=flash",
+          bar:"<b>Offerte Flash ⚡</b> — sconti lampo",
+          barHref:"./black-friday.html?season=flash"
         }
-        bar.style.display = 'flex';
-        document.body.classList.add('has-bf');
-        label.textContent = ph.text;
-
-        // Micro-banner inline soltanto durante BF
-        if(inline) inline.style.display = 'flex';
-
-        let diff = ph.endsAt - now;
-        if (diff <= 0){ timer.textContent = 'ULTIME ORE!'; return; }
-        const d = Math.floor(diff/86400000); diff -= d*86400000;
-        const h = Math.floor(diff/3600000);  diff -= h*3600000;
-        const m = Math.floor(diff/60000);    diff -= m*60000;
-        const s = Math.floor(diff/1000);
-        timer.textContent = `${String(d).padStart(2,'0')}g ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      }
-      tick(); setInterval(tick, 1000);
-    })();
-
-    /* WhatsApp templates auto con UTM per tracciamento base */
-    (function(){
-      const WA_BASE = "https://wa.me/3908119578844?text=";
-      const UTM = "&utm_source=hub&utm_medium=cta&utm_campaign=bf25";
-      const templates = {
-        "SMARTPHONE A RATE": "Ciao Re Long, vorrei info su smartphone a rate (Vodafone & Compass). 📱",
-        "OFFERTE BUSINESS":  "Ciao Re Long, sono P.IVA: info offerte Business. 🧾",
-        "ENERGIA CASA":      "Ciao Re Long, ti invio la bolletta per verifica risparmio. ⚡",
-        "ASSISTENZA PC":     "Ciao Re Long, ho bisogno di assistenza/upgrade PC. 🧰",
-        "VODAFONE BUSINESS": "Ciao Re Long, info su offerte Mobili Business. 📲"
       };
-      document.querySelectorAll("article.card .btn.wa").forEach((a)=>{
-        try{
-          const url = new URL(a.href, location.href);
-          if (url.searchParams.has("text")) return;
-          const card   = a.closest("article.card");
-          const badge  = card?.querySelector(".badge")?.textContent?.trim() || "";
-          const title  = card?.querySelector(".title")?.textContent?.trim() || "";
-          let msg = templates[badge] || `Ciao Re Long, vorrei informazioni su: ${title}. Grazie!`;
-          a.href = WA_BASE + encodeURIComponent(msg) + UTM;
-          a.setAttribute("rel","noopener");
-        }catch(_){}
-      });
-    })();
 
-    /* Haptic feedback mobile (opzionale) */
-    (() => {
-      const isTouch = window.matchMedia('(pointer: coarse)').matches;
-      const canVibrate = 'vibrate' in navigator && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!isTouch || !canVibrate) return;
-      const SELECTOR = 'a, button, .btn, .fab-btn';
-      const VIB_TAP = [10];
-      const VIB_STRONG = [14, 30, 12];
-      document.addEventListener('pointerdown', (e) => {
-        const el = e.target.closest(SELECTOR);
-        if (!el) return;
-        if (el.classList.contains('fab-btn')) {
-          navigator.vibrate(VIB_STRONG);
-        } else {
-          navigator.vibrate(VIB_TAP);
-        }
-      }, { passive: true });
+      const c = copy[season];
+      const $badge = document.getElementById('season-badge');
+      const $title = document.getElementById('season-title');
+      const $desc  = document.getElementById('season-desc');
+      const $link  = document.getElementById('season-link');
+      const $bar   = document.getElementById('seasonBar');
+      if($badge) $badge.textContent = c.badge;
+      if($title) $title.textContent = c.title;
+      if($desc)  $desc.textContent  = c.desc;
+      if($link){ $link.textContent = c.btn; $link.href = c.href; $link.setAttribute('aria-label', c.btn); }
+      if($bar){
+        const textEl = $bar.querySelector('.seasonbar__text');
+        if(textEl) textEl.innerHTML = c.bar;
+        $bar.href = c.barHref;
+      }
     })();
-
-    /* Logger click minimale (console) */
-    document.addEventListener('click',(e)=>{
-      const a=e.target.closest('a'); if(!a) return;
-      const where = a.textContent.trim().slice(0,60) || a.getAttribute('aria-label') || a.href;
-      console.log('[click]', where);
-    });
   </script>
+
+  <!-- Barra in basso stagionale -->
+  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
+    <span class="seasonbar__icon">⚡</span>
+    <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
+    <span class="seasonbar__cta">Scopri ora</span>
+  </a>
+  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }
+.brand {
+  color: #ffffff !important;
+}
+.brand:visited {
+  color: #ffffff !important;
+}
+.brand:hover {
+  color: #ffffff !important;
+  opacity: .9;
+}
+
+
+.brand, .brand:visited, .brand:hover {
+  text-decoration: none !important;
+}
+
+</style>
 
   <!-- FAB -->
   <div class="fab-nav" aria-label="Azioni rapide">
@@ -443,7 +431,21 @@
     </a>
   </div>
 
-  <!-- Structured Data: LocalBusiness -->
+  <!-- Attiva offset quando la barra è presente -->
+  <script>
+    (function(){
+      const bar = document.getElementById('seasonBar');
+      if(!bar) return;
+      document.body.classList.add('has-seasonbar');
+      const obs = new IntersectionObserver((entries)=>{
+        const show = entries[0].isIntersecting;
+        document.body.classList.toggle('has-seasonbar', show);
+      }, {threshold: 0});
+      obs.observe(bar);
+    })();
+  </script>
+
+  <!-- Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -459,16 +461,28 @@
       "postalCode": "80016",
       "addressCountry": "IT"
     },
-    "sameAs": ["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"],
-    "openingHoursSpecification": [
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:30","closes":"13:30"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"16:00","closes":"20:30"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:30","closes":"13:30"}
-    ]
+    "sameAs": ["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"]
   }
   </script>
 
-  <!-- Noscript: se JS disattivato, nascondi loader -->
-  <noscript><style>#rl-loader{display:none!important}</style></noscript>
+  <!-- Noscript -->
+  <noscript><style>#rl-loader{display:none!important}
+.brand {
+  color: #ffffff !important;
+}
+.brand:visited {
+  color: #ffffff !important;
+}
+.brand:hover {
+  color: #ffffff !important;
+  opacity: .9;
+}
+
+
+.brand, .brand:visited, .brand:hover {
+  text-decoration: none !important;
+}
+
+</style></noscript>
 </body>
 </html>
