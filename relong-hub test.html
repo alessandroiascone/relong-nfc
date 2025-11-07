@@ -50,7 +50,7 @@
     h1{font-size:clamp(32px,5.5vw,56px);line-height:1.05;letter-spacing:-.02em;margin-top:10px}
     .sub{color:var(--muted);margin-top:10px;font-size:clamp(14px,2vw,18px)}
 
-    /* ===== Cards grid (anteprima contenuti) ===== */
+    /* ===== Cards grid ===== */
     .section{max-width:1100px;margin:26px auto;padding:0 16px}
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
     .card{grid-column:span 12;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border-radius:18px;overflow:hidden;position:relative;transition:transform .2s ease,box-shadow .2s ease}
@@ -66,7 +66,7 @@
     .btn:hover{transform:translateY(-1px); box-shadow:0 0 0 6px var(--ring)}
     .btn--accent{background:linear-gradient(180deg, rgba(255,59,26,.18), rgba(255,123,0,.12))}
 
-    /* ===== Bottom Seasonal Bar (unica barra visibile) ===== */
+    /* ===== Bottom Seasonal Bar ===== */
     .seasonbar{
       position:fixed; left:0; right:0; bottom:0; z-index:90;
       display:flex; align-items:center; gap:.75rem; justify-content:center;
@@ -74,21 +74,16 @@
       color:#fff; text-decoration:none; font-weight:700; border-top:1px solid rgba(255,255,255,.18);
       backdrop-filter:saturate(1.2) blur(6px);
     }
-    .seasonbar__icon{ animation:pulse 1.2s infinite }
-    .seasonbar__text{ font-weight:600 }
-    .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
-    @keyframes pulse{0%,60%{opacity:1}61%,90%{opacity:.6}91%,100%{opacity:1}}
     body{ padding-bottom: clamp(56px, 7vh, 72px); }
 
-    /* ===== Footer ===== */
     footer{ color:var(--muted2); font-size:12px; text-align:center; padding:22px 16px; border-top:1px solid var(--stroke); margin-top:28px }
 
-    /* ===== IMPORTANT: NON visualizzare eventuale vecchia pillola bf ===== */
     .pill--blackfriday, #bfPill, .blackfriday-pill{ display:none !important }
   </style>
 </head>
 <body>
-  <!-- HEADER / NAV -->
+
+  <!-- HEADER -->
   <header>
     <nav class="nav" aria-label="Principale">
       <div class="brand"><span class="logo" aria-hidden="true"></span> Re Long Informatica</div>
@@ -111,12 +106,12 @@
     </div>
   </section>
 
-  <!-- SEZIONI (placeholder essenziali) -->
+  <!-- SEZIONI -->
   <main>
     <div class="section" id="smartphone">
       <div class="grid">
         <article class="card">
-          <div class="card__media"><!-- immagine o logo smartphone --></div>
+          <div class="card__media"></div>
           <div class="card__body">
             <div class="brandtxt">Smartphone</div>
             <div class="title">Catalogo & Rate senza busta paga</div>
@@ -126,8 +121,9 @@
             </div>
           </div>
         </article>
+
         <article class="card" id="energia">
-          <div class="card__media"><!-- immagine energia --></div>
+          <div class="card__media"></div>
           <div class="card__body">
             <div class="brandtxt">Energia</div>
             <div class="title">Fastweb Vodafone Energia — sconto immediato</div>
@@ -137,8 +133,9 @@
             </div>
           </div>
         </article>
+
         <article class="card" id="business">
-          <div class="card__media"><!-- immagine business --></div>
+          <div class="card__media"></div>
           <div class="card__body">
             <div class="brandtxt">Business</div>
             <div class="title">Linee e soluzioni per Partita IVA</div>
@@ -148,8 +145,9 @@
             </div>
           </div>
         </article>
+
         <article class="card" id="assistenza">
-          <div class="card__media"><!-- immagine assistenza --></div>
+          <div class="card__media"></div>
           <div class="card__body">
             <div class="brandtxt">Assistenza PC</div>
             <div class="title">Riparazioni, upgrade, pulizia, backup</div>
@@ -167,26 +165,12 @@
     © Re Long Informatica — 08119578844 — Marano di Napoli
   </footer>
 
-  <!-- ===== Unica BOTTOM BAR stagionale ===== -->
-  <!-- OGGI: Black Friday (link NON al catalogo, ma alla sezione offerte dedicate) -->
-  <a id="seasonBar" class="seasonbar" href="/black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
-    <span class="seasonbar__icon" aria-hidden="true">⚡</span>
+  <!-- ===== Barra stagionale ===== -->
+  <a id="seasonBar" class="seasonbar" href="/black-friday.html">
+    <span class="seasonbar__icon">⚡</span>
     <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
     <span class="seasonbar__cta">Scopri ora</span>
   </a>
 
-  <script>
-    // Helper: facile switch di stagione via JS (da usare in futuro)
-    // Esempi:
-    // setSeason({ label:"Offerte di Natale 🎄", href:"/natale.html" });
-    // setSeason({ label:"Offerte Flash ⚡", href:"/offerte-flash.html" });
-    function setSeason({label, href}){
-      const bar = document.getElementById('seasonBar');
-      if(!bar) return;
-      bar.href = href || bar.href;
-      const text = bar.querySelector('.seasonbar__text');
-      if(text && label){ text.innerHTML = '<b>'+label+'</b>'; }
-    }
-  </script>
 </body>
 </html>
