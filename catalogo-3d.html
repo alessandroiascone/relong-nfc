@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catalogo Smartphone 3D | Re Long</title>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,Inter,sans-serif;
+  background:#0a0a0a;
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:20px 10px;
+}
+h1{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+.filters{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:12px;
+}
+.filters button{
+  background:#111;
+  border:1px solid #333;
+  color:#fff;
+  padding:8px 16px;
+  border-radius:30px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.filters button.active{
+  background:linear-gradient(90deg,#ff0000,#ff7b00);
+  color:#000;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:22px;
+  padding:20px;
+}
+
+.card{
+  background:linear-gradient(160deg,rgba(20,20,20,.9),rgba(0,0,0,.6));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:16px;
+  position:relative;
+  box-shadow:0 20px 45px rgba(0,0,0,.8);
+  transition:.25s;
+}
+.card:hover{
+  transform:translateY(-6px) scale(1.03);
+}
+.card img{
+  width:100%;
+  border-radius:12px;
+  margin-bottom:12px;
+  background:#000;
+}
+
+.badge{
+  position:absolute;
+  top:-10px;
+  right:14px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  color:#000;
+}
+.badge.novita{
+  background:linear-gradient(90deg,#ff006e,#ffbe0b);
+}
+.badge.promo{
+  background:linear-gradient(90deg,#00b4d8,#0077b6);
+}
+.badge.top{
+  background:linear-gradient(90deg,#7209b7,#4361ee);
+}
+
+.price{
+  font-size:20px;
+  font-weight:900;
+  margin:6px 0;
+  background:linear-gradient(90deg,#ff0000,#ff7b00);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.rate-box{
+  background:#111;
+  border:1px solid #333;
+  padding:12px;
+  border-radius:12px;
+  margin-top:12px;
+}
+.rate-box select{
+  width:100%;
+  padding:8px;
+  background:#000;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:8px;
+}
+
+.btn-wa{
+  margin-top:14px;
+  display:block;
+  text-align:center;
+  padding:12px;
+  background:radial-gradient(circle at 0% 0%,#25D366,#128C7E);
+  color:#000;
+  border-radius:12px;
+  font-weight:800;
+  text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Catalogo Smartphone 3D</h1>
+  <p>Scegli, calcola la rata, invia il preventivo su WhatsApp</p>
+</header>
+
+<div class="filters" id="filters"></div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+
+// Carica dinamicamente il file LITE
+async function loadProdotti(){
+  const res = await fetch("./catalogo-smartphone-reale-v3-lite.html");
+  const text = await res.text();
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, "text/html");
+  const script = doc.querySelector("script");
+
+  let prodotti = [];
+  eval(script.innerText); // => carica const prodotti = [...]
+
+  return prodotti;
+}
+
+function creaCard(p){
+  const badge = p.novita ? "novita"
+              : p.promo ? "promo"
+              : p.top   ? "top"
+              : null;
+
+  return `
+  <div class="card" data-brand="${p.brand}">
+    ${badge ? `<div class="badge ${badge}">${badge.toUpperCase()}</div>` : ""}
+    <img src="${p.img}" alt="${p.nome}">
+    <div class="name">${p.nome}</div>
+    <div class="price">€ ${p.prezzo.toFixed(2)}</div>
+
+    <div class="rate-box">
+      <label>Seleziona le rate:</label>
+      <select onchange="calcolaRata(this, ${p.prezzo})">
+        <option value="">Scegli rate</option>
+        <option value="12">12 mesi</option>
+        <option value="20">20 mesi</option>
+        <option value="30">30 mesi</option>
+      </select>
+      <div class="rata" style="margin-top:8px;font-size:14px;"></div>
+    </div>
+
+    <a class="btn-wa"
+       href="https://wa.me/3908119578844?text=Vorrei%20il%20preventivo%20per%20${encodeURIComponent(p.nome)}"
+       target="_blank">
+       Invia Preventivo 📲
+    </a>
+  </div>`;
+}
+
+function calcolaRata(sel, prezzo){
+  const mesi = parseInt(sel.value);
+  const box = sel.parentElement.querySelector(".rata");
+  if(!mesi){ box.innerHTML=""; return; }
+  const rata = prezzo / mesi;
+  box.innerHTML = `≈ € ${rata.toFixed(2)}/mese`;
+}
+
+function filtra(brand){
+  document.querySelectorAll(".card").forEach(c=>{
+    c.style.display = (brand==="all" || c.dataset.brand===brand) ? "block":"none";
+  });
+
+  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.filters button[data-brand='${brand}']`).classList.add("active");
+}
+
+(async ()=>{
+  const grid = document.getElementById("grid");
+  const filters = document.getElementById("filters");
+
+  const prodotti = await loadProdotti();
+
+  grid.innerHTML = prodotti.map(creaCard).join("");
+
+  const marchi = ["all", ...new Set(prodotti.map(p=>p.brand))];
+
+  filters.innerHTML = marchi.map(b=>`
+    <button data-brand="${b}" onclick="filtra('${b}')">
+      ${b==="all"?"Tutti":b}
+    </button>
+  `).join("");
+
+  filtra("all");
+})();
+</script>
+
+</body>
+</html>
