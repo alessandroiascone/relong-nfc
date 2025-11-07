@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -67,6 +66,7 @@
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
 
+    /* Body + micro-noise (10) */
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
       background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
@@ -78,6 +78,22 @@
       background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
       filter:blur(6px);pointer-events:none;z-index:0
     }
+    /* micro-noise overlay */
+    body::after{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+      opacity:.035;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.25) 0, rgba(0,0,0,0) 100%),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.2) 0, rgba(0,0,0,0) 100%),
+        radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,.18) 0, rgba(0,0,0,0) 100%),
+        radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,.22) 0, rgba(0,0,0,0) 100%);
+      animation: noiseShift 6s ease-in-out infinite alternate;
+    }
+    @keyframes noiseShift{
+      from{opacity:.03; transform:translateY(0)}
+      to{opacity:.05; transform:translateY(-1.2%)}
+    }
+
     .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
     @media(max-width:480px){.wrap{padding-bottom:130px}}
 
@@ -85,36 +101,92 @@
     .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
     .brand .logo{width:24px;height:24px;display:inline-block}
     .brand .logo path{stroke-dasharray:150;stroke-dashoffset:150;animation:strokeDash .6s ease forwards .15s}
+    /* (8) glow periodico sul logo */
+    @keyframes logoGlow {
+      0% { filter:none; }
+      10% { filter:drop-shadow(0 0 10px rgba(255,90,0,.5)) drop-shadow(0 0 20px rgba(255,140,0,.35)); }
+      20% { filter:none; }
+      100%{ filter:none; }
+    }
+    .brand .logo{ animation: logoGlow 12s ease-in-out infinite; }
+
     .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both, titleGlow 1.2s ease .9s 1}
 
-    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+    /* Hero + (1) soft parallax glow */
+    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;position:relative}
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
+    .hero::after{
+      content:""; position:absolute; top:-30px; left:50%; width:min(900px,88vw); height:240px; transform:translateX(-50%);
+      background: radial-gradient(120px 220px at var(--hx,50%) 50%, rgba(255,120,0,.18), rgba(0,0,0,0) 70%),
+                  radial-gradient(220px 160px at calc(100% - var(--hx,50%)) 60%, rgba(255,0,0,.12), rgba(0,0,0,0) 72%);
+      filter: blur(14px);
+      pointer-events:none; z-index:0; opacity:.6; transition:opacity .3s ease;
+      animation: heroDrift 9s ease-in-out infinite alternate;
+    }
+    @keyframes heroDrift{
+      from{transform:translateX(-52%) translateY(0)}
+      to{transform:translateX(-48%) translateY(2px)}
+    }
 
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
     @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
 
-    /* Card */
+    /* Card base */
     .card{
       position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
       border:1px solid var(--stroke);border-radius:18px;padding:18px;
       box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
       display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
-      transform-style:preserve-3d
+      transform-style:preserve-3d; will-change: transform;
     }
     .card[data-anim]{opacity:0;transform:translateY(18px)}
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
-    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
+
+    /* (5) Card 3D PRO via variabili CSS */
+    .card{
+      --rx: 0deg; --ry: 0deg; --tz: 0px;
+      transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(var(--tz));
+    }
+    .card._hover{
+      --tz: 10px;
+      box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);
+      border-color:rgba(255,255,255,.18)
+    }
 
     .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
     article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
-    /* Badge via ID per le ultime card */
+
+    /* (2) Micro-spark sul badge ENERGIA CASA (3^ card) */
+    article.card:nth-of-type(3) .badge{
+      position:relative; overflow:visible;
+    }
+    @keyframes spark {
+      0% { transform:translate(-12px, -6px) scale(.9); opacity:0; }
+      8% { opacity:.9; }
+      50%{ opacity:.9; }
+      100%{ transform:translate(46px, -12px) scale(1.1); opacity:0; }
+    }
+    article.card:nth-of-type(3) .badge::after{
+      content:""; position:absolute; top:50%; left:0;
+      width:22px; height:10px; border-radius:20px;
+      background: radial-gradient(circle at 30% 50%, rgba(255,183,3,.85), rgba(255,255,255,.75) 45%, rgba(255,183,3,.0) 70%);
+      filter: blur(1px);
+      transform: translate(-12px,-50%);
+      opacity:0;
+      animation: spark 12s ease-in-out infinite;
+      animation-delay: 2.2s;
+      pointer-events:none;
+    }
+    @media (prefers-reduced-motion:reduce){
+      article.card:nth-of-type(3) .badge::after{ animation: none !important; }
+    }
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px}
@@ -158,24 +230,12 @@
     #season-card .badge{
       background:linear-gradient(90deg,#ff0000,#ff7b00);
     }
-  
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
 
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style>
+    /* Brand link style normalization */
+    .brand, .brand:visited, .brand:hover {
+      color:#ffffff !important; text-decoration:none !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -251,7 +311,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
-      <!-- BUSINESS MOBILI (ripristinata) -->
+      <!-- BUSINESS MOBILI -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
@@ -260,7 +320,7 @@
         <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
       </article>
 
-      <!-- SEZIONE STAGIONALE: BLACK FRIDAY → NATALE → FLASH -->
+      <!-- STAGIONALE -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
@@ -392,6 +452,119 @@
         $bar.href = c.barHref;
       }
     })();
+
+    /* (1) Soft parallax glow su HERO: aggiorna var --hx */
+    (function(){
+      const hero = document.querySelector('.hero');
+      if(!hero) return;
+      const mq = window.matchMedia('(pointer:fine)');
+      function move(e){
+        const r = hero.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width));
+        hero.style.setProperty('--hx', (x*100)+'%');
+      }
+      if(mq.matches){
+        window.addEventListener('mousemove', move, {passive:true});
+      }
+    })();
+
+    /* (5) Card 3D PRO: tilt in base al cursore */
+    (function(){
+      const fine = window.matchMedia('(pointer:fine)').matches;
+      if(!fine) return;
+      const MAX = 6; // gradi
+      document.querySelectorAll('.card').forEach(card=>{
+        let raf = null;
+        function onMove(e){
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left)/r.width;
+          const py = (e.clientY - r.top)/r.height;
+          const ry = (px - 0.5) * (MAX*2);
+          const rx = -(py - 0.5) * (MAX*2);
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(()=>{
+            card.style.setProperty('--rx', rx.toFixed(2)+'deg');
+            card.style.setProperty('--ry', ry.toFixed(2)+'deg');
+          });
+          card.classList.add('_hover');
+        }
+        function onLeave(){
+          card.classList.remove('_hover');
+          card.style.setProperty('--rx','0deg');
+          card.style.setProperty('--ry','0deg');
+          card.style.setProperty('--tz','0px');
+        }
+        card.addEventListener('mousemove', onMove);
+        card.addEventListener('mouseleave', onLeave);
+      });
+    })();
+
+    /* (4) Pulse mobile visivo al tap sui bottoni (senza haptic) */
+    (function(){
+      const isTouch = window.matchMedia('(pointer:coarse)').matches;
+      if(!isTouch) return;
+      const cls = 'tapPulse';
+      const style = document.createElement('style');
+      style.textContent = `
+        .${cls}{ transform:scale(.985); filter:brightness(1.02); }
+      `;
+      document.head.appendChild(style);
+      function pulse(el){
+        el.classList.add(cls);
+        setTimeout(()=>el.classList.remove(cls), 120);
+      }
+      document.addEventListener('pointerdown', (e)=>{
+        const btn = e.target.closest('.btn, .fab-btn');
+        if(btn) pulse(btn);
+      }, {passive:true});
+    })();
+
+    /* (12) Confetti PRO su click WhatsApp */
+    (function(){
+      const COLORS = ['#ff0000','#ff7b00','#ffd166','#ffffff','#a78bfa','#22c55e'];
+      function burst(x,y){
+        const N = 22;
+        for(let i=0;i<N;i++){
+          const el = document.createElement('div');
+          el.className = 'confetti-piece';
+          el.style.left = x+'px';
+          el.style.top  = y+'px';
+          el.style.background = COLORS[(Math.random()*COLORS.length)|0];
+          el.style.transform = `translate(0,0) rotate(${Math.random()*360}deg)`;
+          document.body.appendChild(el);
+
+          const ang = (Math.random()*Math.PI*2);
+          const spd = (6 + Math.random()*11);
+          const dx  = Math.cos(ang)*spd*14;
+          const dy  = Math.sin(ang)*spd*12;
+
+          requestAnimationFrame(()=>{
+            el.style.transition = 'transform .9s cubic-bezier(.15,.7,.2,1), opacity 1s ease';
+            el.style.transform = `translate(${dx}px, ${dy-50}px) rotate(${Math.random()*720-360}deg)`;
+            el.style.opacity = '0';
+          });
+          setTimeout(()=>{ el.remove(); }, 1000);
+        }
+      }
+      const style = document.createElement('style');
+      style.textContent = `
+        .confetti-piece{
+          position: fixed; width:8px; height:8px; border-radius:2px; pointer-events:none;
+          will-change: transform, opacity; z-index:9999;
+        }
+      `;
+      document.head.appendChild(style);
+
+      const SEL = 'a.btn.wa, .fab-nav a[href^="https://wa.me"], .fab-nav a[href^="https://api.whatsapp.com"]';
+      document.querySelectorAll(SEL).forEach(a=>{
+        a.addEventListener('click', ()=>{
+          try{
+            const r = a.getBoundingClientRect();
+            burst(r.left + r.width/2, r.top + r.height/2);
+          }catch(_){}
+        }, {passive:true});
+      });
+    })();
   </script>
 
   <!-- Barra in basso stagionale -->
@@ -400,24 +573,7 @@
     <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
     <span class="seasonbar__cta">Scopri ora</span>
   </a>
-  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
-
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style>
+  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
 
   <!-- FAB -->
   <div class="fab-nav" aria-label="Azioni rapide">
@@ -466,23 +622,6 @@
   </script>
 
   <!-- Noscript -->
-  <noscript><style>#rl-loader{display:none!important}
-.brand {
-  color: #ffffff !important;
-}
-.brand:visited {
-  color: #ffffff !important;
-}
-.brand:hover {
-  color: #ffffff !important;
-  opacity: .9;
-}
-
-
-.brand, .brand:visited, .brand:hover {
-  text-decoration: none !important;
-}
-
-</style></noscript>
+  <noscript><style>#rl-loader{display:none!important}</style></noscript>
 </body>
 </html>
