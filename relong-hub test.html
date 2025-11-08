@@ -35,143 +35,105 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#0a0a0a;--bg2:#000;
-      --brand1:#ff0000;--brand2:#ff7b00;--brand3:#ffd400;
+      --bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;
       --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
-      --card:rgba(20,20,20,.88);--stroke:rgba(255,255,255,.08);
-      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
-      --glow1:#ff3b1a;--glow2:#ff7b00;
+      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
+      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
     }
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-    /* Grana + reticolo tecnico + sfondo energetico */
-    body{
-      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#fff;min-height:100vh;
-      background:
-        radial-gradient(1200px 800px at 12% 10%, rgba(255,90,0,.20), transparent 60%),
-        radial-gradient(1200px 800px at 88% 0%, rgba(255,140,0,.18), transparent 60%),
-        conic-gradient(from 240deg at 50% 50%, #0b0b0b, #0a0a0a, #000 60%, #0b0b0b),
-        linear-gradient(180deg,var(--bg1),var(--bg2));
-      overflow-x:hidden;
-    }
-    /* Grana cinema */
-    body::after{
-      content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:soft-light;
-      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity="0.55"/></svg>');
-      background-size:220px 220px;
-    }
-    /* Spotlight cursore */
-    .spotlight{
-      position:fixed;inset:-20vmax;pointer-events:none;z-index:0;
-      background:radial-gradient(600px 400px at var(--mx,50%) var(--my,40%), rgba(255,150,0,.09), transparent 60%);
-      transition:opacity .25s ease;
-    }
+    :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
+    a.btn:focus-visible,.fab-btn:focus-visible{filter:brightness(1.08)}
 
     /* Loader */
-    #rl-loader{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:rgba(0,0,0,.65);backdrop-filter:blur(2px);transition:opacity .45s ease,visibility .45s ease}
+    #rl-loader{
+      position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      transition:opacity .45s ease, visibility .45s ease;
+      animation: loaderAutoHide 0s linear 3.2s forwards;
+    }
     #rl-loader.hidden{opacity:0;visibility:hidden}
     .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
-    .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.4s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
-    .rl-cube .face{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand1),var(--brand2));border:1px solid rgba(255,255,255,.12);border-radius:10px;opacity:.98}
+    .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.6s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
+    .rl-cube .face{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand1),var(--brand2));border:1px solid rgba(255,255,255,.12);border-radius:10px;opacity:.96}
     .rl-cube .f1{transform:translateZ(42px)} .rl-cube .f2{transform:rotateY(180deg) translateZ(42px)}
     .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
+    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
 
-    .wrap{position:relative;z-index:1;width:100%;max-width:980px;margin:0 auto;padding:24px;display:grid;gap:22px}
-    .head{text-align:center;padding:8px 8px 0}
-    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.035em;text-decoration:none;color:#fff}
-    .brand .logo{width:24px;height:24px}
-    .sub{font-size:12px;color:var(--muted);margin-top:6px}
-
-    /* Hero con testo a gradiente “energetico” */
-    .hero{margin-top:8px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
-    .hero h1{
-      font-size:clamp(22px,3.6vw,34px);font-weight:1000;letter-spacing:-.02em;line-height:1.06;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-      text-shadow:0 10px 60px rgba(255,120,0,.18);
+    body{
+      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
+      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow-x:hidden
     }
-    .hero p{font-size:13.5px;color:var(--muted);max-width:720px}
-    .hero .line{width:min(86%,560px);height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.38;border-radius:999px}
+    body::before{
+      content:"";position:fixed;inset:auto;left:50%;top:40%;
+      transform:translateX(-50%);width:1200px;height:1200px;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
+      filter:blur(6px);pointer-events:none;z-index:0
+    }
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
+    @media(max-width:480px){.wrap{padding-bottom:130px}}
+
+    .head{text-align:center;padding:8px 8px 0 8px}
+    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .brand .logo{width:24px;height:24px;display:inline-block}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
+
+    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+    .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
+    .hero p{font-size:13px;color:var(--muted)}
+    .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
 
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns:1fr 1fr 1fr}}
+    @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
 
-    /* Card: bordo glow dinamico + vetro + leggera inclinazione al hover */
+    /* Card */
     .card{
-      position:relative;border-radius:20px;padding:18px;isolation:isolate;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) ,
-        var(--card);
-      border:1px solid var(--stroke);
-      box-shadow:
-        0 18px 42px rgba(0,0,0,.65),
-        inset 0 0 0 1px rgba(255,255,255,.03);
-      transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
-      transform-style:preserve-3d;
-      overflow:hidden;
+      position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);border-radius:18px;padding:18px;
+      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+      display:flex;flex-direction:column;gap:10px;transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
+      transform-style:preserve-3d
     }
-    /* Bordo energia */
-    .card::before{
-      content:"";position:absolute;inset:-1px;border-radius:22px;z-index:-1;
-      background:
-        conic-gradient(from var(--gradRot,0deg), rgba(255,59,26,.55), rgba(255,123,0,.55), rgba(255,212,0,.35), rgba(255,59,26,.55));
-      filter:blur(14px);opacity:.35;transition:opacity .25s ease, transform .35s ease;
-    }
-    .card:hover{
-      transform:perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
-      box-shadow:0 36px 84px rgba(0,0,0,.85), 0 0 120px rgba(255,90,0,.18);
-      border-color:rgba(255,255,255,.16);
-    }
-    .card:hover::before{opacity:.6;transform:rotate(10deg)}
-
-    .badge{
-      position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:900;padding:7px 11px;border-radius:999px;
-      background:linear-gradient(90deg,#ff2a2a,#ff7b00,#ffd400);
-      box-shadow:0 14px 26px rgba(255,90,0,.45), inset 0 0 0 1px rgba(0,0,0,.08);
-      border:1px solid rgba(0,0,0,.05);
-      text-transform:uppercase;letter-spacing:.04em;
-    }
-    /* Accent per card specifiche */
-    #biz-mobile .badge{background:linear-gradient(90deg,#10B981,#84CC16)}
-    #season-card .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)}
-
-    .title{font-size:18px;font-weight:900;display:flex;gap:8px;align-items:center;letter-spacing:.1px}
-    .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
-    .desc{font-size:13px;color:var(--muted);line-height:1.5;margin-top:2px}
-
-    /* CTA full-width iper leggibile con riflesso */
-    .btn{
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      text-decoration:none;text-align:center;width:100%;
-      padding:14px 18px;border-radius:16px;margin-top:10px;
-      font-size:15.5px;font-weight:1000;letter-spacing:.2px;color:#000;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2));
-      box-shadow:0 20px 42px rgba(255,90,0,.38);
-      transform-style:preserve-3d;transition:transform .22s ease, box-shadow .22s ease, filter .22s ease;
-      position:relative;overflow:hidden;
-    }
-    .btn::after{
-      content:"";position:absolute;inset:-40%;background:linear-gradient(90deg,rgba(255,255,255,.0) 30%,rgba(255,255,255,.35) 50%,rgba(255,255,255,.0) 70%);
-      transform:translateX(-60%);filter:blur(10px);
-    }
-    .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg);box-shadow:0 32px 64px rgba(255,90,0,.55);filter:brightness(1.05)}
-    .btn:hover::after{animation:shine .9s ease}
-    @keyframes shine{to{transform:translateX(120%)}}
-
-    /* On-scroll */
     .card[data-anim]{opacity:0;transform:translateY(18px)}
-    .card.in{opacity:1;transform:none;transition:opacity .6s ease, transform .6s ease}
+    .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
+    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    /* Footer */
-    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:6px}
+    .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
+    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
+    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
+    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
+    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+
+    .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
+    .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
+    .desc{font-size:13px;color:var(--muted);line-height:1.45}
+
+    /* CTA principale */
+    .btn{
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none; text-align:center;
+      width:100%; padding:14px 18px; border-radius:16px;
+      font-size:15.5px; font-weight:900; letter-spacing:.2px; color:#000;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      box-shadow:0 18px 36px rgba(255,90,0,.38);
+      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+      transform-style:preserve-3d;
+    }
+    .btn:hover{ transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg); box-shadow:0 28px 54px rgba(255,90,0,.55); filter:brightness(1.05) }
+
+    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
     /* FAB & Torna su */
     .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
-    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d}
+    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
     .fab-btn svg{width:18px;height:18px}
     @media(max-width:420px){.fab-btn span{display:none}}
@@ -182,30 +144,69 @@
 
     .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
 
-    /* Barra stagionale */
+    /* Bottom Seasonal Bar */
     .seasonbar{
-      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;
-      background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px)
+      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px)
     }
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    /* Offset con barra */
     body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
     body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
 
-    /* Accessibilità focus */
-    :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:12px}
-
-    @media (prefers-reduced-motion:reduce){
-      .card:hover,.btn:hover{transform:none}
-      .btn:hover::after{animation:none}
+    /* Badge forzati via ID */
+    #biz-mobile .badge{
+      background:linear-gradient(90deg,#10B981,#84CC16);
+      box-shadow:0 10px 18px rgba(16,185,129,.35);
     }
+    #season-card .badge{
+      background:linear-gradient(90deg,#ff0000,#ff7b00); /* default BF/Flash */
+    }
+    /* Mini-badge evidenza dinamico sulla card Black Friday */
+    #season-card .highlight{
+      position:absolute; top:-11px; right:14px;
+      background:linear-gradient(90deg,#ff5a1a,#ffbe0b);
+      color:#000; font-size:11px; font-weight:900; letter-spacing:.02em;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 10px 18px rgba(255,90,0,.45);
+      animation:pulse 2.4s ease-in-out infinite;
+      white-space:nowrap;
+    }
+
+    /* ——— Natale ——— */
+    /* Gradiente badge rosso→verde e bottone stagionale rosso→verde quando attivo il tema Natale */
+    body.theme-xmas #season-card .badge{ background:linear-gradient(90deg,#ff2a2a,#1db954); }
+    body.theme-xmas #season-card .btn{ background:linear-gradient(90deg,#ff2a2a,#1db954) !important; }
+    /* Icona Babbo Natale che “sbuca” */
+    #season-card .santa{
+      position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
+      transform-origin:bottom right; transform:rotate(10deg);
+      opacity:0; pointer-events:none;
+    }
+    body.theme-xmas #season-card .santa{
+      opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite;
+    }
+    @keyframes santaPop{0%{transform:translateY(-12px) rotate(18deg);opacity:0}100%{transform:translateY(0) rotate(10deg);opacity:1}}
+    @keyframes santaBob{0%,100%{transform:translateY(0) rotate(10deg)}50%{transform:translateY(3px) rotate(8deg)}}
+
+    /* Neve leggera (CSS only, ultra light) visibile solo a Natale */
+    .snow{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;display:none}
+    body.theme-xmas .snow{display:block}
+    .snow i{
+      position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6));
+      border-radius:50%; opacity:.9; filter:blur(.2px);
+      animation:fall linear infinite;
+    }
+    @keyframes fall{
+      to{ transform:translateY(105vh); opacity:.92; }
+    }
+
+    /* brand link sempre bianco */
+    .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
   </style>
 </head>
 <body>
-  <!-- Spotlight mouse -->
-  <div class="spotlight" aria-hidden="true"></div>
 
   <!-- Loader -->
   <div id="rl-loader" aria-label="Caricamento in corso" role="status">
@@ -223,13 +224,7 @@
       }
       if(document.readyState!=='loading'){ hideNow(); }
       window.addEventListener('load', hideNow, {once:true});
-      setTimeout(hideNow, 2200);
-    })();
-    // Spotlight follow
-    (function(){
-      const s = document.querySelector('.spotlight');
-      const set = (e)=>{ s.style.setProperty('--mx', e.clientX+'px'); s.style.setProperty('--my', e.clientY+'px'); };
-      window.addEventListener('pointermove', set, {passive:true});
+      setTimeout(hideNow, 3200);
     })();
   </script>
 
@@ -252,6 +247,7 @@
     </header>
 
     <section class="grid" aria-label="Collegamenti rapidi Re Long">
+      <!-- 1 -->
       <article class="card" data-anim>
         <div class="badge">SMARTPHONE A RATE</div>
         <div class="title"><span class="ico">📱</span><span>Scegli il tuo Smartphone</span></div>
@@ -259,6 +255,7 @@
         <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
       </article>
 
+      <!-- 2 -->
       <article class="card" data-anim>
         <div class="badge">AZIENDE & P.IVA FULL PACK</div>
         <div class="title"><span class="ico">🧾</span><span>Fisso + Mobile con Energia per P.IVA</span></div>
@@ -266,6 +263,7 @@
         <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
       </article>
 
+      <!-- 3 -->
       <article class="card" data-anim>
         <div class="badge">ENERGIA CASA</div>
         <div class="title"><span class="ico">⚡</span><span>Accendi la tua Energia</span></div>
@@ -273,6 +271,7 @@
         <a class="btn" href="./index.html">Vai all’Area Energia</a>
       </article>
 
+      <!-- 4 -->
       <article class="card" data-anim>
         <div class="badge">ASSISTENZA PC</div>
         <div class="title"><span class="ico">🧰</span><span>Riparazioni & Upgrade</span></div>
@@ -280,18 +279,22 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
+      <!-- 5 — SEASON CARD con badge dinamico, bottone stagionale e santa -->
+      <article class="card" data-anim id="season-card">
+        <div class="badge" id="season-badge">BLACK FRIDAY</div>
+        <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
+        <div class="santa" id="santa" aria-hidden="true">🎅</div>
+        <div class="title"><span class="ico" id="season-ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
+        <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
+        <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
+      </article>
+
+      <!-- 6 — BUSINESS MOBILI -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
         <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
         <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
-      </article>
-
-      <article class="card" data-anim id="season-card">
-        <div class="badge" id="season-badge">BLACK FRIDAY</div>
-        <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
-        <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
-        <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
       </article>
     </section>
 
@@ -302,12 +305,15 @@
     </p>
   </main>
 
+  <!-- Neve (elementi creati via JS) -->
+  <div class="snow" id="snow"></div>
+
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script>
     const HOME_PAGE = './relong-hub-v2.html';
 
-    // Bottone Torna su
+    /* to-top */
     (function(){
       const toTop = document.createElement('div');
       toTop.className = 'to-top';
@@ -323,7 +329,7 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
-    // Navigazione interna con fallback
+    /* Navigazione interna sicura + fallback alla Home */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
@@ -346,11 +352,15 @@
 
     // Normalizza link root
     document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
-      document.querySelectorAll('a[rel~="home"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
+      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
+      document.querySelectorAll('a[rel~="home"]').forEach(a=>{
+        a.setAttribute('href', HOME_PAGE);
+      });
     });
 
-    // Animazioni on-scroll
+    /* Animazioni on-scroll */
     (function(){
       const obs = new IntersectionObserver((entries)=>{
         entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
@@ -358,7 +368,25 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    // Switch stagionale
+    /* Utility neve leggera */
+    function buildSnow(container){
+      if(!container) return;
+      const flakes = 18; // numero moderato, leggerissimo
+      const frag = document.createDocumentFragment();
+      for(let i=0;i<flakes;i++){
+        const f = document.createElement('i');
+        const size = (Math.random()*5)+3; // 3-8px
+        f.style.width = f.style.height = size + 'px';
+        f.style.left = Math.floor(Math.random()*100) + 'vw';
+        f.style.animationDuration = (5 + Math.random()*7) + 's';
+        f.style.animationDelay = (Math.random()*3) + 's';
+        f.style.opacity = (0.65 + Math.random()*0.35).toFixed(2);
+        frag.appendChild(f);
+      }
+      container.innerHTML=''; container.appendChild(frag);
+    }
+
+    /* Switch stagionale + mini-badge dinamico + tema Natale */
     (function(){
       const now = new Date();
       const m = now.getMonth()+1, d = now.getDate();
@@ -367,21 +395,96 @@
       if (m === 1) season = "flash";
 
       const copy = {
-        blackfriday:{badge:"BLACK FRIDAY",title:"Black Friday ReLong",desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",btn:"Vai alle Offerte Black Friday",href:"./black-friday.html",bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",barHref:"./black-friday.html"},
-        christmas:{badge:"NATALE",title:"Christmas Promo 🎄",desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",btn:"Scopri le Offerte di Natale",href:"./black-friday.html?season=christmas",bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",barHref:"./black-friday.html?season=christmas"},
-        flash:{badge:"FLASH",title:"Offerte Flash ⚡",desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",btn:"Vedi le Offerte Flash",href:"./black-friday.html?season=flash",bar:"<b>Offerte Flash ⚡</b> — sconti lampo",barHref:"./black-friday.html?season=flash"}
+        blackfriday:{
+          badge:"BLACK FRIDAY",
+          title:"Black Friday ReLong",
+          desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",
+          btn:"Vai alle Offerte Black Friday",
+          href:"./black-friday.html",
+          bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",
+          barHref:"./black-friday.html",
+          highlight:"🔥 IN EVIDENZA",
+          icon:"⚡",
+          themeClass:"theme-bf",
+          btnGradient:null /* usa default rosso→arancio */
+        },
+        christmas:{
+          badge:"NATALE",
+          title:"Christmas Promo 🎄",
+          desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",
+          btn:"Scopri le Offerte di Natale",
+          href:"./black-friday.html?season=christmas",
+          bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",
+          barHref:"./black-friday.html?season=christmas",
+          highlight:"🎄🎅 IN EVIDENZA",
+          icon:"🎄",
+          themeClass:"theme-xmas",
+          btnGradient:"linear-gradient(90deg,#ff2a2a,#1db954)" /* rosso→verde */
+        },
+        flash:{
+          badge:"FLASH",
+          title:"Offerte Flash ⚡",
+          desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",
+          btn:"Vedi le Offerte Flash",
+          href:"./black-friday.html?season=flash",
+          bar:"<b>Offerte Flash ⚡</b> — sconti lampo",
+          barHref:"./black-friday.html?season=flash",
+          highlight:"🔥 IN EVIDENZA",
+          icon:"⚡",
+          themeClass:"theme-flash",
+          btnGradient:null
+        }
       };
 
       const c = copy[season];
+
+      // Applica testi
       document.getElementById('season-badge').textContent = c.badge;
       document.getElementById('season-title').textContent = c.title;
       document.getElementById('season-desc').textContent  = c.desc;
       const link = document.getElementById('season-link');
       link.textContent = c.btn; link.href = c.href; link.setAttribute('aria-label', c.btn);
+      document.getElementById('season-highlight').textContent = c.highlight;
+      const ico = document.getElementById('season-ico'); if(ico) ico.textContent = c.icon;
 
+      // Barra stagionale
       const bar = document.getElementById('seasonBar');
       const textEl = bar.querySelector('.seasonbar__text');
       textEl.innerHTML = c.bar; bar.href = c.barHref;
+
+      // Temi body (per Natale abilita snow e santa)
+      document.body.classList.remove('theme-bf','theme-xmas','theme-flash');
+      document.body.classList.add(c.themeClass);
+
+      // Bottone stagionale rosso→verde a Natale
+      if(c.btnGradient){
+        link.style.background = c.btnGradient;
+      } else {
+        link.style.background = ''; // default CSS
+      }
+
+      // Neve e Babbo Natale
+      const snow = document.getElementById('snow');
+      const santa = document.getElementById('santa');
+      if(c.themeClass === 'theme-xmas'){
+        buildSnow(snow);
+        if(santa) santa.style.display = 'block';
+      }else{
+        if(snow) snow.innerHTML = '';
+        if(santa) santa.style.display = 'none';
+      }
+    })();
+
+    /* Attiva offset quando la barra è presente */
+    (function(){
+      const bar = document.getElementById('seasonBar');
+      if(!bar) return;
+      document.body.classList.add('has-seasonbar');
+      const obs = new IntersectionObserver((entries)=>{
+        const show = entries[0].isIntersecting;
+        document.body.classList.toggle('has-seasonbar', show);
+      }, {threshold: 0});
+      obs.observe(bar);
     })();
   </script>
 
@@ -404,20 +507,6 @@
       <span>Chiamaci</span>
     </a>
   </div>
-
-  <!-- Offset per barra -->
-  <script>
-    (function(){
-      const bar = document.getElementById('seasonBar');
-      if(!bar) return;
-      document.body.classList.add('has-seasonbar');
-      const obs = new IntersectionObserver((entries)=>{
-        const show = entries[0].isIntersecting;
-        document.body.classList.toggle('has-seasonbar', show);
-      }, {threshold: 0});
-      obs.observe(bar);
-    })();
-  </script>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
