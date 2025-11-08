@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long | Assistenza PC</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000;
+      --brand1:#ff0000; --brand2:#ff7b00;
+      --muted:rgba(255,255,255,.8);
+      --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
+      --wa1:#25D366; --wa2:#128C7E;
+      --focus:#ffd166;
+    }
+    html, body { height:100%; }
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap{ width:100%; display:flex; justify-content:center; }
+    /* Use fluid width and clamp() to avoid tiny content on mobile */
+    .card{
+      width:min(92vw, 560px);
+      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);
+      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
+      box-shadow:0 30px 60px rgba(0,0,0,.9);
+      position:relative;
+    }
+    .badge{
+      position:absolute; top:-12px; left:16px;
+      background:linear-gradient(90deg,var(--brand1) 0%, var(--brand2) 100%);
+      color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
+      box-shadow:0 12px 22px rgba(255,80,0,.42);
+    }
+    h1{ font-size:clamp(22px, 3.8vw, 28px); letter-spacing:-.03em; margin-bottom:8px }
+    p{ opacity:.9; line-height:1.5; font-size:clamp(14px, 2.5vw, 16px) }
+    .info{
+      margin:clamp(14px, 2.5vw, 18px) 0;
+      padding:clamp(12px, 2.2vw, 16px);
+      border-radius:16px; border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.03);
+    }
+    .row{ display:flex; gap:10px; margin:8px 0; font-size:clamp(14px, 2.5vw, 16px) }
+    .cta{
+      display:block; text-align:center; margin-top:clamp(10px,2vw,14px);
+      padding:clamp(12px, 2.2vw, 14px);
+      border-radius:14px;
+      background:radial-gradient(circle at 0% 0%, var(--wa1) 0%, var(--wa2) 60%);
+      color:#000; font-weight:900; text-decoration:none;
+      box-shadow:0 18px 30px rgba(18,140,126,.45);
+      font-size:clamp(14px, 2.6vw, 16px);
+      outline:none;
+    }
+    .cta:focus-visible{ outline:2px solid var(--focus); outline-offset:3px }
+    .small{ font-size:clamp(11px, 2.2vw, 12px); opacity:.6; margin-top:10px; text-align:center }
+    /* Prevent iOS auto-zoom on tap by keeping font-size >= 16px on interactive elements */
+    input, select, textarea { font-size:16px }
+    @media (min-width:1100px){
+      .card{ width:560px }
+    }
+    @supports (font-size: clamp(1px, 1vw, 100px)) {
+      /* already using clamp */
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" aria-label="Assistenza PC Re Long">
+    <section class="card">
+      <div class="badge">ASSISTENZA TECNICA PC</div>
+      <h1>Non cambiarlo, Potenzialo 💻</h1>
+      <p>Da Re Long il tuo PC torna veloce, silenzioso e affidabile, diagnosi immediata e upgrade su misura.</p>
+      <div class="info" role="list">
+        <div class="row" role="listitem">🧪 Diagnosi lentezza / virus / surriscaldamento</div>
+        <div class="row" role="listitem">🚀 Assemblaggio PC gaming &amp; Upgrade</div>
+        <div class="row" role="listitem">🧼 Assistenza Hardware &amp; Software</div>
+      </div>
+      <a class="cta" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20il%20mio%20PC%20ha%20un%20problema.%20Posso%20inviarvi%20foto%20o%20video%20per%20un%20parere%3F" aria-label="Chatta con l’assistenza tecnica su WhatsApp">
+        💬 Chatta con l’assistenza tecnica
+      </a>
+      <div class="small">Supporto reale in sede. Re Long Informatica — Marano di Napoli.</div>
+    </section>
+  </main>
+</body>
+</html>
