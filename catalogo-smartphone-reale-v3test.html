@@ -1,11 +1,13 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <title>Re Long | Catalogo Pro (Sicuro • Fallback Immagini)</title>
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{--bg1:#0a0a0a;--bg2:#000;--card:rgba(25,25,25,.92);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--muted:rgba(255,255,255,.7);--brand1:#ff0000;--brand2:#ff7b00}
@@ -32,7 +34,7 @@
     .tag.stock{background:linear-gradient(90deg,#aaff00,#27ae60)}
     .tag.hot{background:linear-gradient(90deg,#ffd500,#ff7b00);color:#000}
     .simulatore{margin-top:12px;padding:12px;border:1px solid var(--stroke);border-radius:24px;background:rgba(255,255,255,.05)}
-    .sim-label{font-size:14px;color:var(--muted)}
+    .sim-label{font-size:14px;color:#ffd166cc}
     .sim-select{width:100%;margin-top:6px;padding:10px;border-radius:12px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
     .sim-output{margin-top:8px;font-size:15px;font-weight:700;color:#ffd166}
     .note-colori{color:#ffd166;font-size:12px;margin-top:4px;opacity:.9}
@@ -43,6 +45,7 @@
     .err{white-space:pre-wrap;background:#300;color:#fff;border:1px solid #933;padding:12px;border-radius:12px;margin-bottom:12px}
   </style>
 </head>
+
 <body>
   <main class="wrap" id="app">
     <div class="head">
@@ -59,7 +62,9 @@
   <script>
   (function(){
     try{
+      // WhatsApp: numero ufficiale Re Long (Italia) -> 08119578844
       var WA = "3908119578844";
+
       var prodotti = [
         {brand:"Apple", nome:"Apple iPhone 17 Pro 256GB",    prezzo:1489.0, img:"imgcatalogo/apple-iphone-17-pro-256gb.webp",     tags:["Novità"]},
         {brand:"Apple", nome:"Apple iPhone 17 256GB",        prezzo:1110.0, img:"imgcatalogo/apple-iphone-17-256gb.webp",         tags:["Novità"]},
@@ -99,7 +104,6 @@
         img.setAttribute('data-idx', tried+1);
         img.src = IMG_FOLDERS[f] + base + "." + IMG_EXTS[e];
       }
-
       function onImgError(){ tryNextSrc(this); }
       function onImgLoad(){ var w=this.parentNode; if(w && w.classList) w.classList.remove('skel'); }
 
@@ -170,9 +174,8 @@
             var out = this.parentNode.querySelector('.sim-output');
             if(!mesi){ out.textContent = 'Rata mensile: —'; return; }
             var priceEl = this.closest('.card').querySelector('.price');
-            var price = 0;
             var txt = priceEl.textContent.replace(/[^0-9,\.]/g,'').replace('.','').replace(',','.');
-            price = parseFloat(txt);
+            var price = parseFloat(txt);
             if(isNaN(price)){ out.textContent = 'Rata mensile: —'; return; }
             out.textContent = 'Rata mensile: ' + fmt(price/mesi);
           });
@@ -188,6 +191,49 @@
         grid.innerHTML = html;
         attachBehaviors(document);
       }
+
+      // === Invio simulazione via WhatsApp (event delegation) ===
+      document.getElementById('grid').addEventListener('click', function(e){
+        var btn = e.target.closest('.btn.secondary');
+        if(!btn) return;
+
+        var card   = btn.closest('.card');
+        var model  = card.querySelector('.model') ? card.querySelector('.model').textContent.trim() : '';
+        var priceEl= card.querySelector('.price');
+        var select = card.querySelector('.sim-select');
+        var mesi   = parseInt(select && select.value ? select.value : "0", 10);
+
+        if(!mesi){
+          select.focus();
+          select.style.outline = '2px solid #ff7b00';
+          setTimeout(function(){ select.style.outline=''; }, 900);
+          alert('Seleziona la durata (mesi) per inviare la simulazione su WhatsApp.');
+          return;
+        }
+
+        // parse prezzo numerico (formato it-IT)
+        var txt   = priceEl.textContent.replace(/[^0-9,\.]/g,'').replace('.','').replace(',','.');
+        var price = parseFloat(txt);
+        if (isNaN(price)) price = 0;
+        var rata  = price / mesi;
+
+        // formattazione valuta
+        var format = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format;
+
+        // messaggio precompilato
+        var msg =
+          "Ciao Re Long 👋%0A" +
+          "Vorrei la simulazione per questo smartphone:%0A" +
+          "• Modello: " + encodeURIComponent(model) + "%0A" +
+          "• Prezzo: " + encodeURIComponent(format(price)) + "%0A" +
+          "• Durata: " + mesi + " mesi%0A" +
+          "• Rata stimata: " + encodeURIComponent(format(rata)) + "%0A%0A" +
+          "Inclusi: Assicurazione Kasko + Accessori.%0A" +
+          "Mi confermi disponibilità?";
+
+        var url = "https://wa.me/" + WA + "?text=" + msg;
+        window.open(url, "_blank", "noopener");
+      });
 
       buildFilters();
       render("Tutti");
