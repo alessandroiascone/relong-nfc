@@ -13,7 +13,6 @@
       --stroke:rgba(255,255,255,.09);
       --muted:rgba(255,255,255,.68);
       --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
-      --cta:#ffb300;
       --win1:#ff2d2d; --win2:#ff6a00;
     }
     body{
@@ -53,24 +52,22 @@
       background:#101010; color:#fff; border:1px solid var(--stroke);
     }
 
-    /* Banner messaggi */
+    /* Banner */
     .banner{
       display:none; margin-top:14px; margin-bottom:8px;
       padding:14px; border-radius:14px; font-weight:800;
       text-shadow:0 1px 0 rgba(0,0,0,.4);
+      background:linear-gradient(90deg,var(--win1),var(--win2));
     }
     .banner.show{display:block}
-    .banner.cta{background:linear-gradient(90deg,var(--cta),#ff7b00)}
-    .banner.win{background:linear-gradient(90deg,var(--win1),var(--win2))}
 
-    /* Price tag */
+    /* Prezzo */
     .price{
       display:none; margin-top:10px;
-      align-self:flex-start;
       padding:10px 14px; border-radius:14px; font-weight:900; font-size:18px;
       border:1px solid rgba(255,255,255,.14);
       background:linear-gradient(90deg,#ffd400,#ff7b00);
-      color:#0a0a0a; box-shadow:0 8px 18px rgba(255,150,0,.25);
+      color:#000; box-shadow:0 8px 18px rgba(255,150,0,.25);
       width:max-content;
     }
     .price.show{display:inline-block}
@@ -109,46 +106,30 @@
       background:radial-gradient(circle, rgba(255,255,220,.35) 0%, rgba(255,220,120,.18) 40%, transparent 70%);
       filter:blur(3px); opacity:.8; z-index:-1;
     }
-    /* Raggi dinamici */
-    .rays{
-      position:absolute; width:340px; height:340px; border-radius:50%;
-      background:
-        conic-gradient(from 0deg,
-          rgba(255,210,80,.0) 0deg, rgba(255,210,80,.35) 6deg, rgba(255,210,80,.0) 12deg,
-          rgba(255,210,80,.0) 30deg, rgba(255,210,80,.28) 36deg, rgba(255,210,80,.0) 42deg,
-          rgba(255,210,80,.0) 60deg, rgba(255,210,80,.22) 66deg, rgba(255,210,80,.0) 72deg,
-          rgba(255,210,80,.0) 90deg, rgba(255,210,80,.30) 96deg, rgba(255,210,80,.0) 102deg,
-          rgba(255,210,80,.0) 120deg, rgba(255,210,80,.28) 126deg, rgba(255,210,80,.0) 132deg,
-          rgba(255,210,80,.0) 150deg, rgba(255,210,80,.22) 156deg, rgba(255,210,80,.0) 162deg,
-          rgba(255,210,80,.0) 180deg, rgba(255,210,80,.30) 186deg, rgba(255,210,80,.0) 192deg,
-          rgba(255,210,80,.0) 210deg, rgba(255,210,80,.28) 216deg, rgba(255,210,80,.0) 222deg,
-          rgba(255,210,80,.0) 240deg, rgba(255,210,80,.22) 246deg, rgba(255,210,80,.0) 252deg,
-          rgba(255,210,80,.0) 270deg, rgba(255,210,80,.30) 276deg, rgba(255,210,80,.0) 282deg,
-          rgba(255,210,80,.0) 300deg, rgba(255,210,80,.28) 306deg, rgba(255,210,80,.0) 312deg,
-          rgba(255,210,80,.0) 330deg, rgba(255,210,80,.22) 336deg, rgba(255,210,80,.0) 342deg
-        );
-      filter:blur(10px);
-      opacity:0; transform:scale(.9);
-      transition:opacity .35s ease, transform .35s ease;
-      pointer-events:none;
-    }
-    .lamp3d.on .rays{opacity:.9; transform:scale(1); animation:spin 14s linear infinite}
 
-    /* micro-movimento/pulse */
-    .lamp3d.on .bulb{animation:pulse 2.8s ease-in-out infinite}
+    /* CLICK GLOW EFFECT — leggero (A) */
+    .bulb.flash{
+      animation:flashGlow .35s ease-out;
+    }
+    @keyframes flashGlow{
+      0%{
+        box-shadow:0 0 22px rgba(255,200,0,.65), 0 0 44px rgba(255,190,0,.30);
+        transform:scale(1.00);
+      }
+      50%{
+        box-shadow:0 0 38px rgba(255,210,0,.85), 0 0 72px rgba(255,200,0,.45);
+        transform:scale(1.04);
+      }
+      100%{
+        box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22);
+        transform:scale(1.00);
+      }
+    }
 
     @keyframes haloSoft{
       0%{transform:scale(.98);opacity:.92}
       50%{transform:scale(1.03);opacity:1}
       100%{transform:scale(.98);opacity:.92}
-    }
-    @keyframes spin{
-      0%{transform:rotate(0deg)}
-      100%{transform:rotate(360deg)}
-    }
-    @keyframes pulse{
-      0%,100%{transform:scale(1)}
-      50%{transform:scale(1.03)}
     }
 
     /* Bottoni */
@@ -159,8 +140,6 @@
       background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
       color:#000; box-shadow:0 8px 20px rgba(255,150,0,.35);
     }
-    .btn.secondary{background:#161616; color:#fff; border:1px solid var(--stroke)}
-    .pill{padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); font-size:12px; background:rgba(255,255,255,.04)}
   </style>
 </head>
 <body>
@@ -187,7 +166,6 @@
       <div class="row" style="margin-top:10px">
         <div>
           <label>Vodafone Business (Energia)</label>
-          <!-- visibile, preselezionata e bloccata -->
           <select id="selEnergia" disabled>
             <option value="si" selected>Sì (inclusa per ottenere lo sconto)</option>
           </select>
@@ -197,16 +175,13 @@
       <div id="price" class="price"></div>
       <div id="banner" class="banner"></div>
 
-      <!-- Lampadina 3D centrata, senza testi laterali -->
+      <!-- Lampadina 3D centrata -->
       <div id="lampBox" class="lamp3d" aria-live="polite">
-        <div id="rays" class="rays" aria-hidden="true"></div>
         <div id="bulb" class="bulb off" role="img" aria-label="Lampadina"></div>
       </div>
 
       <div class="btns">
-        <button class="btn secondary" id="btnCopy">Copia simulazione</button>
         <a class="btn" id="btnWA" target="_blank" rel="noopener">Invia su WhatsApp</a>
-        <span class="pill">WhatsApp: 08119578844</span>
       </div>
     </section>
   </main>
@@ -219,13 +194,12 @@
       const price  = document.getElementById('price');
       const banner = document.getElementById('banner');
 
-      const lampBox= document.getElementById('lampBox');
       const bulb   = document.getElementById('bulb');
-
-      const btnCopy= document.getElementById('btnCopy');
       const btnWA  = document.getElementById('btnWA');
 
-      const WA_NUMBER = "3908119578844"; // +39 08119578844
+      const WA_NUMBER = "3908119578844";
+
+      let wasOn = false; // per applicare il flash solo nei passaggi OFF -> ON
 
       function setPrice(text){
         if(text){
@@ -237,70 +211,72 @@
         }
       }
 
-      function setBanner(type, html){
-        banner.classList.remove('show','cta','win');
-        if(!html){ banner.innerHTML=''; return; }
-        banner.classList.add('show', type);
+      function setBanner(html){
+        if(!html){
+          banner.classList.remove('show');
+          banner.innerHTML='';
+          return;
+        }
+        banner.classList.add('show');
         banner.innerHTML = html;
       }
 
       function setLamp(on){
+        const goingOn = on && !wasOn;
         bulb.classList.toggle('off', !on);
         bulb.classList.toggle('glow', on);
-        lampBox.classList.toggle('on', on);
+
+        // Flash leggero solo quando passa da OFF a ON
+        if (goingOn) {
+          bulb.classList.remove('flash'); // reset eventuale
+          // Reflow per riavviare animazione se ri-selezionano
+          // eslint-disable-next-line no-unused-expressions
+          void bulb.offsetWidth;
+          bulb.classList.add('flash');
+          setTimeout(()=>bulb.classList.remove('flash'), 360);
+        }
+
+        wasOn = on;
       }
 
       function compute(){
-        const m = selMobile.value;   // 'si' | 'no'
-        const f = selFisso.value;    // 'si' | 'no'
-        const e = 'si';              // energia sempre inclusa
+        const m = selMobile.value;
+        const f = selFisso.value;
 
-        // reset
         setPrice('');
-        setBanner('', '');
+        setBanner('');
         setLamp(false);
 
-        // Regole con Energia inclusa
-        if (m === 'si' && f === 'no') {
+        if (m==='si' && f==='no') {
           setPrice('€15/mese');
-          setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
           setLamp(true);
-        } else if (f === 'si' && m === 'no') {
+        } 
+        else if (f==='si' && m==='no') {
           setPrice('€28/mese');
-          setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
           setLamp(true);
-        } else if (f === 'si' && m === 'si') {
+        }
+        else if (f==='si' && m==='si') {
           setPrice('€30/mese');
-          setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te un super sconto di <u>€260/anno</u>.');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Super sconto di <u>€260/anno</u>.');
           setLamp(true);
         }
 
-        // Messaggio WhatsApp (non visibile)
         const msg =
 `Simulazione Re Long
 Mobile: ${m}
 Fisso: ${f}
-Energia: ${e}
+Energia: si
 Prezzo: ${price.textContent || '-'}
 Banner: ${banner.textContent || '-'}`;
 
         btnWA.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
+
         return msg;
       }
 
       [selMobile, selFisso].forEach(el => el.addEventListener('change', compute));
-
-      btnCopy.addEventListener('click', async()=> {
-        const msg = compute();
-        try{
-          await navigator.clipboard.writeText(msg);
-          btnCopy.textContent="Copiato ✔";
-          setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
-        }catch(_){
-          btnCopy.textContent="Errore copia";
-          setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
-        }
-      });
 
       // init
       compute();
