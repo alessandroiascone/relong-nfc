@@ -42,9 +42,6 @@
     }
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-    @keyframes titleGlow{0%{text-shadow:none;opacity:.85}60%{text-shadow:0 0 18px rgba(255,122,0,.35),0 0 34px rgba(255,80,0,.18);opacity:1}100%{text-shadow:none;opacity:1}}
-    @keyframes strokeDash {from{stroke-dashoffset:150;opacity:.8} to{stroke-dashoffset:0;opacity:1}}
-    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
     :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
@@ -65,6 +62,7 @@
     .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
     .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
     @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
+    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
 
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
@@ -83,8 +81,7 @@
     .head{text-align:center;padding:8px 8px 0 8px}
     .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
     .brand .logo{width:24px;height:24px;display:inline-block}
-    .brand .logo path{stroke-dasharray:150;stroke-dashoffset:150;animation:strokeDash .6s ease forwards .15s}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both, titleGlow 1.2s ease .9s 1}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
 
     .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
@@ -117,9 +114,27 @@
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
-    .btn{display:block;text-decoration:none;text-align:center;padding:12px 14px;border-radius:14px;font-size:14px;font-weight:800;color:#000;background:linear-gradient(90deg,#ff0000,#ff7b00);box-shadow:0 16px 26px rgba(255,90,0,.35);transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;transform-style:preserve-3d}
-    .btn:hover{transform:perspective(700px) translateZ(12px) scale(1.06) rotateX(2deg);box-shadow:0 28px 44px rgba(255,90,0,.5);filter:brightness(1.05)}
-    .btn.wa{background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));box-shadow:0 18px 30px rgba(18,140,126,.45)}
+
+    /* ===== CTA PRINCIPALE ALLARGATA (FORMAT GENERALE) ===== */
+    .btn{
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none; text-align:center;
+      width:100%;                       /* larghezza piena */
+      padding:14px 18px;                /* più alta */
+      border-radius:16px;               /* più morbida */
+      font-size:15.5px; font-weight:900;
+      letter-spacing:.2px;
+      color:#000;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      box-shadow:0 18px 36px rgba(255,90,0,.38); /* ombra più forte */
+      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+      transform-style:preserve-3d;
+    }
+    .btn:hover{
+      transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg);
+      box-shadow:0 28px 54px rgba(255,90,0,.55);
+      filter:brightness(1.05);
+    }
 
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
@@ -208,7 +223,6 @@
         <div class="title"><span class="ico">📱</span><span>Scegli il tuo Smartphone</span></div>
         <p class="desc">Finanziamento Vodafone & Compass senza busta paga con rate flessibili.</p>
         <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Scrivici su WhatsApp</a>
       </article>
 
       <article class="card" data-anim>
@@ -216,16 +230,14 @@
         <div class="title"><span class="ico">🧾</span><span>Fisso + Mobile con Energia per P.IVA</span></div>
         <p class="desc">Soluzioni per Partite IVA e Aziende.</p>
         <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un consulente Business</a>
       </article>
 
-      <!-- ENERGIA CASA (allineata come le altre) -->
+      <!-- ENERGIA CASA -->
       <article class="card" data-anim>
         <div class="badge">ENERGIA CASA</div>
         <div class="title"><span class="ico">⚡</span><span>Accendi la tua Energia</span></div>
         <p class="desc">Invia la foto della tua bolletta per una verifica immediata.</p>
         <a class="btn" href="./index.html">Vai all’Area Energia</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Inviaci la tua Bolletta</a>
       </article>
 
       <article class="card" data-anim>
@@ -233,7 +245,6 @@
         <div class="title"><span class="ico">🧰</span><span>Riparazioni & Upgrade</span></div>
         <p class="desc">Diagnosi immediata e upgrade su misura.</p>
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con l'assistenza Tecnica</a>
       </article>
 
       <!-- BUSINESS MOBILI -->
@@ -242,7 +253,6 @@
         <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
         <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
         <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
-        <a class="btn wa" href="https://wa.me/3908119578844">Chatta con un Consulente Business</a>
       </article>
 
       <!-- SEZIONE STAGIONALE -->
@@ -251,7 +261,6 @@
         <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
         <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
         <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
-        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long!%20Ho%20visto%20le%20offerte%20Black%20Friday%20e%20vorrei%20bloccarne%20una.">Blocca ora su WhatsApp</a>
       </article>
     </section>
 
@@ -283,7 +292,7 @@
       t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
     }
 
-    /* Navigazione interna sicura + fallback sempre alla Home dell’hub */
+    /* Navigazione interna sicura + fallback alla Home */
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
@@ -304,7 +313,7 @@
       }
     }, false);
 
-    // Normalizza link root per puntare sempre alla home dell’hub
+    // Normalizza link root
     document.addEventListener('DOMContentLoaded', ()=>{
       document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>{
         a.setAttribute('href', HOME_PAGE);
@@ -322,7 +331,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Switch automatico testo card + barra stagionale */
+    /* Switch stagionale */
     (function(){
       const now = new Date();
       const m = now.getMonth()+1, d = now.getDate();
@@ -361,20 +370,15 @@
       };
 
       const c = copy[season];
-      const $badge = document.getElementById('season-badge');
-      const $title = document.getElementById('season-title');
-      const $desc  = document.getElementById('season-desc');
-      const $link  = document.getElementById('season-link');
-      const $bar   = document.getElementById('seasonBar');
-      if($badge) $badge.textContent = c.badge;
-      if($title) $title.textContent = c.title;
-      if($desc)  $desc.textContent  = c.desc;
-      if($link){ $link.textContent = c.btn; $link.href = c.href; $link.setAttribute('aria-label', c.btn); }
-      if($bar){
-        const textEl = $bar.querySelector('.seasonbar__text');
-        if(textEl) textEl.innerHTML = c.bar;
-        $bar.href = c.barHref;
-      }
+      document.getElementById('season-badge').textContent = c.badge;
+      document.getElementById('season-title').textContent = c.title;
+      document.getElementById('season-desc').textContent  = c.desc;
+      const link = document.getElementById('season-link');
+      link.textContent = c.btn; link.href = c.href; link.setAttribute('aria-label', c.btn);
+
+      const bar = document.getElementById('seasonBar');
+      const textEl = bar.querySelector('.seasonbar__text');
+      textEl.innerHTML = c.bar; bar.href = c.barHref;
     })();
   </script>
 
