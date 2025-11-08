@@ -28,7 +28,6 @@
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
-  <!-- Performance hints -->
   <link rel="dns-prefetch" href="https://alessandroiascone.github.io">
   <link rel="prefetch" href="./catalogo-smartphone-reale-v3.html" as="document" crossorigin>
 
@@ -38,14 +37,14 @@
       --bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;
       --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
       --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
-      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166
+      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
+      --seasonbar-h:96px;           /* aggiornato via JS */
+      --safe-bottom:env(safe-area-inset-bottom,0px);
     }
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
     :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
-    a.btn:focus-visible,.fab-btn:focus-visible{filter:brightness(1.08)}
 
     /* Loader */
     #rl-loader{
@@ -91,7 +90,7 @@
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1 fr 1fr}}
 
     /* Card */
     .card{
@@ -105,74 +104,102 @@
     .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
     .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
 
-    .badge{position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06)}
+    .badge{
+      position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;
+      padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);
+      animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06);z-index:2
+    }
     article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
 
-    .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
+    /* Pillola verde “Contatto rapido” */
+    #biz-mobile .badge{
+      background:linear-gradient(90deg,#10B981,#84CC16);
+      box-shadow:0 10px 22px rgba(16,185,129,.55);
+      color:#042;
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
     .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
 
-    /* ===== CTA PRINCIPALE ALLARGATA (FORMAT GENERALE) ===== */
+    /* CTA principale */
     .btn{
       display:flex; align-items:center; justify-content:center;
       text-decoration:none; text-align:center;
-      width:100%;                       /* larghezza piena */
-      padding:14px 18px;                /* più alta */
-      border-radius:16px;               /* più morbida */
-      font-size:15.5px; font-weight:900;
-      letter-spacing:.2px;
-      color:#000;
+      width:100%; padding:14px 18px; border-radius:16px;
+      font-size:15.5px; font-weight:900; letter-spacing:.2px; color:#000;
       background:linear-gradient(90deg,var(--brand1),var(--brand2));
-      box-shadow:0 18px 36px rgba(255,90,0,.38); /* ombra più forte */
+      box-shadow:0 18px 36px rgba(255,90,0,.38);
       transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
       transform-style:preserve-3d;
     }
-    .btn:hover{
-      transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg);
-      box-shadow:0 28px 54px rgba(255,90,0,.55);
-      filter:brightness(1.05);
-    }
+    .btn:hover{ transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg); box-shadow:0 28px 54px rgba(255,90,0,.55); filter:brightness(1.05) }
 
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
-    /* FAB & Torna su */
-    .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
-    .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
-    .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
-    .fab-btn svg{width:18px;height:18px}
-    @media(max-width:420px){.fab-btn span{display:none}}
-
-    .to-top{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9999}
-    .to-top.show{opacity:1;pointer-events:auto}
-    .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
-
-    .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9999}
-
-    /* ===== Bottom Seasonal Bar ===== */
+    /* ===== Barra stagionale ===== */
     .seasonbar{
-      position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;align-items:center;gap:.75rem;justify-content:center;padding:.85rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);backdrop-filter:saturate(1.2) blur(6px)
+      position:fixed;left:0;right:0;bottom:0;z-index:2100;
+      display:flex;align-items:center;gap:.75rem;justify-content:center;
+      padding:.95rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));
+      color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);
+      backdrop-filter:saturate(1.2) blur(6px)
     }
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    /* Offset quando la barra stagionale è presente (no sovrapposizione) */
-    body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-    body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-
-    /* Badge forzati via ID */
-    #biz-mobile .badge{
-      background:linear-gradient(90deg,#10B981,#84CC16);
-      box-shadow:0 10px 18px rgba(16,185,129,.35);
+    /* ===== Pulsanti floating (fianco a fianco) con offset sulla barra ===== */
+    .fab-nav{
+      position:fixed; right:16px;
+      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom)); /* “appoggiati” alla barra */
+      display:flex; flex-direction:row; gap:12px;
+      z-index:2101;
     }
-    #season-card .badge{
-      background:linear-gradient(90deg,#ff0000,#ff7b00);
+    .fab-btn{
+      display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
+      color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;
+      box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite
     }
+    .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
+    .fab-btn svg{width:18px;height:18px}
+    @media(max-width:420px){.fab-btn span{display:none}}
 
-    /* brand link sempre bianco */
+    /* Torna su allineato alla stessa baseline dei FAB */
+    .to-top{
+      position:fixed; left:16px;
+      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom));
+      opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2101
+    }
+    .to-top.show{opacity:1;pointer-events:auto}
+    .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
+
+    .toast{position:fixed;left:50%;bottom:calc(var(--seasonbar-h) + 64px + var(--safe-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:2101}
+
+    /* Evidenze Season card */
+    #season-card .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)}
+    #season-card .highlight{
+      position:absolute; top:-11px; right:14px;
+      background:linear-gradient(90deg,#ff5a1a,#ffbe0b);
+      color:#000; font-size:11px; font-weight:900; letter-spacing:.02em;
+      padding:6px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 10px 18px rgba(255,90,0,.45); animation:pulse 2.4s ease-in-out infinite; white-space:nowrap; z-index:2;
+    }
+    #season-card .santa{position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45)); transform-origin:bottom right; transform:rotate(10deg); opacity:0; pointer-events:none}
+    body.theme-xmas #season-card .santa{opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite}
+    @keyframes santaPop{0%{transform:translateY(-12px) rotate(18deg);opacity:0}100%{transform:translateY(0) rotate(10deg);opacity:1}}
+    @keyframes santaBob{0%,100%{transform:translateY(0) rotate(10deg)}50%{transform:translateY(3px) rotate(8deg)}}
+
+    /* Neve */
+    .snow{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;display:none}
+    body.theme-xmas .snow{display:block}
+    .snow i{position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6)); border-radius:50%; opacity:.9; filter:blur(.2px); animation:fall linear infinite}
+    @keyframes fall{ to{ transform:translateY(105vh); opacity:.92; } }
+
     .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
   </style>
 </head>
@@ -188,22 +215,16 @@
   </div>
   <script>
     (function(){
-      function hideNow(){
-        var ld = document.getElementById('rl-loader');
-        if(ld){ ld.classList.add('hidden'); setTimeout(function(){ try{ ld.remove(); }catch(e){} }, 600); }
-      }
-      if(document.readyState!=='loading'){ hideNow(); }
-      window.addEventListener('load', hideNow, {once:true});
-      setTimeout(hideNow, 3200);
+      const hideNow=()=>{const ld=document.getElementById('rl-loader');if(ld){ld.classList.add('hidden');setTimeout(()=>{try{ld.remove()}catch(e){}},600)}};
+      if(document.readyState!=='loading'){hideNow()} window.addEventListener('load',hideNow,{once:true}); setTimeout(hideNow,3200);
     })();
   </script>
 
   <main class="wrap">
     <header class="head">
-      <!-- Brand cliccabile verso la Home dell'hub -->
       <a class="brand" href="./relong-hub-v2.html" rel="home">
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
-          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
+          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
           <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Re Long Telefonia, Energia & Assistenza PC
@@ -218,6 +239,7 @@
     </header>
 
     <section class="grid" aria-label="Collegamenti rapidi Re Long">
+      <!-- 1 -->
       <article class="card" data-anim>
         <div class="badge">SMARTPHONE A RATE</div>
         <div class="title"><span class="ico">📱</span><span>Scegli il tuo Smartphone</span></div>
@@ -225,6 +247,7 @@
         <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
       </article>
 
+      <!-- 2 -->
       <article class="card" data-anim>
         <div class="badge">AZIENDE & P.IVA FULL PACK</div>
         <div class="title"><span class="ico">🧾</span><span>Fisso + Mobile con Energia per P.IVA</span></div>
@@ -232,7 +255,7 @@
         <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
       </article>
 
-      <!-- ENERGIA CASA -->
+      <!-- 3 -->
       <article class="card" data-anim>
         <div class="badge">ENERGIA CASA</div>
         <div class="title"><span class="ico">⚡</span><span>Accendi la tua Energia</span></div>
@@ -240,6 +263,7 @@
         <a class="btn" href="./index.html">Vai all’Area Energia</a>
       </article>
 
+      <!-- 4 -->
       <article class="card" data-anim>
         <div class="badge">ASSISTENZA PC</div>
         <div class="title"><span class="ico">🧰</span><span>Riparazioni & Upgrade</span></div>
@@ -247,20 +271,22 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
-      <!-- BUSINESS MOBILI -->
-      <article class="card" data-anim id="biz-mobile">
-        <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
-        <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
-        <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
-        <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
-      </article>
-
-      <!-- SEZIONE STAGIONALE -->
+      <!-- 5 — SEASON CARD -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
-        <div class="title"><span class="ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
+        <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
+        <div class="santa" id="santa" aria-hidden="true">🎅</div>
+        <div class="title"><span class="ico" id="season-ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
         <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
         <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
+      </article>
+
+      <!-- 6 — CONTATTO RAPIDO -->
+      <article class="card" data-anim id="biz-mobile">
+        <div class="badge">CONTATTO RAPIDO</div>
+        <div class="title"><span class="ico">💬</span><span>Contattaci per altre info</span></div>
+        <p class="desc">Hai una domanda? Ti rispondiamo subito su WhatsApp.</p>
+        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20posso%20fare%20una%20domanda%3F%20Grazie">💬 Chatta con noi</a>
       </article>
     </section>
 
@@ -271,126 +297,11 @@
     </p>
   </main>
 
-  <div class="toast" role="status" aria-live="polite"></div>
+  <!-- Neve -->
+  <div class="snow" id="snow"></div>
 
-  <script>
-    const HOME_PAGE = './relong-hub-v2.html';
-
-    /* to-top */
-    (function(){
-      const toTop = document.createElement('div');
-      toTop.className = 'to-top';
-      toTop.innerHTML = `<a href="#" aria-label="Torna su">⬆️ Torna su</a>`;
-      document.body.appendChild(toTop);
-      const onScroll = ()=>{ (window.scrollY > 250) ? toTop.classList.add('show') : toTop.classList.remove('show'); };
-      window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
-    })();
-
-    function showToast(msg){
-      let t = document.querySelector('.toast');
-      if(!t){ t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
-      t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
-    }
-
-    /* Navigazione interna sicura + fallback alla Home */
-    document.addEventListener('click', async (e)=>{
-      const a = e.target.closest('a'); if(!a) return;
-      const href = a.getAttribute('href')||'';
-      const isSpecial = /^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href) || href.includes('wa.me');
-      if(isSpecial) return;
-      let url;
-      try{ url = new URL(a.href, location.href); }catch(_){ return; }
-      const isInternal = (url.protocol==='http:'||url.protocol==='https:') && url.origin===location.origin && /\.html?$/.test(url.pathname);
-      if(isInternal){
-        e.preventDefault();
-        try{
-          const res = await fetch(url.href, {method:'GET', cache:'no-store', redirect:'follow'});
-          if(res.ok){ location.href = url.href; }
-          else { showToast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 800); }
-        }catch(_){
-          showToast('Impossibile aprire la pagina. Torno alla Home.'); setTimeout(()=>location.href = HOME_PAGE, 1000);
-        }
-      }
-    }, false);
-
-    // Normalizza link root
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>{
-        a.setAttribute('href', HOME_PAGE);
-      });
-      document.querySelectorAll('a[rel~="home"]').forEach(a=>{
-        a.setAttribute('href', HOME_PAGE);
-      });
-    });
-
-    /* Animazioni on-scroll */
-    (function(){
-      const obs = new IntersectionObserver((entries)=>{
-        entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); obs.unobserve(en.target); } });
-      }, {threshold:.18});
-      document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
-    })();
-
-    /* Switch stagionale */
-    (function(){
-      const now = new Date();
-      const m = now.getMonth()+1, d = now.getDate();
-      let season = "blackfriday";
-      if (m === 12 && d >= 8) season = "christmas";
-      if (m === 1) season = "flash";
-
-      const copy = {
-        blackfriday:{
-          badge:"BLACK FRIDAY",
-          title:"Black Friday ReLong",
-          desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",
-          btn:"Vai alle Offerte Black Friday",
-          href:"./black-friday.html",
-          bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",
-          barHref:"./black-friday.html"
-        },
-        christmas:{
-          badge:"NATALE",
-          title:"Christmas Promo 🎄",
-          desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",
-          btn:"Scopri le Offerte di Natale",
-          href:"./black-friday.html?season=christmas",
-          bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",
-          barHref:"./black-friday.html?season=christmas"
-        },
-        flash:{
-          badge:"FLASH",
-          title:"Offerte Flash ⚡",
-          desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",
-          btn:"Vedi le Offerte Flash",
-          href:"./black-friday.html?season=flash",
-          bar:"<b>Offerte Flash ⚡</b> — sconti lampo",
-          barHref:"./black-friday.html?season=flash"
-        }
-      };
-
-      const c = copy[season];
-      document.getElementById('season-badge').textContent = c.badge;
-      document.getElementById('season-title').textContent = c.title;
-      document.getElementById('season-desc').textContent  = c.desc;
-      const link = document.getElementById('season-link');
-      link.textContent = c.btn; link.href = c.href; link.setAttribute('aria-label', c.btn);
-
-      const bar = document.getElementById('seasonBar');
-      const textEl = bar.querySelector('.seasonbar__text');
-      textEl.innerHTML = c.bar; bar.href = c.barHref;
-    })();
-  </script>
-
-  <!-- Barra in basso stagionale -->
-  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
-    <span class="seasonbar__icon">⚡</span>
-    <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
-    <span class="seasonbar__cta">Scopri ora</span>
-  </a>
-  <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
-
-  <!-- FAB -->
+  <!-- TO-TOP + FAB (fianco a fianco) -->
+  <div class="to-top" id="toTop"><a href="#" aria-label="Torna su">⬆️ Torna su</a></div>
   <div class="fab-nav" aria-label="Azioni rapide">
     <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
       <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
@@ -402,19 +313,96 @@
     </a>
   </div>
 
-  <!-- Attiva offset quando la barra è presente -->
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Script UX -->
   <script>
+    const HOME_PAGE = './relong-hub-v2.html';
+
+    /* Click sicuri + fallback */
+    document.addEventListener('click', async (e)=>{
+      const a = e.target.closest('a'); if(!a) return;
+      const href = a.getAttribute('href')||'';
+      const special=/^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href)||href.includes('wa.me')||href==='#';
+      if(special){ if(href==='#'){e.preventDefault()} return; }
+      let url; try{ url=new URL(a.href,location.href);}catch(_){return;}
+      const internal=(url.protocol==='http:'||url.protocol==='https:')&&url.origin===location.origin&&/\.html?$/.test(url.pathname);
+      if(internal){ e.preventDefault(); try{ const res=await fetch(url.href,{method:'GET',cache:'no-store',redirect:'follow'}); if(res.ok){location.href=url.href}else{ toast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href=HOME_PAGE,800)} }catch(_){ toast('Impossibile aprire la pagina. Torno alla Home.'); setTimeout(()=>location.href=HOME_PAGE,1000)} }
+    });
+
+    function toast(msg){
+      let t=document.querySelector('.toast'); if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}
+      t.textContent=msg; t.style.opacity=1; setTimeout(()=>t.style.opacity=0,2200);
+    }
+
+    /* To-top visibile dopo scroll */
     (function(){
-      const bar = document.getElementById('seasonBar');
-      if(!bar) return;
-      document.body.classList.add('has-seasonbar');
-      const obs = new IntersectionObserver((entries)=>{
-        const show = entries[0].isIntersecting;
-        document.body.classList.toggle('has-seasonbar', show);
-      }, {threshold: 0});
-      obs.observe(bar);
+      const tt=document.getElementById('toTop');
+      const onScroll=()=>{ (window.scrollY>250)?tt.classList.add('show'):tt.classList.remove('show'); };
+      window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+      tt.addEventListener('click',e=>{const a=e.target.closest('a'); if(!a) return; e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});});
+    })();
+
+    /* Animazioni in-view */
+    (function(){
+      const obs=new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){en.target.classList.add('in'); obs.unobserve(en.target);} }); }, {threshold:.18});
+      document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
+    })();
+
+    /* Neve */
+    function buildSnow(container){
+      if(!container) return;
+      const flakes=18, frag=document.createDocumentFragment();
+      for(let i=0;i<flakes;i++){ const f=document.createElement('i'); const size=(Math.random()*5)+3; f.style.width=f.style.height=size+'px'; f.style.left=Math.floor(Math.random()*100)+'vw'; f.style.animationDuration=(5+Math.random()*7)+'s'; f.style.animationDelay=(Math.random()*3)+'s'; f.style.opacity=(0.65+Math.random()*0.35).toFixed(2); frag.appendChild(f); }
+      container.innerHTML=''; container.appendChild(frag);
+    }
+
+    /* Stagioni + tema */
+    (function(){
+      const now=new Date(); const m=now.getMonth()+1, d=now.getDate();
+      let season="blackfriday"; if(m===12 && d>=8) season="christmas"; if(m===1) season="flash";
+      const copy={
+        blackfriday:{badge:"BLACK FRIDAY",title:"Black Friday ReLong",desc:"Offerte flash reali su TV, Console, Smartphone ed Energia. Valide per poco!",btn:"Vai alle Offerte Black Friday",href:"./black-friday.html",bar:"<b>Black Friday ReLong</b> — sconti a tempo limitato",barHref:"./black-friday.html",highlight:"🔥 IN EVIDENZA",icon:"⚡",themeClass:"theme-bf",btnGradient:null},
+        christmas:{badge:"NATALE",title:"Christmas Promo 🎄",desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",btn:"Scopri le Offerte di Natale",href:"./black-friday.html?season=christmas",bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",barHref:"./black-friday.html?season=christmas",highlight:"🎄🎅 IN EVIDENZA",icon:"🎄",themeClass:"theme-xmas",btnGradient:"linear-gradient(90deg,#ff2a2a,#1db954)"},
+        flash:{badge:"FLASH",title:"Offerte Flash ⚡",desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",btn:"Vedi le Offerte Flash",href:"./black-friday.html?season=flash",bar:"<b>Offerte Flash ⚡</b> — sconti lampo",barHref:"./black-friday.html?season=flash",highlight:"🔥 IN EVIDENZA",icon:"⚡",themeClass:"theme-flash",btnGradient:null}
+      };
+      const c=copy[season];
+      document.getElementById('season-badge').textContent=c.badge;
+      document.getElementById('season-title').textContent=c.title;
+      document.getElementById('season-desc').textContent=c.desc;
+      const link=document.getElementById('season-link'); link.textContent=c.btn; link.href=c.href; link.setAttribute('aria-label',c.btn);
+      document.getElementById('season-highlight').textContent=c.highlight;
+      const ico=document.getElementById('season-ico'); if(ico) ico.textContent=c.icon;
+
+      const bar=document.getElementById('seasonBar'); const textEl=bar.querySelector('.seasonbar__text'); textEl.innerHTML=c.bar; bar.href=c.barHref;
+
+      document.body.classList.remove('theme-bf','theme-xmas','theme-flash'); document.body.classList.add(c.themeClass);
+      if(c.btnGradient){ link.style.background=c.btnGradient } else { link.style.background='' }
+
+      const snow=document.getElementById('snow'); const santa=document.getElementById('santa');
+      if(c.themeClass==='theme-xmas'){ buildSnow(snow); if(santa) santa.style.display='block'; } else { if(snow) snow.innerHTML=''; if(santa) santa.style.display='none'; }
+    })();
+
+    /* Offset dinamico: misura la barra e posiziona FAB/to-top sulla stessa baseline */
+    (function(){
+      const bar=document.getElementById('seasonBar');
+      function setH(){
+        const h=Math.max(bar.getBoundingClientRect().height, bar.offsetHeight, 86);
+        document.documentElement.style.setProperty('--seasonbar-h', h + 'px');
+      }
+      setH();
+      window.addEventListener('resize', setH);
+      window.addEventListener('orientationchange', setH);
+      new ResizeObserver(setH).observe(bar);
     })();
   </script>
+
+  <!-- Barra in basso stagionale -->
+  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
+    <span class="seasonbar__icon">⚡</span>
+    <span class="seasonbar__text"><b>Black Friday ReLong</b> — sconti a tempo limitato</span>
+    <span class="seasonbar__cta">Scopri ora</span>
+  </a>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -436,7 +424,6 @@
   }
   </script>
 
-  <!-- Noscript -->
   <noscript><style>#rl-loader{display:none!important}</style></noscript>
 </body>
 </html>
