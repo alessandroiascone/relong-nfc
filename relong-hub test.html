@@ -38,9 +38,10 @@
       --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
       --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
       --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
-      /* Offset dinamici per NON coprire la barra */
-      --seasonbar-h: 96px;              /* fallback */
-      --seasonbar-gap: 32px;            /* spazio aggiuntivo sopra la barra */
+
+      /* === OFFSET DINAMICI (evita sovrapposizioni) === */
+      --seasonbar-h: 100px;     /* fallback, sovrascritto via JS */
+      --seasonbar-gap: 56px;    /* spazio extra sopra la barra */
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
@@ -134,31 +135,37 @@
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
-    /* FAB & Torna su */
-    .fab-nav{position:fixed;right:16px;bottom:calc(16px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;z-index:800} /* z-index abbassato */
+    /* === FAB & Torna su === */
+    .fab-nav{
+      position:fixed;right:16px;bottom:calc(16px + var(--safe-bottom));
+      display:flex;flex-direction:column;gap:12px;z-index:2101; /* sopra la seasonbar */
+    }
     .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
     .fab-btn svg{width:18px;height:18px}
     @media(max-width:420px){.fab-btn span{display:none}}
 
-    .to-top{position:fixed;left:16px;bottom:calc(16px + var(--safe-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:800} /* z-index abbassato */
+    .to-top{
+      position:fixed;left:16px;bottom:calc(16px + var(--safe-bottom));
+      opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2101; /* sopra la seasonbar */
+    }
     .to-top.show{opacity:1;pointer-events:auto}
     .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
 
-    .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:800}
+    .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:1100}
 
-    /* Bottom Seasonal Bar */
+    /* === Barra stagionale === */
     .seasonbar{
-      position:fixed;left:0;right:0;bottom:0;z-index:2000; /* sopra i pulsanti */
+      position:fixed;left:0;right:0;bottom:0;z-index:2100; /* sotto i pulsanti */
       display:flex;align-items:center;gap:.75rem;justify-content:center;
-      padding:.85rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));
+      padding:.95rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));
       color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);
       backdrop-filter:saturate(1.2) blur(6px)
     }
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    /* Offset DINAMICO quando la barra è presente */
+    /* Offset quando la barra è presente (alza pulsanti) */
     body.has-seasonbar .to-top{
       bottom: calc(var(--seasonbar-h) + var(--seasonbar-gap) + var(--safe-bottom));
     }
@@ -166,12 +173,12 @@
       bottom: calc(var(--seasonbar-h) + var(--seasonbar-gap) + var(--safe-bottom));
     }
     body.has-seasonbar .wrap{
-      padding-bottom: calc(var(--seasonbar-h) + 200px);
+      padding-bottom: calc(var(--seasonbar-h) + 220px);
     }
 
     /* Badge forzati via ID */
     #biz-mobile .badge{ background:linear-gradient(90deg,#10B981,#84CC16); box-shadow:0 10px 18px rgba(16,185,129,.35) }
-    #season-card .badge{ background:linear-gradient(90deg,#ff0000,#ff7b00) } /* default BF/Flash */
+    #season-card .badge{ background:linear-gradient(90deg,#ff0000,#ff7b00) }
 
     #season-card .highlight{
       position:absolute; top:-11px; right:14px;
@@ -183,26 +190,18 @@
       animation:pulse 2.4s ease-in-out infinite; white-space:nowrap;
     }
 
-    /* ——— Natale ——— */
+    /* Natale */
     body.theme-xmas #season-card .badge{ background:linear-gradient(90deg,#ff2a2a,#1db954) }
     body.theme-xmas #season-card .btn{ background:linear-gradient(90deg,#ff2a2a,#1db954) !important }
-    #season-card .santa{
-      position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
-      transform-origin:bottom right; transform:rotate(10deg); opacity:0; pointer-events:none;
-    }
-    body.theme-xmas #season-card .santa{
-      opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite;
-    }
+    #season-card .santa{ position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45)); transform-origin:bottom right; transform:rotate(10deg); opacity:0; pointer-events:none; }
+    body.theme-xmas #season-card .santa{ opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite; }
     @keyframes santaPop{0%{transform:translateY(-12px) rotate(18deg);opacity:0}100%{transform:translateY(0) rotate(10deg);opacity:1}}
     @keyframes santaBob{0%,100%{transform:translateY(0) rotate(10deg)}50%{transform:translateY(3px) rotate(8deg)}}
 
-    /* Neve leggera */
+    /* Neve */
     .snow{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;display:none}
     body.theme-xmas .snow{display:block}
-    .snow i{
-      position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6));
-      border-radius:50%; opacity:.9; filter:blur(.2px); animation:fall linear infinite;
-    }
+    .snow i{ position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6)); border-radius:50%; opacity:.9; filter:blur(.2px); animation:fall linear infinite; }
     @keyframes fall{ to{ transform:translateY(105vh); opacity:.92 } }
 
     .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
@@ -220,13 +219,8 @@
   </div>
   <script>
     (function(){
-      function hideNow(){
-        var ld = document.getElementById('rl-loader');
-        if(ld){ ld.classList.add('hidden'); setTimeout(function(){ try{ ld.remove(); }catch(e){} }, 600); }
-      }
-      if(document.readyState!=='loading'){ hideNow(); }
-      window.addEventListener('load', hideNow, {once:true});
-      setTimeout(hideNow, 3200);
+      const hideNow=()=>{const ld=document.getElementById('rl-loader');if(ld){ld.classList.add('hidden');setTimeout(()=>{try{ld.remove()}catch(e){}},600)}};
+      if(document.readyState!=='loading'){hideNow()} window.addEventListener('load',hideNow,{once:true}); setTimeout(hideNow,3200);
     })();
   </script>
 
@@ -445,7 +439,7 @@
       document.getElementById('season-highlight').textContent = c.highlight;
       const ico = document.getElementById('season-ico'); if(ico) ico.textContent = c.icon;
 
-      // Barra stagionale (testo + link)
+      // Barra stagionale
       const bar = document.getElementById('seasonBar');
       const textEl = bar.querySelector('.seasonbar__text');
       textEl.innerHTML = c.bar; bar.href = c.barHref;
@@ -467,35 +461,30 @@
       }
     })();
 
-    /* Calcolo offset dinamico (niente overlap) */
+    /* Calcolo offset dinamico: alza i pulsanti sopra la barra */
     (function(){
       const bar = document.getElementById('seasonBar');
       if(!bar) return;
 
       function applyOffsets(){
-        const h = bar.getBoundingClientRect().height || bar.offsetHeight || 96;
+        const h = Math.max(bar.getBoundingClientRect().height, bar.offsetHeight, 86);
         document.documentElement.style.setProperty('--seasonbar-h', h + 'px');
         document.body.classList.add('has-seasonbar');
       }
-
       applyOffsets();
+
       let rAF;
       window.addEventListener('resize', ()=>{ cancelAnimationFrame(rAF); rAF = requestAnimationFrame(applyOffsets); });
       window.addEventListener('orientationchange', applyOffsets);
 
-      const ro = new ResizeObserver(applyOffsets);
-      ro.observe(bar);
-
-      // anche se la barra esce/entra dal viewport, manteniamo l'offset sopra
-      const io = new IntersectionObserver(()=>applyOffsets(), {threshold: 0});
-      io.observe(bar);
+      const ro = new ResizeObserver(applyOffsets); ro.observe(bar);
     })();
   </script>
 
   <!-- Barra in basso stagionale -->
   <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
     <span class="seasonbar__icon">⚡</span>
-    <span class="seasonbar__text"><b>Offerte Black Friday ReLong</b> — sconti a tempo limitato</span>
+    <span class="seasonbar__text"><b>Black Friday ReLong</b> — sconti a tempo limitato</span>
     <span class="seasonbar__cta">Scopri ora</span>
   </a>
 
