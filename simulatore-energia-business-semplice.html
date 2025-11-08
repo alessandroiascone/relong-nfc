@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Re Long | Simulatore Energia (Energia inclusa)</title>
+  <title>Re Long | Soluzioni Business + Energia</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
       --bg1:#0a0a0a; --bg2:#000;
       --card:rgba(20,20,20,.92);
-      --stroke:rgba(255,255,255,.09);
+      --stroke:rgba(255,255,255,.10);
       --muted:rgba(255,255,255,.68);
       --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
       --win1:#ff2d2d; --win2:#ff6a00;
+
+      /* WA */
+      --wa1:#25D366; --wa2:#128C7E;
     }
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif;
@@ -24,24 +27,34 @@
       color:#fff; min-height:100dvh;
       display:flex; justify-content:center; padding:24px;
     }
-    .wrap{width:min(980px,100%); display:grid; gap:18px}
-    .title{
-      display:flex; justify-content:space-between; padding:18px 20px; align-items:center;
-      border:1px solid var(--stroke); border-radius:20px;
-      background:linear-gradient(135deg, rgba(255,200,0,.08), rgba(255,255,255,.03));
-      box-shadow:0 10px 30px rgba(0,0,0,.45);
+    .wrap{
+      width:min(980px,100%); display:grid; gap:16px;
+      /* 9) layout più simmetrico */
+      align-content:start; padding-top:6px;
     }
-    .title h1{font-size:20px}
-    .badge{
-      padding:8px 12px; border-radius:999px; font-size:12px; font-weight:700;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
-      -webkit-background-clip:text; color:transparent;
+
+    /* Pillola top (invece del titolo): stile “solito” elegante */
+    .topbar{
+      display:flex; justify-content:center;
+    }
+    .pillTitle{
+      padding:10px 16px; border-radius:999px; font-weight:800; font-size:13px;
       border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      letter-spacing:.2px;
+    }
+    .pillTitle span{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
     }
 
     .card{
-      border:1px solid var(--stroke); border-radius:20px; padding:20px;
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)), var(--card);
+      border:1.5px solid var(--stroke); /* 4) bordo leggermente più spesso e pulito */
+      border-radius:20px; padding:18px;
+      background:
+        radial-gradient(800px 400px at 100% 0%, rgba(255,160,0,.06), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)),
+        var(--card);
       box-shadow:0 12px 32px rgba(0,0,0,.5);
     }
     .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
@@ -50,14 +63,18 @@
     select{
       width:100%; padding:14px; border-radius:14px;
       background:#101010; color:#fff; border:1px solid var(--stroke);
+      transition:transform .08s ease; /* 7) micro-animazione select */
     }
+    select:active{ transform:scale(1.02) }
 
-    /* Banner */
+    /* 8) Banner più aggressivo (ma elegante) */
     .banner{
       display:none; margin-top:14px; margin-bottom:8px;
-      padding:14px; border-radius:14px; font-weight:800;
-      text-shadow:0 1px 0 rgba(0,0,0,.4);
+      padding:16px; border-radius:16px; font-weight:900;
+      text-shadow:0 1px 0 rgba(0,0,0,.35);
       background:linear-gradient(90deg,var(--win1),var(--win2));
+      box-shadow:0 10px 28px rgba(255,90,0,.28), inset 0 0 0 1px rgba(255,255,255,.08);
+      font-size:16px;
     }
     .banner.show{display:block}
 
@@ -76,62 +93,74 @@
     .lamp3d{
       position:relative;
       display:flex; align-items:center; justify-content:center;
-      margin-top:16px; padding:24px; min-height:180px;
-      border:1px dashed var(--stroke); border-radius:16px;
-      background:radial-gradient(120% 120% at 50% 0%, rgba(255,200,0,.05), transparent 60%);
+      margin-top:14px; padding:22px; min-height:190px;
+      border:1px dashed var(--stroke); border-radius:18px;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,200,0,.05), transparent 60%),
+        radial-gradient(80% 60% at 50% 100%, rgba(255,180,0,.05), transparent 70%);
       overflow:hidden;
     }
-    /* raggi circolari */
+    /* 2) Raggi più ordinati e simmetrici */
     .rays{
-      position:absolute; width:360px; height:360px; border-radius:50%;
+      position:absolute; width:380px; height:380px; border-radius:50%;
       background:
-        conic-gradient(from 0deg,
-          rgba(255,210,80,.0) 0deg, rgba(255,210,80,.36) 8deg, rgba(255,210,80,.0) 16deg,
-          rgba(255,210,80,.0) 36deg, rgba(255,210,80,.28) 44deg, rgba(255,210,80,.0) 52deg,
-          rgba(255,210,80,.0) 72deg, rgba(255,210,80,.22) 80deg, rgba(255,210,80,.0) 88deg,
-          rgba(255,210,80,.0) 108deg, rgba(255,210,80,.30) 116deg, rgba(255,210,80,.0) 124deg,
-          rgba(255,210,80,.0) 144deg, rgba(255,210,80,.28) 152deg, rgba(255,210,80,.0) 160deg,
-          rgba(255,210,80,.0) 180deg, rgba(255,210,80,.30) 188deg, rgba(255,210,80,.0) 196deg,
-          rgba(255,210,80,.0) 216deg, rgba(255,210,80,.28) 224deg, rgba(255,210,80,.0) 232deg,
-          rgba(255,210,80,.0) 252deg, rgba(255,210,80,.22) 260deg, rgba(255,210,80,.0) 268deg,
-          rgba(255,210,80,.0) 288deg, rgba(255,210,80,.30) 296deg, rgba(255,210,80,.0) 304deg,
-          rgba(255,210,80,.0) 324deg, rgba(255,210,80,.28) 332deg, rgba(255,210,80,.0) 340deg
+        repeating-conic-gradient(
+          from 0deg,
+          rgba(255,210,80,.34) 0deg, rgba(255,210,80,0) 6deg,
+          rgba(255,210,80,0) 12deg, rgba(255,210,80,.26) 18deg
         );
-      filter:blur(10px); opacity:0; transform:scale(.9);
+      filter:blur(10px); opacity:0; transform:scale(.92);
       transition:opacity .35s ease, transform .35s ease;
       pointer-events:none;
     }
-    .lamp3d.on .rays{opacity:.8; transform:scale(1); animation:spin 16s linear infinite}
+    .lamp3d.on .rays{opacity:.75; transform:scale(1); animation:spin 16s linear infinite}
     .lamp3d.super .rays{opacity:1; transform:scale(1.05); animation:spinFast 10s linear infinite}
 
+    /* 1) Glow più morbido e uniforme + 3) Pulse più elegante */
     .bulb{
       position:relative;
-      width:100px; height:100px; border-radius:50%;
-      background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
-      box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22);
-      transition:transform .25s ease, filter .25s ease, box-shadow .25s ease, opacity .25s ease;
+      width:102px; height:102px; border-radius:50%;
+      background:
+        radial-gradient(circle at 40% 30%, #fff 0%, #fff5cc 28%, #ffe08a 50%, #ffd15a 70%, #ffb300 88%, #a76f00 100%);
+      box-shadow:0 0 16px rgba(255,190,0,.52), 0 0 30px rgba(255,170,0,.20);
+      transition:transform .22s ease, filter .22s ease, box-shadow .22s ease, opacity .22s ease;
       isolation:isolate; transform:translateZ(0);
     }
     .bulb.off{
-      background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
-      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.85; transform:scale(.98);
+      background:radial-gradient(circle at 40% 30%, #666 0%, #555 30%, #3a3a3a 75%);
+      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.88; transform:scale(.985);
     }
-    /* Alone glow morbido */
+    /* alone soft */
     .bulb.glow::after{
       content:""; position:absolute; inset:-36px; border-radius:50%;
-      background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 26%, rgba(255,195,70,.18) 48%, rgba(255,170,0,.1) 66%, transparent 76%);
-      filter:blur(6px); opacity:.95; z-index:-1; animation:haloSoft 4s ease-in-out infinite;
+      background:radial-gradient(circle, rgba(255,235,180,.52) 0%, rgba(255,215,120,.30) 28%, rgba(255,195,70,.16) 52%, rgba(255,170,0,.08) 70%, transparent 78%);
+      filter:blur(7px); opacity:.95; z-index:-1; animation:haloSoft 4.2s ease-in-out infinite;
     }
     .bulb.glow::before{
       content:""; position:absolute; inset:-12px; border-radius:50%;
-      background:radial-gradient(circle, rgba(255,255,220,.35) 0%, rgba(255,220,120,.18) 40%, transparent 70%);
-      filter:blur(3px); opacity:.8; z-index:-1;
+      background:radial-gradient(circle, rgba(255,255,230,.30) 0%, rgba(255,230,150,.16) 44%, transparent 72%);
+      filter:blur(3px); opacity:.82; z-index:-1;
+    }
+    /* 3) pulse più elegante */
+    .lamp3d.on .bulb{ animation:pulseSoft 3.2s ease-in-out infinite }
+    .lamp3d.super .bulb{ animation:pulseSoft 2.8s ease-in-out infinite }
+    @keyframes pulseSoft{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.015)}
     }
 
-    /* Scintille ⚡ (solo SUPER) */
-    .sparks{
-      position:absolute; inset:0; pointer-events:none;
+    /* 5) Ombra sotto la lampadina più profonda */
+    .bulbShadow{
+      position:absolute; bottom:24px; width:46%; height:22px; border-radius:50%;
+      background:radial-gradient(ellipse at center, rgba(0,0,0,.35) 0%, rgba(0,0,0,.15) 55%, transparent 70%);
+      filter:blur(6px); opacity:.75; transition:opacity .25s ease, transform .25s ease;
+      pointer-events:none;
     }
+    .lamp3d.on .bulbShadow{ opacity:.9 }
+    .lamp3d.super .bulbShadow{ opacity:1; transform:scale(1.06) }
+
+    /* Scintille ⚡ (solo SUPER) */
+    .sparks{ position:absolute; inset:0; pointer-events:none }
     .sparks span{
       position:absolute; font-size:22px; opacity:0; transform:scale(.6);
       filter:drop-shadow(0 0 6px rgba(255,210,0,.6));
@@ -139,31 +168,28 @@
     .sparks span:nth-child(1){ left:20%; top:24% }
     .sparks span:nth-child(2){ right:18%; top:30% }
     .sparks span:nth-child(3){ left:28%; bottom:20% }
-    .lamp3d.super .sparks span{
-      animation:sparkUp 1.8s ease-in-out infinite;
-    }
+    .lamp3d.super .sparks span{ animation:sparkUp 1.8s ease-in-out infinite }
     .lamp3d.super .sparks span:nth-child(2){ animation-delay:.25s }
     .lamp3d.super .sparks span:nth-child(3){ animation-delay:.5s }
 
-    /* Click glow leggero quando passa OFF->ON */
+    /* Flash (soft/strong) */
     .bulb.flash{ animation:flashGlow .35s ease-out }
     @keyframes flashGlow{
       0%{ box-shadow:0 0 22px rgba(255,200,0,.65), 0 0 44px rgba(255,190,0,.30); transform:scale(1.00) }
-      50%{ box-shadow:0 0 38px rgba(255,210,0,.85), 0 0 72px rgba(255,200,0,.45); transform:scale(1.04) }
-      100%{ box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22); transform:scale(1.00) }
+      50%{ box-shadow:0 0 34px rgba(255,210,0,.80), 0 0 64px rgba(255,200,0,.42); transform:scale(1.03) }
+      100%{ box-shadow:0 0 16px rgba(255,190,0,.52), 0 0 30px rgba(255,170,0,.20); transform:scale(1.00) }
     }
-    /* Flash più marcato per SUPER o ON->SUPER */
     .bulb.flashStrong{ animation:flashStrong .45s ease-out }
     @keyframes flashStrong{
       0%{ box-shadow:0 0 30px rgba(255,210,0,.85), 0 0 80px rgba(255,200,0,.5); transform:scale(1.02) }
       60%{ box-shadow:0 0 60px rgba(255,220,0,1), 0 0 120px rgba(255,215,0,.65); transform:scale(1.07) }
-      100%{ box-shadow:0 0 18px rgba(255,185,0,.6), 0 0 34px rgba(255,175,0,.28); transform:scale(1.00) }
+      100%{ box-shadow:0 0 20px rgba(255,190,0,.55), 0 0 36px rgba(255,175,0,.26); transform:scale(1.00) }
     }
 
     @keyframes haloSoft{
-      0%{transform:scale(.98);opacity:.92}
-      50%{transform:scale(1.03);opacity:1}
-      100%{transform:scale(.98);opacity:.92}
+      0%{transform:scale(.985);opacity:.92}
+      50%{transform:scale(1.01);opacity:1}
+      100%{transform:scale(.985);opacity:.92}
     }
     @keyframes spin{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
     @keyframes spinFast{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
@@ -173,25 +199,33 @@
       100%{ opacity:0; transform:translateY(-14px) scale(1.05) rotate(6deg) }
     }
 
-    /* Bottoni: centrati */
+    /* Bottoni centrati */
     .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; justify-content:center}
+    /* Nuovo pulsante WhatsApp verde sfumato + emoji */
     .btn{
-      padding:12px 18px; border-radius:14px; font-weight:700;
-      border:none; cursor:pointer; text-decoration:none;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
-      color:#000; box-shadow:0 8px 20px rgba(255,150,0,.35);
+      padding:14px 20px; border-radius:14px; font-weight:900; font-size:15px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(90deg,var(--wa1),var(--wa2));
+      color:#fff; box-shadow:0 10px 24px rgba(19,140,96,.35);
+      text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+      transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
     }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(19,140,96,.40); filter:saturate(1.05) }
+    .btn:active{ transform:translateY(0) scale(.995) }
+
+    /* Spaziatura più pulita verticale (9) */
+    .card > *:not(:last-child){ margin-bottom:6px }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <header class="title">
-      <h1>Simulatore Sconti • Re Long</h1>
-      <span class="badge">Business • Energia</span>
-    </header>
+    <!-- Pillola top -->
+    <div class="topbar">
+      <div class="pillTitle"> <span>Soluzioni Business + Energia</span> • Re Long </div>
+    </div>
 
     <section class="card">
-      <h2 style="font-size:16px;margin-bottom:10px">Imposta la tua situazione</h2>
+      <h2 style="font-size:16px;margin-bottom:8px">Imposta la tua situazione</h2>
 
       <div class="row">
         <div>
@@ -216,17 +250,18 @@
       <div id="price" class="price"></div>
       <div id="banner" class="banner"></div>
 
-      <!-- Lampadina 3D centrata con raggi e scintille -->
+      <!-- Lampadina 3D centrata con raggi, ombra e scintille -->
       <div id="lampBox" class="lamp3d" aria-live="polite">
         <div id="rays" class="rays" aria-hidden="true"></div>
         <div id="bulb" class="bulb off" role="img" aria-label="Lampadina"></div>
+        <div class="bulbShadow" aria-hidden="true"></div>
         <div class="sparks" aria-hidden="true">
           <span>⚡</span><span>⚡</span><span>⚡</span>
         </div>
       </div>
 
       <div class="btns">
-        <a class="btn" id="btnWA" target="_blank" rel="noopener">Invia su WhatsApp</a>
+        <a class="btn" id="btnWA" target="_blank" rel="noopener">💬 Richiedi una consulenza</a>
       </div>
     </section>
   </main>
@@ -269,20 +304,17 @@
       }
 
       function setLamp(level){
-        // level: 0 off, 1 on, 2 super
         lampBox.classList.toggle('on', level >= 1);
         lampBox.classList.toggle('super', level === 2);
         bulb.classList.toggle('off', level === 0);
         bulb.classList.toggle('glow', level >= 1);
 
-        // gestisci flash:
+        // flash: soft per ON, strong per SUPER o transizione ON->SUPER
         bulb.classList.remove('flash','flashStrong');
-        void bulb.offsetWidth; // reflow per ri-avviare animazioni
+        void bulb.offsetWidth;
         if (prevLevel === 0 && level >= 1) {
-          // OFF -> ON/SUPER
           bulb.classList.add(level === 2 ? 'flashStrong' : 'flash');
         } else if (prevLevel === 1 && level === 2) {
-          // ON -> SUPER
           bulb.classList.add('flashStrong');
         }
         prevLevel = level;
@@ -305,7 +337,7 @@
         } else if (m && f) {
           setPrice('€30/mese');
           setBanner('🎉 <b>Hai acceso la tua energia!</b> Super sconto di <u>€260/anno</u>.');
-          level = 2; // SUPER EFFECT
+          level = 2;
         } else {
           setPrice('');
           setBanner('');
