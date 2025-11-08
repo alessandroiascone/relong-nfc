@@ -15,6 +15,7 @@
       --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
       --cta:#ffb300;
       --win1:#ff2d2d; --win2:#ff6a00;
+      --halo:#ffd36a; /* glow premium morbido */
     }
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif;
@@ -27,7 +28,7 @@
     }
     .wrap{width:min(980px,100%); display:grid; gap:18px}
     .title{
-      display:flex; justify-content:space-between; padding:18px 20px;
+      display:flex; justify-content:space-between; padding:18px 20px; align-items:center;
       border:1px solid var(--stroke); border-radius:20px;
       background:linear-gradient(135deg, rgba(255,200,0,.08), rgba(255,255,255,.03));
       box-shadow:0 10px 30px rgba(0,0,0,.45);
@@ -46,6 +47,7 @@
     }
     .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
     @media(max-width:720px){ .row{grid-template-columns:1fr} }
+    label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
     select{
       width:100%; padding:14px; border-radius:14px;
       background:#101010; color:#fff; border:1px solid var(--stroke);
@@ -64,17 +66,47 @@
       display:flex; gap:14px; align-items:center;
       padding:14px; margin-top:14px;
       border-radius:14px; border:1px dashed var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     }
+
     .bulb{
+      position:relative;
       width:58px; height:58px; border-radius:50%;
       background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
-      box-shadow:0 0 16px rgba(255,180,0,.6);
-      transition:.25s;
+      box-shadow:0 0 10px rgba(255,180,0,.55), 0 0 22px rgba(255,170,0,.25);
+      transition:.28s ease;
+      isolation:isolate; /* per glow overlay */
     }
     .bulb.off{
       background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
-      box-shadow:none;
-      filter:saturate(.3) brightness(.6);
+      box-shadow:none; filter:saturate(.35) brightness(.65);
+    }
+    /* Glow premium morbido (Stile A) */
+    .bulb.glow::after{
+      content:"";
+      position:absolute; inset:-22px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 25%, rgba(255,195,70,.18) 45%, rgba(255,170,0,.09) 62%, transparent 72%);
+      filter:blur(4px);
+      opacity:.95;
+      z-index:-1;
+      animation:haloSoft 4s ease-in-out infinite;
+      pointer-events:none;
+    }
+    .bulb.glow::before{
+      content:"";
+      position:absolute; inset:-8px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,220,.35) 0%, rgba(255,220,120,.18) 40%, transparent 70%);
+      filter:blur(2px);
+      opacity:.8;
+      z-index:-1;
+      pointer-events:none;
+    }
+    @keyframes haloSoft{
+      0%  { transform:scale(.98); opacity:.92}
+      50% { transform:scale(1.03); opacity:1 }
+      100%{ transform:scale(.98); opacity:.92}
     }
 
     .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
@@ -88,7 +120,6 @@
     .btn.secondary{
       background:#161616; color:#fff; border:1px solid var(--stroke);
     }
-
     .pill{
       padding:6px 10px; border-radius:999px;
       border:1px solid var(--stroke); font-size:12px;
@@ -122,7 +153,6 @@
           <label>Diventa cliente Vodafone Business (Energia)?</label>
           <select id="selEnergia"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
-        <div></div>
       </div>
 
       <div id="banner" class="banner"></div>
@@ -135,11 +165,9 @@
         </div>
       </div>
 
-      <!-- DETTAGLIO SIMULAZIONE RIMOSSO -->
-
       <div class="btns">
         <button class="btn secondary" id="btnCopy">Copia simulazione</button>
-        <a class="btn" id="btnWA" target="_blank">Invia su WhatsApp</a>
+        <a class="btn" id="btnWA" target="_blank" rel="noopener">Invia su WhatsApp</a>
         <span class="pill">WhatsApp: 08119578844</span>
       </div>
     </section>
@@ -152,13 +180,13 @@
       const selFisso   = document.getElementById('selFisso');
       const selEnergia = document.getElementById('selEnergia');
 
-      const bulb = document.getElementById('bulb');
-      const lampTit = document.getElementById('lampTit');
-      const lampSub = document.getElementById('lampSub');
+      const bulb   = document.getElementById('bulb');
+      const lampTit= document.getElementById('lampTit');
+      const lampSub= document.getElementById('lampSub');
       const banner = document.getElementById('banner');
 
-      const btnCopy = document.getElementById('btnCopy');
-      const btnWA   = document.getElementById('btnWA');
+      const btnCopy= document.getElementById('btnCopy');
+      const btnWA  = document.getElementById('btnWA');
 
       const WA_NUMBER = "3908119578844";
 
@@ -169,6 +197,9 @@
 
         let amount = 0;
 
+        // Regole ufficiali:
+        // Energia Sì + (Mobile o Fisso) = €180
+        // Energia Sì + (Mobile e Fisso) = €240
         if (e === 'si') {
           if (m === 'si' && f === 'si') amount = 240;
           else if (m === 'si' || f === 'si') amount = 180;
@@ -176,42 +207,39 @@
 
         const lampOn = amount > 0;
 
-        // BANNER
+        // Banner (invito o vittoria)
         banner.classList.remove('show','cta','win');
         if (lampOn) {
           banner.classList.add('show','win');
           banner.innerHTML = `🎉 Complimenti! Hai diritto allo <u>sconto annuo di €${amount}</u>.`;
-        } 
-        else if (e === 'no' && (m==='si'||f==='si')) {
+        } else if (e === 'no' && (m==='si'||f==='si')) {
           const hint = (m==='si' && f==='si') ? 240 : 180;
           banner.classList.add('show','cta');
           banner.innerHTML = `💡 Attiva anche <b>Energia Business</b> per ottenere <u>€${hint}</u> di sconto annuo.`;
+        } else {
+          banner.innerHTML = '';
         }
 
-        // Lampadina
+        // Lampadina + testi + glow premium
         bulb.classList.toggle('off', !lampOn);
-        lampTit.textContent = lampOn ? 'Lampadina accesa' : 'Lampadina spenta';
-        lampSub.textContent = lampOn 
+        bulb.classList.toggle('glow', lampOn);
+
+        lampTit.textContent = lampOn ? 'Hai acceso la tua energia' : 'Lampadina spenta';
+        lampSub.textContent = lampOn
           ? (amount===240 ? 'Fisso + Mobile + Energia: sconto totale €240/anno.'
                           : 'Mobile/Fisso + Energia: sconto €180/anno.')
           : 'Scopri gli sconti selezionando le opzioni.';
 
-        // Messaggio per WhatsApp (non visibile nel sito)
-        const message = lampOn
-          ? `✅ Simulazione Re Long
-• Mobile: ${m}
-• Fisso: ${f}
-• Energia: ${e}
-→ Sconto €${amount}/anno
-WhatsApp: 08119578844`
-          : `ℹ️ Simulazione Re Long
-• Mobile: ${m}
-• Fisso: ${f}
-• Energia: ${e}
-→ Nessuno sconto automatico
-WhatsApp: 08119578844`;
+        // Messaggio WhatsApp (non visibile)
+        const message =
+          `Simulazione Re Long
+Mobile: ${m}
+Fisso: ${f}
+Energia: ${e}
+Sconto: €${amount}/anno`;
 
         btnWA.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(message);
+
         return message;
       }
 
@@ -219,9 +247,14 @@ WhatsApp: 08119578844`;
 
       btnCopy.addEventListener('click', async()=> {
         const msg = compute();
-        await navigator.clipboard.writeText(msg);
-        btnCopy.textContent="Copiato ✔";
-        setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
+        try{
+          await navigator.clipboard.writeText(msg);
+          btnCopy.textContent="Copiato ✔";
+          setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
+        }catch(_){
+          btnCopy.textContent="Errore copia";
+          setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
+        }
       });
 
       compute();
