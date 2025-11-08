@@ -82,6 +82,7 @@
       background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
       box-shadow:none; filter:saturate(.35) brightness(.65);
     }
+    /* Glow premium morbido */
     .bulb.glow::after{
       content:""; position:absolute; inset:-22px; border-radius:50%;
       background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 25%, rgba(255,195,70,.18) 45%, rgba(255,170,0,.09) 62%, transparent 72%);
@@ -210,34 +211,47 @@
         setPrice('');
         setBanner('', '');
         let lampOn = false;
+        let amount = 0;
 
-        // LOGICA SEMPLIFICATA
-        if (m === 'si' && f === 'no' && e === 'no') {
+        // --- Regole richieste ---
+        if (e === 'si' && m === 'si' && f === 'no') {
+          // Mobile + Energia
+          amount = 180;
           setPrice('€15/mese');
-          setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere <u>€180/anno</u> di sconto.');
-        }
-        else if (f === 'si' && m === 'no' && e === 'no') {
-          setPrice('€28/mese');
-          setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere <u>€180/anno</u> di sconto.');
-        }
-        else if (m === 'si' && f === 'si' && e === 'si') {
-          setPrice('€30/mese');
+          setBanner('win', '🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
           lampOn = true;
-          setBanner('win', '🎉 <b>Complimenti, hai acceso la tua energia!</b> Per te un super sconto di <u>€260/anno</u>.');
+        } else if (e === 'si' && f === 'si' && m === 'no') {
+          // Fisso + Energia
+          amount = 180;
+          setPrice('€28/mese');
+          setBanner('win', '🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
+          lampOn = true;
+        } else if (e === 'si' && m === 'si' && f === 'si') {
+          // Fisso + Mobile + Energia
+          amount = 260;
+          setPrice('€30/mese');
+          setBanner('win', '🎉 <b>Hai acceso la tua energia!</b> Per te un super sconto di <u>€260/anno</u>.');
+          lampOn = true;
+        } else {
+          // CTA quando manca Energia ma c'è almeno una linea
+          if (e === 'no') {
+            if (m === 'si' && f === 'no') {
+              setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere <u>€180/anno</u> di sconto.');
+            } else if (f === 'si' && m === 'no') {
+              setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere <u>€180/anno</u> di sconto.');
+            } else if (m === 'si' && f === 'si') {
+              setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere lo sconto totale di <u>€260/anno</u>.');
+            }
+          }
         }
-        else if (m === 'si' && f === 'si' && e === 'no') {
-          // Bonus: se l’utente seleziona Fisso+Mobile senza Energia, mostra prezzo combinato e invito a Energia
-          setPrice('€43/mese');
-          setBanner('cta', '💡 Aggiungi <b>Energia Business</b> per ottenere lo sconto totale di <u>€260/anno</u>.');
-        }
-        // altri casi: nessun prezzo, nessun banner, lamp spenta
 
         // Lampadina + testi
         bulb.classList.toggle('off', !lampOn);
         bulb.classList.toggle('glow', lampOn);
         lampTit.textContent = lampOn ? 'Hai acceso la tua energia' : 'Lampadina spenta';
         lampSub.textContent = lampOn
-          ? 'Fisso + Mobile + Energia: sconto totale €260/anno.'
+          ? (amount===260 ? 'Fisso + Mobile + Energia: sconto totale €260/anno.'
+                          : 'Linea + Energia: sconto €180/anno.')
           : 'Scopri gli sconti selezionando le opzioni.';
 
         // Messaggio WhatsApp (non visibile)
