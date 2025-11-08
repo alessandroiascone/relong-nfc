@@ -76,28 +76,49 @@
     .lamp3d{
       position:relative;
       display:flex; align-items:center; justify-content:center;
-      margin-top:16px; padding:24px; min-height:160px;
+      margin-top:16px; padding:24px; min-height:180px;
       border:1px dashed var(--stroke); border-radius:16px;
       background:radial-gradient(120% 120% at 50% 0%, rgba(255,200,0,.05), transparent 60%);
       overflow:hidden;
     }
+    /* raggi circolari */
+    .rays{
+      position:absolute; width:360px; height:360px; border-radius:50%;
+      background:
+        conic-gradient(from 0deg,
+          rgba(255,210,80,.0) 0deg, rgba(255,210,80,.36) 8deg, rgba(255,210,80,.0) 16deg,
+          rgba(255,210,80,.0) 36deg, rgba(255,210,80,.28) 44deg, rgba(255,210,80,.0) 52deg,
+          rgba(255,210,80,.0) 72deg, rgba(255,210,80,.22) 80deg, rgba(255,210,80,.0) 88deg,
+          rgba(255,210,80,.0) 108deg, rgba(255,210,80,.30) 116deg, rgba(255,210,80,.0) 124deg,
+          rgba(255,210,80,.0) 144deg, rgba(255,210,80,.28) 152deg, rgba(255,210,80,.0) 160deg,
+          rgba(255,210,80,.0) 180deg, rgba(255,210,80,.30) 188deg, rgba(255,210,80,.0) 196deg,
+          rgba(255,210,80,.0) 216deg, rgba(255,210,80,.28) 224deg, rgba(255,210,80,.0) 232deg,
+          rgba(255,210,80,.0) 252deg, rgba(255,210,80,.22) 260deg, rgba(255,210,80,.0) 268deg,
+          rgba(255,210,80,.0) 288deg, rgba(255,210,80,.30) 296deg, rgba(255,210,80,.0) 304deg,
+          rgba(255,210,80,.0) 324deg, rgba(255,210,80,.28) 332deg, rgba(255,210,80,.0) 340deg
+        );
+      filter:blur(10px); opacity:0; transform:scale(.9);
+      transition:opacity .35s ease, transform .35s ease;
+      pointer-events:none;
+    }
+    .lamp3d.on .rays{opacity:.8; transform:scale(1); animation:spin 16s linear infinite}
+    .lamp3d.super .rays{opacity:1; transform:scale(1.05); animation:spinFast 10s linear infinite}
+
     .bulb{
       position:relative;
-      width:96px; height:96px; border-radius:50%;
+      width:100px; height:100px; border-radius:50%;
       background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
       box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22);
       transition:transform .25s ease, filter .25s ease, box-shadow .25s ease, opacity .25s ease;
-      isolation:isolate;
-      transform:translateZ(0);
+      isolation:isolate; transform:translateZ(0);
     }
     .bulb.off{
       background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
-      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.85;
-      transform:scale(.98);
+      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.85; transform:scale(.98);
     }
-    /* Alone morbido premium */
+    /* Alone glow morbido */
     .bulb.glow::after{
-      content:""; position:absolute; inset:-34px; border-radius:50%;
+      content:""; position:absolute; inset:-36px; border-radius:50%;
       background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 26%, rgba(255,195,70,.18) 48%, rgba(255,170,0,.1) 66%, transparent 76%);
       filter:blur(6px); opacity:.95; z-index:-1; animation:haloSoft 4s ease-in-out infinite;
     }
@@ -107,23 +128,36 @@
       filter:blur(3px); opacity:.8; z-index:-1;
     }
 
-    /* CLICK GLOW EFFECT — leggero (A) */
-    .bulb.flash{
-      animation:flashGlow .35s ease-out;
+    /* Scintille ⚡ (solo SUPER) */
+    .sparks{
+      position:absolute; inset:0; pointer-events:none;
     }
+    .sparks span{
+      position:absolute; font-size:22px; opacity:0; transform:scale(.6);
+      filter:drop-shadow(0 0 6px rgba(255,210,0,.6));
+    }
+    .sparks span:nth-child(1){ left:20%; top:24% }
+    .sparks span:nth-child(2){ right:18%; top:30% }
+    .sparks span:nth-child(3){ left:28%; bottom:20% }
+    .lamp3d.super .sparks span{
+      animation:sparkUp 1.8s ease-in-out infinite;
+    }
+    .lamp3d.super .sparks span:nth-child(2){ animation-delay:.25s }
+    .lamp3d.super .sparks span:nth-child(3){ animation-delay:.5s }
+
+    /* Click glow leggero quando passa OFF->ON */
+    .bulb.flash{ animation:flashGlow .35s ease-out }
     @keyframes flashGlow{
-      0%{
-        box-shadow:0 0 22px rgba(255,200,0,.65), 0 0 44px rgba(255,190,0,.30);
-        transform:scale(1.00);
-      }
-      50%{
-        box-shadow:0 0 38px rgba(255,210,0,.85), 0 0 72px rgba(255,200,0,.45);
-        transform:scale(1.04);
-      }
-      100%{
-        box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22);
-        transform:scale(1.00);
-      }
+      0%{ box-shadow:0 0 22px rgba(255,200,0,.65), 0 0 44px rgba(255,190,0,.30); transform:scale(1.00) }
+      50%{ box-shadow:0 0 38px rgba(255,210,0,.85), 0 0 72px rgba(255,200,0,.45); transform:scale(1.04) }
+      100%{ box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22); transform:scale(1.00) }
+    }
+    /* Flash più marcato per SUPER o ON->SUPER */
+    .bulb.flashStrong{ animation:flashStrong .45s ease-out }
+    @keyframes flashStrong{
+      0%{ box-shadow:0 0 30px rgba(255,210,0,.85), 0 0 80px rgba(255,200,0,.5); transform:scale(1.02) }
+      60%{ box-shadow:0 0 60px rgba(255,220,0,1), 0 0 120px rgba(255,215,0,.65); transform:scale(1.07) }
+      100%{ box-shadow:0 0 18px rgba(255,185,0,.6), 0 0 34px rgba(255,175,0,.28); transform:scale(1.00) }
     }
 
     @keyframes haloSoft{
@@ -131,9 +165,16 @@
       50%{transform:scale(1.03);opacity:1}
       100%{transform:scale(.98);opacity:.92}
     }
+    @keyframes spin{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+    @keyframes spinFast{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+    @keyframes sparkUp{
+      0%{ opacity:0; transform:translateY(8px) scale(.6) rotate(-8deg) }
+      35%{ opacity:1; transform:translateY(-4px) scale(1) rotate(0deg) }
+      100%{ opacity:0; transform:translateY(-14px) scale(1.05) rotate(6deg) }
+    }
 
-    /* Bottoni */
-    .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
+    /* Bottoni: centrati */
+    .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; justify-content:center}
     .btn{
       padding:12px 18px; border-radius:14px; font-weight:700;
       border:none; cursor:pointer; text-decoration:none;
@@ -175,9 +216,13 @@
       <div id="price" class="price"></div>
       <div id="banner" class="banner"></div>
 
-      <!-- Lampadina 3D centrata -->
+      <!-- Lampadina 3D centrata con raggi e scintille -->
       <div id="lampBox" class="lamp3d" aria-live="polite">
+        <div id="rays" class="rays" aria-hidden="true"></div>
         <div id="bulb" class="bulb off" role="img" aria-label="Lampadina"></div>
+        <div class="sparks" aria-hidden="true">
+          <span>⚡</span><span>⚡</span><span>⚡</span>
+        </div>
       </div>
 
       <div class="btns">
@@ -194,12 +239,14 @@
       const price  = document.getElementById('price');
       const banner = document.getElementById('banner');
 
+      const lampBox= document.getElementById('lampBox');
       const bulb   = document.getElementById('bulb');
-      const btnWA  = document.getElementById('btnWA');
 
+      const btnWA  = document.getElementById('btnWA');
       const WA_NUMBER = "3908119578844";
 
-      let wasOn = false; // per applicare il flash solo nei passaggi OFF -> ON
+      // 0=off, 1=on (uno solo), 2=super (entrambi)
+      let prevLevel = 0;
 
       function setPrice(text){
         if(text){
@@ -221,64 +268,64 @@
         banner.innerHTML = html;
       }
 
-      function setLamp(on){
-        const goingOn = on && !wasOn;
-        bulb.classList.toggle('off', !on);
-        bulb.classList.toggle('glow', on);
+      function setLamp(level){
+        // level: 0 off, 1 on, 2 super
+        lampBox.classList.toggle('on', level >= 1);
+        lampBox.classList.toggle('super', level === 2);
+        bulb.classList.toggle('off', level === 0);
+        bulb.classList.toggle('glow', level >= 1);
 
-        // Flash leggero solo quando passa da OFF a ON
-        if (goingOn) {
-          bulb.classList.remove('flash'); // reset eventuale
-          // Reflow per riavviare animazione se ri-selezionano
-          // eslint-disable-next-line no-unused-expressions
-          void bulb.offsetWidth;
-          bulb.classList.add('flash');
-          setTimeout(()=>bulb.classList.remove('flash'), 360);
+        // gestisci flash:
+        bulb.classList.remove('flash','flashStrong');
+        void bulb.offsetWidth; // reflow per ri-avviare animazioni
+        if (prevLevel === 0 && level >= 1) {
+          // OFF -> ON/SUPER
+          bulb.classList.add(level === 2 ? 'flashStrong' : 'flash');
+        } else if (prevLevel === 1 && level === 2) {
+          // ON -> SUPER
+          bulb.classList.add('flashStrong');
         }
-
-        wasOn = on;
+        prevLevel = level;
       }
 
       function compute(){
-        const m = selMobile.value;
-        const f = selFisso.value;
+        const m = selMobile.value === 'si';
+        const f = selFisso.value === 'si';
 
-        setPrice('');
-        setBanner('');
-        setLamp(false);
+        let level = 0;
 
-        if (m==='si' && f==='no') {
+        if (m && !f) {
           setPrice('€15/mese');
           setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
-          setLamp(true);
-        } 
-        else if (f==='si' && m==='no') {
+          level = 1;
+        } else if (f && !m) {
           setPrice('€28/mese');
           setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
-          setLamp(true);
-        }
-        else if (f==='si' && m==='si') {
+          level = 1;
+        } else if (m && f) {
           setPrice('€30/mese');
           setBanner('🎉 <b>Hai acceso la tua energia!</b> Super sconto di <u>€260/anno</u>.');
-          setLamp(true);
+          level = 2; // SUPER EFFECT
+        } else {
+          setPrice('');
+          setBanner('');
+          level = 0;
         }
+
+        setLamp(level);
 
         const msg =
 `Simulazione Re Long
-Mobile: ${m}
-Fisso: ${f}
+Mobile: ${m ? 'si' : 'no'}
+Fisso: ${f ? 'si' : 'no'}
 Energia: si
 Prezzo: ${price.textContent || '-'}
 Banner: ${banner.textContent || '-'}`;
 
         btnWA.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
-
-        return msg;
       }
 
       [selMobile, selFisso].forEach(el => el.addEventListener('change', compute));
-
-      // init
       compute();
     })();
   </script>
