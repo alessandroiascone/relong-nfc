@@ -38,7 +38,7 @@
       --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
       --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
       --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
-      --seasonbar-h:96px; /* aggiornato via JS */
+      --seasonbar-h:96px;           /* aggiornato via JS */
       --safe-bottom:env(safe-area-inset-bottom,0px);
     }
     @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
@@ -90,7 +90,7 @@
     /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1 fr 1fr}}
 
     /* Card */
     .card{
@@ -114,11 +114,11 @@
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
 
-    /* >>> Pillola VERDE per “Contatto rapido” (riaccesa) */
+    /* Pillola verde “Contatto rapido” */
     #biz-mobile .badge{
       background:linear-gradient(90deg,#10B981,#84CC16);
       box-shadow:0 10px 22px rgba(16,185,129,.55);
-      color:#042;  /* micro-contrasto sul verde */
+      color:#042;
       border:1px solid rgba(0,0,0,.08);
     }
 
@@ -153,11 +153,12 @@
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    /* ===== Pulsanti floating con offset dinamico ===== */
+    /* ===== Pulsanti floating (fianco a fianco) con offset sulla barra ===== */
     .fab-nav{
-      position:fixed;right:16px;
-      bottom:calc(var(--seasonbar-h) + 16px + var(--safe-bottom));
-      display:flex;flex-direction:column;gap:12px;z-index:2101;
+      position:fixed; right:16px;
+      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom)); /* “appoggiati” alla barra */
+      display:flex; flex-direction:row; gap:12px;
+      z-index:2101;
     }
     .fab-btn{
       display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
@@ -168,9 +169,10 @@
     .fab-btn svg{width:18px;height:18px}
     @media(max-width:420px){.fab-btn span{display:none}}
 
+    /* Torna su allineato alla stessa baseline dei FAB */
     .to-top{
-      position:fixed;left:16px;
-      bottom:calc(var(--seasonbar-h) + 16px + var(--safe-bottom));
+      position:fixed; left:16px;
+      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom));
       opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2101
     }
     .to-top.show{opacity:1;pointer-events:auto}
@@ -298,7 +300,7 @@
   <!-- Neve -->
   <div class="snow" id="snow"></div>
 
-  <!-- TO-TOP + FAB -->
+  <!-- TO-TOP + FAB (fianco a fianco) -->
   <div class="to-top" id="toTop"><a href="#" aria-label="Torna su">⬆️ Torna su</a></div>
   <div class="fab-nav" aria-label="Azioni rapide">
     <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
@@ -381,7 +383,7 @@
       if(c.themeClass==='theme-xmas'){ buildSnow(snow); if(santa) santa.style.display='block'; } else { if(snow) snow.innerHTML=''; if(santa) santa.style.display='none'; }
     })();
 
-    /* Offset dinamico per non coprire la barra */
+    /* Offset dinamico: misura la barra e posiziona FAB/to-top sulla stessa baseline */
     (function(){
       const bar=document.getElementById('seasonBar');
       function setH(){
