@@ -1,240 +1,365 @@
 <!DOCTYPE html>
-<html lang="it"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Re Long | Offerta Business & Energia</title>
-<meta name="description" content="Fisso + Mobile tutto illimitato a €30/mese con assistenza Re Long e sconto energia.">
-<meta name="theme-color" content="#0a0a0a">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
-  body{font-family:system-ui,-apple-system,BlinkMacSystemFont,Inter,Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,#0a0a0a 0%,#000 70%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
- .card{
-      width:min(92vw, 560px);
-      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long | Soluzioni Business + Energia</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000;
+      --card:rgba(20,20,20,.92);
+      --stroke:rgba(255,255,255,.10);
+      --muted:rgba(255,255,255,.68);
+      --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
+      --win1:#ff2d2d; --win2:#ff6a00;
+
+      /* WA */
+      --wa1:#25D366; --wa2:#128C7E;
+    }
+    body{
+      font-family:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 10% 10%, #151515 0%, transparent 60%),
+        radial-gradient(1000px 600px at 90% 20%, #181818 0%, transparent 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#fff; min-height:100dvh;
+      display:flex; justify-content:center; padding:24px;
+    }
+    .wrap{
+      width:min(980px,100%); display:grid; gap:16px;
+      /* 9) layout più simmetrico */
+      align-content:start; padding-top:6px;
+    }
+
+    /* Pillola top (invece del titolo): stile “solito” elegante */
+    .topbar{
+      display:flex; justify-content:center;
+    }
+    .pillTitle{
+      padding:10px 16px; border-radius:999px; font-weight:800; font-size:13px;
       border:1px solid var(--stroke);
-      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
-      box-shadow:0 30px 60px rgba(0,0,0,.9);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      letter-spacing:.2px;
+    }
+    .pillTitle span{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+
+    .card{
+      border:1.5px solid var(--stroke); /* 4) bordo leggermente più spesso e pulito */
+      border-radius:20px; padding:18px;
+      background:
+        radial-gradient(800px 400px at 100% 0%, rgba(255,160,0,.06), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)),
+        var(--card);
+      box-shadow:0 12px 32px rgba(0,0,0,.5);
+    }
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media(max-width:720px){ .row{grid-template-columns:1fr} }
+    label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+    select{
+      width:100%; padding:14px; border-radius:14px;
+      background:#101010; color:#fff; border:1px solid var(--stroke);
+      transition:transform .08s ease; /* 7) micro-animazione select */
+    }
+    select:active{ transform:scale(1.02) }
+
+    /* 8) Banner più aggressivo (ma elegante) */
+    .banner{
+      display:none; margin-top:14px; margin-bottom:8px;
+      padding:16px; border-radius:16px; font-weight:900;
+      text-shadow:0 1px 0 rgba(0,0,0,.35);
+      background:linear-gradient(90deg,var(--win1),var(--win2));
+      box-shadow:0 10px 28px rgba(255,90,0,.28), inset 0 0 0 1px rgba(255,255,255,.08);
+      font-size:16px;
+    }
+    .banner.show{display:block}
+
+    /* Prezzo */
+    .price{
+      display:none; margin-top:10px;
+      padding:10px 14px; border-radius:14px; font-weight:900; font-size:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background:linear-gradient(90deg,#ffd400,#ff7b00);
+      color:#000; box-shadow:0 8px 18px rgba(255,150,0,.25);
+      width:max-content;
+    }
+    .price.show{display:inline-block}
+
+    /* LAMPADINA 3D CENTRATA */
+    .lamp3d{
       position:relative;
-  .badge{position:absolute;top:-12px;left:16px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;font-size:12px;font-weight:800;padding:7px 12px;border-radius:999px}
-  h1{font-size:24px;letter-spacing:-.04em;margin-bottom:10px}
-  .info{margin:16px 0;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
-  .row{display:flex;gap:10px;margin:6px 0}
-  .btn{display:block;text-decoration:none;text-align:center;padding:14px;border-radius:14px;background:radial-gradient(circle at 0% 0%,#25D366 0%,#128C7E 60%);color:#000;font-weight:900;box-shadow:0 18px 30px rgba(18,140,126,.45)}
-  .btn:hover{transform:translateY(-1px)}
+      display:flex; align-items:center; justify-content:center;
+      margin-top:14px; padding:22px; min-height:190px;
+      border:1px dashed var(--stroke); border-radius:18px;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,200,0,.05), transparent 60%),
+        radial-gradient(80% 60% at 50% 100%, rgba(255,180,0,.05), transparent 70%);
+      overflow:hidden;
+    }
+    /* 2) Raggi più ordinati e simmetrici */
+    .rays{
+      position:absolute; width:380px; height:380px; border-radius:50%;
+      background:
+        repeating-conic-gradient(
+          from 0deg,
+          rgba(255,210,80,.34) 0deg, rgba(255,210,80,0) 6deg,
+          rgba(255,210,80,0) 12deg, rgba(255,210,80,.26) 18deg
+        );
+      filter:blur(10px); opacity:0; transform:scale(.92);
+      transition:opacity .35s ease, transform .35s ease;
+      pointer-events:none;
+    }
+    .lamp3d.on .rays{opacity:.75; transform:scale(1); animation:spin 16s linear infinite}
+    .lamp3d.super .rays{opacity:1; transform:scale(1.05); animation:spinFast 10s linear infinite}
 
-/* ===== WhatsApp Cart — Style C (pill + centered modal) ===== */
-#rl-cart-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9999}
-#rl-cart-fab button{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:999px;padding:12px 16px;font-weight:900;box-shadow:0 18px 30px rgba(255,90,0,.35)}
-#rl-cart-fab .badge{background:#000;color:#fff;border-radius:999px;padding:6px 10px;font-weight:900}
-#rl-cart-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:10000}
-#rl-cart-modal .card{width:min(92vw,520px);background:linear-gradient(160deg, rgba(20,20,20,.98), rgba(0,0,0,.82));border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 26px 58px rgba(0,0,0,.75);padding:16px}
-#rl-cart-modal .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#rl-cart-modal h3{font-size:18px;font-weight:900;margin:0}
-#rl-cart-modal .list{max-height:52vh;overflow:auto;margin:6px 0 12px 0;border:1px solid rgba(255,255,255,.08);border-radius:12px}
-#rl-cart-modal .row{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
-#rl-cart-modal .row:last-child{border-bottom:0}
-#rl-cart-modal .name{font-weight:700}
-#rl-cart-modal .price{opacity:.9}
-#rl-cart-modal .act{display:flex;gap:8px;justify-content:flex-end}
-#rl-cart-modal .btn{background:linear-gradient(90deg,#ff0000,#ff7b00);color:#000;border:0;border-radius:12px;padding:10px 12px;font-weight:900;cursor:pointer}
-#rl-cart-modal .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.16)}
-.addcart-btn{display:inline-block;margin-top:8px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}
-.addcart-btn:hover{filter:brightness(1.08)}
-@media (max-width:480px){
-  #rl-cart-fab button span.txt{display:none}
-}
+    /* 1) Glow più morbido e uniforme + 3) Pulse più elegante */
+    .bulb{
+      position:relative;
+      width:102px; height:102px; border-radius:50%;
+      background:
+        radial-gradient(circle at 40% 30%, #fff 0%, #fff5cc 28%, #ffe08a 50%, #ffd15a 70%, #ffb300 88%, #a76f00 100%);
+      box-shadow:0 0 16px rgba(255,190,0,.52), 0 0 30px rgba(255,170,0,.20);
+      transition:transform .22s ease, filter .22s ease, box-shadow .22s ease, opacity .22s ease;
+      isolation:isolate; transform:translateZ(0);
+    }
+    .bulb.off{
+      background:radial-gradient(circle at 40% 30%, #666 0%, #555 30%, #3a3a3a 75%);
+      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.88; transform:scale(.985);
+    }
+    /* alone soft */
+    .bulb.glow::after{
+      content:""; position:absolute; inset:-36px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,235,180,.52) 0%, rgba(255,215,120,.30) 28%, rgba(255,195,70,.16) 52%, rgba(255,170,0,.08) 70%, transparent 78%);
+      filter:blur(7px); opacity:.95; z-index:-1; animation:haloSoft 4.2s ease-in-out infinite;
+    }
+    .bulb.glow::before{
+      content:""; position:absolute; inset:-12px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,230,.30) 0%, rgba(255,230,150,.16) 44%, transparent 72%);
+      filter:blur(3px); opacity:.82; z-index:-1;
+    }
+    /* 3) pulse più elegante */
+    .lamp3d.on .bulb{ animation:pulseSoft 3.2s ease-in-out infinite }
+    .lamp3d.super .bulb{ animation:pulseSoft 2.8s ease-in-out infinite }
+    @keyframes pulseSoft{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.015)}
+    }
 
-</style>
-</head><body>
-<main class="card">
-  <div class="badge">OFFERTA BUSINESS</div>
-  <h1>Fisso + Mobile TUTTO ILLIMITATO a €30/mese</h1>
-  <div class="info">
-    <div class="row">📶 Connessioni Business stabili e prioritarie</div>
-    <div class="row">💡 Energia: sconto -15€</div>
-    <div class="row">💰 Risparmio Annuo stimato €268</div>
-    <div class="row">🛠️ Assistenza diretta Re Long (NO call center)</div>
-  </div>
-  <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20voglio%20attivare%20l%E2%80%99Offerta%20Business%20.">💬 Chatta con un consulente Business</a>
-</main>
+    /* 5) Ombra sotto la lampadina più profonda */
+    .bulbShadow{
+      position:absolute; bottom:24px; width:46%; height:22px; border-radius:50%;
+      background:radial-gradient(ellipse at center, rgba(0,0,0,.35) 0%, rgba(0,0,0,.15) 55%, transparent 70%);
+      filter:blur(6px); opacity:.75; transition:opacity .25s ease, transform .25s ease;
+      pointer-events:none;
+    }
+    .lamp3d.on .bulbShadow{ opacity:.9 }
+    .lamp3d.super .bulbShadow{ opacity:1; transform:scale(1.06) }
 
+    /* Scintille ⚡ (solo SUPER) */
+    .sparks{ position:absolute; inset:0; pointer-events:none }
+    .sparks span{
+      position:absolute; font-size:22px; opacity:0; transform:scale(.6);
+      filter:drop-shadow(0 0 6px rgba(255,210,0,.6));
+    }
+    .sparks span:nth-child(1){ left:20%; top:24% }
+    .sparks span:nth-child(2){ right:18%; top:30% }
+    .sparks span:nth-child(3){ left:28%; bottom:20% }
+    .lamp3d.super .sparks span{ animation:sparkUp 1.8s ease-in-out infinite }
+    .lamp3d.super .sparks span:nth-child(2){ animation-delay:.25s }
+    .lamp3d.super .sparks span:nth-child(3){ animation-delay:.5s }
 
+    /* Flash (soft/strong) */
+    .bulb.flash{ animation:flashGlow .35s ease-out }
+    @keyframes flashGlow{
+      0%{ box-shadow:0 0 22px rgba(255,200,0,.65), 0 0 44px rgba(255,190,0,.30); transform:scale(1.00) }
+      50%{ box-shadow:0 0 34px rgba(255,210,0,.80), 0 0 64px rgba(255,200,0,.42); transform:scale(1.03) }
+      100%{ box-shadow:0 0 16px rgba(255,190,0,.52), 0 0 30px rgba(255,170,0,.20); transform:scale(1.00) }
+    }
+    .bulb.flashStrong{ animation:flashStrong .45s ease-out }
+    @keyframes flashStrong{
+      0%{ box-shadow:0 0 30px rgba(255,210,0,.85), 0 0 80px rgba(255,200,0,.5); transform:scale(1.02) }
+      60%{ box-shadow:0 0 60px rgba(255,220,0,1), 0 0 120px rgba(255,215,0,.65); transform:scale(1.07) }
+      100%{ box-shadow:0 0 20px rgba(255,190,0,.55), 0 0 36px rgba(255,175,0,.26); transform:scale(1.00) }
+    }
+
+    @keyframes haloSoft{
+      0%{transform:scale(.985);opacity:.92}
+      50%{transform:scale(1.01);opacity:1}
+      100%{transform:scale(.985);opacity:.92}
+    }
+    @keyframes spin{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+    @keyframes spinFast{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+    @keyframes sparkUp{
+      0%{ opacity:0; transform:translateY(8px) scale(.6) rotate(-8deg) }
+      35%{ opacity:1; transform:translateY(-4px) scale(1) rotate(0deg) }
+      100%{ opacity:0; transform:translateY(-14px) scale(1.05) rotate(6deg) }
+    }
+
+    /* Bottoni centrati */
+    .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; justify-content:center}
+    /* Nuovo pulsante WhatsApp verde sfumato + emoji */
+    .btn{
+      padding:14px 20px; border-radius:14px; font-weight:900; font-size:15px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(90deg,var(--wa1),var(--wa2));
+      color:#fff; box-shadow:0 10px 24px rgba(19,140,96,.35);
+      text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+      transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
+    }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(19,140,96,.40); filter:saturate(1.05) }
+    .btn:active{ transform:translateY(0) scale(.995) }
+
+    /* Spaziatura più pulita verticale (9) */
+    .card > *:not(:last-child){ margin-bottom:6px }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <!-- Pillola top -->
+    <div class="topbar">
+      <div class="pillTitle"> <span>Soluzioni Business + Energia</span> • Re Long </div>
     </div>
-  </div>
-</div>
 
+    <section class="card">
+      <h2 style="font-size:16px;margin-bottom:8px">Imposta la tua situazione</h2>
 
-<script>
-// ===== WhatsApp Cart Core =====
-(function(){
-  const WA_NUM = "3908119578844"; // IT +39 + 08119578844
-  const KEY = "rl_cart";
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
-
-  function getCart(){ try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } }
-  function setCart(v){ localStorage.setItem(KEY, JSON.stringify(v)); updateBadge(); }
-  function updateBadge(){
-    const n = getCart().length;
-    const b = $("#rl-cart-badge");
-    if (b) b.textContent = n;
-  }
-
-  function listToHTML(items){
-    if (!items.length) return '<div class="row"><div>Carrello vuoto</div></div>';
-    return items.map(x => `
-      <div class="row" data-sku="${(x.sku||"").replace(/"/g,'&quot;')}">
+      <div class="row">
         <div>
-          <div class="name">${(x.name||x.sku||"Senza nome").replace(/</g,'&lt;')}</div>
-          ${x.price != null ? `<div class="price">€ ${x.price}</div>` : ""}
+          <label>Diventa cliente Vodafone Business (Mobile)</label>
+          <select id="selMobile"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
-        <div class="act">
-          <button class="btn ghost rl-remove" data-sku="${(x.sku||"").replace(/"/g,'&quot;')}">Rimuovi</button>
+        <div>
+          <label>Diventa cliente Vodafone Business (Fisso)</label>
+          <select id="selFisso"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
-      </div>`).join("");
-  }
+      </div>
 
-  function openModal(){
-    const modal = $("#rl-cart-modal");
-    const list = $("#rl-cart-list");
-    list.innerHTML = listToHTML(getCart());
-    modal.style.display = "flex";
-  }
-  function closeModal(){ $("#rl-cart-modal").style.display="none"; }
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label>Vodafone Business (Energia)</label>
+          <select id="selEnergia" disabled>
+            <option value="si" selected>Sì (inclusa per ottenere lo sconto)</option>
+          </select>
+        </div>
+      </div>
 
-  function sendCart(){
-    const items = getCart();
-    if (!items.length) return alert("Carrello vuoto");
-    const lines = items.map((x,i)=>`${i+1}) ${x.name||x.sku}${x.price!=null?(" — €"+x.price):""}`).join("\n");
-    const msg = `Ciao Re Long, vorrei un preventivo per:\n${lines}\nGrazie!`;
-    const url = `https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
-  }
+      <div id="price" class="price"></div>
+      <div id="banner" class="banner"></div>
 
-  // Public API
-  window.RLCart = {
-    add: (item)=>{
-      const arr = getCart();
-      arr.push(item);
-      setCart(arr);
-      toast("Aggiunto: " + (item.name || item.sku || "Articolo"));
-    },
-    remove:(sku)=>{ setCart(getCart().filter(x=>x.sku!==sku)); toast("Rimosso: " + sku); },
-    clear: ()=>{ setCart([]); toast("Carrello svuotato"); },
-    list: getCart
-  };
+      <!-- Lampadina 3D centrata con raggi, ombra e scintille -->
+      <div id="lampBox" class="lamp3d" aria-live="polite">
+        <div id="rays" class="rays" aria-hidden="true"></div>
+        <div id="bulb" class="bulb off" role="img" aria-label="Lampadina"></div>
+        <div class="bulbShadow" aria-hidden="true"></div>
+        <div class="sparks" aria-hidden="true">
+          <span>⚡</span><span>⚡</span><span>⚡</span>
+        </div>
+      </div>
 
-  // UI hooks
-  document.addEventListener("click", (e)=>{
-    const add = e.target.closest("[data-cart-add]");
-    if (add){
-      e.preventDefault();
-      try{
-        const data = JSON.parse(add.getAttribute("data-cart-add"));
-        if (!data.sku) data.sku = (data.name||"ARTICOLO").toUpperCase().replace(/\W+/g,"-").slice(0,20);
-        window.RLCart.add(data);
-      }catch(err){
-        console.error("data-cart-add non valido", err);
+      <div class="btns">
+        <a class="btn" id="btnWA" target="_blank" rel="noopener">💬 Richiedi una consulenza</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const selMobile  = document.getElementById('selMobile');
+      const selFisso   = document.getElementById('selFisso');
+
+      const price  = document.getElementById('price');
+      const banner = document.getElementById('banner');
+
+      const lampBox= document.getElementById('lampBox');
+      const bulb   = document.getElementById('bulb');
+
+      const btnWA  = document.getElementById('btnWA');
+      const WA_NUMBER = "3908119578844";
+
+      // 0=off, 1=on (uno solo), 2=super (entrambi)
+      let prevLevel = 0;
+
+      function setPrice(text){
+        if(text){
+          price.textContent = text;
+          price.classList.add('show');
+        } else {
+          price.textContent = '';
+          price.classList.remove('show');
+        }
       }
-    }
-    const rm = e.target.closest(".rl-remove");
-    if (rm){
-      e.preventDefault();
-      const sku = rm.getAttribute("data-sku");
-      window.RLCart.remove(sku);
-      // refresh list
-      const lst = $("#rl-cart-list");
-      lst.innerHTML = listToHTML(getCart());
-    }
-  });
 
-  // Modal controls
-  $("#rl-cart-open")?.addEventListener("click", openModal);
-  $("#rl-cart-close")?.addEventListener("click", closeModal);
-  $("#rl-cart-clear")?.addEventListener("click", ()=>{ window.RLCart.clear(); $("#rl-cart-list").innerHTML = listToHTML([]); });
-  $("#rl-cart-send")?.addEventListener("click", sendCart);
-  $("#rl-cart-modal")?.addEventListener("click", (e)=>{ if(e.target.id==="rl-cart-modal") closeModal(); });
+      function setBanner(html){
+        if(!html){
+          banner.classList.remove('show');
+          banner.innerHTML='';
+          return;
+        }
+        banner.classList.add('show');
+        banner.innerHTML = html;
+      }
 
-  // Toast utility (reuses .toast if present; else creates)
-  function toast(msg){
-    let t = document.querySelector('.toast');
-    if(!t){ t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
-    t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000);
-  }
+      function setLamp(level){
+        lampBox.classList.toggle('on', level >= 1);
+        lampBox.classList.toggle('super', level === 2);
+        bulb.classList.toggle('off', level === 0);
+        bulb.classList.toggle('glow', level >= 1);
 
-  updateBadge();
+        // flash: soft per ON, strong per SUPER o transizione ON->SUPER
+        bulb.classList.remove('flash','flashStrong');
+        void bulb.offsetWidth;
+        if (prevLevel === 0 && level >= 1) {
+          bulb.classList.add(level === 2 ? 'flashStrong' : 'flash');
+        } else if (prevLevel === 1 && level === 2) {
+          bulb.classList.add('flashStrong');
+        }
+        prevLevel = level;
+      }
 
-  // ===== Auto-augment: add unobtrusive "Aggiungi al carrello" buttons =====
-  // Heuristics for common card structures in provided pages
-  function addButtons(){
-    const selectorCandidates = [
-      // likely product cards
-      ".product-card",
-      ".phone-card",
-      ".device-card",
-      ".catalog-card",
-      ".item-card",
-      // generic cards but only if they contain a price-like text
-      "article.card"
-    ];
+      function compute(){
+        const m = selMobile.value === 'si';
+        const f = selFisso.value === 'si';
 
-    const isPricey = (el)=>/\b€\s?\d/.test(el.textContent.replace(",", "."));
+        let level = 0;
 
-    const seen = new WeakSet();
-    selectorCandidates.forEach(sel=>{
-      document.querySelectorAll(sel).forEach(card=>{
-        if (seen.has(card)) return;
-        let title = card.querySelector(".title, h3, h2, .name, .product-title");
-        let priceEl = card.querySelector(".price, .prezzo, .product-price, .amount");
-        let priceText = priceEl?.textContent or None
-        if priceText:
-            priceText = priceText.strip()
-        # Only add on product-like cards
-        cond_ok = title is not None and (priceEl is not None or isPricey(card))
-        if not cond_ok:
-            return
-        # Avoid duplicates
-        if card.querySelector(".addcart-btn"):
-            return
-        # Guess data
-        name = (title.textContent or "Articolo").strip()
-        name = re.sub(r"\s+", " ", name)
-        price = None
-        if priceEl:
-            # try to parse number
-            import re as _re
-            m = _re.search(r"(\d+[.,]?\d*)", priceEl.textContent)
-            if m:
-                price = m.group(1).replace(",", ".")
-                try:
-                    price = float(price)
-                except:
-                    price = None
+        if (m && !f) {
+          setPrice('€15/mese');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
+          level = 1;
+        } else if (f && !m) {
+          setPrice('€28/mese');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Sconto di <u>€180/anno</u>.');
+          level = 1;
+        } else if (m && f) {
+          setPrice('€30/mese');
+          setBanner('🎉 <b>Hai acceso la tua energia!</b> Super sconto di <u>€260/anno</u>.');
+          level = 2;
+        } else {
+          setPrice('');
+          setBanner('');
+          level = 0;
+        }
 
-        # place button after the first .btn or at the card end
-        insertAfterEl = card.querySelector(".btn") or card
-        btn = document.createElement("a")
-        btn.className = "addcart-btn"
-        payload = {"name": name}
-        if price is not None:
-            payload["price"] = price
-        btn.setAttribute("data-cart-add", JSON.stringify(payload))
-        btn.textContent = "➕ Aggiungi al carrello"
-        if insertAfterEl === card:
-            card.appendChild(btn)
-        else:
-            insertAfterEl.insertAdjacentElement("afterend", btn)
-        seen.add(card)
-      })
-    });
-  }
+        setLamp(level);
 
-  // Run after DOM ready
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", addButtons);
-  } else {
-    addButtons();
-  }
-})();
-</script>
+        const msg =
+`Simulazione Re Long
+Mobile: ${m ? 'si' : 'no'}
+Fisso: ${f ? 'si' : 'no'}
+Energia: si
+Prezzo: ${price.textContent || '-'}
+Banner: ${banner.textContent || '-'}`;
 
-</body></html>
+        btnWA.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
+      }
+
+      [selMobile, selFisso].forEach(el => el.addEventListener('change', compute));
+      compute();
+    })();
+  </script>
+</body>
+</html>
