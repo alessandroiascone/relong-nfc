@@ -1,4 +1,3 @@
-<!-- File: simulatore-energia-business-sconto.html -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -14,213 +13,165 @@
       --stroke:rgba(255,255,255,.09);
       --muted:rgba(255,255,255,.68);
       --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
+      --cta:#ffb300;
+      --win1:#ff2d2d; --win2:#ff6a00;
     }
     body{
-      font-family:system-ui,-apple-system,Inter,Roboto,Segoe UI,Arial,sans-serif;
-      color:#fff; min-height:100dvh;
+      font-family:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif;
       background:
-        radial-gradient(1200px 800px at 10% 10%, #131313 0%, transparent 60%),
-        radial-gradient(1000px 600px at 90% 20%, #171717 0%, transparent 60%),
+        radial-gradient(1200px 800px at 10% 10%, #151515 0%, transparent 60%),
+        radial-gradient(1000px 600px at 90% 20%, #181818 0%, transparent 60%),
         linear-gradient(180deg,var(--bg1),var(--bg2));
-      display:flex; align-items:center; justify-content:center; padding:24px;
+      color:#fff; min-height:100dvh;
+      display:flex; justify-content:center; padding:24px;
     }
     .wrap{width:min(980px,100%); display:grid; gap:18px}
     .title{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:18px 20px; border:1px solid var(--stroke); border-radius:20px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)),
-        linear-gradient(135deg, rgba(255,122,0,.08), rgba(255,212,0,.03));
-      box-shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.03);
+      display:flex; justify-content:space-between; padding:18px 20px;
+      border:1px solid var(--stroke); border-radius:20px;
+      background:linear-gradient(135deg, rgba(255,200,0,.08), rgba(255,255,255,.03));
+      box-shadow:0 10px 30px rgba(0,0,0,.45);
     }
-    .title h1{font-size:20px; letter-spacing:.2px}
+    .title h1{font-size:20px}
     .badge{
-      font-weight:700; font-size:12px; letter-spacing:.6px; text-transform:uppercase;
-      padding:8px 12px; border-radius:999px; border:1px solid var(--stroke);
+      padding:8px 12px; border-radius:999px; font-size:12px; font-weight:700;
       background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+      -webkit-background-clip:text; color:transparent;
+      border:1px solid var(--stroke);
     }
-
     .card{
-      border:1px solid var(--stroke); border-radius:20px; padding:18px;
-      background:
-        radial-gradient(120% 120% at 80% 0%, rgba(255,160,0,.08), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)),
-        var(--card);
-      box-shadow:0 12px 32px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.02);
+      border:1px solid var(--stroke); border-radius:20px; padding:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)), var(--card);
+      box-shadow:0 12px 32px rgba(0,0,0,.5);
     }
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:6px}
-    @media (max-width:720px){ .row{grid-template-columns:1fr} }
-
-    label{font-size:13px; color:var(--muted); margin-bottom:6px; display:block}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media(max-width:720px){ .row{grid-template-columns:1fr} }
     select{
-      width:100%; padding:14px 14px; border-radius:14px; border:1px solid var(--stroke);
-      background:#101010; color:#fff; outline:none; font-size:15px;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+      width:100%; padding:14px; border-radius:14px;
+      background:#101010; color:#fff; border:1px solid var(--stroke);
     }
+
+    .banner{
+      display:none; margin-top:14px; margin-bottom:8px;
+      padding:14px; border-radius:14px; font-weight:800;
+      text-shadow:0 1px 0 rgba(0,0,0,.4);
+    }
+    .banner.show{display:block}
+    .banner.cta{background:linear-gradient(90deg,var(--cta),#ff7b00)}
+    .banner.win{background:linear-gradient(90deg,var(--win1),var(--win2))}
 
     .lamp{
-      display:flex; align-items:center; gap:14px; padding:14px;
-      border-radius:16px; border:1px dashed var(--stroke);
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-      margin:14px 0 10px;
+      display:flex; gap:14px; align-items:center;
+      padding:14px; margin-top:14px;
+      border-radius:14px; border:1px dashed var(--stroke);
     }
     .bulb{
       width:58px; height:58px; border-radius:50%;
       background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
-      box-shadow:0 0 12px rgba(255,210,64,.7), 0 0 36px rgba(255,180,24,.35), inset 0 -10px 20px rgba(0,0,0,.35);
-      transition:filter .25s ease, opacity .25s ease;
+      box-shadow:0 0 16px rgba(255,180,0,.6);
+      transition:.25s;
     }
     .bulb.off{
-      background:radial-gradient(circle at 35% 30%, #777 0%, #666 40%, #4b4b4b 70%, #2a2a2a 100%);
-      box-shadow: inset 0 -6px 12px rgba(0,0,0,.6);
-      filter:grayscale(.2) brightness(.8);
+      background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
+      box-shadow:none;
+      filter:saturate(.3) brightness(.6);
     }
 
-    .banner{
-      display:none;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      padding:12px 14px; font-weight:800; letter-spacing:.2px;
-      text-shadow:0 1px 0 rgba(0,0,0,.4);
-      margin-bottom:10px;
-    }
-    .banner.show{display:block}
-    .banner.cta{
-      background:linear-gradient(90deg, #ffb300, #ff7b00);
-    }
-    .banner.win{
-      background:linear-gradient(90deg, #ff2d2d, #ff6a00);
-    }
-
-    .out{
-      border:1px solid var(--stroke); border-radius:16px; padding:14px; min-height:64px;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-      font-size:15px;
-    }
-
-    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
     .btn{
-      appearance:none; border:0; cursor:pointer; border-radius:14px; padding:12px 16px;
-      font-weight:700; font-size:14px; color:#0a0a0a;
+      padding:12px 18px; border-radius:14px; font-weight:700;
+      border:none; cursor:pointer; text-decoration:none;
       background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
-      box-shadow:0 8px 20px rgba(255,140,0,.25);
-      text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+      color:#000;
+      box-shadow:0 8px 20px rgba(255,150,0,.35);
     }
     .btn.secondary{
-      background:linear-gradient(180deg,#161616,#101010);
-      color:#fff; border:1px solid var(--stroke);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+      background:#161616; color:#fff; border:1px solid var(--stroke);
     }
+
     .pill{
-      font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke);
-      background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,0));
-      color:var(--muted);
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--stroke); font-size:12px;
+      background:rgba(255,255,255,.04);
     }
-    .foot{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px}
-    .foot small{color:var(--muted)}
   </style>
 </head>
 <body>
-  <main class="wrap" role="main">
+  <main class="wrap">
     <header class="title">
       <h1>Simulatore Sconti • Re Long</h1>
       <span class="badge">Business • Energia</span>
     </header>
 
-    <section class="card" aria-labelledby="lbl-scelte">
-      <h2 id="lbl-scelte" style="font-size:16px; margin-top:2px">Imposta la tua situazione</h2>
+    <section class="card">
+      <h2 style="font-size:16px;margin-bottom:10px">Imposta la tua situazione</h2>
 
-      <div class="row" style="margin-top:10px">
+      <div class="row">
         <div>
-          <label for="selMobile">Diventa cliente Vodafone Business (Mobile)</label>
-          <select id="selMobile" aria-label="Diventa cliente Vodafone Business Mobile">
-            <option value="no">No</option>
-            <option value="si">Sì</option>
-          </select>
+          <label>Diventa cliente Vodafone Business (Mobile)</label>
+          <select id="selMobile"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
         <div>
-          <label for="selFisso">Diventa cliente Vodafone Business (Fisso)</label>
-          <select id="selFisso" aria-label="Diventa cliente Vodafone Business Fisso">
-            <option value="no">No</option>
-            <option value="si">Sì</option>
-          </select>
+          <label>Diventa cliente Vodafone Business (Fisso)</label>
+          <select id="selFisso"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
       </div>
 
       <div class="row" style="margin-top:10px">
         <div>
-          <label for="selEnergia">Diventa cliente Vodafone Business (Energia)?</label>
-          <select id="selEnergia" aria-label="Diventa cliente Vodafone Business Energia">
-            <option value="no">No</option>
-            <option value="si">Sì</option>
-          </select>
+          <label>Diventa cliente Vodafone Business (Energia)?</label>
+          <select id="selEnergia"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
         <div></div>
       </div>
 
-      <div id="banner" class="banner" role="status" aria-live="polite"></div>
+      <div id="banner" class="banner"></div>
 
       <div class="lamp">
-        <div id="bulb" class="bulb off" aria-hidden="true"></div>
-        <div class="txt">
-          <div id="lampTit" style="font-size:16px; font-weight:800">Lampadina spenta</div>
-          <div id="lampSub" style="font-size:13px; color:var(--muted)">Scopri gli sconti selezionando le opzioni.</div>
+        <div id="bulb" class="bulb off"></div>
+        <div>
+          <div id="lampTit" style="font-weight:800;font-size:16px">Lampadina spenta</div>
+          <div id="lampSub" style="font-size:13px;color:var(--muted)">Scopri gli sconti selezionando le opzioni.</div>
         </div>
       </div>
 
-      <div id="output" class="out" aria-live="polite"></div>
+      <!-- DETTAGLIO SIMULAZIONE RIMOSSO -->
 
       <div class="btns">
-        <button class="btn secondary" id="btnCopy" type="button">Copia simulazione</button>
-        <a class="btn" id="btnWA" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
+        <button class="btn secondary" id="btnCopy">Copia simulazione</button>
+        <a class="btn" id="btnWA" target="_blank">Invia su WhatsApp</a>
         <span class="pill">WhatsApp: 08119578844</span>
-      </div>
-
-      <div class="foot">
-        <small>Stime indicative. Verifica in negozio le condizioni.</small>
-        <small>Re Long Informatica • Marano di Napoli</small>
       </div>
     </section>
   </main>
 
   <script>
     (function(){
+
       const selMobile  = document.getElementById('selMobile');
       const selFisso   = document.getElementById('selFisso');
       const selEnergia = document.getElementById('selEnergia');
 
-      const bulb   = document.getElementById('bulb');
-      const lampTit= document.getElementById('lampTit');
-      const lampSub= document.getElementById('lampSub');
-      const out    = document.getElementById('output');
+      const bulb = document.getElementById('bulb');
+      const lampTit = document.getElementById('lampTit');
+      const lampSub = document.getElementById('lampSub');
       const banner = document.getElementById('banner');
 
-      const btnCopy= document.getElementById('btnCopy');
-      const btnWA  = document.getElementById('btnWA');
+      const btnCopy = document.getElementById('btnCopy');
+      const btnWA   = document.getElementById('btnWA');
 
-      const WA_NUMBER = '3908119578844'; // +39 08119578844
+      const WA_NUMBER = "3908119578844";
 
       function compute(){
-        const m = selMobile.value;   // 'si' | 'no'
-        const f = selFisso.value;    // 'si' | 'no'
-        const e = selEnergia.value;  // 'si' | 'no'
+        const m = selMobile.value;
+        const f = selFisso.value;
+        const e = selEnergia.value;
 
-        // Calcolo sconto:
-        // - Se Energia = Sì:
-        //    - Mobile = Sì & Fisso = Sì -> €240
-        //    - Mobile = Sì XOR Fisso = Sì -> €180
-        //    - Nessuna linea -> €0 (niente sconto)
-        // - Se Energia = No:
-        //    - Se Mobile = Sì XOR Fisso = Sì -> mostra banner invito ad attivare Energia (con importo 180)
-        //    - Se Mobile = Sì & Fisso = Sì -> mostra banner invito ad attivare Energia (con importo 240)
-        //    - Altrimenti nessun banner
         let amount = 0;
+
         if (e === 'si') {
           if (m === 'si' && f === 'si') amount = 240;
-          else if (m === 'si' ^ f === 'si') amount = 180; // XOR
-          else amount = 0;
+          else if (m === 'si' || f === 'si') amount = 180;
         }
 
         const lampOn = amount > 0;
@@ -230,69 +181,49 @@
         if (lampOn) {
           banner.classList.add('show','win');
           banner.innerHTML = `🎉 Complimenti! Hai diritto allo <u>sconto annuo di €${amount}</u>.`;
-        } else if (e === 'no' && (m === 'si' || f === 'si')) {
-          const hint = (m === 'si' && f === 'si') ? 240 : 180;
+        } 
+        else if (e === 'no' && (m==='si'||f==='si')) {
+          const hint = (m==='si' && f==='si') ? 240 : 180;
           banner.classList.add('show','cta');
-          banner.innerHTML = `💡 Attiva anche <b>Energia Business</b> per ottenere <u>€${hint} di sconto annuo</u>.`;
-        } else {
-          banner.innerHTML = '';
+          banner.innerHTML = `💡 Attiva anche <b>Energia Business</b> per ottenere <u>€${hint}</u> di sconto annuo.`;
         }
 
-        // LAMPADINA + titoli
+        // Lampadina
         bulb.classList.toggle('off', !lampOn);
         lampTit.textContent = lampOn ? 'Lampadina accesa' : 'Lampadina spenta';
-        lampSub.textContent = lampOn
-          ? (amount === 240 ? 'Fisso + Mobile + Energia attivi: sconto totale €240/anno.'
-                            : 'Con Energia + (Fisso o Mobile): sconto €180/anno.')
+        lampSub.textContent = lampOn 
+          ? (amount===240 ? 'Fisso + Mobile + Energia: sconto totale €240/anno.'
+                          : 'Mobile/Fisso + Energia: sconto €180/anno.')
           : 'Scopri gli sconti selezionando le opzioni.';
 
-        // Messaggio riepilogo
+        // Messaggio per WhatsApp (non visibile nel sito)
         const message = lampOn
           ? `✅ Simulazione Re Long
-• Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
-• Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
-• Diventa Vodafone Business Energia: ${e==='si'?'Sì':'No'}
-→ Esito: Lampadina accesa • SCONTO €${amount} annui
+• Mobile: ${m}
+• Fisso: ${f}
+• Energia: ${e}
+→ Sconto €${amount}/anno
 WhatsApp: 08119578844`
-          : (e==='no' && (m==='si'||f==='si'))
-            ? `ℹ️ Simulazione Re Long
-• Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
-• Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
-• Diventa Vodafone Business Energia: No
-→ Suggerimento: attiva Energia Business per ottenere lo sconto annuale (€${(m==='si' && f==='si')?240:180})
-WhatsApp: 08119578844`
-            : `ℹ️ Simulazione Re Long
-• Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
-• Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
-• Diventa Vodafone Business Energia: ${e==='si'?'Sì':'No'}
-→ Esito: Nessuno sconto automatico
+          : `ℹ️ Simulazione Re Long
+• Mobile: ${m}
+• Fisso: ${f}
+• Energia: ${e}
+→ Nessuno sconto automatico
 WhatsApp: 08119578844`;
 
-        out.innerHTML = message.replace(/\n/g,'<br>');
-
-        // WhatsApp link
-        const waText = encodeURIComponent(message + '\n— Inviato da Simulatore Re Long');
-        btnWA.href = 'https://wa.me/' + WA_NUMBER + '?text=' + waText;
-
+        btnWA.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(message);
         return message;
       }
 
       [selMobile, selFisso, selEnergia].forEach(el => el.addEventListener('change', compute));
 
-      // Copia negli appunti
-      btnCopy.addEventListener('click', async () => {
+      btnCopy.addEventListener('click', async()=> {
         const msg = compute();
-        try {
-          await navigator.clipboard.writeText(msg);
-          btnCopy.textContent = 'Copiato ✔';
-          setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
-        } catch {
-          btnCopy.textContent = 'Errore copia';
-          setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
-        }
+        await navigator.clipboard.writeText(msg);
+        btnCopy.textContent="Copiato ✔";
+        setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
       });
 
-      // Init
       compute();
     })();
   </script>
