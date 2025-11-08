@@ -14,7 +14,6 @@
       --stroke:rgba(255,255,255,.09);
       --muted:rgba(255,255,255,.68);
       --brand1:#ff3b1a; --brand2:#ff7b00; --brand3:#ffd400;
-      --banner:#ff2d2d;
     }
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,Segoe UI,Arial,sans-serif;
@@ -42,6 +41,7 @@
       -webkit-background-clip:text; background-clip:text; color:transparent;
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
     }
+
     .card{
       border:1px solid var(--stroke); border-radius:20px; padding:18px;
       background:
@@ -82,12 +82,17 @@
       display:none;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.14);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)), linear-gradient(90deg, var(--banner), #ff6a00);
       padding:12px 14px; font-weight:800; letter-spacing:.2px;
       text-shadow:0 1px 0 rgba(0,0,0,.4);
       margin-bottom:10px;
     }
     .banner.show{display:block}
+    .banner.cta{
+      background:linear-gradient(90deg, #ffb300, #ff7b00);
+    }
+    .banner.win{
+      background:linear-gradient(90deg, #ff2d2d, #ff6a00);
+    }
 
     .out{
       border:1px solid var(--stroke); border-radius:16px; padding:14px; min-height:64px;
@@ -202,30 +207,38 @@
         const f = selFisso.value;    // 'si' | 'no'
         const e = selEnergia.value;  // 'si' | 'no'
 
-        // Regole richieste:
-        // - Mobile = Sì e Energia = Sì  -> €180 annui
-        // - Fisso  = Sì e Energia = Sì  -> €180 annui
-        // - Mobile = Sì & Fisso = Sì & Energia = Sì -> €240 annui
-        // - Energia = No -> nessuno sconto (anche se Mobile/Fisso sono Sì)
-
+        // Calcolo sconto:
+        // - Se Energia = Sì:
+        //    - Mobile = Sì & Fisso = Sì -> €240
+        //    - Mobile = Sì XOR Fisso = Sì -> €180
+        //    - Nessuna linea -> €0 (niente sconto)
+        // - Se Energia = No:
+        //    - Se Mobile = Sì XOR Fisso = Sì -> mostra banner invito ad attivare Energia (con importo 180)
+        //    - Se Mobile = Sì & Fisso = Sì -> mostra banner invito ad attivare Energia (con importo 240)
+        //    - Altrimenti nessun banner
         let amount = 0;
         if (e === 'si') {
           if (m === 'si' && f === 'si') amount = 240;
-          else if (m === 'si' || f === 'si') amount = 180;
+          else if (m === 'si' ^ f === 'si') amount = 180; // XOR
+          else amount = 0;
         }
 
         const lampOn = amount > 0;
 
-        // Banner (solo quando c'è diritto allo sconto)
+        // BANNER
+        banner.classList.remove('show','cta','win');
         if (lampOn) {
-          banner.classList.add('show');
+          banner.classList.add('show','win');
           banner.innerHTML = `🎉 Complimenti! Hai diritto allo <u>sconto annuo di €${amount}</u>.`;
+        } else if (e === 'no' && (m === 'si' || f === 'si')) {
+          const hint = (m === 'si' && f === 'si') ? 240 : 180;
+          banner.classList.add('show','cta');
+          banner.innerHTML = `💡 Attiva anche <b>Energia Business</b> per ottenere <u>€${hint} di sconto annuo</u>.`;
         } else {
-          banner.classList.remove('show');
           banner.innerHTML = '';
         }
 
-        // UI lampadina + testi
+        // LAMPADINA + titoli
         bulb.classList.toggle('off', !lampOn);
         lampTit.textContent = lampOn ? 'Lampadina accesa' : 'Lampadina spenta';
         lampSub.textContent = lampOn
@@ -233,22 +246,27 @@
                             : 'Con Energia + (Fisso o Mobile): sconto €180/anno.')
           : 'Scopri gli sconti selezionando le opzioni.';
 
-        // Messaggio di riepilogo (senza mostrare le regole esplicite)
-        const message =
-          (lampOn
-            ? `✅ Simulazione Re Long
+        // Messaggio riepilogo
+        const message = lampOn
+          ? `✅ Simulazione Re Long
 • Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
 • Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
 • Diventa Vodafone Business Energia: ${e==='si'?'Sì':'No'}
 → Esito: Lampadina accesa • SCONTO €${amount} annui
+WhatsApp: 08119578844`
+          : (e==='no' && (m==='si'||f==='si'))
+            ? `ℹ️ Simulazione Re Long
+• Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
+• Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
+• Diventa Vodafone Business Energia: No
+→ Suggerimento: attiva Energia Business per ottenere lo sconto annuale (€${(m==='si' && f==='si')?240:180})
 WhatsApp: 08119578844`
             : `ℹ️ Simulazione Re Long
 • Diventa Vodafone Business Mobile: ${m==='si'?'Sì':'No'}
 • Diventa Vodafone Business Fisso: ${f==='si'?'Sì':'No'}
 • Diventa Vodafone Business Energia: ${e==='si'?'Sì':'No'}
 → Esito: Nessuno sconto automatico
-WhatsApp: 08119578844`
-          );
+WhatsApp: 08119578844`;
 
         out.innerHTML = message.replace(/\n/g,'<br>');
 
@@ -268,7 +286,7 @@ WhatsApp: 08119578844`
           await navigator.clipboard.writeText(msg);
           btnCopy.textContent = 'Copiato ✔';
           setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
-        } catch (e) {
+        } catch {
           btnCopy.textContent = 'Errore copia';
           setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
         }
