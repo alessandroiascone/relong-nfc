@@ -63,38 +63,6 @@
     .banner.cta{background:linear-gradient(90deg,var(--cta),#ff7b00)}
     .banner.win{background:linear-gradient(90deg,var(--win1),var(--win2))}
 
-    /* Lampadina */
-    .lamp{
-      display:flex; gap:14px; align-items:center;
-      padding:14px; margin-top:14px;
-      border-radius:14px; border:1px dashed var(--stroke);
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-    }
-    .bulb{
-      position:relative;
-      width:58px; height:58px; border-radius:50%;
-      background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
-      box-shadow:0 0 10px rgba(255,180,0,.55), 0 0 22px rgba(255,170,0,.25);
-      transition:.28s ease;
-      isolation:isolate;
-    }
-    .bulb.off{
-      background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
-      box-shadow:none; filter:saturate(.35) brightness(.65);
-    }
-    /* Glow premium morbido */
-    .bulb.glow::after{
-      content:""; position:absolute; inset:-22px; border-radius:50%;
-      background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 25%, rgba(255,195,70,.18) 45%, rgba(255,170,0,.09) 62%, transparent 72%);
-      filter:blur(4px); opacity:.95; z-index:-1; animation:haloSoft 4s ease-in-out infinite;
-    }
-    .bulb.glow::before{
-      content:""; position:absolute; inset:-8px; border-radius:50%;
-      background:radial-gradient(circle, rgba(255,255,220,.35) 0%, rgba(255,220,120,.18) 40%, transparent 70%);
-      filter:blur(2px); opacity:.8; z-index:-1;
-    }
-    @keyframes haloSoft{0%{transform:scale(.98);opacity:.92}50%{transform:scale(1.03);opacity:1}100%{transform:scale(.98);opacity:.92}}
-
     /* Price tag */
     .price{
       display:none; margin-top:10px;
@@ -107,9 +75,80 @@
     }
     .price.show{display:inline-block}
 
-    /* Nota energia inclusa */
-    .energy-note{
-      margin-top:8px; font-size:13px; color:var(--muted);
+    /* LAMPADINA 3D CENTRATA */
+    .lamp3d{
+      position:relative;
+      display:flex; align-items:center; justify-content:center;
+      margin-top:16px; padding:24px; min-height:160px;
+      border:1px dashed var(--stroke); border-radius:16px;
+      background:radial-gradient(120% 120% at 50% 0%, rgba(255,200,0,.05), transparent 60%);
+      overflow:hidden;
+    }
+    .bulb{
+      position:relative;
+      width:96px; height:96px; border-radius:50%;
+      background:radial-gradient(circle at 35% 30%, #fff 0%, #ffe08a 40%, #ffcf4a 60%, #ffb300 85%, #aa7000 100%);
+      box-shadow:0 0 14px rgba(255,180,0,.55), 0 0 28px rgba(255,170,0,.22);
+      transition:transform .25s ease, filter .25s ease, box-shadow .25s ease, opacity .25s ease;
+      isolation:isolate;
+      transform:translateZ(0);
+    }
+    .bulb.off{
+      background:radial-gradient(circle at 35% 30%, #555 0%, #444 40%, #2b2b2b 80%);
+      box-shadow:none; filter:saturate(.35) brightness(.68); opacity:.85;
+      transform:scale(.98);
+    }
+    /* Alone morbido premium */
+    .bulb.glow::after{
+      content:""; position:absolute; inset:-34px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,230,170,.55) 0%, rgba(255,210,110,.35) 26%, rgba(255,195,70,.18) 48%, rgba(255,170,0,.1) 66%, transparent 76%);
+      filter:blur(6px); opacity:.95; z-index:-1; animation:haloSoft 4s ease-in-out infinite;
+    }
+    .bulb.glow::before{
+      content:""; position:absolute; inset:-12px; border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,220,.35) 0%, rgba(255,220,120,.18) 40%, transparent 70%);
+      filter:blur(3px); opacity:.8; z-index:-1;
+    }
+    /* Raggi dinamici */
+    .rays{
+      position:absolute; width:340px; height:340px; border-radius:50%;
+      background:
+        conic-gradient(from 0deg,
+          rgba(255,210,80,.0) 0deg, rgba(255,210,80,.35) 6deg, rgba(255,210,80,.0) 12deg,
+          rgba(255,210,80,.0) 30deg, rgba(255,210,80,.28) 36deg, rgba(255,210,80,.0) 42deg,
+          rgba(255,210,80,.0) 60deg, rgba(255,210,80,.22) 66deg, rgba(255,210,80,.0) 72deg,
+          rgba(255,210,80,.0) 90deg, rgba(255,210,80,.30) 96deg, rgba(255,210,80,.0) 102deg,
+          rgba(255,210,80,.0) 120deg, rgba(255,210,80,.28) 126deg, rgba(255,210,80,.0) 132deg,
+          rgba(255,210,80,.0) 150deg, rgba(255,210,80,.22) 156deg, rgba(255,210,80,.0) 162deg,
+          rgba(255,210,80,.0) 180deg, rgba(255,210,80,.30) 186deg, rgba(255,210,80,.0) 192deg,
+          rgba(255,210,80,.0) 210deg, rgba(255,210,80,.28) 216deg, rgba(255,210,80,.0) 222deg,
+          rgba(255,210,80,.0) 240deg, rgba(255,210,80,.22) 246deg, rgba(255,210,80,.0) 252deg,
+          rgba(255,210,80,.0) 270deg, rgba(255,210,80,.30) 276deg, rgba(255,210,80,.0) 282deg,
+          rgba(255,210,80,.0) 300deg, rgba(255,210,80,.28) 306deg, rgba(255,210,80,.0) 312deg,
+          rgba(255,210,80,.0) 330deg, rgba(255,210,80,.22) 336deg, rgba(255,210,80,.0) 342deg
+        );
+      filter:blur(10px);
+      opacity:0; transform:scale(.9);
+      transition:opacity .35s ease, transform .35s ease;
+      pointer-events:none;
+    }
+    .lamp3d.on .rays{opacity:.9; transform:scale(1); animation:spin 14s linear infinite}
+
+    /* micro-movimento/pulse */
+    .lamp3d.on .bulb{animation:pulse 2.8s ease-in-out infinite}
+
+    @keyframes haloSoft{
+      0%{transform:scale(.98);opacity:.92}
+      50%{transform:scale(1.03);opacity:1}
+      100%{transform:scale(.98);opacity:.92}
+    }
+    @keyframes spin{
+      0%{transform:rotate(0deg)}
+      100%{transform:rotate(360deg)}
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.03)}
     }
 
     /* Bottoni */
@@ -137,7 +176,7 @@
       <div class="row">
         <div>
           <label>Diventa cliente Vodafone Business (Mobile)</label>
-        <select id="selMobile"><option value="no">No</option><option value="si">Sì</option></select>
+          <select id="selMobile"><option value="no">No</option><option value="si">Sì</option></select>
         </div>
         <div>
           <label>Diventa cliente Vodafone Business (Fisso)</label>
@@ -152,19 +191,16 @@
           <select id="selEnergia" disabled>
             <option value="si" selected>Sì (inclusa per ottenere lo sconto)</option>
           </select>
-          <div class="energy-note">L’energia è inclusa per accendere la lampadina e attivare lo sconto.</div>
         </div>
       </div>
 
       <div id="price" class="price"></div>
       <div id="banner" class="banner"></div>
 
-      <div class="lamp">
-        <div id="bulb" class="bulb off"></div>
-        <div>
-          <div id="lampTit" style="font-weight:800;font-size:16px">Lampadina spenta</div>
-          <div id="lampSub" style="font-size:13px;color:var(--muted)">Seleziona Fisso e/o Mobile per vedere i vantaggi.</div>
-        </div>
+      <!-- Lampadina 3D centrata, senza testi laterali -->
+      <div id="lampBox" class="lamp3d" aria-live="polite">
+        <div id="rays" class="rays" aria-hidden="true"></div>
+        <div id="bulb" class="bulb off" role="img" aria-label="Lampadina"></div>
       </div>
 
       <div class="btns">
@@ -179,14 +215,12 @@
     (function(){
       const selMobile  = document.getElementById('selMobile');
       const selFisso   = document.getElementById('selFisso');
-      const selEnergia = document.getElementById('selEnergia'); // sempre 'si' (disabilitato)
 
       const price  = document.getElementById('price');
       const banner = document.getElementById('banner');
 
+      const lampBox= document.getElementById('lampBox');
       const bulb   = document.getElementById('bulb');
-      const lampTit= document.getElementById('lampTit');
-      const lampSub= document.getElementById('lampSub');
 
       const btnCopy= document.getElementById('btnCopy');
       const btnWA  = document.getElementById('btnWA');
@@ -210,6 +244,12 @@
         banner.innerHTML = html;
       }
 
+      function setLamp(on){
+        bulb.classList.toggle('off', !on);
+        bulb.classList.toggle('glow', on);
+        lampBox.classList.toggle('on', on);
+      }
+
       function compute(){
         const m = selMobile.value;   // 'si' | 'no'
         const f = selFisso.value;    // 'si' | 'no'
@@ -218,35 +258,22 @@
         // reset
         setPrice('');
         setBanner('', '');
-        let lampOn = false;
-        let amount = 0;
+        setLamp(false);
 
         // Regole con Energia inclusa
         if (m === 'si' && f === 'no') {
-          amount = 180; lampOn = true;
           setPrice('€15/mese');
           setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
+          setLamp(true);
         } else if (f === 'si' && m === 'no') {
-          amount = 180; lampOn = true;
           setPrice('€28/mese');
           setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te uno sconto di <u>€180/anno</u>.');
+          setLamp(true);
         } else if (f === 'si' && m === 'si') {
-          amount = 260; lampOn = true;
           setPrice('€30/mese');
           setBanner('win','🎉 <b>Hai acceso la tua energia!</b> Per te un super sconto di <u>€260/anno</u>.');
-        } else {
-          // Nessuna scelta
-          lampOn = false;
+          setLamp(true);
         }
-
-        // Lampadina + testi
-        bulb.classList.toggle('off', !lampOn);
-        bulb.classList.toggle('glow', lampOn);
-        lampTit.textContent = lampOn ? 'Hai acceso la tua energia' : 'Lampadina spenta';
-        lampSub.textContent = lampOn
-          ? (amount===260 ? 'Fisso + Mobile + Energia: sconto totale €260/anno.'
-                          : 'Linea + Energia: sconto €180/anno.')
-          : 'Seleziona Fisso e/o Mobile per vedere i vantaggi.';
 
         // Messaggio WhatsApp (non visibile)
         const msg =
