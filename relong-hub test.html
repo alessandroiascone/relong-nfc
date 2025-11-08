@@ -75,8 +75,10 @@
       background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
       filter:blur(6px);pointer-events:none;z-index:0
     }
-    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
-    @media(max-width:480px){.wrap{padding-bottom:130px}}
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:150px;position:relative;z-index:1}
+    /* Aumenta ulteriore padding quando la barra stagionale è visibile */
+    body.has-seasonbar .wrap{padding-bottom: clamp(160px, 24vh, 220px);}
+    @media(max-width:480px){.wrap{padding-bottom:160px} body.has-seasonbar .wrap{padding-bottom: clamp(180px, 30vh, 260px);} }
 
     .head{text-align:center;padding:8px 8px 0 8px}
     .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
@@ -110,6 +112,7 @@
     article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
     article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
     article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+    #season-card .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)}
 
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
     .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
@@ -127,18 +130,22 @@
       transform-style:preserve-3d;
     }
     .btn:hover{ transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg); box-shadow:0 28px 54px rgba(255,90,0,.55); filter:brightness(1.05) }
+    .btn.wa{ background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2)); box-shadow:0 18px 30px rgba(18,140,126,.45); color:#000 }
 
     .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
     .footer a{color:var(--muted2);text-decoration:none}
 
     /* FAB & Torna su */
-    .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:9999}
+    .fab-nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;z-index:80}
+    /* Sposta i FAB più in alto quando la seasonbar è visibile */
+    body.has-seasonbar .fab-nav{ bottom: calc(112px + env(safe-area-inset-bottom)) !important; }
     .fab-btn{display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite}
     .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
     .fab-btn svg{width:18px;height:18px}
     @media(max-width:420px){.fab-btn span{display:none}}
 
-    .to-top{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9999}
+    .to-top{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:80}
+    body.has-seasonbar .to-top{ bottom: calc(112px + env(safe-area-inset-bottom)) !important; }
     .to-top.show{opacity:1;pointer-events:auto}
     .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
 
@@ -151,55 +158,10 @@
     .seasonbar__icon{ animation:pulse 1.2s infinite }
     .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
 
-    body.has-seasonbar .to-top{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-    body.has-seasonbar .fab-nav{ bottom: calc(96px + env(safe-area-inset-bottom)) !important; }
-
     /* Badge forzati via ID */
     #biz-mobile .badge{
       background:linear-gradient(90deg,#10B981,#84CC16);
       box-shadow:0 10px 18px rgba(16,185,129,.35);
-    }
-    #season-card .badge{
-      background:linear-gradient(90deg,#ff0000,#ff7b00); /* default BF/Flash */
-    }
-    /* Mini-badge evidenza dinamico sulla card Black Friday */
-    #season-card .highlight{
-      position:absolute; top:-11px; right:14px;
-      background:linear-gradient(90deg,#ff5a1a,#ffbe0b);
-      color:#000; font-size:11px; font-weight:900; letter-spacing:.02em;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(0,0,0,.06);
-      box-shadow:0 10px 18px rgba(255,90,0,.45);
-      animation:pulse 2.4s ease-in-out infinite;
-      white-space:nowrap;
-    }
-
-    /* ——— Natale ——— */
-    /* Gradiente badge rosso→verde e bottone stagionale rosso→verde quando attivo il tema Natale */
-    body.theme-xmas #season-card .badge{ background:linear-gradient(90deg,#ff2a2a,#1db954); }
-    body.theme-xmas #season-card .btn{ background:linear-gradient(90deg,#ff2a2a,#1db954) !important; }
-    /* Icona Babbo Natale che “sbuca” */
-    #season-card .santa{
-      position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45));
-      transform-origin:bottom right; transform:rotate(10deg);
-      opacity:0; pointer-events:none;
-    }
-    body.theme-xmas #season-card .santa{
-      opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite;
-    }
-    @keyframes santaPop{0%{transform:translateY(-12px) rotate(18deg);opacity:0}100%{transform:translateY(0) rotate(10deg);opacity:1}}
-    @keyframes santaBob{0%,100%{transform:translateY(0) rotate(10deg)}50%{transform:translateY(3px) rotate(8deg)}}
-
-    /* Neve leggera (CSS only, ultra light) visibile solo a Natale */
-    .snow{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;display:none}
-    body.theme-xmas .snow{display:block}
-    .snow i{
-      position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6));
-      border-radius:50%; opacity:.9; filter:blur(.2px);
-      animation:fall linear infinite;
-    }
-    @keyframes fall{
-      to{ transform:translateY(105vh); opacity:.92; }
     }
 
     /* brand link sempre bianco */
@@ -279,22 +241,20 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
-      <!-- 5 — SEASON CARD con badge dinamico, bottone stagionale e santa -->
+      <!-- 5 — SEASON CARD -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
-        <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
-        <div class="santa" id="santa" aria-hidden="true">🎅</div>
         <div class="title"><span class="ico" id="season-ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
         <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
         <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
       </article>
 
-      <!-- 6 — BUSINESS MOBILI -->
+      <!-- 6 — CONTATTACI (ex Business Mobili) -->
       <article class="card" data-anim id="biz-mobile">
-        <div class="badge">OFFERTE AZIENDE & P.IVA PER SMARTPHONE</div>
-        <div class="title"><span class="ico">📲</span><span>Offerte Business Mobili</span></div>
-        <p class="desc">Piani dedicati ad Aziende e Partite IVA</p>
-        <a class="btn" href="./business.html">📲 Scopri offerte Mobili Business</a>
+        <div class="badge">PARLA CON NOI</div>
+        <div class="title"><span class="ico">💬</span><span>Contattaci per altre info</span></div>
+        <p class="desc">Hai domande su offerte, smartphone o energia? Rispondiamo subito.</p>
+        <a class="btn wa" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20posso%20fare%20una%20domanda%3F%20Grazie">💬 Chatta con noi</a>
       </article>
     </section>
 
@@ -305,15 +265,22 @@
     </p>
   </main>
 
-  <!-- Neve (elementi creati via JS) -->
-  <div class="snow" id="snow"></div>
-
   <div class="toast" role="status" aria-live="polite"></div>
 
-  <script>
-    const HOME_PAGE = './relong-hub-v2.html';
+  <!-- FAB -->
+  <div class="fab-nav" aria-label="Azioni rapide">
+    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+      <span>Portami allo Store</span>
+    </a>
+    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
+      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
+      <span>Chiamaci</span>
+    </a>
+  </div>
 
-    /* to-top */
+  <!-- to-top -->
+  <script>
     (function(){
       const toTop = document.createElement('div');
       toTop.className = 'to-top';
@@ -330,6 +297,7 @@
     }
 
     /* Navigazione interna sicura + fallback alla Home */
+    const HOME_PAGE = './relong-hub-v2.html';
     document.addEventListener('click', async (e)=>{
       const a = e.target.closest('a'); if(!a) return;
       const href = a.getAttribute('href')||'';
@@ -368,25 +336,19 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* Utility neve leggera */
-    function buildSnow(container){
-      if(!container) return;
-      const flakes = 18; // numero moderato, leggerissimo
-      const frag = document.createDocumentFragment();
-      for(let i=0;i<flakes;i++){
-        const f = document.createElement('i');
-        const size = (Math.random()*5)+3; // 3-8px
-        f.style.width = f.style.height = size + 'px';
-        f.style.left = Math.floor(Math.random()*100) + 'vw';
-        f.style.animationDuration = (5 + Math.random()*7) + 's';
-        f.style.animationDelay = (Math.random()*3) + 's';
-        f.style.opacity = (0.65 + Math.random()*0.35).toFixed(2);
-        frag.appendChild(f);
-      }
-      container.innerHTML=''; container.appendChild(frag);
-    }
+    /* Attiva offset quando la barra è presente (evita sovrapposizioni) */
+    (function(){
+      const bar = document.getElementById('seasonBar');
+      if(!bar) return;
+      document.body.classList.add('has-seasonbar');
+      const obs = new IntersectionObserver((entries)=>{
+        const show = entries[0].isIntersecting;
+        document.body.classList.toggle('has-seasonbar', show);
+      }, {threshold: 0});
+      obs.observe(bar);
+    })();
 
-    /* Switch stagionale + mini-badge dinamico + tema Natale */
+    /* Switch stagionale */
     (function(){
       const now = new Date();
       const m = now.getMonth()+1, d = now.getDate();
@@ -402,11 +364,7 @@
           btn:"Vai alle Offerte Black Friday",
           href:"./black-friday.html",
           bar:"<b>Offerte Black Friday ReLong</b> — sconti a tempo limitato",
-          barHref:"./black-friday.html",
-          highlight:"🔥 IN EVIDENZA",
-          icon:"⚡",
-          themeClass:"theme-bf",
-          btnGradient:null /* usa default rosso→arancio */
+          barHref:"./black-friday.html"
         },
         christmas:{
           badge:"NATALE",
@@ -415,11 +373,7 @@
           btn:"Scopri le Offerte di Natale",
           href:"./black-friday.html?season=christmas",
           bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",
-          barHref:"./black-friday.html?season=christmas",
-          highlight:"🎄🎅 IN EVIDENZA",
-          icon:"🎄",
-          themeClass:"theme-xmas",
-          btnGradient:"linear-gradient(90deg,#ff2a2a,#1db954)" /* rosso→verde */
+          barHref:"./black-friday.html?season=christmas"
         },
         flash:{
           badge:"FLASH",
@@ -428,63 +382,20 @@
           btn:"Vedi le Offerte Flash",
           href:"./black-friday.html?season=flash",
           bar:"<b>Offerte Flash ⚡</b> — sconti lampo",
-          barHref:"./black-friday.html?season=flash",
-          highlight:"🔥 IN EVIDENZA",
-          icon:"⚡",
-          themeClass:"theme-flash",
-          btnGradient:null
+          barHref:"./black-friday.html?season=flash"
         }
       };
 
       const c = copy[season];
-
-      // Applica testi
       document.getElementById('season-badge').textContent = c.badge;
       document.getElementById('season-title').textContent = c.title;
       document.getElementById('season-desc').textContent  = c.desc;
       const link = document.getElementById('season-link');
       link.textContent = c.btn; link.href = c.href; link.setAttribute('aria-label', c.btn);
-      document.getElementById('season-highlight').textContent = c.highlight;
-      const ico = document.getElementById('season-ico'); if(ico) ico.textContent = c.icon;
 
-      // Barra stagionale
       const bar = document.getElementById('seasonBar');
       const textEl = bar.querySelector('.seasonbar__text');
       textEl.innerHTML = c.bar; bar.href = c.barHref;
-
-      // Temi body (per Natale abilita snow e santa)
-      document.body.classList.remove('theme-bf','theme-xmas','theme-flash');
-      document.body.classList.add(c.themeClass);
-
-      // Bottone stagionale rosso→verde a Natale
-      if(c.btnGradient){
-        link.style.background = c.btnGradient;
-      } else {
-        link.style.background = ''; // default CSS
-      }
-
-      // Neve e Babbo Natale
-      const snow = document.getElementById('snow');
-      const santa = document.getElementById('santa');
-      if(c.themeClass === 'theme-xmas'){
-        buildSnow(snow);
-        if(santa) santa.style.display = 'block';
-      }else{
-        if(snow) snow.innerHTML = '';
-        if(santa) santa.style.display = 'none';
-      }
-    })();
-
-    /* Attiva offset quando la barra è presente */
-    (function(){
-      const bar = document.getElementById('seasonBar');
-      if(!bar) return;
-      document.body.classList.add('has-seasonbar');
-      const obs = new IntersectionObserver((entries)=>{
-        const show = entries[0].isIntersecting;
-        document.body.classList.toggle('has-seasonbar', show);
-      }, {threshold: 0});
-      obs.observe(bar);
     })();
   </script>
 
@@ -495,18 +406,6 @@
     <span class="seasonbar__cta">Scopri ora</span>
   </a>
   <style>body{ padding-bottom: clamp(56px, 7vh, 72px); }</style>
-
-  <!-- FAB -->
-  <div class="fab-nav" aria-label="Azioni rapide">
-    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
-      <span>Portami allo Store</span>
-    </a>
-    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
-      <span>Chiamaci</span>
-    </a>
-  </div>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
