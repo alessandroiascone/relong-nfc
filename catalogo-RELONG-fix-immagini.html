@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <title>Re Long | Catalogo Pro (Filtri • Badge • WhatsApp)</title>
+  <style>
+    /* Base */
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{--bg1:#0a0a0a;--bg2:#000;--card:rgba(25,25,25,.92);--stroke:rgba(255,255,255,.08);--wa1:#25D366;--wa2:#128C7E;--muted:rgba(255,255,255,.7);--brand1:#ff0000;--brand2:#ff7b00}
+    html,body{height:100%;}
+    body{
+      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%,var(--bg1),var(--bg2));
+      color:#fff;min-height:100dvh;
+      display:flex;align-items:flex-start;justify-content:center;padding:16px 16px 24px;
+      overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch;
+    }
+
+    .wrap{width:100%;max-width:1240px;display:grid;gap:18px}
+    /* Sticky header + blur */
+    .head{
+      position:sticky; top:0; z-index:30;
+      display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+      padding:10px 8px;
+      background:linear-gradient(180deg, rgba(10,10,10,.85), rgba(10,10,10,.55) 60%, transparent);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      border-top-left-radius:14px;border-top-right-radius:14px;
+    }
+    .title{font-weight:900;letter-spacing:-.02em;font-size:22px;flex:1 1 auto}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1 1 100%}
+
+    /* Home button small */
+    .home-btn{
+      margin-left:auto;
+      display:inline-flex;align-items:center;justify-content:center;
+      width:40px;height:40px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      text-decoration:none;font-size:18px;color:#fff;
+      transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .home-btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+
+    .btn-filter{
+      padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);color:#fff;font-weight:800;cursor:pointer;
+      transition:transform .15s, box-shadow .2s;
+      letter-spacing:.2px;
+    }
+    .btn-filter.active{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;border-color:transparent;
+      box-shadow:0 12px 28px rgba(255,123,0,.28)
+    }
+
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr 1fr 1fr}}
+
+    /* Card */
+    .card{
+      position:relative;background:var(--card);padding:16px;border-radius:18px;border:1px solid var(--stroke);
+      box-shadow:0 16px 36px rgba(0,0,0,.6), 0 0 30px rgba(255,0,0,.10);
+      overflow:hidden; contain:paint;
+    }
+
+    /* Skeleton loader */
+    .skel{
+      background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06));
+      background-size:200% 100%; animation:skel 1.1s ease-in-out infinite;
+      border-radius:24px; overflow:hidden;
+    }
+    @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    .photo{width:100%;border-radius:24px;aspect-ratio:1/1;object-fit:contain;background:#000}
+    .model{font-size:18px;font-weight:900;margin-top:6px}
+    .price{font-size:15px;margin-top:4px;margin-bottom:8px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .badges{position:absolute;top:10px;left:10px;display:flex;flex-wrap:wrap;gap:6px}
+    .tag{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;backdrop-filter:blur(6px)}
+    .tag.brand{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000}
+    .tag.new{background:linear-gradient(90deg,#00e1ff,#0078ff)}
+    .tag.stock{background:linear-gradient(90deg,#aaff00,#27ae60)}
+    .tag.hot{background:linear-gradient(90deg,#ffd500,#ff7b00);color:#000}
+
+    .simulatore{margin-top:12px;padding:12px;border:1px solid var(--stroke);border-radius:24px;background:rgba(255,255,255,.05)}
+    .sim-label{font-size:14px;color:var(--muted)}
+    .sim-select{width:100%;margin-top:6px;padding:10px;border-radius:12px;background:#0f0f0f;color:#fff;border:1px solid rgba(255,255,255,.15)}
+    .sim-output{margin-top:8px;font-size:15px;font-weight:700;color:#ffd166}
+
+    .note-colori{color:#ffd166;font-size:12px;margin-top:4px;opacity:.9}
+
+    /* CTA premium */
+    .btn.secondary{
+      width:75%; margin:10px auto 0; padding:12px 16px; border-radius:24px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      color:#000; font-weight:900; letter-spacing:.2px;
+      border:1px solid rgba(0,255,140,.35);
+      background:linear-gradient(90deg,#00ff88,#00d977,#00c56a,#00ff88); background-size:200% 200%;
+      transition:transform .2s ease, filter .2s ease, box-shadow .2s ease;
+      box-shadow:0 0 16px rgba(0,255,120,.35);
+      text-align:center;
+    }
+    .btn.secondary:hover{ transform:translateY(-2px); filter:brightness(1.08); box-shadow:0 0 28px rgba(0,255,140,.5) }
+    .btn.secondary .txt{ display:inline-flex; align-items:center; line-height:1; font-size:18px }
+    .btn.secondary .wa-ico{ width:18px;height:18px;display:inline-block }
+
+    /* Spotlight & tilt SOLO desktop */
+    @media (pointer:fine){
+      .card::before{
+        content:""; position:absolute; inset:-30%;
+        background:radial-gradient(180px 180px at var(--mx,50%) var(--my,50%), rgba(255,255,255,.10), rgba(255,255,255,0) 70%);
+        opacity:0; pointer-events:none; transition:opacity .25s ease; mix-blend-mode:screen
+      }
+      .card:hover::before{opacity:.9}
+      .card{transform:perspective(800px) rotateX(0) rotateY(0); transition:transform .25s ease,box-shadow .25s ease,background .3s}
+      .card:hover{will-change:transform}
+    }
+
+    :focus-visible{outline:2px solid #ff7b00; outline-offset:2px; border-radius:12px}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="head">
+      <div class="title">Catalogo Smartphone a Rate - Assicurazione Kasko ed Accessori Inclusi</div>
+      <a href="/relong-nfc/index.html" class="home-btn" aria-label="Torna alla home">🏠</a>
+      <div class="controls" id="brandFilters"></div>
+    </div>
+    <section class="grid" id="grid"></section>
+  </main>
+
+  <script>
+    // Fullscreen soft trick on mobile address bar
+    window.addEventListener('load', ()=>{
+      setTimeout(()=> window.scrollTo(0,1), 350);
+    });
+
+    const WA = "3908119578844";
+    const DIAG = false;
+
+    const prodotti = [
+      {brand:"Apple", nome:"Apple iPhone 17 Pro 256GB", prezzo:1489.0, img:"imgcatalogo/apple-iphone-17-pro-256gb.webp", tags:["Novità"]},
+      {brand:"Apple", nome:"Apple iPhone 17 256GB", prezzo:1110.0, img:"imgcatalogo/apple-iphone-17-256gb.webp", tags:["Novità"]},
+      {brand:"Apple", nome:"Apple iPhone Air 512GB", prezzo:1657.0, img:"imgcatalogo/apple-iphone-air-512gb.webp", tags:["Novità"]},
+      {brand:"Apple", nome:"iPhone 17 Pro Max 256GB", prezzo:1657.8, img:"imgcatalogo/apple-iphone-17-pro-max-256gb.webp", tags:["Novità"]},
+      {brand:"Apple", nome:"iPhone 17 Pro 1TB", prezzo:1993.8, img:"imgcatalogo/apple-iphone-17-pro-1tb.webp", tags:["Novità"]},
+
+      {brand:"Samsung", nome:"Samsung Galaxy S25 Ultra 256GB", prezzo:985.0, img:"imgcatalogo/samsung-galaxy-s25-ultra-256gb.webp", tags:["Novità"]},
+      {brand:"Samsung", nome:"Samsung Galaxy S25 FE 256GB", prezzo:773.9, img:"imgcatalogo/samsung-galaxy-s25-fe-256gb.webp", tags:["Novità"]},
+      {brand:"Samsung", nome:"Samsung Galaxy Z Fold 7 256GB", prezzo:1977.0, img:"imgcatalogo/samsung-galaxy-z-fold-7-256gb.webp", tags:["Novità"]},
+      {brand:"Samsung", nome:"Samsung Galaxy A56 5G", prezzo:483.8, img:"imgcatalogo/samsung-galaxy-a56-5g.webp", tags:["Novità"]},
+      {brand:"Samsung", nome:"Samsung Galaxy A17 256GB", prezzo:315.0, img:"imgcatalogo/samsung-galaxy-a17-256gb.webp", tags:["Promo"]},
+
+      {brand:"OPPO", nome:"Oppo 14F 256GB", prezzo:255.9, img:"imgcatalogo/oppo-14f-256gb.webp", tags:["Promo"]},
+      {brand:"OPPO", nome:"Oppo A5 Pro", prezzo:255.9, img:"imgcatalogo/oppo-a5-pro.webp", tags:["Promo"]},
+
+      {brand:"HONOR", nome:"Honor 400 Lite 256GB", prezzo:159.9, img:"imgcatalogo/honor-400-lite-256gb.webp", tags:["Convenienza"]},
+    ];
+
+    const fmt = (n)=> new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR', maximumFractionDigits:2}).format(n);
+
+    function badgeClass(tag){
+      if(tag==="Novità") return "tag new";
+      if(tag==="Promo") return "tag hot";
+      if(tag==="Ultimi pezzi") return "tag stock";
+      if(tag==="Bestseller") return "tag hot";
+      if(tag==="Premium") return "tag brand";
+      if(tag==="Convenienza") return "tag stock";
+      return "tag";
+    }
+
+    // --- Fallback immagini robusto (cartelle + estensioni alternative)
+    window.IMG_FOLDERS = ["imgcatalogo/","./imgcatalogo/","../imgcatalogo/","docs/imgcatalogo/"];
+    window.IMG_EXTS = ["webp","jpg","jpeg","png","JPG","JPEG","PNG","Webp","WEBP"];
+
+    window.imgFallback = function(el){
+      const orig = el.getAttribute('data-orig') || el.getAttribute('src') || "";
+      const m = orig.match(/([^\\/]+)\\.[A-Za-z0-9]+$/);
+      const base = m ? m[1] : orig; // nome file senza estensione
+      let idx = parseInt(el.getAttribute('data-fidx') || "0", 10);
+      if (idx >= (IMG_FOLDERS.length * IMG_EXTS.length)) {
+        el.onerror = null; // niente più tentativi
+        return;
+      }
+      const f = Math.floor(idx / IMG_EXTS.length);
+      const e = idx % IMG_EXTS.length;
+      el.setAttribute('data-fidx', String(idx + 1));
+      el.src = IMG_FOLDERS[f] + base + "." + IMG_EXTS[e];
+    };
+
+    function cardHTML(p){
+      const _tags = (p.tags||[]);
+      const badges = _tags.map(t => `<span class="${badgeClass(t)}">${t}</span>`).join("");
+      return `
+        <article class="card" data-brand="\${p.brand}">
+          <div class="badges">
+            <span class="tag brand">\${p.brand}</span>
+            \${badges}
+          </div>
+          <div class="photo-wrap skel">
+              <img class="photo" src="\${p.img}" data-orig="\${p.img}" alt="\${p.nome}" loading="lazy" decoding="async" fetchpriority="low"
+                   onload="this.closest('.photo-wrap')?.classList.remove('skel')"
+                   onerror="imgFallback(this)">
+          </div>
+          <div class="model">\${p.nome}</div>
+          <p class="price">Prezzo totale: \${fmt(p.prezzo)}</p>
+          <p class="note-colori">Colori indicativi</p>
+          <div class="simulatore">
+            <label class="sim-label">Simula la tua rata:</label>
+            <select class="sim-select" onchange="calcolaRata(this, \${p.prezzo})" aria-label="Seleziona durata rata per \${p.nome}">
+              <option value="">Seleziona durata</option>
+              <option value="12">12 mesi</option>
+              <option value="24">24 mesi</option>
+              <option value="30">30 mesi</option>
+              <option value="36">36 mesi</option>
+              <option value="48">48 mesi</option>
+            </select>
+            <div class="sim-output">Rata mensile: —</div>
+          </div>
+          <button class="btn secondary" onclick="inviaSimulazione(this, '\${p.nome.replace(/'/g, "\\'")}', \${p.prezzo})" aria-label="Invia simulazione su WhatsApp">
+            <span class="wa-ico">💬</span><span class="txt">Invia simulazione su WhatsApp</span>
+          </button>
+        </article>
+      `;
+    }
+
+    function buildFilters(){
+      const wrap = document.getElementById("brandFilters");
+      const brands = ["Tutti", ...Array.from(new Set(prodotti.map(p => p.brand)))];
+      wrap.innerHTML = brands.map(b => `<button class="btn-filter \${b==='Tutti'?'active':''}" data-b="\${b}" aria-label="Filtro \${b}">\${b}</button>`).join("");
+      wrap.addEventListener("click",(e)=>{
+        const b = e.target.dataset?.b; if(!b) return;
+        document.querySelectorAll(".btn-filter").forEach(x=>x.classList.toggle("active", x.dataset.b===b));
+        render(b);
+      });
+    }
+
+    function render(filter="Tutti"){
+      const grid=document.getElementById("grid");
+      const list = filter==="Tutti" ? prodotti : prodotti.filter(p => p.brand===filter);
+      grid.innerHTML = list.map(cardHTML).join("");
+
+      // Tilt & spotlight solo desktop
+      if (matchMedia("(pointer:fine)").matches){
+        const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+        document.querySelectorAll('.card').forEach(card=>{
+          let raf = 0; const maxDeg = 5;
+          function onMove(e){
+            const r = card.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width;
+            const py = (e.clientY - r.top) / r.height;
+            const rotY = clamp((px - .5) * (maxDeg*2), -maxDeg, maxDeg);
+            const rotX = clamp((.5 - py) * (maxDeg*2), -maxDeg, maxDeg);
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(()=>{
+              card.style.transform = \`perspective(800px) rotateX(\${rotX}deg) rotateY(\${rotY}deg)\`;
+              card.style.setProperty('--mx', (px*100).toFixed(2)+'%');
+              card.style.setProperty('--my', (py*100).toFixed(2)+'%');
+            });
+          }
+          function reset(){
+            cancelAnimationFrame(raf);
+            card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
+            card.style.removeProperty('--mx'); card.style.removeProperty('--my');
+          }
+          card.addEventListener('mousemove', onMove);
+          card.addEventListener('mouseleave', reset);
+        });
+      }
+    }
+
+    // Simulatore (esposto globalmente)
+    window.calcolaRata = function(select, prezzo){
+      const mesi=parseInt(select.value);
+      const out=select.parentElement.querySelector('.sim-output');
+      if(!mesi){ out.textContent="Rata mensile: —"; return; }
+      out.textContent="Rata mensile: " + fmt(prezzo/mesi);
+    };
+
+    window.inviaSimulazione = function(btn, nome, prezzo){
+      const card = btn.closest('.card');
+      const select = card.querySelector('.sim-select');
+      const mesi = parseInt(select?.value || "");
+      if(!mesi){ alert("Seleziona la durata (12/24/30/36/48 mesi) prima di inviare la simulazione."); return; }
+      const msg = \`Ciao Re Long, ho simulato \${nome}: prezzo \${fmt(prezzo)}, durata \${mesi} mesi, rata \${fmt(prezzo/mesi)} al mese. Mi confermi disponibilità?\`;
+      const url = "https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
+      window.open(url, "_blank");
+    };
+
+    // Start
+    document.addEventListener("DOMContentLoaded", function(){
+      buildFilters(); 
+      render("Tutti");
+    });
+
+    // Diagnostica opzionale (pillola)
+    (function(){
+      if(!DIAG) return;
+      const grid = document.getElementById('grid');
+      const pill = document.createElement("button");
+      pill.textContent = "Diag immagini";
+      pill.style.position="fixed"; pill.style.left="12px"; pill.style.bottom="12px";
+      pill.onclick = ()=>{
+        const imgs = Array.from(grid.querySelectorAll('img.photo'));
+        const notLoaded = imgs.filter(i=>!i.complete || i.naturalWidth===0).map(i=>i.getAttribute('src'));
+        alert(["IMMAGINI NON CARICATE ("+notLoaded.length+")", ...notLoaded].join("\\n"));
+      };
+      document.body.appendChild(pill);
+    })();
+  </script>
+</body>
+</html>
