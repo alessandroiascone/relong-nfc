@@ -38,6 +38,7 @@
       padding:8px 12px; border-radius:999px; border:1px solid var(--stroke);
       background:linear-gradient(90deg,var(--brand1),var(--brand2),var(--brand3));
       -webkit-background-clip:text; background-clip:text; color:transparent;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
     }
     .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:18px}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
@@ -45,7 +46,7 @@
       border:1px solid var(--stroke); border-radius:20px; padding:18px;
       background:
         radial-gradient(120% 120% at 80% 0%, rgba(255,160,0,.08), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)),
         var(--card);
       box-shadow:0 12px 32px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.02);
     }
@@ -55,9 +56,11 @@
     select, .chkline{
       width:100%; padding:14px 14px; border-radius:14px; border:1px solid var(--stroke);
       background:#101010; color:#fff; outline:none; font-size:15px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
     }
     .chkline{display:flex; align-items:center; gap:10px; cursor:pointer}
     .chkline input{accent-color:#ff7b00; width:18px; height:18px}
+
     .lamp{
       display:flex; align-items:center; gap:14px; padding:14px;
       border-radius:16px; border:1px dashed var(--stroke);
@@ -103,51 +106,53 @@
   </header>
 
   <div class="grid">
-    <section class="card">
-      <h2 style="font-size:16px;margin-bottom:10px">Imposta la tua situazione</h2>
+    <section class="card" aria-labelledby="lbl-scelte">
+      <h2 id="lbl-scelte" style="font-size:16px;margin-bottom:10px">Imposta la tua situazione</h2>
 
       <div class="row">
         <div>
-          <label>Cliente Vodafone Business (Mobile)</label>
-          <select id="selMobile">
+          <label for="selMobile">Diventa cliente Vodafone Business (Mobile)</label>
+          <select id="selMobile" aria-label="Diventa cliente Vodafone Business Mobile">
             <option value="no">No</option><option value="si">Sì</option>
           </select>
         </div>
         <div>
-          <label>Cliente Vodafone Business (Fisso)</label>
-          <select id="selFisso">
+          <label for="selFisso">Diventa cliente Vodafone Business (Fisso)</label>
+          <select id="selFisso" aria-label="Diventa cliente Vodafone Business Fisso">
             <option value="no">No</option><option value="si">Sì</option>
           </select>
         </div>
       </div>
 
-      <label class="chkline" style="margin-top:12px">
+      <label class="chkline" style="margin-top:12px" for="chkEnergia">
         <input type="checkbox" id="chkEnergia">
         <span>Attiva anche <b>Energia Business</b></span>
       </label>
 
       <div class="lamp" style="margin-top:14px">
-        <div id="bulb" class="bulb off"></div>
+        <div id="bulb" class="bulb off" aria-hidden="true"></div>
         <div>
           <div id="lampTit" style="font-weight:800">Lampadina spenta</div>
-          <div id="lampSub" style="font-size:13px;color:var(--muted)">Seleziona le opzioni</div>
+          <div id="lampSub" style="font-size:13px;color:var(--muted)">Seleziona le opzioni per vedere gli sconti.</div>
         </div>
       </div>
 
-      <div id="output" class="out"></div>
+      <div id="output" class="out" aria-live="polite"></div>
 
       <div class="btns">
         <button id="btnCopy" class="btn secondary" type="button">Copia simulazione</button>
-        <a id="btnWA" class="btn" href="#" target="_blank">Invia su WhatsApp</a>
+        <a id="btnWA" class="btn" href="#" target="_blank" rel="noopener">Invia su WhatsApp</a>
         <span class="pill">WhatsApp: 08119578844</span>
       </div>
     </section>
 
-    <aside class="card">
-      <h2 style="font-size:16px;margin-bottom:10px">Come funziona lo sconto</h2>
-      <p style="font-size:14px;color:var(--muted);line-height:1.45">
-        • Se sei già Vodafone Business (mobile o fisso) → Sconto Energia.<br>
-        • Se NON sei Vodafone, ma attivi Energia Business → Sconto Totale Fisso + Mobile + Energia (€30/mese – €240 annui).
+    <aside class="card" aria-labelledby="lbl-info">
+      <h2 id="lbl-info" style="font-size:16px;margin-bottom:10px">Regole sconto</h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.5">
+        • <b>Mobile = Sì</b> e <b>Fisso = Sì</b> e <b>Energia = Sì</b> → Lampadina accesa, <b>€260 annui</b>.<br>
+        • <b>Mobile = Sì</b> e <b>Fisso = No</b> → Lampadina accesa, <b>€180 annui</b>.<br>
+        • <b>Fisso = Sì</b> e <b>Mobile = No</b> → Lampadina accesa, <b>€180 annui</b>.<br>
+        • Tutti gli altri casi → nessuno sconto automatico.
       </p>
     </aside>
   </div>
@@ -155,72 +160,118 @@
 
 <script>
 (function(){
-  const m=document.getElementById("selMobile");
-  const f=document.getElementById("selFisso");
-  const e=document.getElementById("chkEnergia");
-  const bulb=document.getElementById("bulb");
-  const lampTit=document.getElementById("lampTit");
-  const lampSub=document.getElementById("lampSub");
-  const out=document.getElementById("output");
-  const btnCopy=document.getElementById("btnCopy");
-  const btnWA=document.getElementById("btnWA");
-  const WA="3908119578844";
+  const selMobile = document.getElementById('selMobile');
+  const selFisso  = document.getElementById('selFisso');
+  const chkEnergia = document.getElementById('chkEnergia');
+
+  const bulb   = document.getElementById('bulb');
+  const lampTit= document.getElementById('lampTit');
+  const lampSub= document.getElementById('lampSub');
+  const out    = document.getElementById('output');
+
+  const btnCopy= document.getElementById('btnCopy');
+  const btnWA  = document.getElementById('btnWA');
+
+  const WA_NUMBER = '3908119578844'; // +39 08119578844
 
   function compute(){
-    let sm=m.value, sf=f.value, se=e.checked;
-    let lamp=false, t="", s="", msg="";
+    const m = selMobile.value; // 'si' | 'no'
+    const f = selFisso.value;  // 'si' | 'no'
+    const e = chkEnergia.checked;
 
-    if(sm==="si"||sf==="si"){
-      lamp=true;
-      t="Hai diritto allo SCONTO ENERGIA!";
-      s="Sei già cliente Vodafone Business.";
-      msg=`✅ Risultato simulazione Re Long
-• Vodafone Business Mobile: ${sm==="si"?"Sì":"No"}
-• Vodafone Business Fisso: ${sf==="si"?"Sì":"No"}
-• Energia Business: ${se?"Sì":"No"}
-→ Esito: Hai diritto allo Sconto ENERGIA ⚡
-WhatsApp: 08119578844`;
-    }
-    else if(sm==="no"&&sf==="no"&&se){
-      lamp=true;
-      t="Sconto TOTALE: Fisso + Mobile + Energia!";
-      s="€30/mese – €240 annui (indicativi).";
-      msg=`✅ Risultato simulazione Re Long
-• Vodafone Business Mobile: No
-• Vodafone Business Fisso: No
-• Energia Business: Sì
-→ Esito: SCONTO TOTALE 🔥
-Tutto a €30/mese – €240 annui
-WhatsApp: 08119578844`;
-    }
-    else{
-      lamp=false;
-      t="Nessuno sconto automatico";
-      s="Contattaci per una proposta personalizzata.";
-      msg=`ℹ️ Risultato simulazione Re Long
-• Vodafone Business Mobile: ${sm==="si"?"Sì":"No"}
-• Vodafone Business Fisso: ${sf==="si"?"Sì":"No"}
-• Energia Business: ${se?"Sì":"No"}
-→ Esito: Nessuno sconto automatico
-WhatsApp: 08119578844`;
+    let lampOn = false;
+    let title = '';
+    let subtitle = '';
+    let message = '';
+
+    // Regole richieste
+    if (m === 'si' && f === 'si' && e) {
+      lampOn = true;
+      title = 'SCONTO COMPLETO €260/anno';
+      subtitle = 'Mobile + Fisso + Energia attivi.';
+      message =
+        '✅ Simulazione Re Long\n' +
+        '• Diventa Vodafone Business Mobile: Sì\n' +
+        '• Diventa Vodafone Business Fisso: Sì\n' +
+        '• Attiva Energia Business: Sì\n' +
+        '→ Esito: Lampadina accesa • SCONTO €260 annui\n' +
+        'WhatsApp: 08119578844';
+    } else if (m === 'si' && f === 'no') {
+      lampOn = true;
+      title = 'SCONTO ENERGIA €180/anno';
+      subtitle = 'Diventa cliente Mobile (Fisso no).';
+      message =
+        '✅ Simulazione Re Long\n' +
+        '• Diventa Vodafone Business Mobile: Sì\n' +
+        '• Diventa Vodafone Business Fisso: No\n' +
+        '• Attiva Energia Business: ' + (e?'Sì':'No') + '\n' +
+        '→ Esito: Lampadina accesa • SCONTO ENERGIA €180 annui\n' +
+        'WhatsApp: 08119578844';
+    } else if (f === 'si' && m === 'no') {
+      lampOn = true;
+      title = 'SCONTO ENERGIA €180/anno';
+      subtitle = 'Diventa cliente Fisso (Mobile no).';
+      message =
+        '✅ Simulazione Re Long\n' +
+        '• Diventa Vodafone Business Mobile: No\n' +
+        '• Diventa Vodafone Business Fisso: Sì\n' +
+        '• Attiva Energia Business: ' + (e?'Sì':'No') + '\n' +
+        '→ Esito: Lampadina accesa • SCONTO ENERGIA €180 annui\n' +
+        'WhatsApp: 08119578844';
+    } else {
+      // Caso informativo utile: se mobile+fisso sì ma energia no, suggerisci come ottenere 260€
+      if (m === 'si' && f === 'si' && !e) {
+        lampOn = false;
+        title = 'Quasi fatto! Attiva Energia per €260/anno';
+        subtitle = 'Con Mobile+Fisso già “Sì”, spunta anche Energia.';
+        message =
+          'ℹ️ Simulazione Re Long\n' +
+          '• Diventa Vodafone Business Mobile: Sì\n' +
+          '• Diventa Vodafone Business Fisso: Sì\n' +
+          '• Attiva Energia Business: No\n' +
+          '→ Esito: Attiva anche Energia per ottenere SCONTO €260 annui\n' +
+          'WhatsApp: 08119578844';
+      } else {
+        lampOn = false;
+        title = 'Nessuno sconto automatico';
+        subtitle = 'Contattaci per una proposta personalizzata.';
+        message =
+          'ℹ️ Simulazione Re Long\n' +
+          '• Diventa Vodafone Business Mobile: ' + (m==='si'?'Sì':'No') + '\n' +
+          '• Diventa Vodafone Business Fisso: ' + (f==='si'?'Sì':'No') + '\n' +
+          '• Attiva Energia Business: ' + (e?'Sì':'No') + '\n' +
+          '→ Esito: Nessuno sconto automatico\n' +
+          'WhatsApp: 08119578844';
+      }
     }
 
-    bulb.classList.toggle("off",!lamp);
-    lampTit.textContent=t;
-    lampSub.textContent=s;
-    out.innerHTML=msg.replace(/\n/g,"<br>");
+    // UI lampadina + testi
+    bulb.classList.toggle('off', !lampOn);
+    lampTit.textContent = title;
+    lampSub.textContent = subtitle;
 
-    btnWA.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
-    return msg;
+    // Output ricco
+    out.innerHTML = message.replace(/\n/g,'<br>');
+
+    // Link WhatsApp
+    const waText = encodeURIComponent(message + '\n— Inviato da Simulatore Re Long');
+    btnWA.href = 'https://wa.me/' + WA_NUMBER + '?text=' + waText;
+
+    return message;
   }
 
-  [m,f,e].forEach(el=>el.addEventListener("change",compute));
+  [selMobile, selFisso, chkEnergia].forEach(el => el.addEventListener('change', compute));
 
-  btnCopy.addEventListener("click",async()=>{
-    const text=compute();
-    await navigator.clipboard.writeText(text);
-    btnCopy.textContent="Copiato ✔";
-    setTimeout(()=>btnCopy.textContent="Copia simulazione",1200);
+  btnCopy.addEventListener('click', async () => {
+    const msg = compute();
+    try{
+      await navigator.clipboard.writeText(msg);
+      btnCopy.textContent = 'Copiato ✔';
+      setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
+    }catch(_){
+      btnCopy.textContent = 'Errore copia';
+      setTimeout(()=>btnCopy.textContent='Copia simulazione', 1200);
+    }
   });
 
   compute();
