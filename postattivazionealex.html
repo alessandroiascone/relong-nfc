@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long | Post‑Attivazione Telefonia</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <style>
+    /* Stesso stile della versione Assistenza Tecnica */
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;
+      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
+      --wa1:#25D366;--wa2:#128C7E;--glow:rgba(0,120,255,.12);
+      --accentRing:rgba(0,140,255,.9);
+      --tileBg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+      --tileStroke:rgba(255,255,255,.16);--muted:rgba(255,255,255,.75);
+    }
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%,var(--bg1) 0%,var(--bg2) 70%);
+      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden}
+    .wrap{width:100%;display:flex;justify-content:center}
+    .card{width:min(92vw,640px);background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);border-radius:22px;padding:clamp(12px,2vw,18px);
+      box-shadow:0 30px 60px rgba(0,0,0,.9),0 0 60px var(--glow);position:relative}
+    h1{text-align:center;font-size:clamp(22px,3.8vw,30px);margin-bottom:10px}
+    p.sub{text-align:center;font-size:13px;color:var(--muted);margin-bottom:18px}/* Nome */
+.idbox{display:grid;gap:10px;margin-bottom:16px}
+.field{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#0e0e0e,#0a0a0a);
+  border:1px solid var(--tileStroke);border-radius:14px;padding:12px 14px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.4)}
+.field input{flex:1;background:transparent;border:0;outline:none;color:#fff;font-weight:800;font-size:14px}
+.hint{text-align:center;font-size:11px;color:var(--muted)}
+
+/* Tiles */
+.chooser{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
+  border-radius:16px;padding:12px;margin-top:10px}
+.chooser-title{text-align:center;font-size:13px;font-weight:900;margin-bottom:10px}
+
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:10px}
+.tile{background:var(--tileBg);border:1px solid rgba(0,140,255,.35);border-radius:14px;
+  padding:10px 8px;text-align:center;cursor:pointer;transition:.22s ease;position:relative;
+  transform-style:preserve-3d;box-shadow:0 0 12px rgba(0,150,255,.25),0 6px 14px rgba(0,0,0,.45)}
+.tile:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 38px rgba(0,0,0,.6),0 0 0 2px rgba(0,140,255,.15) inset}
+.tile[aria-pressed="true"]{border-color:var(--accentRing);box-shadow:0 0 0 2px rgba(0,140,255,.25) inset,0 0 24px rgba(0,160,255,.35)}
+.ico{width:36px;height:36px;margin:0 auto 6px}
+.tile span{font-size:12px;font-weight:800;color:#fff}
+
+/* CTA */
+.cta-wrap{display:none;margin-top:12px;border-radius:14px;padding:12px;
+  background:linear-gradient(90deg,rgba(0,140,255,.12),rgba(0,60,160,.12));
+  border:1px solid rgba(0,140,255,.35)}
+.cta-wrap.show{display:block}
+.cta{text-decoration:none;display:flex;align-items:center;justify-content:center;
+  padding:16px;border-radius:14px;font-size:17px;font-weight:900;color:#fff;
+  background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
+  box-shadow:0 18px 30px rgba(18,140,126,.45),0 0 0 1px rgba(0,0,0,.25) inset}
+
+  </style>
+</head>
+<body><main class="wrap">
+  <section class="card">
+    <h1>Supporto Attivazione SIM 📱</h1>
+    <p class="sub">Inserisci il tuo <b>Nome e Cognome</b> e scegli cosa vuoi fare ora che la tua linea è attiva.</p><div class="idbox">
+  <label class="field"><input id="fullname" placeholder="Nome e Cognome" /></label>
+  <div class="hint">⚠️ Senza Nome e Cognome non possiamo aprire WhatsApp automatico.</div>
+</div>
+
+<div class="chooser">
+  <div class="chooser-title">Cosa vuoi fare?</div>
+
+  <div class="tiles">
+    <button class="tile" data-type="Sim Mobile"><div class="ico">📱</div><span>Sim Mobile</span></button>
+    <button class="tile" data-type="Linea Fissa"><div class="ico">📞</div><span>Linea Fissa</span></button>
+    <button class="tile" data-type="Smartphone a Rate"><div class="ico">📲</div><span>Smartphone a Rate</span></button>
+    <button class="tile" data-type="Fisso + Mobile"><div class="ico">🔗</div><span>Fisso + Mobile</span></button>
+    <button class="tile" data-type="Energia & Gas"><div class="ico">⚡</div><span>Energia & Gas</span></button>
+    <button class="tile" data-type="Sim Business"><div class="ico">💼📱</div><span>Sim Business</span></button>
+    <button class="tile" data-type="Linea Fissa Business"><div class="ico">💼📞</div><span>Linea Fissa Business</span></button>
+    <button class="tile" data-type="Fisso + Mobile Business"><div class="ico">💼🔗</div><span>Fisso + Mobile Business</span></button>
+    <button class="tile" data-type="Energia Business" style="grid-column:1 / -1"><div class="ico">💼⚡</div><span>Energia Business</span></button>
+  </div><span>Configura eSIM</span></button>
+    <button class="tile" data-type="Portabilità in corso"><div class="ico">🔄</div><span>Stato Portabilità</span></button>
+    <button class="tile" data-type="Attivazione VoLTE"><div class="ico">📶</div><span>Attivazione VoLTE</span></button>
+    <button class="tile" data-type="Assistenza Offerta"><div class="ico">💬</div><span>Info sulla tua Offerta</span></button>
+    <button class="tile" data-type="Problemi Segnale" style="grid-column:1 / -1"><div class="ico">📡</div><span>Problemi di Segnale</span></button>
+  </div>
+
+  <div id="ctaWrap" class="cta-wrap">
+    <a id="waBtn" class="cta" href="#" target="_blank">Invia su WhatsApp ✅</a>
+  </div>
+</div>
+
+  </section>
+</main><script>
+(function(){
+  const tiles = document.querySelectorAll('.tile');
+  const fullname = document.getElementById('fullname');
+  const cta = document.getElementById('ctaWrap');
+  const waBtn = document.getElementById('waBtn');
+
+  const WA = '3908119578844';
+
+  function buildMessage(name, product){
+    return `Ciao, sono ${name}. Abbiamo attivato ${product}. Ci terremo in contatto qui. Grazie.`;
+  }
+
+  function cleanName(t){return t.trim().replace(/\s+/g,' ')}
+
+  function link(t){return `https://wa.me/${WA}?text=${encodeURIComponent(t)}`}
+
+  tiles.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const name = cleanName(fullname.value);
+      if(!name || name.length < 3){ fullname.focus(); return; }
+
+      const product = btn.dataset.type;
+      const text = buildMessage(name, product);
+      const href = link(text);
+      waBtn.href = href;
+      cta.classList.add('show');
+      window.open(href, '_blank', 'noopener');
+    });
+  });
+  });
+})();
+</script></body>
+</html>
