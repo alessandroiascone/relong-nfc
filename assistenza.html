@@ -10,7 +10,6 @@
     :root{
       --bg1:#0a0a0a; --bg2:#000;
       --brand1:#ff0000; --brand2:#ff7b00;
-      --muted:rgba(255,255,255,.85);
       --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
       --wa1:#25D366; --wa2:#128C7E;
       --glow: rgba(255,120,0,.16);
@@ -27,30 +26,22 @@
       box-shadow:0 8px 24px rgba(0,0,0,.45);
       border-bottom:1px solid rgba(0,0,0,.25);
     }
-    .topbar .inner{
-      width:min(92vw, 960px); display:flex; align-items:center; justify-content:space-between;
-    }
+    .topbar .inner{ width:min(92vw, 960px); display:flex; align-items:center; justify-content:space-between; }
     .topbar .title{ font-size:16px }
     .topbar .sub{ font-size:12px; opacity:.8; font-weight:800 }
 
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
       background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
-      color:#fff;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      padding-top:calc(var(--topbarH) + 24px); /* spazio sotto la barra */
+      color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:24px; padding-top:calc(var(--topbarH) + 24px);
     }
     .wrap{ width:100%; display:flex; justify-content:center; perspective:1000px }
     .card{
       width:min(92vw, 640px);
       background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
       border:1px solid var(--stroke);
-      border-radius:22px;
-      padding:clamp(18px, 2.5vw, 28px);
+      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
       box-shadow:0 30px 60px rgba(0,0,0,.9), 0 0 60px var(--glow);
       position:relative;
     }
@@ -60,28 +51,21 @@
       color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
       box-shadow:0 12px 22px rgba(255,80,0,.42);
     }
-    h1{ font-size:clamp(22px, 3.8vw, 30px); letter-spacing:-.03em; margin-bottom:8px }
-    p{ color:var(--muted); line-height:1.55; font-size:clamp(14px, 2.5vw, 16px) }
 
-    /* Pillole aggressive 3D – UNA riga con scroll su mobile */
+    h1{ font-size:clamp(22px, 3.8vw, 30px); letter-spacing:-.03em; margin-bottom:10px; text-align:center }
+
+    /* Pillole aggressive 3D – in colonna */
     .pills{
-      display:flex; align-items:center; gap:10px;
-      margin:14px 0 18px;
-      white-space:nowrap; overflow:auto; -webkit-overflow-scrolling:touch;
-      scrollbar-width:none; justify-content:center;
+      display:flex; flex-direction:column; gap:10px;
+      margin:12px 0 16px;
     }
-    .pills::-webkit-scrollbar{ display:none; }
     .pill{
       background:linear-gradient(90deg, rgba(255,123,0,.18), rgba(255,0,0,.18));
       border:1px solid rgba(255,120,0,.5);
-      border-radius:14px;
-      padding:8px 12px;
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:-.02em;
+      border-radius:14px; padding:10px 14px;
+      font-size:14px; font-weight:800; letter-spacing:-.02em;
       box-shadow:0 6px 14px rgba(0,0,0,.45), 0 0 18px rgba(255,120,0,.25);
-      color:#fff;
-      text-shadow:0 2px 4px rgba(0,0,0,.4);
+      color:#fff; text-shadow:0 2px 4px rgba(0,0,0,.4);
     }
 
     /* Scelta rapida dispositivi */
@@ -92,26 +76,17 @@
       padding:clamp(12px,2vw,16px);
       margin-bottom:clamp(14px,2.5vw,18px);
     }
-    .chooser-title{
-      font-size:14px; font-weight:900; letter-spacing:-.02em; margin-bottom:12px;
-    }
+    .chooser-title{ font-size:14px; font-weight:900; letter-spacing:-.02em; margin-bottom:12px; text-align:center }
     .tiles{
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap:12px;
-      transform-style:preserve-3d;
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap:12px; transform-style:preserve-3d;
     }
     .tile{
       background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.14);
-      border-radius:16px;
-      padding:12px 10px;
-      cursor:pointer;
-      text-align:center;
+      border-radius:16px; padding:12px 10px; cursor:pointer; text-align:center;
       transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-      position:relative;
-      outline:none;
-      will-change:transform, box-shadow;
+      position:relative; outline:none; will-change:transform, box-shadow;
     }
     /* Sheen (luce) */
     .tile::after{
@@ -123,52 +98,31 @@
       transform:translateY(-6px) scale(1.02) rotateX(1deg) rotateY(.5deg);
       box-shadow:0 16px 34px rgba(0,0,0,.5), 0 0 0 1px rgba(255,190,0,.18) inset;
     }
-    .tile:hover::after{
-      animation:sheen .9s ease forwards;
-    }
-    @keyframes sheen{
-      to{ transform:translateX(120%); }
-    }
+    .tile:hover::after{ animation:sheen .9s ease forwards }
+    @keyframes sheen{ to{ transform:translateX(120%); } }
+
     .tile[aria-pressed="true"]{
       border-color:var(--accentRing);
       box-shadow:0 10px 34px rgba(255,170,0,.25), inset 0 0 0 1px rgba(255,190,0,.25);
     }
-    .ico{
-      width:42px; height:42px; margin:0 auto 8px;
-      filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));
-    }
-    .tile span{
-      display:block;
-      font-size:13.5px;
-      font-weight:800;
-      color:#fff;
-      letter-spacing:-.01em;
-    }
+    .ico{ width:42px; height:42px; margin:0 auto 8px; filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)) }
+    .tile span{ display:block; font-size:13.5px; font-weight:800; color:#fff; letter-spacing:-.01em }
 
     /* CTA dinamica */
     .cta-wrap{
-      display:none;
-      margin-top:12px;
-      border-radius:14px;
-      padding:12px;
+      display:none; margin-top:12px; border-radius:14px; padding:12px;
       background:linear-gradient(90deg, rgba(255,200,0,.12), rgba(255,80,0,.12));
-      border:1px solid rgba(255,190,0,.35);
-      transform-style:preserve-3d;
+      border:1px solid rgba(255,190,0,.35); transform-style:preserve-3d;
     }
     .cta-wrap.show{ display:block; animation:pop .18s ease-out }
     @keyframes pop{ from{transform:scale(.98);opacity:.6} to{transform:scale(1);opacity:1} }
 
-    .cta-lead{ font-size:13px; font-weight:900 }
+    .cta-lead{ font-size:13px; font-weight:900; text-align:center }
     .cta{
-      display:block; text-align:center; margin-top:10px;
-      padding:12px 16px; border-radius:14px;
+      display:block; text-align:center; margin-top:10px; padding:12px 16px; border-radius:14px;
       background:radial-gradient(circle at 0% 0%, var(--wa1) 0%, var(--wa2) 60%);
-      color:#000; font-weight:900; text-decoration:none;
-      box-shadow:0 18px 30px rgba(18,140,126,.45);
-      font-size:16px;
-      transition:transform .15s ease, box-shadow .15s ease;
-      position:relative; overflow:hidden;
-      will-change:transform;
+      color:#000; font-weight:900; text-decoration:none; box-shadow:0 18px 30px rgba(18,140,126,.45);
+      font-size:16px; transition:transform .15s ease, box-shadow .15s ease; position:relative; overflow:hidden;
     }
     .cta::after{
       content:""; position:absolute; inset:0; pointer-events:none;
@@ -178,24 +132,10 @@
     .cta:hover{ transform:translateY(-2px); box-shadow:0 22px 36px rgba(18,140,126,.55) }
     .cta:hover::after{ animation:sheen .9s ease forwards }
     .cta:active{ transform:translateY(0); box-shadow:0 14px 22px rgba(18,140,126,.45) }
-
     .cta-hint{ margin-top:6px; text-align:center; font-size:11px; color:rgba(255,255,255,.75) }
 
-    .info{
-      margin:18px 0;
-      padding:16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-    }
-    .row{ margin:8px 0; font-size:14px; color:#fff }
-
     svg{width:100%;height:100%}
-
-    @media (max-width:420px){
-      .topbar .title{ font-size:15px }
-      .topbar .sub{ display:none }
-    }
+    @media (max-width:420px){ .topbar .title{ font-size:15px } .topbar .sub{ display:none } }
   </style>
 </head>
 
@@ -251,7 +191,6 @@
 
 <main class="wrap">
   <section class="card">
-
     <div class="badge">ASSISTENZA TECNICA</div>
 
     <!-- SCELTA RAPIDA -->
@@ -284,29 +223,21 @@
       <!-- CTA DINAMICA -->
       <div id="ctaWrap" class="cta-wrap" role="region" aria-live="polite">
         <div class="cta-lead">Hai selezionato: <span id="choiceLabel">—</span></div>
-        <a id="waBtn" class="cta" href="#" target="_blank" rel="noopener noreferrer">
-          Invia FOTO/VIDEO su WhatsApp
-        </a>
+        <a id="waBtn" class="cta" href="#" target="_blank" rel="noopener noreferrer">Invia FOTO/VIDEO su WhatsApp</a>
         <div class="cta-hint">Risposta diretta dal negozio • 08119578844</div>
       </div>
     </div>
 
     <h1>Non cambiarlo, Potenzialo 💻</h1>
 
-    <!-- P I L L O L E  (UNA riga) -->
+    <!-- P I L L O L E  (in colonna) -->
     <div class="pills" aria-label="Vantaggi rapidi">
       <div class="pill">🧪 Diagnosi lentezza, virus e surriscaldamento</div>
       <div class="pill">🎮 Assemblaggio PC Gaming & Upgrade</div>
       <div class="pill">🛠️ Assistenza Hardware e Software</div>
     </div>
 
-    <p>Da Re Long il tuo dispositivo torna veloce, silenzioso e affidabile: diagnosi immediata e interventi su misura.</p>
-
-    <div class="info" role="list">
-      <div class="row" role="listitem">🧪 Diagnosi lentezza / virus / surriscaldamento</div>
-      <div class="row" role="listitem">🚀 Assemblaggio PC Gaming & Upgrade</div>
-      <div class="row" role="listitem">🧼 Assistenza Hardware & Software</div>
-    </div>
+    <!-- NOTE: se servisse altro spazio in futuro, qui è libero -->
 
   </section>
 </main>
@@ -344,7 +275,6 @@
         const type = btn.dataset.type;
         setActive(btn);
 
-        // aggiorna CTA
         choiceLabel.textContent = type;
         waBtn.href = waLink(templates[type] || "Ciao Re Long, ho bisogno di assistenza.");
         ctaWrap.classList.add('show');
