@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="it">
+<!DOCTYPE html>
+<html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -12,218 +13,221 @@
       --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
       --wa1:#25D366; --wa2:#128C7E;
       --glow: rgba(0,120,255,.12);
-      --accentRing: rgba(0,140,255,.9); /* neon blu */
+      --accentRing: rgba(0,140,255,.9);
       --tileBg: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       --tileStroke: rgba(255,255,255,.16);
       --muted: rgba(255,255,255,.75);
-    }body{
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
-  background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
-  color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center;
-  padding:24px;
-}
-.wrap{ width:100%; display:flex; justify-content:center; perspective:1000px }
-.card{
-  width:min(92vw, 700px);
-  background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
-  border:1px solid var(--stroke);
-  border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
-  box-shadow:0 30px 60px rgba(0,0,0,.9), 0 0 60px var(--glow);
-  position:relative;
-}
-.badge{
-  position:absolute; top:-12px; left:16px;
-  background:linear-gradient(90deg,var(--brand1) 0%, var(--brand2) 100%);
-  color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
-  box-shadow:0 12px 22px rgba(255,80,0,.42);
-}
+    }
 
-h1{ font-size:clamp(22px, 3.8vw, 30px); text-align:center; margin-bottom:12px }
-p.sub{ text-align:center; font-size:13px; color:var(--muted); margin-bottom:14px }
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:24px;
+    }
+    .wrap{ width:100%; display:flex; justify-content:center; perspective:1000px }
+    .card{
+      width:min(92vw, 700px);
+      background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);
+      border-radius:22px; padding:clamp(18px, 2.5vw, 28px);
+      box-shadow:0 30px 60px rgba(0,0,0,.9), 0 0 60px var(--glow);
+      position:relative;
+    }
+    .badge{
+      position:absolute; top:-12px; left:16px;
+      background:linear-gradient(90deg,var(--brand1) 0%, var(--brand2) 100%);
+      color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
+      box-shadow:0 12px 22px rgba(255,80,0,.42);
+    }
 
-/* Nome & Consenso */
-.idbox{ display:grid; grid-template-columns:1fr; gap:10px; margin:10px 0 16px }
-.field{
-  position:relative; display:flex; align-items:center; gap:10px;
-  background:linear-gradient(180deg,#0e0e0e,#0a0a0a);
-  border:1px solid var(--tileStroke); border-radius:14px; padding:12px 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.4);
-}
-.field input{ flex:1; background:transparent; border:0; outline:none; color:#fff; font-weight:800; font-size:14px }
-.hint{ font-size:11px; color:var(--muted); text-align:center; margin-top:-4px }
+    h1{ font-size:clamp(22px, 3.8vw, 30px); text-align:center; margin-bottom:10px }
+    p.sub{ text-align:center; font-size:13px; color:var(--muted); margin-bottom:16px }
 
-.consent{
-  display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted);
-  background:linear-gradient(180deg,#0e0e0e,#0a0a0a);
-  border:1px solid var(--tileStroke); border-radius:14px; padding:10px 12px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.4);
-}
-.consent input{ width:18px; height:18px; accent-color:#0af; }
-.consent small{ opacity:.9 }
+    /* Nome & Consenso */
+    .idbox{ display:grid; grid-template-columns:1fr; gap:10px; margin:10px 0 16px }
+    .field{
+      position:relative; display:flex; align-items:center; gap:10px;
+      background:linear-gradient(180deg,#0e0e0e,#0a0a0a);
+      border:1px solid var(--tileStroke); border-radius:14px; padding:12px 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.4);
+    }
+    .field input{ flex:1; background:transparent; border:0; outline:none; color:#fff; font-weight:800; font-size:14px }
+    .hint{ font-size:11px; color:var(--muted); text-align:center; margin-top:-4px }
 
-/* Scelta dispositivi */
-.chooser{ border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); border-radius:16px; padding:16px; margin-bottom:18px }
-.chooser-title{ text-align:center; font-size:14px; font-weight:900; margin-bottom:12px }
+    .consent{
+      display:flex; align-items:center; gap:10px; font-size:13px; color:#e8f1ff;
+      background:linear-gradient(180deg, rgba(0,120,255,.22), rgba(0,80,220,.18));
+      border:1px solid rgba(0,150,255,.75); border-radius:14px; padding:12px 14px;
+      box-shadow: 0 0 0 2px rgba(0,150,255,.15) inset, 0 10px 26px rgba(0,120,255,.25);
+    }
+    .consent input{ width:18px; height:18px; accent-color:#0af; filter: drop-shadow(0 0 6px rgba(0,160,255,.9)); }
+    .consent small{ opacity:.95; font-weight:700 }
 
-.tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px }
-.tile{
-  background:var(--tileBg);
-  border:1px solid var(--tileStroke);
-  border-radius:18px; padding:14px 12px; text-align:center; cursor:pointer; transition:.22s ease;
-  position:relative; transform-style:preserve-3d;
-  box-shadow:
-    0 10px 20px rgba(0,0,0,.5),
-    0 1px 0 rgba(255,255,255,.04) inset,
-    0 -2px 0 rgba(255,255,255,.02) inset;
-}
-.tile::after{ /* base 3D */
-  content:""; position:absolute; inset:auto 10px -10px 10px; height:10px; border-radius:12px; filter:blur(8px);
-  background: radial-gradient(50% 60% at 50% 40%, rgba(0,0,0,.45), rgba(0,0,0,0));
-}
-.tile:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 18px 38px rgba(0,0,0,.6), 0 0 0 2px rgba(0,140,255,.15) inset }
-.tile[aria-pressed="true"]{
-  border-color:var(--accentRing);
-  box-shadow:0 0 0 2px rgba(0,140,255,.25) inset, 0 0 24px rgba(0,160,255,.35);
-}
-.ico{ width:48px; height:48px; margin:0 auto 10px }
-.tile span{ font-size:13.5px; font-weight:900; color:#fff }
+    /* Scelta dispositivi */
+    .chooser{ border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); border-radius:16px; padding:16px; margin-bottom:10px }
+    .chooser-title{ text-align:center; font-size:14px; font-weight:900; margin-bottom:12px }
 
-/* CTA (fallback/manual) */
-.cta-wrap{ display:none; margin-top:12px; border-radius:14px; padding:12px; background:linear-gradient(90deg, rgba(0,140,255,.12), rgba(0,60,160,.12)); border:1px solid rgba(0,140,255,.35) }
-.cta-wrap.show{ display:block }
-.cta-lead{ text-align:center; font-size:14px; font-weight:900; margin-bottom:6px }
+    .tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px }
+    .tile{
+      background:var(--tileBg);
+      border:1px solid var(--tileStroke);
+      border-radius:18px; padding:14px 12px; text-align:center; cursor:pointer; transition:.22s ease;
+      position:relative; transform-style:preserve-3d;
+      box-shadow:
+        0 10px 20px rgba(0,0,0,.5),
+        0 1px 0 rgba(255,255,255,.04) inset,
+        0 -2px 0 rgba(255,255,255,.02) inset;
+    }
+    .tile::after{
+      content:""; position:absolute; inset:auto 10px -10px 10px; height:10px; border-radius:12px; filter:blur(8px);
+      background: radial-gradient(50% 60% at 50% 40%, rgba(0,0,0,.45), rgba(0,0,0,0));
+    }
+    .tile:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 18px 38px rgba(0,0,0,.6), 0 0 0 2px rgba(0,140,255,.15) inset }
+    .tile[aria-pressed="true"]{
+      border-color:var(--accentRing);
+      box-shadow:0 0 0 2px rgba(0,140,255,.25) inset, 0 0 24px rgba(0,160,255,.35);
+    }
+    .ico{ width:48px; height:48px; margin:0 auto 10px }
+    .tile span{ font-size:13.5px; font-weight:900; color:#fff }
 
-.cta{
-  display:flex; align-items:center; justify-content:center; text-align:center; padding:16px; border-radius:14px;
-  font-size:17px; font-weight:900; color:#fff; text-decoration:none;
-  background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));
-  box-shadow:0 18px 30px rgba(18,140,126,.45), 0 0 0 1px rgba(0,0,0,.25) inset;
-  position:relative; overflow:hidden; transform:translateZ(0);
-  transition: transform .18s cubic-bezier(.22,.61,.36,1), box-shadow .18s ease, filter .18s ease;
-}
-.cta::after{ content:""; position:absolute; inset:0; background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.6) 40%, rgba(255,255,255,0) 75%); transform:translateX(-120%); pointer-events:none }
-.cta:hover{ transform:translateY(-5px) scale(1.02); box-shadow:0 26px 44px rgba(18,140,126,.55), 0 0 0 1px rgba(0,0,0,.3) inset }
-.cta:hover::after{ animation:sheenMove .9s ease forwards }
-@keyframes sheenMove { to { transform:translateX(120%); } }
+    /* CTA (solo se il nome è valido) */
+    .cta-wrap{ display:none; margin-top:12px; border-radius:14px; padding:12px; background:linear-gradient(90deg, rgba(0,140,255,.12), rgba(0,60,160,.12)); border:1px solid rgba(0,140,255,.35) }
+    .cta-wrap.show{ display:block }
+    .cta-lead{ text-align:center; font-size:14px; font-weight:900; margin-bottom:6px }
 
-.cta-hint{ text-align:center; font-size:11px; margin-top:6px; color:rgba(255,255,255,.75) }
+    .cta{
+      display:flex; align-items:center; justify-content:center; text-align:center; padding:16px; border-radius:14px;
+      font-size:17px; font-weight:900; color:#fff; text-decoration:none;
+      background:radial-gradient(circle at 0% 0%, var(--wa1), var(--wa2));
+      box-shadow:0 18px 30px rgba(18,140,126,.45), 0 0 0 1px rgba(0,0,0,.25) inset;
+      position:relative; overflow:hidden; transform:translateZ(0);
+      transition: transform .18s cubic-bezier(.22,.61,.36,1), box-shadow .18s ease, filter .18s ease;
+    }
+    .cta::after{ content:""; position:absolute; inset:0; background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.6) 40%, rgba(255,255,255,0) 75%); transform:translateX(-120%); pointer-events:none }
+    .cta:hover{ transform:translateY(-5px) scale(1.02); box-shadow:0 26px 44px rgba(18,140,126,.55), 0 0 0 1px rgba(0,0,0,.3) inset }
+    .cta:hover::after{ animation:sheenMove .9s ease forwards }
+    @keyframes sheenMove { to { transform:translateX(120%); } }
 
-.shake{ animation:shake .35s ease }
-@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+    .cta-hint{ text-align:center; font-size:11px; margin-top:6px; color:rgba(255,255,255,.75) }
 
-svg{width:100%;height:100%}
+    .shake{ animation:shake .35s ease }
+    @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
 
+    svg{width:100%;height:100%}
   </style>
-</head><body><!-- SVG ICONS --><svg width="0" height="0" style="position:absolute">
+</head>
+
+<body>
+
+<!-- SVG ICONS -->
+<svg width="0" height="0" style="position:absolute">
   <defs>
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#e0e0e0"/>
       <stop offset=".5" stop-color="#7a7a7a"/>
       <stop offset="1" stop-color="#bdbdbd"/>
-    </linearGradient><symbol id="ico-desktop" viewBox="0 0 64 64">
-  <rect x="6" y="10" width="52" height="34" rx="4" fill="url(#metal)"/>
-  <rect x="10" y="14" width="44" height="26" rx="2" fill="#0a0a0a"/>
-</symbol>
+    </linearGradient>
 
-<symbol id="ico-phone" viewBox="0 0 64 64">
-  <rect x="22" y="6" width="20" height="52" rx="5" fill="url(#metal)"/>
-  <rect x="24" y="12" width="16" height="36" rx="2" fill="#0a0a0a"/>
-</symbol>
+    <symbol id="ico-desktop" viewBox="0 0 64 64">
+      <rect x="6" y="10" width="52" height="34" rx="4" fill="url(#metal)"/>
+      <rect x="10" y="14" width="44" height="26" rx="2" fill="#0a0a0a"/>
+    </symbol>
 
-<symbol id="ico-printer" viewBox="0 0 64 64">
-  <rect x="10" y="20" width="44" height="22" rx="3" fill="url(#metal)"/>
-  <rect x="16" y="8" width="32" height="12" rx="2" fill="#bdbdbd"/>
-</symbol>
+    <symbol id="ico-phone" viewBox="0 0 64 64">
+      <rect x="22" y="6" width="20" height="52" rx="5" fill="url(#metal)"/>
+      <rect x="24" y="12" width="16" height="36" rx="2" fill="#0a0a0a"/>
+    </symbol>
 
-<!-- Gamepad -->
-<symbol id="ico-gamepad" viewBox="0 0 64 64">
-  <rect x="10" y="26" width="44" height="12" rx="6" fill="url(#metal)"/>
-  <circle cx="22" cy="32" r="3" fill="#0a0a0a"/>
-  <rect x="20" y="30" width="4" height="8" rx="1" fill="#0a0a0a"/>
-  <rect x="18" y="32" width="8" height="4" rx="1" fill="#0a0a0a"/>
-  <circle cx="42" cy="31" r="2" fill="#0a0a0a"/>
-  <circle cx="46" cy="31" r="2" fill="#0a0a0a"/>
-  <circle cx="42" cy="35" r="2" fill="#0a0a0a"/>
-  <circle cx="46" cy="35" r="2" fill="#0a0a0a"/>
-</symbol>
+    <symbol id="ico-printer" viewBox="0 0 64 64">
+      <rect x="10" y="20" width="44" height="22" rx="3" fill="url(#metal)"/>
+      <rect x="16" y="8" width="32" height="12" rx="2" fill="#bdbdbd"/>
+    </symbol>
 
-<!-- Preventivo (ricevuta) -->
-<symbol id="ico-receipt" viewBox="0 0 64 64">
-  <path d="M16 10h32v44l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3z" fill="url(#metal)"/>
-  <rect x="22" y="18" width="20" height="4" rx="1" fill="#0a0a0a"/>
-  <rect x="22" y="26" width="20" height="4" rx="1" fill="#0a0a0a"/>
-  <rect x="22" y="34" width="14" height="4" rx="1" fill="#0a0a0a"/>
-</symbol>
+    <symbol id="ico-gamepad" viewBox="0 0 64 64">
+      <rect x="10" y="26" width="44" height="12" rx="6" fill="url(#metal)"/>
+      <circle cx="22" cy="32" r="3" fill="#0a0a0a"/>
+      <rect x="20" y="30" width="4" height="8" rx="1" fill="#0a0a0a"/>
+      <rect x="18" y="32" width="8" height="4" rx="1" fill="#0a0a0a"/>
+      <circle cx="42" cy="31" r="2" fill="#0a0a0a"/>
+      <circle cx="46" cy="31" r="2" fill="#0a0a0a"/>
+      <circle cx="42" cy="35" r="2" fill="#0a0a0a"/>
+      <circle cx="46" cy="35" r="2" fill="#0a0a0a"/>
+    </symbol>
 
+    <symbol id="ico-receipt" viewBox="0 0 64 64">
+      <path d="M16 10h32v44l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3z" fill="url(#metal)"/>
+      <rect x="22" y="18" width="20" height="4" rx="1" fill="#0a0a0a"/>
+      <rect x="22" y="26" width="20" height="4" rx="1" fill="#0a0a0a"/>
+      <rect x="22" y="34" width="14" height="4" rx="1" fill="#0a0a0a"/>
+    </symbol>
   </defs>
-</svg><main class="wrap">
+</svg>
+
+<main class="wrap">
   <section class="card">
-    <div class="badge">ASSISTENZA TECNICA</div><h1>Non cambiarlo, Potenzialo 💻</h1>
-<p class="sub">Inserisci il tuo <b>Nome e Cognome</b>, poi tocca il tasto giusto: si apre WhatsApp già compilato.</p>
+    <div class="badge">ASSISTENZA TECNICA</div>
 
-<!-- Nome & Consenso -->
-<div class="idbox">
-  <label class="field" aria-label="Nome e Cognome">
-    <svg class="ico" style="width:22px;height:22px;opacity:.9" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#bdbdbd" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5m0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
-    </svg>
-    <input id="fullname" type="text" inputmode="text" autocomplete="name" placeholder="Nome e Cognome" maxlength="60" />
-  </label>
-  <div class="consent" title="Consenso privacy via WhatsApp">
-    <input type="checkbox" checked disabled aria-checked="true" aria-label="Consenso privacy" />
-    <small>Autorizzo il <b>trattamento dei dati</b> via WhatsApp (GDPR). <i>Flag già spuntato</i>.</small>
-  </div>
-  <div class="hint">⚠️ Senza Nome e Cognome non possiamo aprire WhatsApp automatico.</div>
-</div>
+    <h1>Canale Assistenza Re Long</h1>
+    <p class="sub">Sei nel <b>canale ufficiale Assistenza Re Long</b>. Inserisci <b>Nome e Cognome</b>, poi scegli il prodotto: si aprirà WhatsApp con il messaggio già pronto.</p>
 
-<!-- SCELTA RAPIDA -->
-<div class="chooser">
-  <div class="chooser-title">Scegli per cosa ti serve assistenza</div>
+    <!-- Nome & Consenso -->
+    <div class="idbox">
+      <label class="field" aria-label="Nome e Cognome">
+        <svg class="ico" style="width:22px;height:22px;opacity:.9" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#bdbdbd" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5m0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+        </svg>
+        <input id="fullname" type="text" inputmode="text" autocomplete="name" placeholder="Nome e Cognome" maxlength="60" />
+      </label>
+      <div class="consent" title="Consenso privacy via WhatsApp">
+        <input type="checkbox" checked disabled aria-checked="true" aria-label="Consenso privacy" />
+        <small>Consenso privacy WhatsApp (obbligatorio)</small>
+      </div>
+      <div class="hint">⚠️ Senza Nome e Cognome non è possibile inviare la richiesta.</div>
+    </div>
 
-  <div class="tiles">
-    <button class="tile" data-type="Computer in Riparazione" data-icon="desktop">
-      <div class="ico"><svg><use href="#ico-desktop"/></svg></div>
-      <span>Computer in Riparazione</span>
-    </button>
+    <!-- SCELTA RAPIDA -->
+    <div class="chooser">
+      <div class="chooser-title">Scegli per cosa ti serve assistenza</div>
 
-    <button class="tile" data-type="Smartphone in Riparazione" data-icon="phone">
-      <div class="ico"><svg><use href="#ico-phone"/></svg></div>
-      <span>Smartphone in Riparazione</span>
-    </button>
+      <div class="tiles">
+        <button class="tile" data-type="Computer in Riparazione">
+          <div class="ico"><svg><use href="#ico-desktop"/></svg></div>
+          <span>Computer in Riparazione</span>
+        </button>
 
-    <button class="tile" data-type="Stampante in Riparazione" data-icon="printer">
-      <div class="ico"><svg><use href="#ico-printer"/></svg></div>
-      <span>Stampante in Riparazione</span>
-    </button>
+        <button class="tile" data-type="Smartphone in Riparazione">
+          <div class="ico"><svg><use href="#ico-phone"/></svg></div>
+          <span>Smartphone in Riparazione</span>
+        </button>
 
-    <button class="tile" data-type="Console & Accessori in Riparazione" data-icon="gamepad">
-      <div class="ico"><svg><use href="#ico-gamepad"/></svg></div>
-      <span>Console & Accessori in Riparazione</span>
-    </button>
+        <button class="tile" data-type="Stampante in Riparazione">
+          <div class="ico"><svg><use href="#ico-printer"/></svg></div>
+          <span>Stampante in Riparazione</span>
+        </button>
 
-    <button class="tile" data-type="Richiesta Preventivo" data-icon="receipt">
-      <div class="ico"><svg><use href="#ico-receipt"/></svg></div>
-      <span>Richiesta Preventivo</span>
-    </button>
-  </div>
+        <button class="tile" data-type="Console & Accessori in Riparazione">
+          <div class="ico"><svg><use href="#ico-gamepad"/></svg></div>
+          <span>Console & Accessori in Riparazione</span>
+        </button>
 
-  <!-- CTA fallback (se serve invio manuale) -->
-  <div id="ctaWrap" class="cta-wrap" aria-live="polite">
-    <div class="cta-lead">Invio WhatsApp pronto per: <span id="choiceLabel">—</span></div>
-    <a id="waBtn" class="cta" href="#" target="_blank" rel="noopener noreferrer">✅ Invia su WhatsApp</a>
-    <div class="cta-hint">Risposta diretta • 08119578844</div>
-  </div>
-</div>
+        <button class="tile" data-type="Richiesta Preventivo">
+          <div class="ico"><svg><use href="#ico-receipt"/></svg></div>
+          <span>Richiesta Preventivo</span>
+        </button>
+      </div>
 
-<!-- Pillole -->
-<div class="pills">
-  <div class="field" style="justify-content:center; text-align:center">🧪 Diagnosi lentezza, virus e surriscaldamento</div>
-  <div class="field" style="justify-content:center; text-align:center">🎮 Assemblaggio PC Gaming & Upgrade</div>
-  <div class="field" style="justify-content:center; text-align:center">🛠️ Assistenza Hardware e Software</div>
-</div>
-
+      <!-- CTA (solo se nome valido) -->
+      <div id="ctaWrap" class="cta-wrap" aria-live="polite">
+        <div class="cta-lead">Invio WhatsApp pronto per: <span id="choiceLabel">—</span></div>
+        <a id="waBtn" class="cta" href="#" target="_blank" rel="noopener noreferrer">✅ Invia su WhatsApp</a>
+        <div class="cta-hint">Risposta diretta • 08119578844</div>
+      </div>
+    </div>
   </section>
-</main><script>
+</main>
+
+<script>
 (function(){
   const tiles = document.querySelectorAll('.tile');
   const ctaWrap = document.getElementById('ctaWrap');
@@ -234,20 +238,12 @@ svg{width:100%;height:100%}
   // Numero ufficiale Re Long (con prefisso internazionale senza +)
   const WA_NUMBER = '3908119578844'; // +39 08119578844
 
-  const templates = {
-    'Computer in Riparazione': (name)=> `Ciao Re Long, mi chiamo ${name}. Ho bisogno di assistenza per il mio computer in riparazione. Autorizzo il trattamento dei dati via WhatsApp.`,
-    'Smartphone in Riparazione': (name)=> `Ciao Re Long, mi chiamo ${name}. Ho bisogno di assistenza per il mio smartphone in riparazione. Autorizzo il trattamento dei dati via WhatsApp.`,
-    'Stampante in Riparazione': (name)=> `Ciao Re Long, mi chiamo ${name}. Ho bisogno di assistenza per la mia stampante in riparazione. Autorizzo il trattamento dei dati via WhatsApp.`,
-    'Console & Accessori in Riparazione': (name)=> `Ciao Re Long, mi chiamo ${name}. Ho bisogno di assistenza per console/accessori in riparazione. Autorizzo il trattamento dei dati via WhatsApp.`,
-    'Richiesta Preventivo': (name)=> `Ciao Re Long, mi chiamo ${name}. Vorrei un preventivo personalizzato. Autorizzo il trattamento dei dati via WhatsApp.`
-  };
-
   function titleCase(s){
     return s
       .trim()
       .toLowerCase()
-      .replace(/\s+/g,' ') // spazi multipli -> uno
-      .replace(/\b([\p{L}'])[\p{L}]*/gu, t => t.charAt(0).toUpperCase() + t.slice(1));
+      .replace(/\s+/g,' ')
+      .replace(/\b([\p{L}'])[ \p{L}]*/gu, t => t.charAt(0).toUpperCase() + t.slice(1));
   }
 
   function waLink(text){
@@ -259,22 +255,30 @@ svg{width:100%;height:100%}
     const nice = titleCase(raw);
     fullname.value = nice;
     if(!nice || nice.length < 3){
-      fullname.classList.remove('shake');
-      // reflow to restart animation
-      void fullname.offsetWidth;
-      fullname.classList.add('shake');
+      fullname.classList.remove('shake'); void fullname.offsetWidth; fullname.classList.add('shake');
       fullname.focus();
       return null;
     }
     return nice;
   }
 
-  // Aggiorna CTA manuale
+  // Messaggio standard per presa in carico assistenza
+  function buildMessage(name, type){
+    if(/Preventivo/i.test(type)){
+      return `Ciao, sono ${name}. Vorrei un preventivo personalizzato. Grazie.`;
+    }
+    const prodotto = type.replace(/\s*in\s*Riparazione/i, "");
+    return `Ciao, sono ${name}. Ho lasciato il mio ${prodotto} in Assistenza, attendo vostri aggiornamenti. Grazie.`;
+  }
+
   function updateCTA(type){
     const name = ensureName();
-    if(!type) return;
+    if(!type || !name){
+      ctaWrap.classList.remove('show');
+      return;
+    }
     choiceLabel.textContent = type;
-    const draft = templates[type]((name || '[Nome Cognome]'));
+    const draft = buildMessage(name, type);
     waBtn.href = waLink(draft);
     ctaWrap.classList.add('show');
   }
@@ -286,20 +290,21 @@ svg{width:100%;height:100%}
       tiles.forEach(t=>t.setAttribute('aria-pressed','false'));
       btn.setAttribute('aria-pressed','true');
 
-      // Se nome presente → invio automatico su WhatsApp
       const name = ensureName();
       if(name){
-        const msg = templates[type](name);
+        const msg = buildMessage(name, type);
         const url = waLink(msg);
-        // open immediato (preferisci _blank per iOS Safari)
-        window.open(url, '_blank', 'noopener');
+        window.open(url, '_blank', 'noopener'); // invio automatico
+        updateCTA(type); // mostra CTA valida
+      } else {
+        // nome obbligatorio -> blocca invio e CTA
+        ctaWrap.classList.remove('show');
       }
-
-      // In ogni caso aggiorno anche la CTA di fallback
-      updateCTA(type);
     });
   });
 
 })();
-</script></body>
+</script>
+
+</body>
 </html>
