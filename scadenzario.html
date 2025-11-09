@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario + Accettazione Riparazioni</title>
+  <title>ReLong • Gestionale Interno</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     /* --- Theme: Premium Dark + Electric Blue --- */
@@ -102,8 +102,8 @@
     <img id="brandLogo" src="https://alessandroiascone.github.io/relong-nfc/img/relong-logo.png" alt="ReLong" style="cursor:pointer" title="Clicca per cambiare logo (salvato in locale)" onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'ReLong',style:'font-weight:900;font-size:20px;letter-spacing:.4px'}))">
     <input id="logoPicker" type="file" accept="image/*" hidden />
     <div>
-      <h1>ReLong • Scadenzario + Accettazione</h1>
-      <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar. (No weekend, richiamo 18:00)</div>
+      <h1>ReLong • Gestionale Interno</h1>
+      <div class="subtitle">Attivazioni & Riparazioni reminder WhatsApp</div>
     </div>
   </header>
 
@@ -131,7 +131,7 @@
             <input id="start" type="date" />
           </div>
           <div class="full">
-            <label>Cosa hai attivato ORA</label>
+            <label>Seleziona Prodotto</label>
             <div class="toggle-grid" id="toggles">
               <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
               <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
@@ -159,7 +159,7 @@
               <option>Computer</option>
               <option>Stampante</option>
               <option>Console & Accessori</option>
-              <option>Richiesta Preventivo</option>
+              <option>Richiesta Preventivo Riparazione</option>
             </select>
           </div>
           <div>
@@ -588,7 +588,7 @@ Hub: ${site}
         energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
         fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
         sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è ACCETTATA. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
       };
       const txt = encodeURIComponent(map[type]);
       return { href:`https://wa.me/39${it.phone}?text=${txt}`, text:`WhatsApp ${labelOf(type)}` };
