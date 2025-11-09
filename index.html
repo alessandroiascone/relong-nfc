@@ -49,28 +49,52 @@
     .energy-left{display:flex;align-items:center;gap:8px}
     .tag-today{font-size:10px;font-weight:700;background:rgba(255,0,0,.12);color:#ff4d00;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,77,0,.4)}
 
-    /* --------- Fulmini 3D / Scelte --------- */
+    /* --------- Scelte --------- */
     .plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
 
     .plan{
       position:relative;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;padding:12px;cursor:pointer;transition:.25s ease;isolation:isolate;overflow:hidden
+      border-radius:14px;padding:12px;cursor:pointer;
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+      isolation:isolate;overflow:hidden;will-change:transform
     }
     .plan:before{
       content:"";position:absolute;inset:-1px;border-radius:14px;
       background:radial-gradient(120px 60px at 0% 0%,rgba(255,123,0,.08),transparent 60%),
                  radial-gradient(120px 60px at 100% 100%,rgba(255,0,0,.06),transparent 60%);
-      opacity:.6;pointer-events:none;transition:.25s ease
+      opacity:.55;pointer-events:none;transition:.25s ease
     }
     .plan:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
-    .plan.inactive .bolt-3d{opacity:.55;filter:grayscale(.15) contrast(.95) brightness(.9)}
-    .plan.active{border-color:rgba(255,190,0,.75);box-shadow:0 10px 44px rgba(255,170,0,.28)}
-    .plan.active:before{opacity:1;background:
-        radial-gradient(160px 80px at 0% 0%,rgba(255,200,0,.22),transparent 60%),
-        radial-gradient(160px 80px at 100% 100%,rgba(255,70,0,.22),transparent 60%)}
+    .plan.inactive{background:rgba(255,255,255,.03)}
+    .plan.active{border-color:rgba(255,190,0,.75);box-shadow:0 10px 44px rgba(255,170,0,.28);background:rgba(255,200,0,.06)}
+    .plan.active:before{opacity:1}
 
-    .bolt-3d{width:52px;height:52px;margin-bottom:8px;display:inline-block}
-    .plan h3{font-size:13px;letter-spacing:.02em;color:rgba(255,255,255,.88)}
+    /* Micro-rimbalzo */
+    .plan.bounce{animation:plan-bounce .28s cubic-bezier(.3,.7,.2,1.1)}
+    @keyframes plan-bounce{
+      0%{transform:scale(1)}
+      35%{transform:scale(1.06)}
+      65%{transform:scale(.985)}
+      100%{transform:scale(1)}
+    }
+    @media (prefers-reduced-motion: reduce){
+      .plan{transition:none}
+      .plan.bounce{animation:none}
+    }
+
+    /* Emoji lampadina: spenta/on */
+    .bulb{font-size:28px;line-height:1;display:inline-block;transition:filter .25s ease, text-shadow .25s ease, transform .25s ease}
+    .bulb.off{filter:grayscale(1) brightness(.6) opacity(.7)}
+    .bulb.on{
+      filter:none;
+      text-shadow:
+        0 0 6px rgba(255,213,74,.85),
+        0 0 14px rgba(255,140,0,.55),
+        0 0 28px rgba(255,90,26,.35);
+      transform:translateZ(0)
+    }
+
+    .plan h3{font-size:13px;letter-spacing:.02em;color:rgba(255,255,255,.9)}
     .plan .price{font-size:18px;font-weight:800;margin-top:2px;background:linear-gradient(90deg,#ffd54a,#ff7b00,#ff2a00);-webkit-background-clip:text;color:transparent}
     .plan small{display:block;margin-top:4px;color:var(--muted2);font-size:11px}
 
@@ -98,77 +122,15 @@
     .steps .riga{font-size:13px;line-height:1.45;color:rgba(255,255,255,.9)}
     .steps .riga strong{font-weight:800}
 
-    /* CTA & footer */
-    .cta-alt{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px 16px;text-align:center;font-size:12px;color:rgba(255,255,255,.65)}
+    /* Footer */
     .footer{text-align:center;margin-top:20px;font-size:11px;color:rgba(255,255,255,.4)}
     .legal{font-size:10px;color:rgba(255,255,255,.28);margin-top:12px}
     .glow{position:absolute;left:50%;transform:translateX(-50%);bottom:-40px;width:180px;height:60px;background:radial-gradient(circle,rgba(255,120,0,.45) 0%,rgba(0,0,0,0) 70%);filter:blur(30px);opacity:.6;pointer-events:none}
 
     @media (min-width:480px){.brand-title{font-size:24px}.headline h1{font-size:25px}}
-
-    /* --- Animazione glow del fulmine acceso --- */
-    .bolt-3d.lit .glow{opacity:1}
-    .bolt-3d.lit .core{fill:url(#gradLit)}
-    .bolt-3d.lit .edge{opacity:.9}
-    .bolt-3d.lit .outer-glow{opacity:.85;animation:pulse 1.4s ease-in-out infinite}
-    @keyframes pulse{
-      0%,100%{filter:blur(6px);opacity:.7}
-      50%{filter:blur(10px);opacity:1}
-    }
   </style>
 </head>
 <body>
-  <!-- Defs SVG condivisi (gradients e filters per 3D) -->
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <linearGradient id="gradMetal" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#dcdcdc"/><stop offset=".22" stop-color="#9e9e9e"/>
-        <stop offset=".5" stop-color="#6e6e6e"/><stop offset=".78" stop-color="#b8b8b8"/>
-        <stop offset="1" stop-color="#7a7a7a"/>
-      </linearGradient>
-      <radialGradient id="gradSpec" cx="25%" cy="20%" r="60%">
-        <stop offset="0" stop-color="#ffffff" stop-opacity=".9"/>
-        <stop offset=".35" stop-color="#ffffff" stop-opacity=".25"/>
-        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="gradEdge" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#000" stop-opacity=".55"/>
-        <stop offset=".5" stop-color="#000" stop-opacity=".15"/>
-        <stop offset="1" stop-color="#000" stop-opacity=".6"/>
-      </linearGradient>
-      <linearGradient id="gradLit" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#fff3a1"/>
-        <stop offset=".45" stop-color="#ffc629"/>
-        <stop offset="1" stop-color="#ff5a1a"/>
-      </linearGradient>
-      <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feOffset dx="0" dy="1" /><feGaussianBlur stdDeviation="1.4" result="blur"/>
-        <feComposite in="SourceGraphic" in2="blur" operator="arithmetic" k2="-1" k3="2" />
-        <feColorMatrix type="matrix"
-          values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0"/>
-      </filter>
-      <filter id="drop" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity=".7"/>
-      </filter>
-      <filter id="glow" x="-80%" y="-80%" width="260%">
-        <feGaussianBlur stdDeviation="6" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="b"/></feMerge>
-      </filter>
-      <symbol id="bolt3D" viewBox="0 0 64 64">
-        <path class="core" d="M36 2 8 38h14l-6 24 40-48H38l-2-12z"
-              fill="url(#gradMetal)" filter="url(#drop)"/>
-        <path class="edge" d="M36 2 8 38h14l-6 24 40-48H38l-2-12z"
-              fill="url(#gradEdge)" opacity=".6" filter="url(#innerShadow)"/>
-        <path d="M36 2 8 38h14l-6 24 40-48H38l-2-12z"
-              fill="url(#gradSpec)" opacity=".45"/>
-        <g class="glow outer-glow" style="opacity:0">
-          <path d="M36 2 8 38h14l-6 24 40-48H38l-2-12z"
-                fill="#ffc629" filter="url(#glow)" opacity=".9"/>
-        </g>
-      </symbol>
-    </defs>
-  </svg>
-
   <div class="card">
     <div class="badge">ACCESSO RISERVATO</div>
 
@@ -178,42 +140,45 @@
     </div>
 
     <div class="headline">
-      <h1>Area <span class="accent">Energia Riservata</span> 🔥</h1>
-      <p class="subtitle">Stai pagando troppo la CORRENTE?<br/>Noi abbassiamo la tua bolletta passando a Fastweb Vodafone Energia.</p>
+      <h1>Energia del Futuro, <span class="accent">oggi con Te</span> 🔥</h1>
+      <p class="subtitle">Stai pagando troppo la CORRENTE?<br/>Noi abbassiamo la tua bolletta.</p>
     </div>
 
-    <!-- Fulmini / Scelte -->
+    <!-- Scelte -->
     <div class="energy-box">
       <div class="energy-title">
-        <div class="energy-left"><span class="icon">⚡</span><span>Scegli il tuo profilo di consumo</span></div>
+        <div class="energy-left">
+          <!-- RIMOSSA l’emoji a sinistra -->
+          <span>Scegli il tuo profilo di consumo</span>
+        </div>
         <div class="tag-today">Clicca e scegli la tua offerta</div>
       </div>
 
       <div class="plans" id="plans">
         <button class="plan inactive" data-kwh="1500" data-price="€35/mese" data-label="1500 kWh/anno — €35/mese" aria-label="1500 kWh anno, 35 euro mese">
-          <span class="bolt-3d" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bolt3D"/></svg></span>
+          <span class="bulb off" aria-hidden="true">💡</span>
           <h3>1500 kWh/anno</h3><div class="price">€35/mese</div><small>Ideale per single / giovani coppie</small>
         </button>
 
         <button class="plan inactive" data-kwh="2500" data-price="€55/mese" data-label="2500 kWh/anno — €55/mese" aria-label="2500 kWh anno, 55 euro mese">
-          <span class="bolt-3d" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bolt3D"/></svg></span>
+          <span class="bulb off" aria-hidden="true">💡</span>
           <h3>2500 kWh/anno</h3><div class="price">€55/mese</div><small>Famiglia media</small>
         </button>
 
         <button class="plan inactive" data-kwh="4000" data-price="€85/mese" data-label="4000 kWh/anno — €85/mese" aria-label="4000 kWh anno, 85 euro mese">
-          <span class="bolt-3d" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bolt3D"/></svg></span>
+          <span class="bulb off" aria-hidden="true">💡</span>
           <h3>4000 kWh/anno</h3><div class="price">€85/mese</div><small>Casa grande / pompe di calore</small>
         </button>
 
         <button class="plan inactive" data-kwh="personalizzata" data-price="—" data-label="Offerta personalizzata" aria-label="Componi la tua offerta">
-          <span class="bolt-3d" aria-hidden="true"><svg viewBox="0 0 64 64"><use href="#bolt3D"/></svg></span>
+          <span class="bulb off" aria-hidden="true">💡</span>
           <h3>Componi la tua offerta</h3><div class="price">Su misura</div><small>Indica esigenze e fasce orarie</small>
         </button>
       </div>
 
       <!-- Banner dinamico -->
       <div id="choiceBanner" class="choice-banner" role="region" aria-live="polite">
-        <div class="banner-title">⚡ Selezione attiva: <span id="choiceText">—</span></div>
+        <div class="banner-title">💡 Selezione attiva: <span id="choiceText">—</span></div>
         <div class="banner-sub">Clicca sotto: invia la tua bolletta e procedi con l’attivazione dell’offerta selezionata.</div>
         <a id="whatsAppCTA" class="cta-inline" href="#" target="_blank" rel="noopener noreferrer">
           Invia la FOTO della bolletta su WhatsApp per ATTIVARE questa offerta
@@ -236,7 +201,7 @@
       <div class="legal">Offerta legata ai clienti di Re Long Informatica.</div>
     </div>
 
-    <div class="glow"></div>
+    <div class="glow" aria-hidden="true"></div>
   </div>
 
   <script>
@@ -246,11 +211,10 @@
       const choiceText = document.getElementById('choiceText');
       const waCTA = document.getElementById('whatsAppCTA');
 
-      function setLit(svgEl, lit){
-        const root = svgEl.closest('.bolt-3d');
-        if(!root) return;
-        if(lit){ root.classList.add('lit'); }
-        else{ root.classList.remove('lit'); }
+      function setBulb(el, on){
+        if(!el) return;
+        el.classList.toggle('on', !!on);
+        el.classList.toggle('off', !on);
       }
 
       function buildMessage(label){
@@ -263,25 +227,35 @@
       function updateBanner(label){
         choiceText.textContent = label;
         const text = buildMessage(label);
+        // WhatsApp ufficiale: 08119578844 -> wa.me/3908119578844
         waCTA.href = `https://wa.me/3908119578844?text=${text}`;
         banner.classList.add('show');
         banner.scrollIntoView({behavior:'smooth',block:'center'});
       }
 
+      function bounce(el){
+        el.classList.remove('bounce'); void el.offsetWidth; // reset
+        el.classList.add('bounce');
+        el.addEventListener('animationend', ()=> el.classList.remove('bounce'), {once:true});
+      }
+
       plans.forEach(btn=>{
         btn.addEventListener('click', ()=>{
+          // reset tutti
           plans.forEach(p=>{
             p.classList.remove('active'); p.classList.add('inactive');
-            const svg = p.querySelector('.bolt-3d svg');
-            if(svg) setLit(svg,false);
+            const bulb = p.querySelector('.bulb');
+            setBulb(bulb,false);
           });
 
+          // attiva selezionato
           btn.classList.add('active'); btn.classList.remove('inactive');
-          const svg = btn.querySelector('.bolt-3d svg');
-          if(svg) setLit(svg,true);
+          const bulb = btn.querySelector('.bulb');
+          setBulb(bulb,true);
 
           const label = btn.dataset.label || 'Offerta personalizzata';
           updateBanner(label);
+          bounce(btn);
         }, {passive:true});
       });
     })();
