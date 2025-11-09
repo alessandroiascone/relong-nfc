@@ -37,11 +37,9 @@
 .chooser-title{text-align:center;font-size:13px;font-weight:900;margin-bottom:10px}
 
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:10px}
-.tile{background:var(--tileBg);border:1px solid rgba(0,140,255,.35);border-radius:14px;
-  padding:10px 8px;text-align:center;cursor:pointer;transition:.22s ease;position:relative;
-  transform-style:preserve-3d;box-shadow:0 0 12px rgba(0,150,255,.25),0 6px 14px rgba(0,0,0,.45)}
+.tile{$1 overflow:hidden;}
 .tile:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 38px rgba(0,0,0,.6),0 0 0 2px rgba(0,140,255,.15) inset}
-.tile[aria-pressed="true"]{border-color:var(--accentRing);box-shadow:0 0 0 2px rgba(0,140,255,.25) inset,0 0 24px rgba(0,160,255,.35)}
+.tile[aria-pressed="true"], .tile.active{$1}
 .ico{width:36px;height:36px;margin:0 auto 6px}
 .tile span{font-size:12px;font-weight:800;color:#fff}
 
@@ -55,7 +53,8 @@
   background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
   box-shadow:0 18px 30px rgba(18,140,126,.45),0 0 0 1px rgba(0,0,0,.25) inset}
 
-  </style>
+.cta-wrap{display:none!important}.cta-wrap.show{display:none!important} .ripple{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);width:10px;height:10px;background:radial-gradient(circle,rgba(255,255,255,.35) 0%,rgba(255,255,255,.22) 45%,rgba(255,255,255,0) 70%);opacity:.9;animation:ripple .55s ease-out forwards} @keyframes ripple{from{transform:translate(-50%,-50%) scale(1);opacity:.35}to{transform:translate(-50%,-50%) scale(18);opacity:0}} </style>
+
 </head>
 <body><main class="wrap">
   <section class="card">
@@ -109,17 +108,32 @@
   function link(t){return `https://wa.me/${WA}?text=${encodeURIComponent(t)}`}
 
   tiles.forEach(btn=>{
-    btn.addEventListener('click',()=>{
+    btn.addEventListener('click', (e)=>{
       const name = cleanName(fullname.value);
       if(!name || name.length < 3){ fullname.focus(); return; }
 
       const product = btn.dataset.type;
-      const text = buildMessage(name, product);
-      const href = link(text);
-      waBtn.href = href;
-      cta.classList.add('show');
-      window.open(href, '_blank', 'noopener');
+
+      // evidenzia selezione
+      tiles.forEach(t=>{ t.setAttribute('aria-pressed','false'); t.classList.remove('active'); });
+      btn.setAttribute('aria-pressed','true');
+      btn.classList.add('active');
+
+      // ripple effect
+      const rect = btn.getBoundingClientRect();
+      const x = (e.clientX - rect.left);
+      const y = (e.clientY - rect.top);
+      const rip = document.createElement('span');
+      rip.className = 'ripple';
+      rip.style.left = x + 'px';
+      rip.style.top = y + 'px';
+      btn.appendChild(rip);
+      rip.addEventListener('animationend', ()=> rip.remove(), {once:true});
+
+      // prepara link e apri WhatsApp con un micro-delay dopo l'highlight
+      setTimeout(()=>{ window.open(href, '_blank', 'noopener'); }, 120);
     });
+  });
   });
   });
 })();
