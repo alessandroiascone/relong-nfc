@@ -81,18 +81,12 @@
     .cta a.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
 
-    /* Stats (opzionali) */
-    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-    .stat{background:#090c12;border:1px solid rgba(0,140,255,.18);border-radius:14px;padding:12px;display:grid;gap:6px}
-    .stat .n{font-size:22px;font-weight:800}
-    @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
-
     /* Glow per task in scadenza oggi */
     .task.dueToday{box-shadow:0 0 0 1px rgba(0,140,255,.35), 0 0 24px rgba(0,140,255,.25)}
     @keyframes pulseGlow{0%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}50%{box-shadow:0 0 0 6px rgba(0,140,255,.12)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}}
     .task.dueToday{animation:pulseGlow 2.4s ease-in-out infinite}
 
-    /* Visibilità accettazione: nascosta di default */
+    /* Accettazione: nascosta finché non si seleziona "riparazione" */
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
 
@@ -169,7 +163,7 @@
       </div>
     </section>
 
-    <!-- Accettazione: nascosta finché non si seleziona "riparazione" -->
+    <!-- Accettazione: si apre solo con "riparazione" -->
     <aside class="card" id="acceptWrap">
       <h2>Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
@@ -267,7 +261,7 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v14';
+    const storeKey = 'relong-scadenzario-v15'; // bump per evitare cache vecchia
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato, azzero lo scadenzario:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -282,7 +276,7 @@
     const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x }
     const avoidWeekend = (d) => { const x = new Date(d); const day = x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x };
 
-    // Giorni preimpostati (+5 rispetto ai precedenti)
+    // Giorni preimpostati
     const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12 };
     const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
@@ -328,8 +322,7 @@
     function updateAcceptanceUI(){
       const isRepair = activeSet.has('riparazione');
       acceptWrap.classList.toggle('show', isRepair);
-      document.getElementById('insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
-      // se si disattiva riparazione pulisco form
+      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
       if(!isRepair){ aForm.reset(); }
     }
 
@@ -360,18 +353,18 @@
 
       const name = c_name.value.trim();
       let phone = (c_phone.value||'').trim();
-      phone = phone.replace(/\D/g,''); // solo cifre
+      phone = phone.replace(/\D/g,'');
       if(phone.startsWith('0')) phone = phone.slice(1);
       if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
 
       const start = startI.value ? new Date(startI.value) : new Date();
       const activated = new Set(activeSet);
 
-      // --- Flusso RIPARAZIONE: tasto unico (accetta + inserisce) ---
+      // Flusso RIPARAZIONE: accetta + inserisce
       if(activated.has('riparazione')){
         const device = {
           type:a_type.value,
-          brand:a_brand.value, // menu a tendina
+          brand:a_brand.value,
           model:a_model.value.trim(),
           issue:a_issue.value.trim()
         };
@@ -380,7 +373,6 @@
         const id = Date.now()+Math.random().toString(16).slice(2);
         const praticaId = nextPraticaId();
 
-        // Reminder allungati per accettazione
         const all = ['energia','fisso','sim','smartphone'];
         const tasks = all.map(type=>{
           let due = addDays(new Date(), ACCEPT_DAYS[type]);
@@ -398,7 +390,7 @@
         };
         items.unshift(obj); save(items); render(); aForm.reset();
 
-        // WhatsApp accettazione (TESTO RICHIESTO)
+        // WhatsApp accettazione (testo richiesto)
         const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
         const msg = `Ciao, ${name}, abbiamo accettato il tuo prodotto in assistenza.
 Marchio: ${device.brand}
@@ -413,7 +405,7 @@ ${site}`;
         return;
       }
 
-      // --- Flusso ATTIVAZIONI classico (no riparazione) ---
+      // Flusso ATTIVAZIONI classico (no riparazione)
       const all = ['energia','fisso','sim','smartphone'];
       const targets = all.filter(t => !activated.has(t));
       const tasks = targets.map(type=>{
@@ -445,7 +437,7 @@ ${site}`;
       if('Notification' in window && httpsOk && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text);
     }
 
-    // --- Filtro, Ricerca & Render + Stats ---
+    // --- Filtro, Ricerca & Render ---
     let filter = 'all';
     const qI = $('#q');
     $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter = p.dataset.filter; render(); }));
@@ -474,19 +466,6 @@ ${site}`;
       });
 
       data.forEach(it=>list.appendChild(renderItem(it)));
-
-      // Stats (opzionali)
-      const createdToday = items.filter(it=>fmtDate(new Date(it.createdAt||it.start))===tStr).length;
-      const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
-      const doneToday = items.filter(it=>it.done && fmtDate(new Date(it.doneAt||it.start))===tStr).length;
-      const late = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>new Date(tsk.due)<now).length), 0);
-      const repairsToday = items.filter(it=> (it.acceptance || (it.activated||[]).includes('riparazione')) && fmtDate(new Date(it.createdAt||it.start))===tStr).length;
-
-      document.getElementById('st-created')?.(createdToday);
-      document.getElementById('st-due')?.(dueToday);
-      document.getElementById('st-done')?.(doneToday);
-      document.getElementById('st-late')?.(late);
-      document.getElementById('st-repairs')?.(repairsToday);
     }
 
     function iconSVG(type){
@@ -509,12 +488,8 @@ ${site}`;
       const tags = t.querySelector('.tags'); tags.innerHTML = '';
       it.activated.forEach(a=>{ const s=document.createElement('span'); s.className='tag'; s.innerHTML = iconSVG(a) + '<span>Attivato: '+labelOf(a)+'</span>'; tags.append(s); });
       if(it.acceptance){ const s=document.createElement('span'); s.className='tag'; s.innerHTML = iconSVG('riparazione') + `<span>Accettazione dispositivo${it.praticaId? ' • '+it.praticaId:''}</span>`; tags.append(s); }
-      if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
-      if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
-      if(it.done) tags.append(tag('Completato'));
 
       const tasksWrap = t.querySelector('.tasks'); tasksWrap.innerHTML='';
-
       if(it.acceptance){
         const card = document.createElement('div'); card.className='task';
         card.innerHTML = `<div class="row"><div><b>Dispositivo</b> • ${it.device?.type||''} — ${it.device?.brand||''} ${it.device?.model||''}</div><div class="cta"><button class="btn ghost" type="button" data-waacc="${it.id}">WhatsApp accettazione</button><button class="btn ghost" type="button" data-copyid="${it.praticaId||''}">Copia ID</button></div></div><div style="margin-top:8px;color:var(--muted)">Difetto: ${it.device?.issue||'-'}</div>`;
@@ -526,37 +501,6 @@ ${site}`;
       }
 
       it.tasks.forEach(task=>tasksWrap.appendChild(renderTask(it, task)));
-
-      const muteBtn = document.createElement('button'); muteBtn.className='btn ghost';
-      muteBtn.textContent = isMutedToday(it)? 'Riattiva notifiche oggi' : 'Sto già chattando (silenzia oggi)';
-      muteBtn.addEventListener('click',()=>{ it.muteDate = isMutedToday(it)? null : fmtDate(new Date()); save(items); render(); });
-      t.appendChild(muteBtn);
-
-      t.addEventListener('click',(ev)=>{
-        const b1 = ev.target.closest('button[data-waacc]');
-        if(b1){
-          const id=b1.getAttribute('data-waacc');
-          const itx = items.find(x=>x.id===id); if(!itx) return;
-          const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-          const msg = `Ciao, ${itx.name}, abbiamo accettato il tuo prodotto in assistenza.
-Marchio: ${itx.device?.brand || '-'}
-Modello: ${itx.device?.model || '-'}
-Difetto dichiarato: ${itx.device?.issue || '-'}
-
-Ti aggiorneremo noi per il ritiro. Grazie!
-Nel frattempo puoi visionare qui i nostri servizi:
-${site}`;
-          const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`;
-          try{ window.open(wa, '_blank'); }catch{}
-          return;
-        }
-        const b2 = ev.target.closest('button[data-copyid]');
-        if(b2){
-          const id = b2.getAttribute('data-copyid');
-          if(id){ navigator.clipboard?.writeText(id); b2.textContent='ID copiato'; setTimeout(()=>b2.textContent='Copia ID',1200); }
-        }
-      });
-
       return t;
     }
 
@@ -629,34 +573,39 @@ ${site}`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // --- PIN Gate Logic ---
+    // --- PIN Gate Logic (FIX robusto) ---
     (function pinGateInit(){
       const gate = document.getElementById('pinGate');
       const ok = document.getElementById('pinOk');
       const input = document.getElementById('pinInput');
       const err = document.getElementById('pinError');
-      const unlocked = sessionStorage.getItem('relong-pin-ok') === '1';
-      const setHidden = (el, h)=> el.toggleAttribute('hidden', h);
 
+      const unlocked = sessionStorage.getItem('relong-pin-ok') === '1';
+
+      function show(el){ el && el.removeAttribute('hidden'); }
+      function hide(el){ el && el.setAttribute('hidden',''); }
       function setAppHidden(h){
-        document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false'));
+        document.querySelectorAll('[aria-hidden]').forEach(n=>{
+          if(h) n.setAttribute('aria-hidden','true'); else n.setAttribute('aria-hidden','false');
+        });
       }
 
       if(unlocked){
-        setHidden(gate, true);
+        hide(gate);
         setAppHidden(false);
-        return;
+      }else{
+        show(gate);
+        setAppHidden(true);
+        setTimeout(()=>input?.focus(), 50);
       }
-      setHidden(gate, false);
-      setAppHidden(true);
-      input.focus();
 
       function tryUnlock(){
         const val = (input.value||'').trim();
         if(val === '1990'){
           sessionStorage.setItem('relong-pin-ok', '1');
-          setHidden(gate, true);
           setAppHidden(false);
+          hide(gate);
+          gate.parentNode && gate.parentNode.removeChild(gate); // rimuovo dal DOM
         }else{
           err.textContent = 'PIN errato. Riprova.';
           input.value = '';
