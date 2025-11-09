@@ -30,14 +30,11 @@
 .subtitle{color:var(--muted);font-size:14px}
 
 /* Form */
-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-form .full{grid-column:1/-1}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.full{grid-column:1/-1}
 label{font-size:12px;color:var(--muted)}
 input,select,textarea{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
 textarea{min-height:84px;resize:vertical}
-
-.brandpill{margin-top:6px;display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,140,255,.35);background:linear-gradient(135deg,rgba(0,140,255,.12),rgba(0,140,255,.05));padding:10px 12px;border-radius:999px;font-weight:700}
-.brandpill .dot{width:8px;height:8px;border-radius:50%;background:var(--elec3);box-shadow:0 0 18px var(--elec3)}
 
 /* Toggles */
 .toggle-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
@@ -101,77 +98,45 @@ textarea{min-height:84px;resize:vertical}
       <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar. (No weekend, richiamo 18:00)</div>
     </div>
   </header>  <section class="card" style="max-width:1200px;margin:0 auto">
-    <h2>Statistiche di oggi</h2>
-    <div class="content">
-      <div class="stats">
-        <div class="stat"><div>Clienti inseriti</div><div class="n" id="st-created">0</div></div>
-        <div class="stat"><div>Follow‑up in scadenza</div><div class="n" id="st-due">0</div></div>
-        <div class="stat"><div>Completati oggi</div><div class="n" id="st-done">0</div></div>
-        <div class="stat"><div>In ritardo</div><div class="n" id="st-late">0</div></div>
-        <div class="stat"><div>Riparazioni oggi</div><div class="n" id="st-repairs">0</div></div>
+    <h2>Dati cliente (unici)</h2>
+    <div class="content grid2">
+      <div>
+        <label>Nome e Cognome</label>
+        <input required id="c_name" placeholder="Mario Rossi" />
+      </div>
+      <div>
+        <label>Telefono (solo cifre, WhatsApp)</label>
+        <input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
       </div>
     </div>
   </section>  <div class="shell">
     <section class="card">
-      <h2>Nuovo cliente (Attivazioni)</h2>
+      <h2>Attivazioni</h2>
       <div class="content">
-        <form id="form">
-          <div>
-            <label>Nome e Cognome</label>
-            <input required id="name" placeholder="Mario Rossi" />
-          </div>
-          <div>
-            <label>Telefono (solo cifre, WhatsApp)</label>
-            <input required id="phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
-          </div>
-          <div class="full">
-            <label>Brand (preselezionato)</label><br>
-            <span class="brandpill"><span class="dot"></span> Vodafone</span>
-            <input type="hidden" id="brandFixed" value="Vodafone">
-          </div>
+        <div class="grid2">
           <div>
             <label>Data attivazione</label>
             <input id="start" type="date" />
-          </div><div class="full">
-        <label>Cosa hai attivato ORA</label>
-        <div class="toggle-grid" id="toggles">
-          <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
-          <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
-          <button type="button" class="tbtn" data-key="energia">Energia</button>
-          <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
-          <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
+          </div>
+          <div class="full">
+            <label>Cosa hai attivato ORA</label>
+            <div class="toggle-grid" id="toggles">
+              <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
+              <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
+              <button type="button" class="tbtn" data-key="energia">Energia</button>
+              <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
+              <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
+            </div>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn primary" id="insertBtn">Inserisci cliente</button>
         </div>
       </div>
-
-      <div class="full">
-        <label>Giorni promemoria</label>
-        <div class="toggle-grid" style="grid-template-columns:repeat(2,1fr)">
-          <div><label>Energia</label><input id="dEnergy" type="number" value="5" min="1"></div>
-          <div><label>Linea Fissa</label><input id="dFiber" type="number" value="12" min="2"></div>
-          <div><label>SIM</label><input id="dSIM" type="number" value="4" min="1"></div>
-          <div><label>Smartphone</label><input id="dPhone" type="number" value="7" min="1"></div>
-        </div>
-      </div>
-
-      <div class="full actions">
-        <button class="btn primary" type="submit" id="insertBtn">Inserisci cliente</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-<aside class="card">
-  <h2>Accettazione dispositivo (Riparazioni)</h2>
+    </section><aside class="card">
+  <h2>Accettazione dispositivo (Assistenza)</h2>
   <div class="content">
-    <form id="acceptForm">
-      <div>
-        <label>Nome e Cognome</label>
-        <input required id="a_name" placeholder="Mario Rossi" />
-      </div>
-      <div>
-        <label>Telefono (solo cifre, WhatsApp)</label>
-        <input required id="a_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
-      </div>
+    <form id="acceptForm" class="grid2">
       <div>
         <label>Tipo dispositivo</label>
         <select id="a_type">
@@ -194,12 +159,11 @@ textarea{min-height:84px;resize:vertical}
         <label>Difetto / Problema</label>
         <textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea>
       </div>
-
       <div class="full actions">
         <button class="btn primary" type="submit" id="acceptBtn">Accetta dispositivo</button>
       </div>
     </form>
-    <p class="subtitle" style="margin-top:12px">Alla conferma: invio WhatsApp di accettazione + inserimento automatico nello scadenzario (con tempi follow‑up <b>più lunghi</b> per SIM/Fisso/Energia/Smartphone).</p>
+    <p class="subtitle" style="margin-top:12px">Alla conferma: WhatsApp di accettazione + inserimento automatico nello scadenzario con follow‑up più lunghi.</p>
   </div>
 </aside>
 
@@ -212,11 +176,6 @@ textarea{min-height:84px;resize:vertical}
           <button class="pill" data-filter="today">Oggi</button>
           <button class="pill" data-filter="late">In ritardo</button>
           <button class="pill" data-filter="done">Completati</button>
-        </div>
-        <div class="actions">
-          <button class="btn ghost" id="export">Esporta .json</button>
-          <label class="btn ghost" for="importFile" style="cursor:pointer">Importa .json</label>
-          <input id="importFile" type="file" accept="application/json" hidden />
         </div>
       </div>
       <div id="list"></div>
@@ -254,7 +213,7 @@ textarea{min-height:84px;resize:vertical}
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v8';
+    const storeKey = 'relong-scadenzario-v9';
     const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -275,9 +234,9 @@ textarea{min-height:84px;resize:vertical}
       return x;
     }
 
-    // Delays (giorni)
-    const DEFAULT_DAYS = { energia:5, fisso:12, sim:4, smartphone:7 };
-    const ACCEPT_DAYS   = { energia:10, fisso:15, sim:7, smartphone:10 }; // follow‑up più lunghi per accettazione
+    // Giorni preimpostati (+5 rispetto ai precedenti)
+    const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12 };
+    const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
     // --- Stato ---
     let items = load();
@@ -295,6 +254,10 @@ textarea{min-height:84px;resize:vertical}
       r.readAsDataURL(f);
     });
 
+    // Shared customer inputs
+    const c_name = $('#c_name');
+    const c_phone = $('#c_phone');
+
     // Toggles attivazioni
     const toggles = $('#toggles');
     const activeSet = new Set();
@@ -306,64 +269,43 @@ textarea{min-height:84px;resize:vertical}
       if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
     });
 
-    // --- Form Attivazioni ---
-    const form = $('#form');
-    const nameI = $('#name');
-    const phoneI = $('#phone');
-    const brandFixed = $('#brandFixed');
+    // --- Attivazioni (Inserisci cliente) ---
+    const insertBtn = $('#insertBtn');
     const startI = $('#start');
-
-    const dEnergyI = $('#dEnergy');
-    const dFiberI = $('#dFiber');
-    const dSIMI = $('#dSIM');
-    const dPhoneI = $('#dPhone');
-
     startI.valueAsDate = new Date();
 
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
+    insertBtn.addEventListener('click', async ()=>{
       try{ if('Notification' in window && Notification.permission==='default'){ await Notification.requestPermission(); } }catch{}
 
-      const name = nameI.value.trim();
-      const phone = phoneI.value.trim();
-      if(!name || !phone) return;
+      const name = c_name.value.trim();
+      const phone = c_phone.value.trim();
+      if(!name || !phone) return alert('Inserisci nome e telefono cliente');
 
-      const brand = brandFixed.value;
       const start = startI.value ? new Date(startI.value) : new Date();
 
       const activated = new Set(activeSet);
       const all = ['energia','fisso','sim','smartphone'];
-      let targets = activated.has('riparazione') ? all.slice() : all.filter(t => !activated.has(t));
+      const targets = activated.has('riparazione') ? all.slice() : all.filter(t => !activated.has(t));
 
-      const days = {
-        energia: parseInt(dEnergyI.value||DEFAULT_DAYS.energia,10),
-        fisso: parseInt(dFiberI.value||DEFAULT_DAYS.fisso,10),
-        sim: parseInt(dSIMI.value||DEFAULT_DAYS.sim,10),
-        smartphone: parseInt(dPhoneI.value||DEFAULT_DAYS.smartphone,10),
-      };
-
-      const tasks = targets.map(type=>{ let due = addDays(start, days[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
+      const tasks = targets.map(type=>{ let due = addDays(start, DEFAULT_DAYS[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
 
       const id = Date.now()+Math.random().toString(16).slice(2);
       items.unshift({
-        id, name, phone, brand, start: start.toISOString(), createdAt: new Date().toISOString(),
+        id, name, phone, start: start.toISOString(), createdAt: new Date().toISOString(),
         activated:[...activated], tasks, done:false,
         optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
         acceptance:false
       });
       save(items);
-      form.reset(); startI.valueAsDate = new Date();
-      dEnergyI.value=DEFAULT_DAYS.energia; dFiberI.value=DEFAULT_DAYS.fisso; dSIMI.value=DEFAULT_DAYS.sim; dPhoneI.value=DEFAULT_DAYS.smartphone;
+      // reset toggles only
       activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
       render();
       if('Notification' in window && Notification.permission==='granted') new Notification('Cliente inserito nello scadenzario ✅');
     });
 
-    // --- Form Accettazione ---
+    // --- Accettazione ---
     const aForm = $('#acceptForm');
-    const a_name = $('#a_name');
-    const a_phone = $('#a_phone');
     const a_type = $('#a_type');
     const a_brand = $('#a_brand');
     const a_model = $('#a_model');
@@ -371,9 +313,9 @@ textarea{min-height:84px;resize:vertical}
 
     aForm.addEventListener('submit', (e)=>{
       e.preventDefault();
-      const name = a_name.value.trim();
-      const phone = a_phone.value.trim();
-      if(!name || !phone) return;
+      const name = c_name.value.trim();
+      const phone = c_phone.value.trim();
+      if(!name || !phone) return alert('Inserisci nome e telefono cliente');
 
       const device = { type:a_type.value, brand:a_brand.value.trim(), model:a_model.value.trim(), issue:a_issue.value.trim() };
 
@@ -383,7 +325,7 @@ textarea{min-height:84px;resize:vertical}
 
       const id = Date.now()+Math.random().toString(16).slice(2);
       const obj = {
-        id, name, phone, brand:'Vodafone', start: start.toISOString(), createdAt: new Date().toISOString(),
+        id, name, phone, start: start.toISOString(), createdAt: new Date().toISOString(),
         activated:['riparazione'], tasks, done:false,
         optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
@@ -391,11 +333,10 @@ textarea{min-height:84px;resize:vertical}
       };
       items.unshift(obj); save(items); render(); aForm.reset();
 
-      // Messaggio WhatsApp di accettazione (apre in nuova scheda)
       const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
       const msg = `✅ Accettazione prodotto registrata
 Ciao ${name}, abbiamo preso in carico:
-${device.brand?device.brand+' ':''}${device.model?device.model:''}
+${device.brand?device.brand+' ':''}${device.model||''}
 Difetto: ${device.issue||'-'}
 
 Ti aggiorniamo appena pronto.
@@ -431,11 +372,11 @@ Hub: ${site}
       const late = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>new Date(tsk.due)<now).length), 0);
       const repairsToday = items.filter(it=> (it.acceptance || (it.activated||[]).includes('riparazione')) && fmtDate(new Date(it.createdAt||it.start))===tStr).length;
 
-      $('#st-created').textContent = createdToday;
-      $('#st-due').textContent = dueToday;
-      $('#st-done').textContent = doneToday;
-      $('#st-late').textContent = late;
-      $('#st-repairs').textContent = repairsToday;
+      $('#st-created')?.textContent = createdToday;
+      $('#st-due')?.textContent = dueToday;
+      $('#st-done')?.textContent = doneToday;
+      $('#st-late')?.textContent = late;
+      $('#st-repairs')?.textContent = repairsToday;
     }
 
     function iconSVG(type){
@@ -463,46 +404,31 @@ Hub: ${site}
 
       const tasksWrap = t.querySelector('.tasks'); tasksWrap.innerHTML='';
 
-      // Se accettazione: mostra scheda breve del device + stato
       if(it.acceptance){
-        const card = document.createElement('div');
-        card.className='task';
-        card.innerHTML = `<div class="row"><div><b>Dispositivo</b> • ${it.device?.type||''} — ${it.device?.brand||''} ${it.device?.model||''}</div><div class="cta"><button class="btn ghost" type="button" data-waacc="${it.id}">WhatsApp accettazione</button></div></div><div style="margin-top:8px;color:var(--muted)">Difetto: ${it.device?.issue||'-'}</div>`;
+        const card = document.createElement('div'); card.className='task';
+        card.innerHTML = `<div class="row"><div><b>Dispositivo</b> • ${it.device?.type||''} — ${it.device?.brand||''} ${it.device?.model||''}</div><div class="cta"><button class="btn ghost" type="button" data-waacc="${it.id}">WhatsApp accettazione</button></div></div><div style=\"margin-top:8px;color:var(--muted)\">Difetto: ${it.device?.issue||'-'}</div>`;
         tasksWrap.appendChild(card);
-        // Stato riparazione
-        const statusWrap = document.createElement('div');
-        statusWrap.className = 'status'; statusWrap.style.display='block';
+        const statusWrap = document.createElement('div'); statusWrap.className='status'; statusWrap.style.display='block';
         statusWrap.innerHTML = '<label style="font-size:12px;color:var(--muted);margin-right:6px">Stato riparazione</label><select class="statusSel"><option value="diagnostica">In diagnostica</option><option value="attesa-ricambi">In attesa ricambi</option><option value="lavorazione">In lavorazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato/Chiuso</option></select>';
         tasksWrap.appendChild(statusWrap);
-        const sel = statusWrap.querySelector('select'); sel.value = it.repairStatus || 'diagnostica';
-        sel.addEventListener('change',()=>{ it.repairStatus = sel.value; save(items); });
+        const sel = statusWrap.querySelector('select'); sel.value = it.repairStatus || 'diagnostica'; sel.addEventListener('change',()=>{ it.repairStatus = sel.value; save(items); });
       }
 
       it.tasks.forEach(task=>tasksWrap.appendChild(renderTask(it, task)));
 
-      // Toggle silenzio oggi
-      const muteBtn = document.createElement('button');
-      muteBtn.className='btn ghost';
+      const muteBtn = document.createElement('button'); muteBtn.className='btn ghost';
       muteBtn.textContent = isMutedToday(it)? 'Riattiva notifiche oggi' : 'Sto già chattando (silenzia oggi)';
       muteBtn.addEventListener('click',()=>{ it.muteDate = isMutedToday(it)? null : fmtDate(new Date()); save(items); render(); });
       t.appendChild(muteBtn);
 
-      // Azione WhatsApp accettazione
-      t.addEventListener('click',(ev)=>{
-        const b = ev.target.closest('button[data-waacc]'); if(!b) return;
-        const id=b.getAttribute('data-waacc'); const itx = items.find(x=>x.id===id); if(!itx) return;
-        const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-        const msg = `✅ Accettazione prodotto registrata
+      t.addEventListener('click',(ev)=>{ const b = ev.target.closest('button[data-waacc]'); if(!b) return; const id=b.getAttribute('data-waacc'); const itx = items.find(x=>x.id===id); if(!itx) return; const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html'; const msg = `✅ Accettazione prodotto registrata
 Ciao ${itx.name}, abbiamo preso in carico:
 ${itx.device?.brand?itx.device.brand+' ':''}${itx.device?.model||''}
 Difetto: ${itx.device?.issue||'-'}
 
 Ti aggiorniamo appena pronto.
 Hub: ${site}
-📞 Re Long Informatica – 08119578844`;
-        const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`;
-        try{ window.open(wa, '_blank'); }catch{}
-      });
+📞 Re Long Informatica – 08119578844`; const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`; try{ window.open(wa, '_blank'); }catch{} });
 
       return t;
     }
@@ -552,7 +478,7 @@ Hub: ${site}
       const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
       const map = {
         energia: `${base}
-Essendo cliente ${it.brand} hai diritto allo sconto Energia dedicato. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?
+Hai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?
 Hub: ${decodeURIComponent(site)}`,
         fisso: `${base}
 Abbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?
