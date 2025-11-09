@@ -60,10 +60,18 @@
     box-shadow:0 0 12px rgba(0,150,255,.25), 0 6px 14px rgba(0,0,0,.45);
     transition:transform .18s cubic-bezier(.22,.61,.36,1), box-shadow .18s ease;
   }
-  .tile .ico{ font-size:28px; line-height:1; margin-bottom:8px; display:block }
-  .tile span{ font-size:13.5px; font-weight:900 }
 
-  /* Effetto B: Press → Lift + flash neon */
+  /* ✅ ICONA + TESTO BIANCO */
+  .tile .ico{
+    font-size:28px; line-height:1; margin-bottom:8px; display:block;
+    color:#fff;
+  }
+  .tile span{
+    font-size:13.5px; font-weight:900;
+    color:#fff;
+  }
+
+  /* Effetto B */
   .tile.press{
     transform:translateY(2px) scale(.98);
     box-shadow:0 8px 16px rgba(0,0,0,.5), 0 0 0 2px rgba(0,140,255,.25) inset;
@@ -75,7 +83,7 @@
   @keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,160,255,0)}40%{box-shadow:0 0 0 8px rgba(0,160,255,.35)}100%{box-shadow:0 0 0 0 rgba(0,160,255,0)}}
   .tile.flash::after{ content:""; position:absolute; inset:-2px; border-radius:16px; animation:flash .22s ease-out 1 }
 
-  /* Ultimo largo (per evitare “buco” sotto) */
+  /* Ultimo largo */
   .tile[data-type="Energia Business"]{ grid-column:1 / -1; }
 
   .shake{ animation:shake .35s ease }
@@ -133,7 +141,6 @@
         fullname.focus(); return;
       }
 
-      // Effetto B: press -> lift -> flash, poi apertura
       tiles.forEach(t=>t.classList.remove('press','lift','flash'));
       btn.classList.add('press');
       setTimeout(()=>{ btn.classList.remove('press'); btn.classList.add('lift'); }, 90);
