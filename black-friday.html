@@ -10,25 +10,33 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#0a0a0a;--bg2:#000;--stroke:rgba(255,255,255,.08);--card:rgba(20,20,20,.92);
+      --bg1:#0a0a0a;--bg2:#000;
+      --stroke:rgba(255,255,255,.08);--card:rgba(20,20,20,.92);
       --muted:rgba(255,255,255,.65);--ring:rgba(255,255,255,.28);
-      --brand1:#ff3b1a;--brand2:#ff7b00; /* default: Black Friday */
+      --brand1:#ff3b1a;--brand2:#ff7b00; /* default Black Friday */
       --wa1:#25D366;--wa2:#128C7E;
+      --heroGlow: rgba(255,120,0,.18);
     }
     /* Temi stagionali */
-    body[data-season="christmas"]{ --brand1:#16a34a; --brand2:#ef4444; }
+    body[data-season="christmas"]{ --brand1:#16a34a; --brand2:#ef4444; --heroGlow: rgba(255,255,255,.16); }
     body[data-season="flash"]{ --brand1:#ff3b1a; --brand2:#ff7b00; }
+
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes sheen{to{transform:translateX(120%)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
     body{
       font-family:system-ui,-apple-system,Inter,Roboto,Helvetica,Arial;
-      color:#fff;background:linear-gradient(180deg,var(--bg1),var(--bg2));
-      overflow-x:hidden;padding-bottom:40px;
+      color:#fff;background:radial-gradient(1200px 600px at 20% 15%, var(--bg1), var(--bg2));
+      overflow-x:hidden;padding-bottom:56px;
     }
     a{text-decoration:none;color:inherit}
 
+    /* Header + countdown bar */
     header{
-      position:sticky;top:0;z-index:50;
-      background:rgba(10,10,10,.75);backdrop-filter:blur(8px);
+      position:sticky;top:0;z-index:60;
+      background:rgba(10,10,10,.7);backdrop-filter:blur(8px);
       border-bottom:1px solid var(--stroke)
     }
     .nav{
@@ -36,80 +44,123 @@
       display:flex;align-items:center;justify-content:space-between
     }
     .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--brand1),var(--brand2))}
-    .back{
-      padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);
-      background:rgba(255,255,255,.05);font-size:14px
-    }
+    .back{padding:8px 12px;border-radius:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);font-size:14px}
 
-    .hero{
-      max-width:1100px;margin:0 auto;padding:32px 16px 16px;
-      border-bottom:1px solid var(--stroke)
+    .countdown{
+      border-top:1px solid var(--stroke);
+      background:linear-gradient(90deg, color-mix(in oklab, var(--brand1) 30%, #000), color-mix(in oklab, var(--brand2) 30%, #000));
+      display:flex;justify-content:center;gap:14px;align-items:center;
+      padding:8px 12px;font-weight:800;letter-spacing:.02em
     }
-    #season-h1{font-size:clamp(32px,5vw,48px);margin-bottom:6px}
+    .cd-badge{
+      padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.16);font-size:12px
+    }
+    .cd-time{display:flex;gap:10px;font-variant-numeric:tabular-nums}
+    .cd-time span{min-width:2ch;text-align:center}
+
+    /* Hero */
+    .hero{
+      max-width:1100px;margin:0 auto;padding:28px 16px 16px;position:relative;
+      border-bottom:1px solid var(--stroke); text-align:left;
+    }
+    .hero::after{
+      content:""; position:absolute; left:50%; top:0; transform:translateX(-50%);
+      width:70%; max-width:780px; height:120px; filter:blur(18px);
+      background:radial-gradient(ellipse at 50% 30%, var(--heroGlow), transparent 70%);
+      pointer-events:none;
+    }
+    #season-h1{
+      font-size:clamp(28px,5vw,46px); margin-bottom:6px; line-height:1.05;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:1000; letter-spacing:-.02em;
+    }
     #season-sub{color:var(--muted);font-size:15px}
 
     .section{max-width:1100px;margin:22px auto;padding:0 16px}
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 
+    /* Card */
     .card{
       grid-column:span 12;border:1px solid var(--stroke);
-      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-      border-radius:18px;overflow:hidden;transition:.2s
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      border-radius:18px;overflow:hidden;position:relative;
+      transition:transform .24s ease, box-shadow .24s ease, border-color .24s ease, filter .24s ease;
+      transform-style:preserve-3d; will-change:transform,filter;
+      box-shadow:0 24px 48px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.03) inset;
+      opacity:0; transform:translateY(18px);
     }
+    .card.in{opacity:1; transform:none; animation:fadeUp .45s ease both}
     @media(min-width:700px){.card{grid-column:span 6}}
     @media(min-width:980px){.card{grid-column:span 4}}
-    .card:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(0,0,0,.28)}
+    .card:hover{
+      transform:perspective(900px) translateZ(8px) rotateX(1.2deg) rotateY(-1.2deg);
+      box-shadow:0 36px 84px rgba(0,0,0,.6), 0 0 60px color-mix(in oklab, var(--brand2) 28%, transparent);
+      border-color:rgba(255,255,255,.16);
+    }
 
-    .media{aspect-ratio:16/12;position:relative;background:#0f0f0f;display:grid;place-items:center}
-    .img{width:100%;height:100%;object-fit:cover}
+    .media{aspect-ratio:16/12;position:relative;background:#0f0f0f;display:grid;place-items:center;overflow:hidden}
+    .img{width:100%;height:100%;object-fit:cover;filter:saturate(1.02)}
+    /* blur-up placeholder */
+    .img[loading="lazy"]{opacity:0;transition:opacity .25s ease}
+    .img.lazy-ready{opacity:1}
 
     .badge{
-      position:absolute;top:10px;left:10px;padding:6px 10px;
-      border-radius:999px;font-weight:800;font-size:12px;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2))
+      position:absolute;top:10px;left:10px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:12px;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2)); color:#000; letter-spacing:.02em;
+      box-shadow:0 10px 20px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.25) inset
     }
 
     .body{padding:14px}
-    .ey{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
-    .title{font-size:18px;margin-top:6px}
-    .price{margin-top:8px;font-size:20px;font-weight:800}
+    .ey{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+    .title{font-size:18px;margin-top:6px;font-weight:850;letter-spacing:-.01em}
+    .price{margin-top:8px;font-size:20px;font-weight:1000;letter-spacing:.01em;background:linear-gradient(90deg,var(--brand1),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
 
     .cta-row{margin-top:12px;display:flex;gap:10px}
 
     .btn{
-      flex:1;padding:10px 12px;text-align:center;
-      border-radius:12px;border:1px solid var(--stroke);
-      background:var(--card);transition:.2s
+      flex:1;padding:12px 14px;text-align:center;border-radius:12px;border:1px solid var(--stroke);
+      background:var(--card);transition:transform .22s ease, box-shadow .22s ease, filter .22s ease; font-weight:900
     }
     .btn:hover{box-shadow:0 0 0 6px var(--ring);transform:translateY(-2px)}
 
-    /* ✅ Verde WhatsApp brillante */
+    /* WhatsApp 3D + sheen */
     .btn--wa{
-      background:linear-gradient(90deg,var(--wa1),var(--wa2));
-      color:#000;font-weight:900;border:none;
-      box-shadow:0 18px 32px rgba(18,140,126,.45)
+      background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
+      color:#fff;border:none;position:relative;overflow:hidden;
+      box-shadow:0 18px 32px rgba(18,140,126,.45), 0 0 0 1px rgba(0,0,0,.2) inset;
     }
-    .btn--wa:hover{
-      transform:translateY(-2px) scale(1.04);
-      box-shadow:0 26px 44px rgba(18,140,126,.55);
-      filter:brightness(1.05)
+    .btn--wa::after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.5) 45%, rgba(255,255,255,0) 75%);
+      transform:translateX(-120%);
     }
+    .btn--wa:hover{ transform:translateY(-3px) scale(1.02); box-shadow:0 26px 44px rgba(18,140,126,.6), 0 0 0 1px rgba(0,0,0,.24) inset; filter:brightness(1.05) }
+    .btn--wa:hover::after{ animation:sheen .9s ease forwards }
+
+    footer{max-width:1100px;margin:24px auto 0;padding:12px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--stroke);text-align:center}
   </style>
 </head>
 
 <body>
   <header>
     <nav class="nav">
-      <div style="display:flex;align-items:center;gap:10px;font-weight:800">
-        <span class="logo"></span> <span id="nav-season">Black Friday ReLong</span>
+      <div style="display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.02em">
+        <span class="logo" aria-hidden="true"></span> <span id="nav-season">Black Friday ReLong</span>
       </div>
       <a class="back" href="./relong-hub-v2.html" rel="home">← Torna alla Home</a>
     </nav>
+    <!-- Countdown dinamico -->
+    <div class="countdown" role="status" aria-live="polite">
+      <span class="cd-badge" id="cd-badge">FLASH</span>
+      <span id="cd-text">Termina tra</span>
+      <div class="cd-time"><span id="cd-d">00</span>d <span id="cd-h">00</span>h <span id="cd-m">00</span>m <span id="cd-s">00</span>s</div>
+    </div>
   </header>
 
   <div class="hero">
     <h1 id="season-h1">Offerte Black Friday</h1>
-    <p class="sub" id="season-sub">Blocca l'offerta su WhatsApp</b>.</p>
+    <p class="sub" id="season-sub">Prodotti reali. Blocca l'offerta su WhatsApp: <b>08119578844</b>.</p>
   </div>
 
   <main class="section">
@@ -118,7 +169,7 @@
       <!-- TV Samsung 55 -->
       <article class="card">
         <div class="media">
-          <img class="img" src="img/promo-tv55.jpg" alt="Samsung TV 55">
+          <img class="img" src="img/promo-tv55.jpg" alt="Samsung TV 55 QLED 4K" loading="lazy" decoding="async">
           <span class="badge" data-badge>FLASH</span>
         </div>
         <div class="body">
@@ -126,7 +177,7 @@
           <div class="title">Samsung QLED 4K • 55"</div>
           <div class="price">€449,99</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20TV%20Samsung%2055%20a%20449,99€">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20TV%20Samsung%2055%20a%20449,99€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -134,7 +185,7 @@
       <!-- PS5 -->
       <article class="card">
         <div class="media">
-          <img class="img" src="img/promo-ps5.jpg" alt="PlayStation 5">
+          <img class="img" src="img/promo-ps5.jpg" alt="PlayStation 5 con Fortnite" loading="lazy" decoding="async">
           <span class="badge" data-badge>FLASH</span>
         </div>
         <div class="body">
@@ -142,7 +193,7 @@
           <div class="title">PlayStation 5 Disco con Fortnite</div>
           <div class="price">€419,99</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20la%20PS5%20a%20419,99€">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20la%20PS5%20a%20419,99€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -150,7 +201,7 @@
       <!-- S25 Ultra -->
       <article class="card">
         <div class="media">
-          <img class="img" src="img/promo-s25ultra.png" alt="Samsung Galaxy S25 Ultra">
+          <img class="img" src="img/promo-s25ultra.png" alt="Samsung Galaxy S25 Ultra" loading="lazy" decoding="async">
           <span class="badge" data-badge>FLASH</span>
         </div>
         <div class="body">
@@ -158,7 +209,7 @@
           <div class="title">Samsung Galaxy S25 Ultra a rate</div>
           <div class="price">€985,90</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20l'S25%20Ultra%20a%20985,90€">Blocca su WhatsApp</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20bloccare%20l'S25%20Ultra%20a%20985,90€" target="_blank" rel="noopener">Blocca su WhatsApp</a>
           </div>
         </div>
       </article>
@@ -166,7 +217,7 @@
       <!-- Energia FW + Vodafone -->
       <article class="card">
         <div class="media">
-          <img class="img" src="img/promo-energia35.jpg" alt="Offerta Energia 35">
+          <img class="img" src="img/promo-energia35.jpg" alt="Offerta Energia Fastweb + Vodafone a 35€/mese" loading="lazy" decoding="async">
           <span class="badge" data-badge>FLASH</span>
         </div>
         <div class="body">
@@ -174,7 +225,7 @@
           <div class="title">Fastweb + Vodafone Energia</div>
           <div class="price">€35/mese</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20info%20sull'offerta%20Energia%20a%2035€%2Fmese">Chiedi info</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20info%20sull'offerta%20Energia%20a%2035€%2Fmese" target="_blank" rel="noopener">Chiedi info</a>
           </div>
         </div>
       </article>
@@ -182,7 +233,7 @@
       <!-- Vodafone Casa 25,95 -->
       <article class="card">
         <div class="media">
-          <img class="img" src="img/promo-vodafonecasa.jpg" alt="Vodafone Casa 25,95€">
+          <img class="img" src="img/promo-vodafonecasa.jpg" alt="Vodafone Casa 25,95€/mese (clienti mobile)" loading="lazy" decoding="async">
           <span class="badge" data-badge>FLASH</span>
         </div>
         <div class="body">
@@ -190,7 +241,7 @@
           <div class="title">Vodafone Casa (Valida per Clienti Mobile)</div>
           <div class="price">€25,95/mese</div>
           <div class="cta-row">
-            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20attivare%20Vodafone%20Casa%20a%2025,95€%2Fmese">Attiva ora</a>
+            <a class="btn btn--wa" href="https://wa.me/3908119578844?text=Ciao%20ReLong!%20Voglio%20attivare%20Vodafone%20Casa%20a%2025,95€%2Fmese" target="_blank" rel="noopener">Attiva ora</a>
           </div>
         </div>
       </article>
@@ -202,44 +253,69 @@
     © ReLong Informatica — Promo Flash — 08119578844
   </footer>
 
-  <!-- Switch stagionale: param ?season=… o data locale -->
+  <!-- Stagione + Countdown + Animazioni -->
   <script>
   (function(){
+    /* Stagione da query o da data */
     const qs = new URLSearchParams(location.search);
     const forced = (qs.get("season")||"").toLowerCase();
-
     function seasonByDate(){
       const n = new Date(), m = n.getMonth()+1, d = n.getDate();
       if(m===12 && d>=8) return "christmas";
       if(m===1) return "flash";
       return "blackfriday";
     }
-
     const season = ["blackfriday","christmas","flash"].includes(forced) ? forced : seasonByDate();
     document.body.setAttribute("data-season", season);
 
-    const map = {
-      blackfriday:{nav:"Black Friday ReLong",h1:"Offerte Black Friday",sub:"Prodotti reali. Blocca l'offerta su WhatsApp: 08119578844.",badge:"FLASH"},
-      christmas:{nav:"Christmas Promo 🎄",h1:"Offerte di Natale 🎄",sub:"Regali tech & risparmio. WhatsApp: 08119578844.",badge:"NATALE"},
-      flash:{nav:"Offerte Flash ⚡",h1:"Offerte Flash ⚡",sub:"Promo rapide fino a esaurimento scorte. WhatsApp: 08119578844.",badge:"FLASH"}
+    /* Copy per stagione + scadenza countdown (locale Italia) */
+    const copy = {
+      blackfriday:{nav:"Black Friday ReLong", h1:"Offerte Black Friday", sub:"Prodotti reali. Blocca l'offerta su WhatsApp: 08119578844.", badge:"FLASH", deadline: new Date(new Date().getFullYear(),10,30,23,59,59)}, // Nov = 10
+      christmas:{nav:"Christmas Promo 🎄", h1:"Offerte di Natale 🎄", sub:"Regali tech & risparmio. WhatsApp: 08119578844.", badge:"NATALE", deadline: new Date(new Date().getFullYear(),11,26,23,59,59)}, // Dec = 11
+      flash:{nav:"Offerte Flash ⚡", h1:"Offerte Flash ⚡", sub:"Promo rapide fino a esaurimento scorte. WhatsApp: 08119578844.", badge:"FLASH", deadline: new Date(Date.now()+3*24*60*60*1000)}
     };
+    const c=copy[season];
 
-    const c = map[season];
+    /* Applica testi */
     document.getElementById("nav-season").textContent = c.nav;
     document.getElementById("season-h1").textContent = c.h1;
     document.getElementById("season-sub").textContent = c.sub;
     document.querySelectorAll("[data-badge]").forEach(el=>el.textContent=c.badge);
+    document.getElementById("cd-badge").textContent = c.badge;
+
+    /* Countdown */
+    const d=document.getElementById('cd-d'), h=document.getElementById('cd-h'), m=document.getElementById('cd-m'), s=document.getElementById('cd-s');
+    function tick(){
+      const now = new Date();
+      let diff = c.deadline - now;
+      if(diff < 0){ d.textContent=h.textContent=m.textContent=s.textContent='00'; return; }
+      const dd = Math.floor(diff/86400000); diff -= dd*86400000;
+      const hh = Math.floor(diff/3600000); diff -= hh*3600000;
+      const mm = Math.floor(diff/60000); diff -= mm*60000;
+      const ss = Math.floor(diff/1000);
+      d.textContent = String(dd).padStart(2,'0');
+      h.textContent = String(hh).padStart(2,'0');
+      m.textContent = String(mm).padStart(2,'0');
+      s.textContent = String(ss).padStart(2,'0');
+    }
+    tick(); setInterval(tick, 1000);
+
+    /* In-view reveal per card */
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, {threshold:.18});
+    document.querySelectorAll('.card').forEach(c=>io.observe(c));
+
+    /* Blur-up effetto semplice per immagini lazy */
+    document.querySelectorAll('.img[loading="lazy"]').forEach(img=>{
+      img.addEventListener('load', ()=> img.classList.add('lazy-ready'), {once:true});
+    });
+
+    /* Home fix */
+    const HOME_PAGE = './relong-hub-v2.html';
+    document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
+    document.querySelectorAll('a[rel~="home"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
   })();
   </script>
-
-  <script>
-    // Home corretta dell’hub
-    const HOME_PAGE = './relong-hub-v2.html';
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll('a[href="/"], a[href="./"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
-      document.querySelectorAll('a[rel~="home"]').forEach(a=>a.setAttribute('href', HOME_PAGE));
-    });
-  </script>
-
 </body>
 </html>
