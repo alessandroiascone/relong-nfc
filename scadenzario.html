@@ -2,16 +2,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario Follow‑up</title>
+  <title>ReLong • Scadenzario + Accettazione Riparazioni</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     /* --- Theme: Premium Dark + Electric Blue --- */
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#0b0d12; --bg2:#06070b; /* deep dark */
+      --bg1:#0b0d12; --bg2:#06070b;
       --card:rgba(14,16,22,.92); --stroke:rgba(255,255,255,.08);
       --muted:rgba(210,220,255,.70);
-      --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff; /* electric blues */
+      --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
       --ok:#25D366; --danger:#ff4d4f;
       --shadow:0 10px 40px rgba(0,140,255,.18), inset 0 1px 0 rgba(255,255,255,.04);
     }
@@ -33,12 +33,13 @@
 form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 form .full{grid-column:1/-1}
 label{font-size:12px;color:var(--muted)}
-input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
+input,select,textarea{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
+textarea{min-height:84px;resize:vertical}
 
 .brandpill{margin-top:6px;display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,140,255,.35);background:linear-gradient(135deg,rgba(0,140,255,.12),rgba(0,140,255,.05));padding:10px 12px;border-radius:999px;font-weight:700}
 .brandpill .dot{width:8px;height:8px;border-radius:50%;background:var(--elec3);box-shadow:0 0 18px var(--elec3)}
 
-/* Toggles (elegant buttons) */
+/* Toggles */
 .toggle-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
 @media (max-width:980px){.toggle-grid{grid-template-columns:repeat(2,1fr)}}
 .tbtn{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease;box-shadow:inset 0 0 0 0 rgba(0,140,255,.25)}
@@ -73,7 +74,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 .task{border:1px solid var(--stroke);border-radius:12px;padding:10px;background:#090c12}
 .task .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .cta{display:flex;gap:8px;flex-wrap:wrap}
-.cta a,.cta button{font-size:13px;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none}
+.cta a,.cta button, .status select{font-size:13px;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none}
 .cta a.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
 .cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
 
@@ -96,7 +97,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
     <img id="brandLogo" src="https://alessandroiascone.github.io/relong-nfc/img/relong-logo.png" alt="ReLong" style="cursor:pointer" title="Clicca per cambiare logo (salvato in locale)" onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'ReLong',style:'font-weight:900;font-size:20px;letter-spacing:.4px'}))">
     <input id="logoPicker" type="file" accept="image/*" hidden />
     <div>
-      <h1>ReLong • Scadenzario Follow‑up</h1>
+      <h1>ReLong • Scadenzario + Accettazione</h1>
       <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar. (No weekend, richiamo 18:00)</div>
     </div>
   </header>  <section class="card" style="max-width:1200px;margin:0 auto">
@@ -112,7 +113,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
     </div>
   </section>  <div class="shell">
     <section class="card">
-      <h2>Nuovo cliente</h2>
+      <h2>Nuovo cliente (Attivazioni)</h2>
       <div class="content">
         <form id="form">
           <div>
@@ -134,26 +135,11 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
           </div><div class="full">
         <label>Cosa hai attivato ORA</label>
         <div class="toggle-grid" id="toggles">
-          <button type="button" class="tbtn" data-key="sim">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm2 9h2v2H8v-2zm0 3h2v2H8v-2zm3-3h2v2h-2v-2zm0 3h2v2h-2v-2z"/></svg>
-            SIM Mobile
-          </button>
-          <button type="button" class="tbtn" data-key="fisso">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c4.97 0 9 4.03 9 9h-2a7 7 0 1 0-7 7v2C6.03 21 2 16.97 2 12S6.03 3 12 3zm0 6a6 6 0 0 1 6 6h-2a4 4 0 1 0-4 4v2a6 6 0 1 1 0-12z"/></svg>
-            Linea Fissa
-          </button>
-          <button type="button" class="tbtn" data-key="energia">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 2L3 14h7v8l11-14h-8z"/></svg>
-            Energia
-          </button>
-          <button type="button" class="tbtn" data-key="smartphone">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm5 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
-            Smartphone a rate
-          </button>
-          <button type="button" class="tbtn" data-key="riparazione">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22.7 19.3l-7.9-7.9a5 5 0 1 0-3.9 3.9l7.9 7.9a1 1 0 0 0 1.4 0l2.5-2.5a1 1 0 0 0 0-1.4zM7 10a3 3 0 1 1 6 0a3 3 0 0 1-6 0z"/></svg>
-            Riparazione<br><small>PC/Smartphone/Console</small>
-          </button>
+          <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
+          <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
+          <button type="button" class="tbtn" data-key="energia">Energia</button>
+          <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
+          <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
         </div>
       </div>
 
@@ -171,42 +157,71 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
         <button class="btn primary" type="submit" id="insertBtn">Inserisci cliente</button>
       </div>
     </form>
-
-    <div class="toolbar">
-      <div class="filters">
-        <button class="pill active" data-filter="all">Tutti</button>
-        <button class="pill" data-filter="today">Oggi</button>
-        <button class="pill" data-filter="late">In ritardo</button>
-        <button class="pill" data-filter="done">Completati</button>
-      </div>
-      <div class="actions">
-        <button class="btn ghost" id="export">Esporta .json</button>
-        <label class="btn ghost" for="importFile" style="cursor:pointer">Importa .json</label>
-        <input id="importFile" type="file" accept="application/json" hidden />
-      </div>
-    </div>
-
-    <div id="list"></div>
   </div>
 </section>
 
 <aside class="card">
-  <h2>Logica follow‑up</h2>
+  <h2>Accettazione dispositivo (Riparazioni)</h2>
   <div class="content">
-    <p class="subtitle">Reminder per i servizi <b>non attivati ora</b>. Se selezioni <b>Riparazione</b> → promemoria per <b>SIM, Fisso, Smartphone, Energia</b>. Weekend evitati, secondo richiamo 18:00 pronto.</p>
-    <ul style="margin-left:18px;display:grid;gap:6px">
-      <li><b>Attivo SIM</b> → Energia, Fisso, Smartphone</li>
-      <li><b>Attivo Fisso</b> → SIM, Energia, Smartphone</li>
-      <li><b>Attivo Fisso + Mobile</b> → Energia, Smartphone</li>
-      <li><b>Attivo Energia</b> → Fisso, SIM, Smartphone</li>
-      <li><b>Attivo Fisso + Energia</b> → SIM, Smartphone</li>
-      <li><b>Attivo SIM + Smartphone</b> → Fisso, Energia</li>
-      <li><b>Riparazione</b> → SIM, Fisso, Smartphone, Energia</li>
-    </ul>
+    <form id="acceptForm">
+      <div>
+        <label>Nome e Cognome</label>
+        <input required id="a_name" placeholder="Mario Rossi" />
+      </div>
+      <div>
+        <label>Telefono (solo cifre, WhatsApp)</label>
+        <input required id="a_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
+      </div>
+      <div>
+        <label>Tipo dispositivo</label>
+        <select id="a_type">
+          <option>Smartphone</option>
+          <option>Computer</option>
+          <option>Stampante</option>
+          <option>Console & Accessori</option>
+          <option>Richiesta Preventivo</option>
+        </select>
+      </div>
+      <div>
+        <label>Marca</label>
+        <input id="a_brand" placeholder="Apple, Samsung, HP…" />
+      </div>
+      <div>
+        <label>Modello</label>
+        <input id="a_model" placeholder="iPhone 13, Galaxy S21…" />
+      </div>
+      <div class="full">
+        <label>Difetto / Problema</label>
+        <textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea>
+      </div>
+
+      <div class="full actions">
+        <button class="btn primary" type="submit" id="acceptBtn">Accetta dispositivo</button>
+      </div>
+    </form>
+    <p class="subtitle" style="margin-top:12px">Alla conferma: invio WhatsApp di accettazione + inserimento automatico nello scadenzario (con tempi follow‑up <b>più lunghi</b> per SIM/Fisso/Energia/Smartphone).</p>
   </div>
 </aside>
 
-  </div>  <template id="tpl-item">
+  </div>  <section class="card" style="max-width:1200px;margin:0 auto">
+    <h2>Clienti & Promemoria</h2>
+    <div class="content">
+      <div class="toolbar">
+        <div class="filters">
+          <button class="pill active" data-filter="all">Tutti</button>
+          <button class="pill" data-filter="today">Oggi</button>
+          <button class="pill" data-filter="late">In ritardo</button>
+          <button class="pill" data-filter="done">Completati</button>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="export">Esporta .json</button>
+          <label class="btn ghost" for="importFile" style="cursor:pointer">Importa .json</label>
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </div>
+      </div>
+      <div id="list"></div>
+    </div>
+  </section>  <template id="tpl-item">
     <div class="item">
       <div class="meta">
         <div class="h"></div>
@@ -223,13 +238,23 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
         </div>
         <div class="cta"></div>
       </div>
+      <div class="status" style="margin-top:8px;display:none">
+        <label style="font-size:12px;color:var(--muted);margin-right:6px">Stato riparazione</label>
+        <select class="statusSel">
+          <option value="diagnostica">In diagnostica</option>
+          <option value="attesa-ricambi">In attesa ricambi</option>
+          <option value="lavorazione">In lavorazione</option>
+          <option value="pronto">Pronto al ritiro</option>
+          <option value="consegnato">Consegnato/Chiuso</option>
+        </select>
+      </div>
     </div>
   </template>  <script>
     // --- Utils ---
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v7';
+    const storeKey = 'relong-scadenzario-v8';
     const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -250,10 +275,14 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       return x;
     }
 
+    // Delays (giorni)
+    const DEFAULT_DAYS = { energia:5, fisso:12, sim:4, smartphone:7 };
+    const ACCEPT_DAYS   = { energia:10, fisso:15, sim:7, smartphone:10 }; // follow‑up più lunghi per accettazione
+
     // --- Stato ---
     let items = load();
 
-    // Logo picker (salva base64 in localStorage)
+    // Logo picker
     const logoImg = $('#brandLogo');
     const logoPicker = $('#logoPicker');
     const savedLogo = localStorage.getItem('relong-logo');
@@ -266,7 +295,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       r.readAsDataURL(f);
     });
 
-    // Toggles behavior
+    // Toggles attivazioni
     const toggles = $('#toggles');
     const activeSet = new Set();
     toggles.addEventListener('click', (e)=>{
@@ -277,7 +306,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
     });
 
-    // --- Form ---
+    // --- Form Attivazioni ---
     const form = $('#form');
     const nameI = $('#name');
     const phoneI = $('#phone');
@@ -293,76 +322,98 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      // In un solo tasto: chiedi permesso notifiche (se necessario) + inserisci
-      try{
-        if('Notification' in window && Notification.permission==='default'){
-          await Notification.requestPermission();
-        }
-      }catch{}
+      try{ if('Notification' in window && Notification.permission==='default'){ await Notification.requestPermission(); } }catch{}
 
       const name = nameI.value.trim();
       const phone = phoneI.value.trim();
       if(!name || !phone) return;
 
-      const brand = brandFixed.value; // unico brand
+      const brand = brandFixed.value;
       const start = startI.value ? new Date(startI.value) : new Date();
 
       const activated = new Set(activeSet);
       const all = ['energia','fisso','sim','smartphone'];
-
-      let targets;
-      if (activated.has('riparazione')) {
-        targets = all.slice();
-      } else {
-        targets = all.filter(t => !activated.has(t));
-      }
+      let targets = activated.has('riparazione') ? all.slice() : all.filter(t => !activated.has(t));
 
       const days = {
-        energia: parseInt(dEnergyI.value||'5',10),
-        fisso: parseInt(dFiberI.value||'12',10),
-        sim: parseInt(dSIMI.value||'4',10),
-        smartphone: parseInt(dPhoneI.value||'7',10),
+        energia: parseInt(dEnergyI.value||DEFAULT_DAYS.energia,10),
+        fisso: parseInt(dFiberI.value||DEFAULT_DAYS.fisso,10),
+        sim: parseInt(dSIMI.value||DEFAULT_DAYS.sim,10),
+        smartphone: parseInt(dPhoneI.value||DEFAULT_DAYS.smartphone,10),
       };
 
-      const tasks = targets.map(type=>{
-        let due = addDays(start, days[type]);
-        due = avoidWeekend(due); // sempre attivo
-        return { type, due: due.toISOString() };
-      });
+      const tasks = targets.map(type=>{ let due = addDays(start, days[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
 
       const id = Date.now()+Math.random().toString(16).slice(2);
       items.unshift({
-        id, name, phone, brand,
-        start: start.toISOString(),
-        createdAt: new Date().toISOString(),
-        activated:[...activated],
-        tasks, done:false,
-        optWeekend: true, optEvening: true,
-        muteDate: null, activeChatUntil: null, doneAt: null
+        id, name, phone, brand, start: start.toISOString(), createdAt: new Date().toISOString(),
+        activated:[...activated], tasks, done:false,
+        optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false
       });
       save(items);
       form.reset(); startI.valueAsDate = new Date();
-      dEnergyI.value=5; dFiberI.value=12; dSIMI.value=4; dPhoneI.value=7; activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
+      dEnergyI.value=DEFAULT_DAYS.energia; dFiberI.value=DEFAULT_DAYS.fisso; dSIMI.value=DEFAULT_DAYS.sim; dPhoneI.value=DEFAULT_DAYS.smartphone;
+      activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
       render();
       if('Notification' in window && Notification.permission==='granted') new Notification('Cliente inserito nello scadenzario ✅');
     });
 
-    function maybeNotify(text){
-      if('Notification' in window && Notification.permission==='granted' && document.visibilityState==='visible')
-        new Notification(text);
-    }
+    // --- Form Accettazione ---
+    const aForm = $('#acceptForm');
+    const a_name = $('#a_name');
+    const a_phone = $('#a_phone');
+    const a_type = $('#a_type');
+    const a_brand = $('#a_brand');
+    const a_model = $('#a_model');
+    const a_issue = $('#a_issue');
+
+    aForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = a_name.value.trim();
+      const phone = a_phone.value.trim();
+      if(!name || !phone) return;
+
+      const device = { type:a_type.value, brand:a_brand.value.trim(), model:a_model.value.trim(), issue:a_issue.value.trim() };
+
+      const start = new Date();
+      const all = ['energia','fisso','sim','smartphone'];
+      const tasks = all.map(type=>{ let due = addDays(start, ACCEPT_DAYS[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
+
+      const id = Date.now()+Math.random().toString(16).slice(2);
+      const obj = {
+        id, name, phone, brand:'Vodafone', start: start.toISOString(), createdAt: new Date().toISOString(),
+        activated:['riparazione'], tasks, done:false,
+        optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:true, device, repairStatus:'diagnostica'
+      };
+      items.unshift(obj); save(items); render(); aForm.reset();
+
+      // Messaggio WhatsApp di accettazione (apre in nuova scheda)
+      const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+      const msg = `✅ Accettazione prodotto registrata
+Ciao ${name}, abbiamo preso in carico:
+${device.brand?device.brand+' ':''}${device.model?device.model:''}
+Difetto: ${device.issue||'-'}
+
+Ti aggiorniamo appena pronto.
+Hub: ${site}
+📞 Re Long Informatica – 08119578844`;
+      const wa = `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
+      try{ window.open(wa, '_blank'); }catch{}
+    });
+
+    function maybeNotify(text){ if('Notification' in window && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text); }
 
     // --- Filtro & Render + Stats ---
     let filter = 'all';
-    $$('.pill').forEach(p=>p.addEventListener('click',()=>{
-      $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active');
-      filter = p.dataset.filter; render();
-    }));
+    $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter = p.dataset.filter; render(); }));
 
     function render(){
       const list = $('#list'); list.innerHTML='';
-      const now = today();
-      const tStr = fmtDate(now);
+      const now = today(); const tStr = fmtDate(now);
 
       const data = items.filter(it=>{
         if(filter==='done') return it.done;
@@ -378,7 +429,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
       const doneToday = items.filter(it=>it.done && fmtDate(new Date(it.doneAt||it.start))===tStr).length;
       const late = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>new Date(tsk.due)<now).length), 0);
-      const repairsToday = items.filter(it=> (it.activated||[]).includes('riparazione') && fmtDate(new Date(it.createdAt||it.start))===tStr).length;
+      const repairsToday = items.filter(it=> (it.acceptance || (it.activated||[]).includes('riparazione')) && fmtDate(new Date(it.createdAt||it.start))===tStr).length;
 
       $('#st-created').textContent = createdToday;
       $('#st-due').textContent = dueToday;
@@ -403,31 +454,55 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       if(it.done) t.classList.add('done');
 
       t.querySelector('.h').textContent = `${it.name} • ${it.phone}`;
-      const tags = t.querySelector('.tags');
-      tags.innerHTML = '';
-      it.activated.forEach(a=>{
-        const s = document.createElement('span');
-        s.className='tag';
-        s.innerHTML = iconSVG(a) + '<span>Attivato: '+labelOf(a)+'</span>';
-        tags.append(s);
-      });
+      const tags = t.querySelector('.tags'); tags.innerHTML = '';
+      it.activated.forEach(a=>{ const s=document.createElement('span'); s.className='tag'; s.innerHTML = iconSVG(a) + '<span>Attivato: '+labelOf(a)+'</span>'; tags.append(s); });
+      if(it.acceptance){ const s=document.createElement('span'); s.className='tag'; s.innerHTML = iconSVG('riparazione') + '<span>Accettazione dispositivo</span>'; tags.append(s); }
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
 
-      const tasksWrap = t.querySelector('.tasks');
-      tasksWrap.innerHTML='';
+      const tasksWrap = t.querySelector('.tasks'); tasksWrap.innerHTML='';
+
+      // Se accettazione: mostra scheda breve del device + stato
+      if(it.acceptance){
+        const card = document.createElement('div');
+        card.className='task';
+        card.innerHTML = `<div class="row"><div><b>Dispositivo</b> • ${it.device?.type||''} — ${it.device?.brand||''} ${it.device?.model||''}</div><div class="cta"><button class="btn ghost" type="button" data-waacc="${it.id}">WhatsApp accettazione</button></div></div><div style="margin-top:8px;color:var(--muted)">Difetto: ${it.device?.issue||'-'}</div>`;
+        tasksWrap.appendChild(card);
+        // Stato riparazione
+        const statusWrap = document.createElement('div');
+        statusWrap.className = 'status'; statusWrap.style.display='block';
+        statusWrap.innerHTML = '<label style="font-size:12px;color:var(--muted);margin-right:6px">Stato riparazione</label><select class="statusSel"><option value="diagnostica">In diagnostica</option><option value="attesa-ricambi">In attesa ricambi</option><option value="lavorazione">In lavorazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato/Chiuso</option></select>';
+        tasksWrap.appendChild(statusWrap);
+        const sel = statusWrap.querySelector('select'); sel.value = it.repairStatus || 'diagnostica';
+        sel.addEventListener('change',()=>{ it.repairStatus = sel.value; save(items); });
+      }
+
       it.tasks.forEach(task=>tasksWrap.appendChild(renderTask(it, task)));
 
       // Toggle silenzio oggi
       const muteBtn = document.createElement('button');
       muteBtn.className='btn ghost';
       muteBtn.textContent = isMutedToday(it)? 'Riattiva notifiche oggi' : 'Sto già chattando (silenzia oggi)';
-      muteBtn.addEventListener('click',()=>{
-        it.muteDate = isMutedToday(it)? null : fmtDate(new Date());
-        save(items); render();
-      });
+      muteBtn.addEventListener('click',()=>{ it.muteDate = isMutedToday(it)? null : fmtDate(new Date()); save(items); render(); });
       t.appendChild(muteBtn);
+
+      // Azione WhatsApp accettazione
+      t.addEventListener('click',(ev)=>{
+        const b = ev.target.closest('button[data-waacc]'); if(!b) return;
+        const id=b.getAttribute('data-waacc'); const itx = items.find(x=>x.id===id); if(!itx) return;
+        const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+        const msg = `✅ Accettazione prodotto registrata
+Ciao ${itx.name}, abbiamo preso in carico:
+${itx.device?.brand?itx.device.brand+' ':''}${itx.device?.model||''}
+Difetto: ${itx.device?.issue||'-'}
+
+Ti aggiorniamo appena pronto.
+Hub: ${site}
+📞 Re Long Informatica – 08119578844`;
+        const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`;
+        try{ window.open(wa, '_blank'); }catch{}
+      });
 
       return t;
     }
@@ -444,54 +519,33 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 
       const cta = el.querySelector('.cta');
       const wa = waFor(it, task.type);
-      if(wa){
-        const a = aBtn(wa.href, wa.text, 'ok');
-        a.dataset.wa = '1';
-        a.dataset.id = it.id;
-        cta.append(a);
-      }
+      if(wa){ const a=aBtn(wa.href, wa.text, 'ok'); a.dataset.wa='1'; a.dataset.id=it.id; cta.append(a); }
 
-      // Calendar 10:00
       const s = new Date(task.due); s.setHours(10,0,0,0);
       const e = new Date(s.getTime()+30*60000);
       const title = encodeURIComponent(`Follow‑up ${labelOf(task.type)} • ${it.name}`);
       const calUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${fmtDateTimeParam(s)}/${fmtDateTimeParam(e)}&details=${encodeURIComponent('Promemoria generato da Scadenzario ReLong')}`;
       cta.append(aBtn(calUrl, 'Calendar 10:00', 'primary'));
 
-      // Calendar 18:00
       const s2 = new Date(task.due); s2.setHours(18,0,0,0);
       const e2 = new Date(s2.getTime()+30*60000);
       const calUrl2 = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}%20(Secondo%20richiamo)&dates=${fmtDateTimeParam(s2)}/${fmtDateTimeParam(e2)}&details=${encodeURIComponent('Richiamo serale (notifiche smart)')}`;
       cta.append(aBtn(calUrl2, 'Calendar 18:00', 'primary'));
 
-      // Snooze +1 giorno (evita weekend)
-      const btnSnooze = document.createElement('button');
-      btnSnooze.textContent = 'Snooze +1 giorno';
-      btnSnooze.addEventListener('click',()=>{
-        let nd = addDays(new Date(task.due), 1);
-        nd = avoidWeekend(nd);
-        task.due = nd.toISOString();
-        save(items); render(); maybeNotify('Spostato a domani ✔️');
-      });
+      const btnSnooze = document.createElement('button'); btnSnooze.textContent = 'Snooze +1 giorno';
+      btnSnooze.addEventListener('click',()=>{ let nd = addDays(new Date(task.due), 1); nd = avoidWeekend(nd); task.due = nd.toISOString(); save(items); render(); maybeNotify('Spostato a domani ✔️'); });
       cta.append(btnSnooze);
 
-      // Stato
-      const btnDone = document.createElement('button');
-      btnDone.textContent = 'Segna cliente completato';
-      btnDone.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
-      cta.append(btnDone);
+      const btnDone = document.createElement('button'); btnDone.textContent = 'Segna cliente completato';
+      btnDone.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); }); cta.append(btnDone);
 
-      const btnDel = document.createElement('button');
-      btnDel.textContent = 'Elimina cliente';
-      btnDel.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); });
-      cta.append(btnDel);
+      const btnDel = document.createElement('button'); btnDel.textContent = 'Elimina cliente';
+      btnDel.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); }); cta.append(btnDel);
 
       return el;
     }
 
-    function labelOf(type){
-      return ({energia:'Energia', fisso:'Internet Casa', sim:'SIM', smartphone:'Smartphone a rate', riparazione:'Riparazione'})[type] || type;
-    }
+    function labelOf(type){ return ({energia:'Energia', fisso:'Internet Casa', sim:'SIM', smartphone:'Smartphone a rate', riparazione:'Riparazione'})[type] || type; }
 
     function waFor(it, type){
       const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
@@ -517,18 +571,12 @@ Hub: ${decodeURIComponent(site)}`,
     function tag(txt, extraClass=''){ const s=document.createElement('span'); s.className='tag'; if(extraClass) s.classList.add(extraClass); s.textContent=txt; return s }
     function aBtn(href, txt, cls=''){ const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener'; a.textContent=txt; if(cls) a.classList.add(cls); return a }
 
-    // Delego click su WhatsApp per marcare "in chat"
+    // Click su WhatsApp per marcare in chat
     $('#list').addEventListener('click', (e)=>{
-      const a = e.target.closest('a[data-wa="1"]');
-      if(!a) return;
-      const id = a.dataset.id;
-      const it = items.find(x=>x.id===id);
-      if(it){
-        const until = new Date(Date.now()+45*60*1000);
-        it.activeChatUntil = until.toISOString();
-        it.muteDate = fmtDate(new Date());
-        save(items); render();
-      }
+      const a = e.target.closest('a[data-wa="1"]'); if(!a) return;
+      const id = a.dataset.id; const it = items.find(x=>x.id===id); if(!it) return;
+      const until = new Date(Date.now()+45*60*1000);
+      it.activeChatUntil = until.toISOString(); it.muteDate = fmtDate(new Date()); save(items); render();
     });
 
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
@@ -539,19 +587,14 @@ Hub: ${decodeURIComponent(site)}`,
 
     // Notifiche intelligenti
     setTimeout(()=>{
-      const now = new Date();
-      const tStr = fmtDate(now);
+      const now = new Date(); const tStr = fmtDate(now);
       const dueList = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr));
       if(dueList.length) maybeNotify(`Follow‑up di oggi: ${dueList.length} clienti (smart)`);
-
-      const at18 = new Date(); at18.setHours(18,0,0,0);
-      const ms = at18 - now;
-      if(ms>0 && ms < 14*60*60*1000){
-        setTimeout(()=>{
-          const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===fmtDate(new Date())));
-          if(pending.length) maybeNotify(`Richiamo 18:00: ${pending.length} clienti ancora da contattare (smart)`);
-        }, ms);
-      }
+      const at18 = new Date(); at18.setHours(18,0,0,0); const ms = at18 - now;
+      if(ms>0 && ms < 14*60*60*1000){ setTimeout(()=>{
+        const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===fmtDate(new Date())));
+        if(pending.length) maybeNotify(`Richiamo 18:00: ${pending.length} clienti ancora da contattare (smart)`);
+      }, ms); }
     }, 800);
   </script></body>
 </html>
