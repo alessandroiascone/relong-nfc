@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Gestionale Interno</title>
+  <title>ReLong • Scadenzario + Accettazione Riparazioni</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     /* --- Theme: Premium Dark + Electric Blue --- */
@@ -95,19 +95,41 @@
     /* Visibilità accettazione: nascosta di default */
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
+
+    /* PIN Gate */
+    #pinGate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95));backdrop-filter:blur(6px);display:grid;place-items:center;z-index:9999}
+    #pinCard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px}
+    #pinCard h3{margin:0;font-size:18px}
+    #pinCard p{color:var(--muted);font-size:13px}
+    #pinInput{letter-spacing:6px;text-align:center;font-weight:800}
+    #pinError{color:#ff7676;min-height:18px;font-size:12px}
   </style>
 </head>
 <body>
-  <header class="title">
+  <!-- PIN Gate -->
+  <div id="pinGate" hidden>
+    <div id="pinCard">
+      <h3>Accesso protetto</h3>
+      <p>Inserisci il PIN a 4 cifre per aprire lo scadenzario.</p>
+      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
+      <div class="actions">
+        <button id="pinOk" class="btn primary" style="flex:1">Sblocca</button>
+      </div>
+      <div id="pinError"></div>
+      <p style="font-size:11px">Nota: questo blocco non è una cifratura forte; per sicurezza reale usa protezioni del server.</p>
+    </div>
+  </div>
+
+  <header class="title" aria-hidden="true">
     <img id="brandLogo" src="https://alessandroiascone.github.io/relong-nfc/img/relong-logo.png" alt="ReLong" style="cursor:pointer" title="Clicca per cambiare logo (salvato in locale)" onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'ReLong',style:'font-weight:900;font-size:20px;letter-spacing:.4px'}))">
     <input id="logoPicker" type="file" accept="image/*" hidden />
     <div>
-      <h1>ReLong • Gestionale Interno</h1>
-      <div class="subtitle">Attivazioni & Riparazioni reminder WhatsApp</div>
+      <h1>ReLong • Scadenzario + Accettazione</h1>
+      <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar. (No weekend, richiamo 18:00)</div>
     </div>
   </header>
 
-  <section class="card" style="max-width:1200px;margin:0 auto">
+  <section class="card" style="max-width:1200px;margin:0 auto" aria-hidden="true">
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div>
@@ -121,7 +143,7 @@
     </div>
   </section>
 
-  <div class="shell">
+  <div class="shell" aria-hidden="true">
     <section class="card">
       <h2>Attivazioni</h2>
       <div class="content">
@@ -131,7 +153,7 @@
             <input id="start" type="date" />
           </div>
           <div class="full">
-            <label>Seleziona Prodotto</label>
+            <label>Cosa hai attivato ORA</label>
             <div class="toggle-grid" id="toggles">
               <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
               <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
@@ -159,12 +181,20 @@
               <option>Computer</option>
               <option>Stampante</option>
               <option>Console & Accessori</option>
-              <option>Richiesta Preventivo Riparazione</option>
+              <option>Richiesta Preventivo</option>
             </select>
           </div>
           <div>
             <label>Marca</label>
-            <input id="a_brand" placeholder="Apple, Samsung, HP…" />
+            <select id="a_brand">
+              <option>Apple</option>
+              <option>Samsung</option>
+              <option>Oppo</option>
+              <option>Redmi</option>
+              <option>Xiaomi</option>
+              <option>Honor</option>
+              <option>Other</option>
+            </select>
           </div>
           <div>
             <label>Modello</label>
@@ -174,15 +204,13 @@
             <label>Difetto / Problema</label>
             <textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea>
           </div>
-
-          <!-- Nessun pulsante qui: il tasto unico è quello principale (insertBtn) -->
           <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
         </form>
       </div>
     </aside>
   </div>
 
-  <section class="card" style="max-width:1200px;margin:0 auto">
+  <section class="card" style="max-width:1200px;margin:0 auto" aria-hidden="true">
     <h2>Clienti & Promemoria</h2>
     <div class="content">
       <div class="toolbar">
@@ -239,7 +267,7 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v13'; // bump versione storage per evitare conflitti
+    const storeKey = 'relong-scadenzario-v14';
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato, azzero lo scadenzario:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -261,7 +289,7 @@
     // --- Stato ---
     let items = load();
 
-    // Sequenza ID pratica per anno (robusta)
+    // Sequenza ID pratica per anno
     function nextPraticaId(){
       const key='relong-pratica-seq';
       const y = new Date().getFullYear();
@@ -300,11 +328,9 @@
     function updateAcceptanceUI(){
       const isRepair = activeSet.has('riparazione');
       acceptWrap.classList.toggle('show', isRepair);
-      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
-      // Se si disattiva riparazione pulisco campi accettazione
-      if(!isRepair){
-        aForm.reset();
-      }
+      document.getElementById('insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
+      // se si disattiva riparazione pulisco form
+      if(!isRepair){ aForm.reset(); }
     }
 
     toggles.addEventListener('click', (e)=>{
@@ -319,13 +345,11 @@
     const insertBtn = $('#insertBtn');
     const startI = $('#start');
 
-    // Imposta data di default oggi
+    // Imposta data di default = oggi
     try{
-      if(startI && 'valueAsDate' in startI) startI.valueAsDate = new Date();
-      else if(startI){
-        const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-        startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-      }
+      const d=new Date(); const pad=n=>String(n).padStart(2,'0');
+      if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
+      else if(startI){ startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
     }catch{}
 
     insertBtn.addEventListener('click', async ()=>{
@@ -347,7 +371,7 @@
       if(activated.has('riparazione')){
         const device = {
           type:a_type.value,
-          brand:a_brand.value.trim(),
+          brand:a_brand.value, // menu a tendina
           model:a_model.value.trim(),
           issue:a_issue.value.trim()
         };
@@ -374,24 +398,22 @@
         };
         items.unshift(obj); save(items); render(); aForm.reset();
 
-        // WhatsApp accettazione
+        // WhatsApp accettazione (TESTO RICHIESTO)
         const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-        const msg = `✅ Accettazione prodotto registrata
-ID pratica: ${praticaId}
-Ciao ${name}, abbiamo preso in carico:
-${device.brand?device.brand+' ':''}${device.model||''}
-Difetto: ${device.issue||'-'}
+        const msg = `Ciao, ${name}, abbiamo accettato il tuo prodotto in assistenza.
+Marchio: ${device.brand}
+Modello: ${device.model || '-'}
+Difetto dichiarato: ${device.issue || '-'}
 
-Ti aggiorniamo appena pronto.
-Hub: ${site}
-📞 Re Long Informatica – 08119578844`;
+Ti aggiorneremo noi per il ritiro. Grazie!
+Nel frattempo puoi visionare qui i nostri servizi:
+${site}`;
         const wa = `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
         try{ window.open(wa, '_blank'); }catch{}
         return;
       }
 
       // --- Flusso ATTIVAZIONI classico (no riparazione) ---
-      // Crea i reminder per i servizi NON selezionati (up-sell in futuro)
       const all = ['energia','fisso','sim','smartphone'];
       const targets = all.filter(t => !activated.has(t));
       const tasks = targets.map(type=>{
@@ -516,15 +538,14 @@ Hub: ${site}
           const id=b1.getAttribute('data-waacc');
           const itx = items.find(x=>x.id===id); if(!itx) return;
           const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-          const msg = `✅ Accettazione prodotto registrata
-ID pratica: ${itx.praticaId||'-'}
-Ciao ${itx.name}, abbiamo preso in carico:
-${itx.device?.brand?itx.device.brand+' ':''}${itx.device?.model||''}
-Difetto: ${itx.device?.issue||'-'}
+          const msg = `Ciao, ${itx.name}, abbiamo accettato il tuo prodotto in assistenza.
+Marchio: ${itx.device?.brand || '-'}
+Modello: ${itx.device?.model || '-'}
+Difetto dichiarato: ${itx.device?.issue || '-'}
 
-Ti aggiorniamo appena pronto.
-Hub: ${site}
-📞 Re Long Informatica – 08119578844`;
+Ti aggiorneremo noi per il ritiro. Grazie!
+Nel frattempo puoi visionare qui i nostri servizi:
+${site}`;
           const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`;
           try{ window.open(wa, '_blank'); }catch{}
           return;
@@ -583,12 +604,12 @@ Hub: ${site}
 
     function waFor(it, type){
       const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long Informatica (08119578844).`;
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
       const map = {
         energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
         fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
         sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è ACCETTATA. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
       };
       const txt = encodeURIComponent(map[type]);
       return { href:`https://wa.me/39${it.phone}?text=${txt}`, text:`WhatsApp ${labelOf(type)}` };
@@ -608,7 +629,46 @@ Hub: ${site}
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // Boot: render + UI iniziale
+    // --- PIN Gate Logic ---
+    (function pinGateInit(){
+      const gate = document.getElementById('pinGate');
+      const ok = document.getElementById('pinOk');
+      const input = document.getElementById('pinInput');
+      const err = document.getElementById('pinError');
+      const unlocked = sessionStorage.getItem('relong-pin-ok') === '1';
+      const setHidden = (el, h)=> el.toggleAttribute('hidden', h);
+
+      function setAppHidden(h){
+        document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false'));
+      }
+
+      if(unlocked){
+        setHidden(gate, true);
+        setAppHidden(false);
+        return;
+      }
+      setHidden(gate, false);
+      setAppHidden(true);
+      input.focus();
+
+      function tryUnlock(){
+        const val = (input.value||'').trim();
+        if(val === '1990'){
+          sessionStorage.setItem('relong-pin-ok', '1');
+          setHidden(gate, true);
+          setAppHidden(false);
+        }else{
+          err.textContent = 'PIN errato. Riprova.';
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      ok.addEventListener('click', tryUnlock);
+      input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
+    })();
+
+    // Boot
     render();
     updateAcceptanceUI();
 
