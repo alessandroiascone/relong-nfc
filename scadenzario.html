@@ -63,7 +63,8 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 .meta{display:grid;gap:6px}
 .meta .h{font-weight:800}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
-.tag{font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:6px 10px;border-radius:999px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:6px 10px;border-radius:999px}
+.tag svg{width:14px;height:14px}
 .muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
 .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
 .over{color:#ffb3b3}
@@ -81,6 +82,11 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 .stat{background:#090c12;border:1px solid rgba(0,140,255,.18);border-radius:14px;padding:12px;display:grid;gap:6px}
 .stat .n{font-size:22px;font-weight:800}
 @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* Glow per task in scadenza oggi */
+.task.dueToday{box-shadow:0 0 0 1px rgba(0,140,255,.35), 0 0 24px rgba(0,140,255,.25)}
+@keyframes pulseGlow{0%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}50%{box-shadow:0 0 0 6px rgba(0,140,255,.12)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}}
+.task.dueToday{animation:pulseGlow 2.4s ease-in-out infinite}
 
   </style>
 </head>
@@ -151,11 +157,9 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
         </div>
       </div>
 
-      <!-- Opzioni nascoste perché sempre attive: evita weekend + richiamo 18:00 -->
-
       <div class="full">
         <label>Giorni promemoria</label>
-        <div class="toggle-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="toggle-grid" style="grid-template-columns:repeat(2,1fr)">
           <div><label>Energia</label><input id="dEnergy" type="number" value="5" min="1"></div>
           <div><label>Linea Fissa</label><input id="dFiber" type="number" value="12" min="2"></div>
           <div><label>SIM</label><input id="dSIM" type="number" value="4" min="1"></div>
@@ -164,8 +168,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       </div>
 
       <div class="full actions">
-        <button class="btn primary" type="submit">Aggiungi allo scadenzario</button>
-        <button class="btn ghost" type="button" id="enableNoti">Abilita notifiche locali</button>
+        <button class="btn primary" type="submit" id="insertBtn">Inserisci cliente</button>
       </div>
     </form>
 
@@ -226,7 +229,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v6';
+    const storeKey = 'relong-scadenzario-v7';
     const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -249,6 +252,19 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 
     // --- Stato ---
     let items = load();
+
+    // Logo picker (salva base64 in localStorage)
+    const logoImg = $('#brandLogo');
+    const logoPicker = $('#logoPicker');
+    const savedLogo = localStorage.getItem('relong-logo');
+    if(savedLogo) logoImg.src = savedLogo;
+    logoImg.addEventListener('click', ()=> logoPicker.click());
+    logoPicker.addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = ()=>{ localStorage.setItem('relong-logo', r.result); logoImg.src = r.result; };
+      r.readAsDataURL(f);
+    });
 
     // Toggles behavior
     const toggles = $('#toggles');
@@ -275,8 +291,15 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
 
     startI.valueAsDate = new Date();
 
-    form.addEventListener('submit', (e)=>{
+    form.addEventListener('submit', async (e)=>{
       e.preventDefault();
+      // In un solo tasto: chiedi permesso notifiche (se necessario) + inserisci
+      try{
+        if('Notification' in window && Notification.permission==='default'){
+          await Notification.requestPermission();
+        }
+      }catch{}
+
       const name = nameI.value.trim();
       const phone = phoneI.value.trim();
       if(!name || !phone) return;
@@ -321,16 +344,7 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       form.reset(); startI.valueAsDate = new Date();
       dEnergyI.value=5; dFiberI.value=12; dSIMI.value=4; dPhoneI.value=7; activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
       render();
-      const preview = tasks.map(t=>`${labelOf(t.type)}: ${fmtDate(new Date(t.due))}`).join(' • ');
-      maybeNotify(`Aggiunto ${name}. Promemoria → ${preview}`);
-    });
-
-    // --- Notifiche locali opzionali ---
-    $('#enableNoti').addEventListener('click', async ()=>{
-      if('Notification' in window){
-        const perm = await Notification.requestPermission();
-        if(perm==='granted') new Notification('Notifiche attive per lo scadenzario ReLong ✅');
-      } else alert('Notifiche non supportate su questo dispositivo.');
+      if('Notification' in window && Notification.permission==='granted') new Notification('Cliente inserito nello scadenzario ✅');
     });
 
     function maybeNotify(text){
@@ -373,6 +387,17 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       $('#st-repairs').textContent = repairsToday;
     }
 
+    function iconSVG(type){
+      const map = {
+        energia:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7v8l11-14h-8z"/></svg>',
+        fisso:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3c4.97 0 9 4.03 9 9h-2a7 7 0 1 0-7 7v2C6.03 21 2 16.97 2 12S6.03 3 12 3z"/></svg>',
+        sim:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>',
+        smartphone:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>',
+        riparazione:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M22.7 19.3l-7.9-7.9a5 5 0 1 0-3.9 3.9l7.9 7.9a1 1 0 0 0 1.4 0l2.5-2.5a1 1 0 0 0 0-1.4z"/></svg>'
+      };
+      return map[type]||'';
+    }
+
     function renderItem(it){
       const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
       if(it.done) t.classList.add('done');
@@ -380,7 +405,12 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       t.querySelector('.h').textContent = `${it.name} • ${it.phone}`;
       const tags = t.querySelector('.tags');
       tags.innerHTML = '';
-      it.activated.forEach(a=>tags.append(tag('Attivato: '+labelOf(a))));
+      it.activated.forEach(a=>{
+        const s = document.createElement('span');
+        s.className='tag';
+        s.innerHTML = iconSVG(a) + '<span>Attivato: '+labelOf(a)+'</span>';
+        tags.append(s);
+      });
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
@@ -406,6 +436,8 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       const el = $('#tpl-task').content.firstElementChild.cloneNode(true);
       const due = new Date(task.due);
       const late = !it.done && due<today();
+      const isToday = fmtDate(due)===fmtDate(new Date());
+      if(isToday) el.classList.add('dueToday');
 
       el.querySelector('.tname').textContent = `Follow‑up ${labelOf(task.type)}`;
       el.querySelector('.due').innerHTML = ` • scadenza: <b class="${late?'over':''}">${fmtDate(due)}</b>`;
@@ -431,6 +463,17 @@ input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#ee
       const e2 = new Date(s2.getTime()+30*60000);
       const calUrl2 = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}%20(Secondo%20richiamo)&dates=${fmtDateTimeParam(s2)}/${fmtDateTimeParam(e2)}&details=${encodeURIComponent('Richiamo serale (notifiche smart)')}`;
       cta.append(aBtn(calUrl2, 'Calendar 18:00', 'primary'));
+
+      // Snooze +1 giorno (evita weekend)
+      const btnSnooze = document.createElement('button');
+      btnSnooze.textContent = 'Snooze +1 giorno';
+      btnSnooze.addEventListener('click',()=>{
+        let nd = addDays(new Date(task.due), 1);
+        nd = avoidWeekend(nd);
+        task.due = nd.toISOString();
+        save(items); render(); maybeNotify('Spostato a domani ✔️');
+      });
+      cta.append(btnSnooze);
 
       // Stato
       const btnDone = document.createElement('button');
