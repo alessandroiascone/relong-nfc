@@ -10,12 +10,29 @@
     :root{
       --bg1:#0a0a0a; --bg2:#000;
       --brand1:#ff0000; --brand2:#ff7b00;
-      --muted:rgba(255,255,255,.8);
+      --muted:rgba(255,255,255,.85);
       --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
       --wa1:#25D366; --wa2:#128C7E;
-      --focus:#ffd166;
       --glow: rgba(255,120,0,.16);
+      --accentRing: rgba(255,190,0,.7);
+      --topbarH: 60px;
     }
+
+    /* Barra superiore fissa */
+    .topbar{
+      position:fixed; inset:0 0 auto 0; height:var(--topbarH); z-index:50;
+      display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      color:#000; font-weight:900; letter-spacing:-.02em;
+      box-shadow:0 8px 24px rgba(0,0,0,.45);
+      border-bottom:1px solid rgba(0,0,0,.25);
+    }
+    .topbar .inner{
+      width:min(92vw, 960px); display:flex; align-items:center; justify-content:space-between;
+    }
+    .topbar .title{ font-size:16px }
+    .topbar .sub{ font-size:12px; opacity:.8; font-weight:800 }
+
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,'Inter',Roboto,sans-serif;
       background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
@@ -25,10 +42,11 @@
       align-items:center;
       justify-content:center;
       padding:24px;
+      padding-top:calc(var(--topbarH) + 24px); /* spazio sotto la barra */
     }
-    .wrap{ width:100%; display:flex; justify-content:center; }
+    .wrap{ width:100%; display:flex; justify-content:center; perspective:1000px }
     .card{
-      width:min(92vw, 600px);
+      width:min(92vw, 640px);
       background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
       border:1px solid var(--stroke);
       border-radius:22px;
@@ -42,67 +60,92 @@
       color:#000; font-size:12px; font-weight:800; padding:7px 12px; border-radius:999px;
       box-shadow:0 12px 22px rgba(255,80,0,.42);
     }
-    h1{ font-size:clamp(22px, 3.8vw, 28px); letter-spacing:-.03em; margin-bottom:6px }
-    p{ opacity:.9; line-height:1.5; font-size:clamp(14px, 2.5vw, 16px) }
+    h1{ font-size:clamp(22px, 3.8vw, 30px); letter-spacing:-.03em; margin-bottom:8px }
+    p{ color:var(--muted); line-height:1.55; font-size:clamp(14px, 2.5vw, 16px) }
 
-    /* Pillole aggressive 3D */
+    /* Pillole aggressive 3D – UNA riga con scroll su mobile */
     .pills{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+      display:flex; align-items:center; gap:10px;
       margin:14px 0 18px;
+      white-space:nowrap; overflow:auto; -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; justify-content:center;
     }
+    .pills::-webkit-scrollbar{ display:none; }
     .pill{
-      background:linear-gradient(90deg, rgba(255,123,0,.16), rgba(255,0,0,.16));
-      border:1px solid rgba(255,120,0,.45);
+      background:linear-gradient(90deg, rgba(255,123,0,.18), rgba(255,0,0,.18));
+      border:1px solid rgba(255,120,0,.5);
       border-radius:14px;
-      padding:8px 14px;
+      padding:8px 12px;
       font-size:13px;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:-.02em;
-      box-shadow:
-        0 6px 14px rgba(0,0,0,.45),
-        0 0 18px rgba(255,120,0,.25);
-      backdrop-filter:blur(4px);
+      box-shadow:0 6px 14px rgba(0,0,0,.45), 0 0 18px rgba(255,120,0,.25);
       color:#fff;
-      display:flex; align-items:center; gap:6px;
       text-shadow:0 2px 4px rgba(0,0,0,.4);
-      white-space:nowrap;
     }
 
+    /* Scelta rapida dispositivi */
     .chooser{
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
       border-radius:16px;
       padding:clamp(12px,2vw,16px);
       margin-bottom:clamp(14px,2.5vw,18px);
     }
     .chooser-title{
-      font-size:14px; font-weight:800; letter-spacing:-.02em; margin-bottom:10px;
+      font-size:14px; font-weight:900; letter-spacing:-.02em; margin-bottom:12px;
     }
     .tiles{
       display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap:10px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap:12px;
+      transform-style:preserve-3d;
     }
     .tile{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:14px;
-      padding:10px 8px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:12px 10px;
       cursor:pointer;
       text-align:center;
-      transition:.22s ease;
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
       position:relative;
+      outline:none;
+      will-change:transform, box-shadow;
     }
-    .tile:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.4) }
+    /* Sheen (luce) */
+    .tile::after{
+      content:""; position:absolute; inset:0; border-radius:16px; pointer-events:none;
+      background:linear-gradient(110deg, rgba(255,255,255,.0) 0%, rgba(255,255,255,.18) 40%, rgba(255,255,255,0) 60%);
+      transform:translateX(-120%);
+    }
+    .tile:hover{
+      transform:translateY(-6px) scale(1.02) rotateX(1deg) rotateY(.5deg);
+      box-shadow:0 16px 34px rgba(0,0,0,.5), 0 0 0 1px rgba(255,190,0,.18) inset;
+    }
+    .tile:hover::after{
+      animation:sheen .9s ease forwards;
+    }
+    @keyframes sheen{
+      to{ transform:translateX(120%); }
+    }
     .tile[aria-pressed="true"]{
-      border-color:rgba(255,190,0,.7);
-      box-shadow:0 10px 34px rgba(255,170,0,.25);
+      border-color:var(--accentRing);
+      box-shadow:0 10px 34px rgba(255,170,0,.25), inset 0 0 0 1px rgba(255,190,0,.25);
     }
-    .ico{ width:34px; height:34px; margin:0 auto 6px; opacity:.8 }
-    .tile span{ display:block; font-size:12px; opacity:.85 }
+    .ico{
+      width:42px; height:42px; margin:0 auto 8px;
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));
+    }
+    .tile span{
+      display:block;
+      font-size:13.5px;
+      font-weight:800;
+      color:#fff;
+      letter-spacing:-.01em;
+    }
 
+    /* CTA dinamica */
     .cta-wrap{
       display:none;
       margin-top:12px;
@@ -110,11 +153,12 @@
       padding:12px;
       background:linear-gradient(90deg, rgba(255,200,0,.12), rgba(255,80,0,.12));
       border:1px solid rgba(255,190,0,.35);
+      transform-style:preserve-3d;
     }
     .cta-wrap.show{ display:block; animation:pop .18s ease-out }
     @keyframes pop{ from{transform:scale(.98);opacity:.6} to{transform:scale(1);opacity:1} }
 
-    .cta-lead{ font-size:13px; font-weight:700 }
+    .cta-lead{ font-size:13px; font-weight:900 }
     .cta{
       display:block; text-align:center; margin-top:10px;
       padding:12px 16px; border-radius:14px;
@@ -122,25 +166,48 @@
       color:#000; font-weight:900; text-decoration:none;
       box-shadow:0 18px 30px rgba(18,140,126,.45);
       font-size:16px;
+      transition:transform .15s ease, box-shadow .15s ease;
+      position:relative; overflow:hidden;
+      will-change:transform;
     }
-    .cta-hint{ margin-top:6px; text-align:center; font-size:11px; color:rgba(255,255,255,.65) }
+    .cta::after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 70%);
+      transform:translateX(-120%);
+    }
+    .cta:hover{ transform:translateY(-2px); box-shadow:0 22px 36px rgba(18,140,126,.55) }
+    .cta:hover::after{ animation:sheen .9s ease forwards }
+    .cta:active{ transform:translateY(0); box-shadow:0 14px 22px rgba(18,140,126,.45) }
+
+    .cta-hint{ margin-top:6px; text-align:center; font-size:11px; color:rgba(255,255,255,.75) }
 
     .info{
       margin:18px 0;
       padding:16px;
       border-radius:16px;
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
     }
-    .row{ margin:8px 0; font-size:14px }
-
-    .small{ font-size:12px; opacity:.6; margin-top:10px; text-align:center }
+    .row{ margin:8px 0; font-size:14px; color:#fff }
 
     svg{width:100%;height:100%}
+
+    @media (max-width:420px){
+      .topbar .title{ font-size:15px }
+      .topbar .sub{ display:none }
+    }
   </style>
 </head>
 
 <body>
+
+<!-- TOP BAR FISSA -->
+<header class="topbar" role="banner">
+  <div class="inner">
+    <div class="title">Re Long | Assistenza Tecnica</div>
+    <div class="sub">Supporto rapido • WhatsApp 08119578844</div>
+  </div>
+</header>
 
 <!-- SVG ICONS -->
 <svg width="0" height="0" style="position:absolute">
@@ -179,7 +246,6 @@
       <circle cx="24" cy="24" r="10" fill="url(#metal)"/>
       <circle cx="40" cy="40" r="8" fill="url(#metal)"/>
     </symbol>
-
   </defs>
 </svg>
 
@@ -189,83 +255,102 @@
     <div class="badge">ASSISTENZA TECNICA</div>
 
     <!-- SCELTA RAPIDA -->
-    <div class="chooser">
-      <div class="chooser-title">Scegli per cosa ti serve assistenza</div>
+    <div class="chooser" aria-labelledby="chooser-title">
+      <div id="chooser-title" class="chooser-title">Scegli per cosa ti serve assistenza</div>
 
-      <div class="tiles">
-        <button class="tile inactive" data-type="Desktop PC"><div class="ico"><svg><use href="#ico-desktop"/></svg></div><span>PC Fisso</span></button>
-        <button class="tile inactive" data-type="Notebook"><div class="ico"><svg><use href="#ico-laptop"/></svg></div><span>Notebook</span></button>
-        <button class="tile inactive" data-type="Smartphone"><div class="ico"><svg><use href="#ico-phone"/></svg></div><span>Smartphone</span></button>
-        <button class="tile inactive" data-type="Stampante"><div class="ico"><svg><use href="#ico-printer"/></svg></div><span>Stampante</span></button>
-        <button class="tile inactive" data-type="Software & Altro"><div class="ico"><svg><use href="#ico-gears"/></svg></div><span>Software & Altro</span></button>
+      <div class="tiles" role="group" aria-label="Tipologia dispositivo">
+        <button class="tile inactive" type="button" data-type="Desktop PC" aria-pressed="false">
+          <div class="ico"><svg viewBox="0 0 64 64"><use href="#ico-desktop"/></svg></div>
+          <span>PC Fisso</span>
+        </button>
+        <button class="tile inactive" type="button" data-type="Notebook" aria-pressed="false">
+          <div class="ico"><svg viewBox="0 0 64 64"><use href="#ico-laptop"/></svg></div>
+          <span>Notebook</span>
+        </button>
+        <button class="tile inactive" type="button" data-type="Smartphone" aria-pressed="false">
+          <div class="ico"><svg viewBox="0 0 64 64"><use href="#ico-phone"/></svg></div>
+          <span>Smartphone</span>
+        </button>
+        <button class="tile inactive" type="button" data-type="Stampante" aria-pressed="false">
+          <div class="ico"><svg viewBox="0 0 64 64"><use href="#ico-printer"/></svg></div>
+          <span>Stampante</span>
+        </button>
+        <button class="tile inactive" type="button" data-type="Software & Altro" aria-pressed="false">
+          <div class="ico"><svg viewBox="0 0 64 64"><use href="#ico-gears"/></svg></div>
+          <span>Software & Altro</span>
+        </button>
       </div>
 
       <!-- CTA DINAMICA -->
-      <div id="ctaWrap" class="cta-wrap">
+      <div id="ctaWrap" class="cta-wrap" role="region" aria-live="polite">
         <div class="cta-lead">Hai selezionato: <span id="choiceLabel">—</span></div>
-        <a id="waBtn" class="cta" href="#" target="_blank">Invia FOTO/VIDEO su WhatsApp</a>
+        <a id="waBtn" class="cta" href="#" target="_blank" rel="noopener noreferrer">
+          Invia FOTO/VIDEO su WhatsApp
+        </a>
         <div class="cta-hint">Risposta diretta dal negozio • 08119578844</div>
       </div>
     </div>
 
     <h1>Non cambiarlo, Potenzialo 💻</h1>
 
-    <!-- P I L L O L E  -->
-    <div class="pills">
-      <div class="pill">⚡ Assistenza Prioritaria</div>
-      <div class="pill">🚀 Preventivo Rapido</div>
-      <div class="pill">🧪 Diagnosi Immediata</div>
+    <!-- P I L L O L E  (UNA riga) -->
+    <div class="pills" aria-label="Vantaggi rapidi">
+      <div class="pill">🧪 Diagnosi lentezza, virus e surriscaldamento</div>
+      <div class="pill">🎮 Assemblaggio PC Gaming & Upgrade</div>
+      <div class="pill">🛠️ Assistenza Hardware e Software</div>
     </div>
 
     <p>Da Re Long il tuo dispositivo torna veloce, silenzioso e affidabile: diagnosi immediata e interventi su misura.</p>
 
-    <div class="info">
-      <div class="row">🧪 Diagnosi lentezza / virus / surriscaldamento</div>
-      <div class="row">🚀 Assemblaggio PC Gaming & Upgrade</div>
-      <div class="row">🧼 Assistenza Hardware & Software</div>
+    <div class="info" role="list">
+      <div class="row" role="listitem">🧪 Diagnosi lentezza / virus / surriscaldamento</div>
+      <div class="row" role="listitem">🚀 Assemblaggio PC Gaming & Upgrade</div>
+      <div class="row" role="listitem">🧼 Assistenza Hardware & Software</div>
     </div>
-
-    <div class="small">Supporto reale in sede. Re Long Informatica — Marano di Napoli.</div>
 
   </section>
 </main>
 
 <script>
   (function(){
-
     const tiles = document.querySelectorAll('.tile');
     const ctaWrap = document.getElementById('ctaWrap');
     const choiceLabel = document.getElementById('choiceLabel');
     const waBtn = document.getElementById('waBtn');
 
     const templates = {
-      'Desktop PC': "Ciao Re Long, ho bisogno di assistenza per il mio PC fisso. Posso mandarvi FOTO/VIDEO del problema?",
-      'Notebook': "Ciao Re Long, ho bisogno di assistenza per il mio notebook. Posso mandarvi FOTO/VIDEO del problema?",
-      'Smartphone': "Ciao Re Long, ho bisogno di assistenza per il mio smartphone. Posso mandarvi FOTO/VIDEO del problema?",
-      'Stampante': "Ciao Re Long, ho bisogno di assistenza per la mia stampante. Posso mandarvi FOTO/VIDEO del problema?",
-      'Software & Altro': "Ciao Re Long, ho bisogno di assistenza software/altro. Posso inviarvi FOTO/VIDEO del problema?"
+      'Desktop PC': "Ciao Re Long, ho bisogno di assistenza per il mio PC fisso. Posso inviarvi FOTO/VIDEO del problema?",
+      'Notebook':   "Ciao Re Long, ho bisogno di assistenza per il mio notebook. Posso inviarvi FOTO/VIDEO del problema?",
+      'Smartphone': "Ciao Re Long, ho bisogno di assistenza per il mio smartphone. Posso inviarvi FOTO/VIDEO del problema?",
+      'Stampante':  "Ciao Re Long, ho bisogno di assistenza per la mia stampante. Posso inviarvi FOTO/VIDEO del problema?",
+      'Software & Altro': "Ciao Re Long, ho bisogno di assistenza software/altro (sistemi, backup, licenze, reti, email, ecc.). Posso inviarvi FOTO/VIDEO/schermate del problema?"
     };
 
     function waLink(text){
       return `https://wa.me/3908119578844?text=${encodeURIComponent(text)}`;
     }
 
+    function setActive(btn){
+      tiles.forEach(t=>{
+        t.classList.add('inactive');
+        t.setAttribute('aria-pressed','false');
+      });
+      btn.classList.remove('inactive');
+      btn.setAttribute('aria-pressed','true');
+    }
+
     tiles.forEach(btn=>{
       btn.addEventListener('click', ()=>{
-
-        tiles.forEach(b=>b.setAttribute('aria-pressed','false'));
-        btn.setAttribute('aria-pressed','true');
-
         const type = btn.dataset.type;
+        setActive(btn);
+
+        // aggiorna CTA
         choiceLabel.textContent = type;
-
-        waBtn.href = waLink(templates[type]);
-
+        waBtn.href = waLink(templates[type] || "Ciao Re Long, ho bisogno di assistenza.");
         ctaWrap.classList.add('show');
-        ctaWrap.scrollIntoView({behavior:"smooth", block:"center"});
-      });
+        ctaWrap.scrollIntoView({behavior:'smooth', block:'center'});
+      }, {passive:true});
     });
-
   })();
 </script>
 
