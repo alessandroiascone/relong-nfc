@@ -143,8 +143,7 @@ svg{width:100%;height:100%}
 
   </defs>
 </svg><main class="wrap">
-  <section class="card">
-    <div class="badge">Re Long Assistenza</div><h1>ASSISTENZA TECNICA LIVE💻</h1>
+  <section class="card"><h1>Non cambiarlo, Potenzialo 💻</h1>
 <p class="sub">Inserisci il tuo <b>Nome e Cognome</b>, poi tocca il tasto giusto: si apre WhatsApp già compilato.</p>
 
 <!-- Nome & Consenso -->
@@ -157,14 +156,14 @@ svg{width:100%;height:100%}
   </label>
   <div class="consent" title="Consenso privacy via WhatsApp">
     <input type="checkbox" checked disabled aria-checked="true" aria-label="Consenso privacy" />
-    <small>Autorizzo il <b>trattamento dei dati</b> via WhatsApp (GDPR). <i>No Spam</i>.</small>
+    <small>Autorizzo il <b>trattamento dei dati</b> via WhatsApp (GDPR). <i>Flag già spuntato</i>.</small>
   </div>
   <div class="hint">⚠️ Senza Nome e Cognome non possiamo aprire WhatsApp automatico.</div>
 </div>
 
 <!-- SCELTA RAPIDA -->
 <div class="chooser">
-  <div class="chooser-title">Scegli l'assistenza di cui hai bisogno</div>
+  <div class="chooser-title">Scegli per cosa ti serve assistenza</div>
 
   <div class="tiles">
     <button class="tile" data-type="Computer in Riparazione" data-icon="desktop">
@@ -187,7 +186,7 @@ svg{width:100%;height:100%}
       <span>Console & Accessori in Riparazione</span>
     </button>
 
-    <button class="tile" data-type="Richiesta Preventivo" data-icon="receipt">
+    <button class="tile" data-type="Richiesta Preventivo" style="grid-column: span 2; justify-self:center;"
       <div class="ico"><svg><use href="#ico-receipt"/></svg></div>
       <span>Richiesta Preventivo</span>
     </button>
@@ -219,7 +218,7 @@ svg{width:100%;height:100%}
     'Smartphone in Riparazione': (name)=> `Ciao, sono ${name}. Ho lasciato il mio smartphone in Assistenza, attendo vostri aggiornamenti. Grazie.`,
     'Stampante in Riparazione': (name)=> `Ciao, sono ${name}. Ho lasciato la mia stampante in Assistenza, attendo vostri aggiornamenti. Grazie.`,
     'Console & Accessori in Riparazione': (name)=> `Ciao, sono ${name}. Ho lasciato la mia console/accessori in Assistenza, attendo vostri aggiornamenti. Grazie.`,
-    'Richiesta Preventivo': (name)=> `Ciao, sono ${name}. Vorrei un preventivo per `
+    'Richiesta Preventivo': (name)=> `Ciao, sono ${name}. Vorrei un preventivo personalizzato. Grazie.`
   };
 
   function titleCase(s){
