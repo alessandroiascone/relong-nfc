@@ -2,84 +2,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario Follow‑up (Intelligent Notifs + Stats)</title>
+  <title>ReLong • Scadenzario Follow‑up</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
+    /* --- Theme: Premium Dark + Electric Blue --- */
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#0a0a0a; --bg2:#000; --card:rgba(22,22,22,.94); --stroke:rgba(255,255,255,.08);
-      --muted:rgba(255,255,255,.70); --brand1:#ff3b1a; --brand2:#ff7b00; --ok:#25D366; --warn:#F8D34A; --danger:#ff4d4f;
-      --glow:0 8px 28px rgba(255,123,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+      --bg1:#0b0d12; --bg2:#06070b; /* deep dark */
+      --card:rgba(14,16,22,.92); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(210,220,255,.70);
+      --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff; /* electric blues */
+      --ok:#25D366; --danger:#ff4d4f;
+      --shadow:0 10px 40px rgba(0,140,255,.18), inset 0 1px 0 rgba(255,255,255,.04);
     }
-    body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#fff;
-      background:radial-gradient(60% 60% at 20% 20%, var(--bg1), var(--bg2));
+    body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
+      background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
       padding:24px;display:flex;flex-direction:column;gap:24px}
     .shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
-    @media (max-width:980px){.shell{grid-template-columns:1fr;}}.card{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--glow)}
-.card h2{font-size:20px;font-weight:800;padding:18px 18px 0}
+    @media (max-width:980px){.shell{grid-template-columns:1fr;}}.card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
 .card .content{padding:18px}
 
-.title{display:flex;align-items:center;gap:12px}
-.title .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand1),var(--brand2));
-  display:grid;place-items:center;box-shadow:0 8px 28px rgba(255,123,0,.25)}
-.title .logo svg{fill:#fff}
+/* Header */
+.title{display:flex;align-items:center;gap:14px}
+.title img{height:36px;aspect-ratio:auto;display:block;filter:drop-shadow(0 8px 24px rgba(0,140,255,.25))}
 .title h1{font-size:26px;letter-spacing:.2px}
 .subtitle{color:var(--muted);font-size:14px}
-
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.stat{background:#0f0f0f;border:1px solid var(--stroke);border-radius:14px;padding:12px;display:grid;gap:6px}
-.stat .n{font-size:22px;font-weight:800}
-@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
 
 /* Form */
 form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 form .full{grid-column:1/-1}
 label{font-size:12px;color:var(--muted)}
-input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);color:#fff;border-radius:14px;padding:12px 14px;font-size:15px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.check{display:flex;gap:8px;align-items:center;background:#121212;border:1px solid var(--stroke);padding:10px;border-radius:12px}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{appearance:none;border:0;border-radius:16px;padding:12px 16px;font-weight:700;letter-spacing:.2px;cursor:pointer}
-.btn.primary{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
-.btn.ghost{background:transparent;border:1px solid var(--stroke);color:#fff}
-.btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
-.btn.warn{background:linear-gradient(135deg,#9a7d06,var(--warn));color:#0d0b00}
-.btn.gray{background:#1a1a1a;color:#fff;border:1px solid var(--stroke)}
+input{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
 
-/* Lista */
+.brandpill{margin-top:6px;display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,140,255,.35);background:linear-gradient(135deg,rgba(0,140,255,.12),rgba(0,140,255,.05));padding:10px 12px;border-radius:999px;font-weight:700}
+.brandpill .dot{width:8px;height:8px;border-radius:50%;background:var(--elec3);box-shadow:0 0 18px var(--elec3)}
+
+/* Toggles (elegant buttons) */
+.toggle-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
+@media (max-width:980px){.toggle-grid{grid-template-columns:repeat(2,1fr)}}
+.tbtn{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease;box-shadow:inset 0 0 0 0 rgba(0,140,255,.25)}
+.tbtn:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(0,140,255,.25)}
+.tbtn.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 10px 30px rgba(0,140,255,.35)}
+.tbtn small{opacity:.9;font-weight:600}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:0;border-radius:16px;padding:12px 16px;font-weight:800;letter-spacing:.25px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;box-shadow:0 8px 26px rgba(0,140,255,.35)}
+.btn.ghost{background:transparent;border:1px solid var(--stroke);color:#eef3ff}
+.btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+
+/* Toolbar & list */
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
-.pill{border:1px solid var(--stroke);color:#fff;padding:8px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:#121212}
-.pill.active{background:linear-gradient(135deg,var(--brand1),var(--brand2))}
+.pill{border:1px solid rgba(0,140,255,.22);color:#dbeaff;padding:8px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02))}
+.pill.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 8px 24px rgba(0,140,255,.25)}
 
-.item{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-bottom:12px;background:#121212}
+.item{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-bottom:12px;background:#0a0d14}
 @media (max-width:780px){.item{grid-template-columns:1fr}}
 .meta{display:grid;gap:6px}
 .meta .h{font-weight:800}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
-.tag{font-size:12px;color:#0d0b00;background:linear-gradient(135deg,var(--brand1),var(--brand2));padding:6px 10px;border-radius:999px}
-.muted{background:linear-gradient(135deg,#777,#aaa);color:#0b0b0b}
-.activeChat{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+.tag{font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:6px 10px;border-radius:999px}
+.muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
+.activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
 .over{color:#ffb3b3}
 
 .tasks{display:grid;gap:8px}
-.task{border:1px solid var(--stroke);border-radius:12px;padding:10px;background:#0f0f0f}
+.task{border:1px solid var(--stroke);border-radius:12px;padding:10px;background:#090c12}
 .task .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .cta{display:flex;gap:8px;flex-wrap:wrap}
-.cta a,.cta button{font-size:13px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#1a1a1a;color:#fff;text-decoration:none}
-.cta a.primary{background:linear-gradient(135deg,var(--brand1),var(--brand2))}
-.cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+.cta a,.cta button{font-size:13px;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none}
+.cta a.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
+.cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.stat{background:#090c12;border:1px solid rgba(0,140,255,.18);border-radius:14px;padding:12px;display:grid;gap:6px}
+.stat .n{font-size:22px;font-weight:800}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
 
   </style>
 </head>
 <body>
   <header class="title">
-    <div class="logo" aria-hidden="true">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01z"/></svg>
-    </div>
+    <!-- Logo: cliccabile per caricare il tuo file e salvarlo in locale -->
+    <img id="brandLogo" src="https://alessandroiascone.github.io/relong-nfc/img/relong-logo.png" alt="ReLong" style="cursor:pointer" title="Clicca per cambiare logo (salvato in locale)" onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'ReLong',style:'font-weight:900;font-size:20px;letter-spacing:.4px'}))">
+    <input id="logoPicker" type="file" accept="image/*" hidden />
     <div>
       <h1>ReLong • Scadenzario Follow‑up</h1>
-      <div class="subtitle">Attivazioni e Riparazioni → reminder smart con WhatsApp & Google Calendar. Notifiche intelligenti + Statistiche.</div>
+      <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar. (No weekend, richiamo 18:00)</div>
     </div>
   </header>  <section class="card" style="max-width:1200px;margin:0 auto">
     <h2>Statistiche di oggi</h2>
@@ -93,7 +105,6 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
       </div>
     </div>
   </section>  <div class="shell">
-    <!-- Colonna sinistra: Form + Lista -->
     <section class="card">
       <h2>Nuovo cliente</h2>
       <div class="content">
@@ -106,44 +117,49 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
             <label>Telefono (solo cifre, WhatsApp)</label>
             <input required id="phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
           </div>
-          <div>
-            <label>Brand (se mobile)</label>
-            <select id="brand">
-              <option value="Vodafone">Vodafone</option>
-              <option value="Wind3">Wind3</option>
-              <option value="Fastweb">Fastweb</option>
-              <option value="Altro">Altro</option>
-            </select>
+          <div class="full">
+            <label>Brand (preselezionato)</label><br>
+            <span class="brandpill"><span class="dot"></span> Vodafone</span>
+            <input type="hidden" id="brandFixed" value="Vodafone">
           </div>
           <div>
             <label>Data attivazione</label>
             <input id="start" type="date" />
           </div><div class="full">
-        <label>Cosa hai attivato ORA (seleziona tutti i presenti)</label>
-        <div class="grid-4">
-          <label class="check"><input type="checkbox" id="act-sim"> SIM Mobile</label>
-          <label class="check"><input type="checkbox" id="act-fisso"> Linea Fissa (Internet Casa)</label>
-          <label class="check"><input type="checkbox" id="act-energia"> Energia</label>
-          <label class="check"><input type="checkbox" id="act-phone"> Smartphone a rate</label>
-          <label class="check"><input type="checkbox" id="act-repair"> Riparazione (PC/Smartphone/Stampante/Console)</label>
+        <label>Cosa hai attivato ORA</label>
+        <div class="toggle-grid" id="toggles">
+          <button type="button" class="tbtn" data-key="sim">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm2 9h2v2H8v-2zm0 3h2v2H8v-2zm3-3h2v2h-2v-2zm0 3h2v2h-2v-2z"/></svg>
+            SIM Mobile
+          </button>
+          <button type="button" class="tbtn" data-key="fisso">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c4.97 0 9 4.03 9 9h-2a7 7 0 1 0-7 7v2C6.03 21 2 16.97 2 12S6.03 3 12 3zm0 6a6 6 0 0 1 6 6h-2a4 4 0 1 0-4 4v2a6 6 0 1 1 0-12z"/></svg>
+            Linea Fissa
+          </button>
+          <button type="button" class="tbtn" data-key="energia">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 2L3 14h7v8l11-14h-8z"/></svg>
+            Energia
+          </button>
+          <button type="button" class="tbtn" data-key="smartphone">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm5 19a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+            Smartphone a rate
+          </button>
+          <button type="button" class="tbtn" data-key="riparazione">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22.7 19.3l-7.9-7.9a5 5 0 1 0-3.9 3.9l7.9 7.9a1 1 0 0 0 1.4 0l2.5-2.5a1 1 0 0 0 0-1.4zM7 10a3 3 0 1 1 6 0a3 3 0 0 1-6 0z"/></svg>
+            Riparazione<br><small>PC/Smartphone/Console</small>
+          </button>
         </div>
       </div>
 
+      <!-- Opzioni nascoste perché sempre attive: evita weekend + richiamo 18:00 -->
+
       <div class="full">
-        <label>Giorni promemoria per ciascun TARGET (modificabili):</label>
-        <div class="grid-4">
+        <label>Giorni promemoria</label>
+        <div class="toggle-grid" style="grid-template-columns:repeat(4,1fr)">
           <div><label>Energia</label><input id="dEnergy" type="number" value="5" min="1"></div>
           <div><label>Linea Fissa</label><input id="dFiber" type="number" value="12" min="2"></div>
           <div><label>SIM</label><input id="dSIM" type="number" value="4" min="1"></div>
-          <div><label>Smartphone a rate</label><input id="dPhone" type="number" value="7" min="1"></div>
-        </div>
-      </div>
-
-      <div class="full">
-        <label>Opzioni (sempre attive)</label>
-        <div class="grid-4">
-          <label class="check"><input type="checkbox" id="optWeekend" checked disabled> Evita sabato e domenica (sposta al lunedì)</label>
-          <label class="check"><input type="checkbox" id="optEvening" checked disabled> Aggiungi secondo richiamo alle 18:00</label>
+          <div><label>Smartphone</label><input id="dPhone" type="number" value="7" min="1"></div>
         </div>
       </div>
 
@@ -156,13 +172,13 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
     <div class="toolbar">
       <div class="filters">
         <button class="pill active" data-filter="all">Tutti</button>
-        <button class="pill" data-filter="today">In scadenza oggi</button>
+        <button class="pill" data-filter="today">Oggi</button>
         <button class="pill" data-filter="late">In ritardo</button>
         <button class="pill" data-filter="done">Completati</button>
       </div>
       <div class="actions">
-        <button class="btn gray" id="export">Esporta .json</button>
-        <label class="btn gray" for="importFile" style="cursor:pointer">Importa .json</label>
+        <button class="btn ghost" id="export">Esporta .json</button>
+        <label class="btn ghost" for="importFile" style="cursor:pointer">Importa .json</label>
         <input id="importFile" type="file" accept="application/json" hidden />
       </div>
     </div>
@@ -171,23 +187,19 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
   </div>
 </section>
 
-<!-- Colonna destra: Suggerimenti + Info -->
 <aside class="card">
   <h2>Logica follow‑up</h2>
   <div class="content">
-    <p style="margin-bottom:10px">Creo i reminder per i servizi <b>non attivati ora</b>. Caso speciale: se selezioni <b>Riparazione</b>, genero promemoria per <b>SIM, Fisso, Smartphone, Energia</b> (tutti). Notifiche intelligenti: se sei già in chat o silenzi l'utente per oggi, niente alert inutili.</p>
+    <p class="subtitle">Reminder per i servizi <b>non attivati ora</b>. Se selezioni <b>Riparazione</b> → promemoria per <b>SIM, Fisso, Smartphone, Energia</b>. Weekend evitati, secondo richiamo 18:00 pronto.</p>
     <ul style="margin-left:18px;display:grid;gap:6px">
-      <li><b>Attivo SIM</b> → reminder: Energia, Linea Fissa, Smartphone</li>
-      <li><b>Attivo Fisso</b> → reminder: SIM, Energia, Smartphone</li>
-      <li><b>Attivo Fisso + Mobile</b> → reminder: Energia, Smartphone</li>
-      <li><b>Attivo Energia</b> → reminder: Fisso, SIM, Smartphone</li>
-      <li><b>Attivo Fisso + Energia</b> → reminder: SIM, Smartphone</li>
-      <li><b>Attivo SIM + Smartphone</b> → reminder: Fisso, Energia</li>
-      <li><b>Riparazione</b> → reminder: SIM, Fisso, Smartphone, Energia</li>
+      <li><b>Attivo SIM</b> → Energia, Fisso, Smartphone</li>
+      <li><b>Attivo Fisso</b> → SIM, Energia, Smartphone</li>
+      <li><b>Attivo Fisso + Mobile</b> → Energia, Smartphone</li>
+      <li><b>Attivo Energia</b> → Fisso, SIM, Smartphone</li>
+      <li><b>Attivo Fisso + Energia</b> → SIM, Smartphone</li>
+      <li><b>Attivo SIM + Smartphone</b> → Fisso, Energia</li>
+      <li><b>Riparazione</b> → SIM, Fisso, Smartphone, Energia</li>
     </ul>
-    <div class="foot" style="margin-top:12px">
-      Numero ufficiale ReLong: <b>08119578844</b> • Hub: <a style="color:#fff" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html" target="_blank" rel="noopener">Online</a>
-    </div>
   </div>
 </aside>
 
@@ -214,7 +226,7 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v5';
+    const storeKey = 'relong-scadenzario-v6';
     const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -230,34 +242,36 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
     const avoidWeekend = (d) => {
       const x = new Date(d);
       const day = x.getDay(); // 0=Dom,6=Sab
-      if(day===0) x.setDate(x.getDate()+1); // Domenica → lunedì
-      if(day===6) x.setDate(x.getDate()+2); // Sabato → lunedì
+      if(day===0) x.setDate(x.getDate()+1);
+      if(day===6) x.setDate(x.getDate()+2);
       return x;
     }
 
     // --- Stato ---
     let items = load();
 
+    // Toggles behavior
+    const toggles = $('#toggles');
+    const activeSet = new Set();
+    toggles.addEventListener('click', (e)=>{
+      const b = e.target.closest('.tbtn');
+      if(!b) return;
+      const key = b.dataset.key;
+      b.classList.toggle('active');
+      if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
+    });
+
     // --- Form ---
     const form = $('#form');
     const nameI = $('#name');
     const phoneI = $('#phone');
-    const brandI = $('#brand');
+    const brandFixed = $('#brandFixed');
     const startI = $('#start');
-
-    const actSIM = $('#act-sim');
-    const actFisso = $('#act-fisso');
-    const actEnergia = $('#act-energia');
-    const actPhone = $('#act-phone');
-    const actRepair = $('#act-repair');
 
     const dEnergyI = $('#dEnergy');
     const dFiberI = $('#dFiber');
     const dSIMI = $('#dSIM');
     const dPhoneI = $('#dPhone');
-
-    const optWeekend = $('#optWeekend');
-    const optEvening = $('#optEvening');
 
     startI.valueAsDate = new Date();
 
@@ -267,18 +281,12 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
       const phone = phoneI.value.trim();
       if(!name || !phone) return;
 
-      const brand = brandI.value;
+      const brand = brandFixed.value; // unico brand
       const start = startI.value ? new Date(startI.value) : new Date();
 
-      const activated = new Set([
-        actSIM.checked?'sim':null,
-        actFisso.checked?'fisso':null,
-        actEnergia.checked?'energia':null,
-        actPhone.checked?'smartphone':null,
-        actRepair.checked?'riparazione':null,
-      ].filter(Boolean));
-
+      const activated = new Set(activeSet);
       const all = ['energia','fisso','sim','smartphone'];
+
       let targets;
       if (activated.has('riparazione')) {
         targets = all.slice();
@@ -293,12 +301,9 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
         smartphone: parseInt(dPhoneI.value||'7',10),
       };
 
-      const useWeekend = true; // bloccato attivo
-      const addEvening = true; // bloccato attivo
-
       const tasks = targets.map(type=>{
         let due = addDays(start, days[type]);
-        if(useWeekend) due = avoidWeekend(due);
+        due = avoidWeekend(due); // sempre attivo
         return { type, due: due.toISOString() };
       });
 
@@ -309,15 +314,15 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
         createdAt: new Date().toISOString(),
         activated:[...activated],
         tasks, done:false,
-        optWeekend: useWeekend, optEvening: addEvening,
+        optWeekend: true, optEvening: true,
         muteDate: null, activeChatUntil: null, doneAt: null
       });
       save(items);
       form.reset(); startI.valueAsDate = new Date();
-      dEnergyI.value=5; dFiberI.value=12; dSIMI.value=4; dPhoneI.value=7;
+      dEnergyI.value=5; dFiberI.value=12; dSIMI.value=4; dPhoneI.value=7; activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
       render();
       const preview = tasks.map(t=>`${labelOf(t.type)}: ${fmtDate(new Date(t.due))}`).join(' • ');
-      maybeNotify(`Aggiunto ${name}. Promemoria → ${preview} • (notifiche smart attive)`);
+      maybeNotify(`Aggiunto ${name}. Promemoria → ${preview}`);
     });
 
     // --- Notifiche locali opzionali ---
@@ -333,14 +338,13 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
         new Notification(text);
     }
 
-    // --- Filtro ---
+    // --- Filtro & Render + Stats ---
     let filter = 'all';
     $$('.pill').forEach(p=>p.addEventListener('click',()=>{
       $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active');
       filter = p.dataset.filter; render();
     }));
 
-    // --- Render lista + stats ---
     function render(){
       const list = $('#list'); list.innerHTML='';
       const now = today();
@@ -349,9 +353,7 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
       const data = items.filter(it=>{
         if(filter==='done') return it.done;
         if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
-        if(filter==='today'){
-          return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
-        }
+        if(filter==='today') return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
         return true;
       });
 
@@ -389,7 +391,7 @@ input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);co
 
       // Toggle silenzio oggi
       const muteBtn = document.createElement('button');
-      muteBtn.className='btn gray';
+      muteBtn.className='btn ghost';
       muteBtn.textContent = isMutedToday(it)? 'Riattiva notifiche oggi' : 'Sto già chattando (silenzia oggi)';
       muteBtn.addEventListener('click',()=>{
         it.muteDate = isMutedToday(it)? null : fmtDate(new Date());
@@ -479,9 +481,8 @@ Hub: ${decodeURIComponent(site)}`,
       const id = a.dataset.id;
       const it = items.find(x=>x.id===id);
       if(it){
-        const until = new Date(Date.now()+45*60*1000); // 45 minuti
+        const until = new Date(Date.now()+45*60*1000);
         it.activeChatUntil = until.toISOString();
-        // toglie eventuale silenzio per oggi (stai già lavorando)
         it.muteDate = fmtDate(new Date());
         save(items); render();
       }
@@ -493,24 +494,20 @@ Hub: ${decodeURIComponent(site)}`,
     // Boot
     render();
 
-    // --- Notifiche intelligenti ---
+    // Notifiche intelligenti
     setTimeout(()=>{
       const now = new Date();
       const tStr = fmtDate(now);
       const dueList = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr));
-      if(dueList.length) maybeNotify(`Follow‑up di oggi: ${dueList.length} clienti (notifiche smart)`);
+      if(dueList.length) maybeNotify(`Follow‑up di oggi: ${dueList.length} clienti (smart)`);
 
-      // Evening 18:00 (solo se pagina aperta)
-      const anyEvening = items.some(it=>!it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr));
-      if(anyEvening){
-        const at18 = new Date(); at18.setHours(18,0,0,0);
-        const ms = at18 - now;
-        if(ms>0 && ms < 14*60*60*1000){
-          setTimeout(()=>{
-            const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===fmtDate(new Date())));
-            if(pending.length) maybeNotify(`Richiamo 18:00: ${pending.length} clienti ancora da contattare (smart)`);
-          }, ms);
-        }
+      const at18 = new Date(); at18.setHours(18,0,0,0);
+      const ms = at18 - now;
+      if(ms>0 && ms < 14*60*60*1000){
+        setTimeout(()=>{
+          const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===fmtDate(new Date())));
+          if(pending.length) maybeNotify(`Richiamo 18:00: ${pending.length} clienti ancora da contattare (smart)`);
+        }, ms);
       }
     }, 800);
   </script></body>
