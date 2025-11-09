@@ -81,7 +81,7 @@
     .cta a.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
 
-    /* Stats (se li vuoi mostrare, aggiungi i 5 span con questi id) */
+    /* Stats (opzionali) */
     .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
     .stat{background:#090c12;border:1px solid rgba(0,140,255,.18);border-radius:14px;padding:12px;display:grid;gap:6px}
     .stat .n{font-size:22px;font-weight:800}
@@ -91,6 +91,10 @@
     .task.dueToday{box-shadow:0 0 0 1px rgba(0,140,255,.35), 0 0 24px rgba(0,140,255,.25)}
     @keyframes pulseGlow{0%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}50%{box-shadow:0 0 0 6px rgba(0,140,255,.12)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.25)}}
     .task.dueToday{animation:pulseGlow 2.4s ease-in-out infinite}
+
+    /* Visibilità accettazione: nascosta di default */
+    #acceptWrap{display:none}
+    #acceptWrap.show{display:block}
   </style>
 </head>
 <body>
@@ -143,10 +147,11 @@
       </div>
     </section>
 
-    <aside class="card">
+    <!-- Accettazione: nascosta finché non si seleziona "riparazione" -->
+    <aside class="card" id="acceptWrap">
       <h2>Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
-        <form id="acceptForm" class="grid2">
+        <form id="acceptForm" class="grid2" onsubmit="return false;">
           <div>
             <label>Tipo dispositivo</label>
             <select id="a_type">
@@ -169,11 +174,10 @@
             <label>Difetto / Problema</label>
             <textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea>
           </div>
-          <div class="full actions">
-            <button class="btn primary" type="submit" id="acceptBtn">Accetta dispositivo</button>
-          </div>
+
+          <!-- Nessun pulsante qui: il tasto unico è quello principale (insertBtn) -->
+          <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
         </form>
-        <p class="subtitle" style="margin-top:12px">Alla conferma: WhatsApp di accettazione + inserimento automatico nello scadenzario con follow-up più lunghi.</p>
       </div>
     </aside>
   </div>
@@ -235,7 +239,7 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v12';
+    const storeKey = 'relong-scadenzario-v13'; // bump versione storage per evitare conflitti
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato, azzero lo scadenzario:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
@@ -281,24 +285,48 @@
     const c_name = $('#c_name');
     const c_phone = $('#c_phone');
 
-    // Toggles attivazioni
-    const toggles = $('#toggles');
-    const activeSet = new Set();
-    toggles.addEventListener('click', (e)=>{ const b = e.target.closest('.tbtn'); if(!b) return; const key = b.dataset.key; b.classList.toggle('active'); if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key); });
-
-    // --- Attivazioni (Inserisci cliente) ---
-    const insertBtn = $('#insertBtn');
-    const startI = $('#start');
-    // Fallback per browser senza valueAsDate
-    try{ if(startI && 'valueAsDate' in startI) startI.valueAsDate = new Date();
-         else if(startI){ const d=new Date(); const pad=n=>String(n).padStart(2,'0'); startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; } }catch{}
-
-    // Accettazione form inputs (riusati nel flusso unico)
+    // Accettazione UI refs
+    const acceptWrap = $('#acceptWrap');
     const aForm = $('#acceptForm');
     const a_type = $('#a_type');
     const a_brand = $('#a_brand');
     const a_model = $('#a_model');
     const a_issue = $('#a_issue');
+
+    // Toggles attivazioni
+    const toggles = $('#toggles');
+    const activeSet = new Set();
+
+    function updateAcceptanceUI(){
+      const isRepair = activeSet.has('riparazione');
+      acceptWrap.classList.toggle('show', isRepair);
+      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
+      // Se si disattiva riparazione pulisco campi accettazione
+      if(!isRepair){
+        aForm.reset();
+      }
+    }
+
+    toggles.addEventListener('click', (e)=>{
+      const b = e.target.closest('.tbtn'); if(!b) return;
+      const key = b.dataset.key;
+      b.classList.toggle('active');
+      if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
+      updateAcceptanceUI();
+    });
+
+    // --- Attivazioni (Inserisci cliente) ---
+    const insertBtn = $('#insertBtn');
+    const startI = $('#start');
+
+    // Imposta data di default oggi
+    try{
+      if(startI && 'valueAsDate' in startI) startI.valueAsDate = new Date();
+      else if(startI){
+        const d=new Date(); const pad=n=>String(n).padStart(2,'0');
+        startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      }
+    }catch{}
 
     insertBtn.addEventListener('click', async ()=>{
       try{
@@ -315,16 +343,30 @@
       const start = startI.value ? new Date(startI.value) : new Date();
       const activated = new Set(activeSet);
 
-      // Se è selezionata "riparazione", il tasto è UNICO: accetta + inserisce
+      // --- Flusso RIPARAZIONE: tasto unico (accetta + inserisce) ---
       if(activated.has('riparazione')){
-        const device = { type:a_type.value, brand:a_brand.value.trim(), model:a_model.value.trim(), issue:a_issue.value.trim() };
+        const device = {
+          type:a_type.value,
+          brand:a_brand.value.trim(),
+          model:a_model.value.trim(),
+          issue:a_issue.value.trim()
+        };
         if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
+
         const id = Date.now()+Math.random().toString(16).slice(2);
         const praticaId = nextPraticaId();
+
+        // Reminder allungati per accettazione
         const all = ['energia','fisso','sim','smartphone'];
-        const tasks = all.map(type=>{ let due = addDays(new Date(), ACCEPT_DAYS[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
+        const tasks = all.map(type=>{
+          let due = addDays(new Date(), ACCEPT_DAYS[type]);
+          due = avoidWeekend(due);
+          return { type, due: due.toISOString() };
+        });
+
         const obj = {
-          id, praticaId, name, phone, start: new Date().toISOString(), createdAt: new Date().toISOString(),
+          id, praticaId, name, phone,
+          start: new Date().toISOString(), createdAt: new Date().toISOString(),
           activated:['riparazione'], tasks, done:false,
           optWeekend:true, optEvening:true,
           muteDate:null, activeChatUntil:null, doneAt:null,
@@ -345,13 +387,18 @@ Hub: ${site}
 📞 Re Long Informatica – 08119578844`;
         const wa = `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
         try{ window.open(wa, '_blank'); }catch{}
-        return; // esce: non esegue il flusso "attivazioni"
+        return;
       }
 
-      // Flusso attivazioni classico (no riparazione)
+      // --- Flusso ATTIVAZIONI classico (no riparazione) ---
+      // Crea i reminder per i servizi NON selezionati (up-sell in futuro)
       const all = ['energia','fisso','sim','smartphone'];
       const targets = all.filter(t => !activated.has(t));
-      const tasks = targets.map(type=>{ let due = addDays(start, DEFAULT_DAYS[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
+      const tasks = targets.map(type=>{
+        let due = addDays(start, DEFAULT_DAYS[type]);
+        due = avoidWeekend(due);
+        return { type, due: due.toISOString() };
+      });
 
       const id = Date.now()+Math.random().toString(16).slice(2);
       items.unshift({
@@ -363,51 +410,12 @@ Hub: ${site}
       });
       save(items);
       activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
+      updateAcceptanceUI();
       render();
       try{
         const httpsOk = (typeof isSecureContext !== 'undefined' ? isSecureContext : (location.protocol === 'https:' || location.hostname === 'localhost'));
         if('Notification' in window && httpsOk && Notification.permission==='granted') new Notification('Cliente inserito nello scadenzario ✅');
       }catch{}
-    });
-
-    // --- Accettazione (pulsante separato resta disponibile se vuoi usarlo) ---
-    aForm.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const name = c_name.value.trim();
-      let phone = (c_phone.value||'').trim();
-      phone = phone.replace(/\D/g,'');
-      if(phone.startsWith('0')) phone = phone.slice(1);
-      if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
-
-      const device = { type:a_type.value, brand:a_brand.value.trim(), model:a_model.value.trim(), issue:a_issue.value.trim() };
-
-      const start = new Date();
-      const all = ['energia','fisso','sim','smartphone'];
-      const tasks = all.map(type=>{ let due = addDays(start, ACCEPT_DAYS[type]); due = avoidWeekend(due); return { type, due: due.toISOString() } });
-
-      const id = Date.now()+Math.random().toString(16).slice(2);
-      const praticaId = nextPraticaId();
-      const obj = {
-        id, praticaId, name, phone, start: start.toISOString(), createdAt: new Date().toISOString(),
-        activated:['riparazione'], tasks, done:false,
-        optWeekend:true, optEvening:true,
-        muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:true, device, repairStatus:'diagnostica'
-      };
-      items.unshift(obj); save(items); render(); aForm.reset();
-
-      const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-      const msg = `✅ Accettazione prodotto registrata
-ID pratica: ${praticaId}
-Ciao ${name}, abbiamo preso in carico:
-${device.brand?device.brand+' ':''}${device.model||''}
-Difetto: ${device.issue||'-'}
-
-Ti aggiorniamo appena pronto.
-Hub: ${site}
-📞 Re Long Informatica – 08119578844`;
-      const wa = `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
-      try{ window.open(wa, '_blank'); }catch{}
     });
 
     function maybeNotify(text){
@@ -437,13 +445,15 @@ Hub: ${site}
         return (
           it.name.toLowerCase().includes(q) ||
           (it.phone||'').toLowerCase().includes(q) ||
-          (it.praticaId||'').toLowerCase().includes(q)
+          (it.praticaId||'').toLowerCase().includes(q) ||
+          (it.device?.brand||'').toLowerCase().includes(q) ||
+          (it.device?.model||'').toLowerCase().includes(q)
         );
       });
 
       data.forEach(it=>list.appendChild(renderItem(it)));
 
-      // Stats (sezione opzionale)
+      // Stats (opzionali)
       const createdToday = items.filter(it=>fmtDate(new Date(it.createdAt||it.start))===tStr).length;
       const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
       const doneToday = items.filter(it=>it.done && fmtDate(new Date(it.doneAt||it.start))===tStr).length;
@@ -598,8 +608,9 @@ Hub: ${site}
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // Boot
+    // Boot: render + UI iniziale
     render();
+    updateAcceptanceUI();
 
     // Notifiche intelligenti (HTTPS only)
     setTimeout(()=>{
