@@ -53,7 +53,7 @@
   background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
   box-shadow:0 18px 30px rgba(18,140,126,.45),0 0 0 1px rgba(0,0,0,.25) inset}
 
-.cta-wrap{display:none!important}.cta-wrap.show{display:none!important} .ripple{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);width:10px;height:10px;background:radial-gradient(circle,rgba(255,255,255,.35) 0%,rgba(255,255,255,.22) 45%,rgba(255,255,255,0) 70%);opacity:.9;animation:ripple .55s ease-out forwards} @keyframes ripple{from{transform:translate(-50%,-50%) scale(1);opacity:.35}to{transform:translate(-50%,-50%) scale(18);opacity:0}} </style>
+.cta-wrap{display:none!important}.cta-wrap.show{display:none!important} .ripple{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);width:10px;height:10px;background:radial-gradient(circle,rgba(255,255,255,.35) 0%,rgba(255,255,255,.22) 45%,rgba(255,255,255,0) 70%);opacity:.9;animation:ripple .55s ease-out forwards} @keyframes ripple{from{transform:translate(-50%,-50%) scale(1);opacity:.35}to{transform:translate(-50%,-50%) scale(18);opacity:0}} .cta-wrap{display:none!important} /* Effetto B: Press → Lift con flash neon */ .tile{transition:transform .18s cubic-bezier(.22,.61,.36,1), box-shadow .18s ease} .tile.press{transform:translateY(2px) scale(.98);box-shadow:0 8px 16px rgba(0,0,0,.5),0 0 0 2px rgba(0,140,255,.25) inset} .tile.lift{transform:translateY(-3px) scale(1.01);box-shadow:0 18px 36px rgba(0,0,0,.6),0 0 0 2px rgba(0,160,255,.35) inset} @keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,160,255,.0)}40%{box-shadow:0 0 0 8px rgba(0,160,255,.35)}100%{box-shadow:0 0 0 0 rgba(0,160,255,0)}} .tile.flash::after{content:"";position:absolute;inset:-2px;border-radius:16px;animation:flash .22s ease-out 1} html,body{height:100dvh;overflow:hidden} </style>
 
 </head>
 <body><main class="wrap">
@@ -108,14 +108,28 @@
   function link(t){return `https://wa.me/${WA}?text=${encodeURIComponent(t)}`}
 
   tiles.forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
+    btn.addEventListener('click',()=>{
       const name = cleanName(fullname.value);
       if(!name || name.length < 3){ fullname.focus(); return; }
 
       const product = btn.dataset.type;
 
-      // evidenzia selezione
-      tiles.forEach(t=>{ t.setAttribute('aria-pressed','false'); t.classList.remove('active'); });
+      // stato visivo: press → lift → flash
+      tiles.forEach(t=>{ t.classList.remove('press','lift','flash'); t.setAttribute('aria-pressed','false'); });
+      btn.classList.add('press');
+      setTimeout(()=>{
+        btn.classList.remove('press');
+        btn.classList.add('lift');
+        btn.setAttribute('aria-pressed','true');
+      }, 90);
+      setTimeout(()=>{ btn.classList.add('flash'); }, 120);
+
+      // apertura WhatsApp dopo il feedback
+      const text = buildMessage(name, product);
+      const href = link(text);
+      setTimeout(()=>{ window.open(href, '_blank', 'noopener'); }, 180);
+    });
+  });
       btn.setAttribute('aria-pressed','true');
       btn.classList.add('active');
 
