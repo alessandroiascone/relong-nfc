@@ -1,0 +1,517 @@
+<!DOCTYPE html><html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ReLong • Scadenzario Follow‑up (Intelligent Notifs + Stats)</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000; --card:rgba(22,22,22,.94); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(255,255,255,.70); --brand1:#ff3b1a; --brand2:#ff7b00; --ok:#25D366; --warn:#F8D34A; --danger:#ff4d4f;
+      --glow:0 8px 28px rgba(255,123,0,.18), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#fff;
+      background:radial-gradient(60% 60% at 20% 20%, var(--bg1), var(--bg2));
+      padding:24px;display:flex;flex-direction:column;gap:24px}
+    .shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
+    @media (max-width:980px){.shell{grid-template-columns:1fr;}}.card{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--glow)}
+.card h2{font-size:20px;font-weight:800;padding:18px 18px 0}
+.card .content{padding:18px}
+
+.title{display:flex;align-items:center;gap:12px}
+.title .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand1),var(--brand2));
+  display:grid;place-items:center;box-shadow:0 8px 28px rgba(255,123,0,.25)}
+.title .logo svg{fill:#fff}
+.title h1{font-size:26px;letter-spacing:.2px}
+.subtitle{color:var(--muted);font-size:14px}
+
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.stat{background:#0f0f0f;border:1px solid var(--stroke);border-radius:14px;padding:12px;display:grid;gap:6px}
+.stat .n{font-size:22px;font-weight:800}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* Form */
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+form .full{grid-column:1/-1}
+label{font-size:12px;color:var(--muted)}
+input,select{margin-top:6px;background:#121212;border:1px solid var(--stroke);color:#fff;border-radius:14px;padding:12px 14px;font-size:15px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.check{display:flex;gap:8px;align-items:center;background:#121212;border:1px solid var(--stroke);padding:10px;border-radius:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:0;border-radius:16px;padding:12px 16px;font-weight:700;letter-spacing:.2px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--stroke);color:#fff}
+.btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+.btn.warn{background:linear-gradient(135deg,#9a7d06,var(--warn));color:#0d0b00}
+.btn.gray{background:#1a1a1a;color:#fff;border:1px solid var(--stroke)}
+
+/* Lista */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--stroke);color:#fff;padding:8px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:#121212}
+.pill.active{background:linear-gradient(135deg,var(--brand1),var(--brand2))}
+
+.item{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-bottom:12px;background:#121212}
+@media (max-width:780px){.item{grid-template-columns:1fr}}
+.meta{display:grid;gap:6px}
+.meta .h{font-weight:800}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;color:#0d0b00;background:linear-gradient(135deg,var(--brand1),var(--brand2));padding:6px 10px;border-radius:999px}
+.muted{background:linear-gradient(135deg,#777,#aaa);color:#0b0b0b}
+.activeChat{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+.over{color:#ffb3b3}
+
+.tasks{display:grid;gap:8px}
+.task{border:1px solid var(--stroke);border-radius:12px;padding:10px;background:#0f0f0f}
+.task .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cta{display:flex;gap:8px;flex-wrap:wrap}
+.cta a,.cta button{font-size:13px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#1a1a1a;color:#fff;text-decoration:none}
+.cta a.primary{background:linear-gradient(135deg,var(--brand1),var(--brand2))}
+.cta a.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
+
+  </style>
+</head>
+<body>
+  <header class="title">
+    <div class="logo" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01z"/></svg>
+    </div>
+    <div>
+      <h1>ReLong • Scadenzario Follow‑up</h1>
+      <div class="subtitle">Attivazioni e Riparazioni → reminder smart con WhatsApp & Google Calendar. Notifiche intelligenti + Statistiche.</div>
+    </div>
+  </header>  <section class="card" style="max-width:1200px;margin:0 auto">
+    <h2>Statistiche di oggi</h2>
+    <div class="content">
+      <div class="stats">
+        <div class="stat"><div>Clienti inseriti</div><div class="n" id="st-created">0</div></div>
+        <div class="stat"><div>Follow‑up in scadenza</div><div class="n" id="st-due">0</div></div>
+        <div class="stat"><div>Completati oggi</div><div class="n" id="st-done">0</div></div>
+        <div class="stat"><div>In ritardo</div><div class="n" id="st-late">0</div></div>
+        <div class="stat"><div>Riparazioni oggi</div><div class="n" id="st-repairs">0</div></div>
+      </div>
+    </div>
+  </section>  <div class="shell">
+    <!-- Colonna sinistra: Form + Lista -->
+    <section class="card">
+      <h2>Nuovo cliente</h2>
+      <div class="content">
+        <form id="form">
+          <div>
+            <label>Nome e Cognome</label>
+            <input required id="name" placeholder="Mario Rossi" />
+          </div>
+          <div>
+            <label>Telefono (solo cifre, WhatsApp)</label>
+            <input required id="phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" />
+          </div>
+          <div>
+            <label>Brand (se mobile)</label>
+            <select id="brand">
+              <option value="Vodafone">Vodafone</option>
+              <option value="Wind3">Wind3</option>
+              <option value="Fastweb">Fastweb</option>
+              <option value="Altro">Altro</option>
+            </select>
+          </div>
+          <div>
+            <label>Data attivazione</label>
+            <input id="start" type="date" />
+          </div><div class="full">
+        <label>Cosa hai attivato ORA (seleziona tutti i presenti)</label>
+        <div class="grid-4">
+          <label class="check"><input type="checkbox" id="act-sim"> SIM Mobile</label>
+          <label class="check"><input type="checkbox" id="act-fisso"> Linea Fissa (Internet Casa)</label>
+          <label class="check"><input type="checkbox" id="act-energia"> Energia</label>
+          <label class="check"><input type="checkbox" id="act-phone"> Smartphone a rate</label>
+          <label class="check"><input type="checkbox" id="act-repair"> Riparazione (PC/Smartphone/Stampante/Console)</label>
+        </div>
+      </div>
+
+      <div class="full">
+        <label>Giorni promemoria per ciascun TARGET (modificabili):</label>
+        <div class="grid-4">
+          <div><label>Energia</label><input id="dEnergy" type="number" value="5" min="1"></div>
+          <div><label>Linea Fissa</label><input id="dFiber" type="number" value="12" min="2"></div>
+          <div><label>SIM</label><input id="dSIM" type="number" value="4" min="1"></div>
+          <div><label>Smartphone a rate</label><input id="dPhone" type="number" value="7" min="1"></div>
+        </div>
+      </div>
+
+      <div class="full">
+        <label>Opzioni (sempre attive)</label>
+        <div class="grid-4">
+          <label class="check"><input type="checkbox" id="optWeekend" checked disabled> Evita sabato e domenica (sposta al lunedì)</label>
+          <label class="check"><input type="checkbox" id="optEvening" checked disabled> Aggiungi secondo richiamo alle 18:00</label>
+        </div>
+      </div>
+
+      <div class="full actions">
+        <button class="btn primary" type="submit">Aggiungi allo scadenzario</button>
+        <button class="btn ghost" type="button" id="enableNoti">Abilita notifiche locali</button>
+      </div>
+    </form>
+
+    <div class="toolbar">
+      <div class="filters">
+        <button class="pill active" data-filter="all">Tutti</button>
+        <button class="pill" data-filter="today">In scadenza oggi</button>
+        <button class="pill" data-filter="late">In ritardo</button>
+        <button class="pill" data-filter="done">Completati</button>
+      </div>
+      <div class="actions">
+        <button class="btn gray" id="export">Esporta .json</button>
+        <label class="btn gray" for="importFile" style="cursor:pointer">Importa .json</label>
+        <input id="importFile" type="file" accept="application/json" hidden />
+      </div>
+    </div>
+
+    <div id="list"></div>
+  </div>
+</section>
+
+<!-- Colonna destra: Suggerimenti + Info -->
+<aside class="card">
+  <h2>Logica follow‑up</h2>
+  <div class="content">
+    <p style="margin-bottom:10px">Creo i reminder per i servizi <b>non attivati ora</b>. Caso speciale: se selezioni <b>Riparazione</b>, genero promemoria per <b>SIM, Fisso, Smartphone, Energia</b> (tutti). Notifiche intelligenti: se sei già in chat o silenzi l'utente per oggi, niente alert inutili.</p>
+    <ul style="margin-left:18px;display:grid;gap:6px">
+      <li><b>Attivo SIM</b> → reminder: Energia, Linea Fissa, Smartphone</li>
+      <li><b>Attivo Fisso</b> → reminder: SIM, Energia, Smartphone</li>
+      <li><b>Attivo Fisso + Mobile</b> → reminder: Energia, Smartphone</li>
+      <li><b>Attivo Energia</b> → reminder: Fisso, SIM, Smartphone</li>
+      <li><b>Attivo Fisso + Energia</b> → reminder: SIM, Smartphone</li>
+      <li><b>Attivo SIM + Smartphone</b> → reminder: Fisso, Energia</li>
+      <li><b>Riparazione</b> → reminder: SIM, Fisso, Smartphone, Energia</li>
+    </ul>
+    <div class="foot" style="margin-top:12px">
+      Numero ufficiale ReLong: <b>08119578844</b> • Hub: <a style="color:#fff" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html" target="_blank" rel="noopener">Online</a>
+    </div>
+  </div>
+</aside>
+
+  </div>  <template id="tpl-item">
+    <div class="item">
+      <div class="meta">
+        <div class="h"></div>
+        <div class="tags"></div>
+      </div>
+      <div class="tasks"></div>
+    </div>
+  </template>  <template id="tpl-task">
+    <div class="task">
+      <div class="row">
+        <div>
+          <b class="tname"></b>
+          <span class="due"></span>
+        </div>
+        <div class="cta"></div>
+      </div>
+    </div>
+  </template>  <script>
+    // --- Utils ---
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+    const storeKey = 'relong-scadenzario-v5';
+    const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
+    const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
+
+    const fmtDate = (d) => d.toLocaleDateString('it-IT', {year:'numeric', month:'2-digit', day:'2-digit'});
+    const fmtDateTimeParam = (d) => {
+      const pad = (n)=>String(n).padStart(2,'0');
+      const z = new Date(d.getTime());
+      return z.getUTCFullYear()+pad(z.getUTCMonth()+1)+pad(z.getUTCDate())+'T'+pad(z.getUTCHours())+pad(z.getUTCMinutes())+pad(z.getUTCSeconds())+'Z';
+    }
+
+    const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d };
+    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x }
+    const avoidWeekend = (d) => {
+      const x = new Date(d);
+      const day = x.getDay(); // 0=Dom,6=Sab
+      if(day===0) x.setDate(x.getDate()+1); // Domenica → lunedì
+      if(day===6) x.setDate(x.getDate()+2); // Sabato → lunedì
+      return x;
+    }
+
+    // --- Stato ---
+    let items = load();
+
+    // --- Form ---
+    const form = $('#form');
+    const nameI = $('#name');
+    const phoneI = $('#phone');
+    const brandI = $('#brand');
+    const startI = $('#start');
+
+    const actSIM = $('#act-sim');
+    const actFisso = $('#act-fisso');
+    const actEnergia = $('#act-energia');
+    const actPhone = $('#act-phone');
+    const actRepair = $('#act-repair');
+
+    const dEnergyI = $('#dEnergy');
+    const dFiberI = $('#dFiber');
+    const dSIMI = $('#dSIM');
+    const dPhoneI = $('#dPhone');
+
+    const optWeekend = $('#optWeekend');
+    const optEvening = $('#optEvening');
+
+    startI.valueAsDate = new Date();
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = nameI.value.trim();
+      const phone = phoneI.value.trim();
+      if(!name || !phone) return;
+
+      const brand = brandI.value;
+      const start = startI.value ? new Date(startI.value) : new Date();
+
+      const activated = new Set([
+        actSIM.checked?'sim':null,
+        actFisso.checked?'fisso':null,
+        actEnergia.checked?'energia':null,
+        actPhone.checked?'smartphone':null,
+        actRepair.checked?'riparazione':null,
+      ].filter(Boolean));
+
+      const all = ['energia','fisso','sim','smartphone'];
+      let targets;
+      if (activated.has('riparazione')) {
+        targets = all.slice();
+      } else {
+        targets = all.filter(t => !activated.has(t));
+      }
+
+      const days = {
+        energia: parseInt(dEnergyI.value||'5',10),
+        fisso: parseInt(dFiberI.value||'12',10),
+        sim: parseInt(dSIMI.value||'4',10),
+        smartphone: parseInt(dPhoneI.value||'7',10),
+      };
+
+      const useWeekend = true; // bloccato attivo
+      const addEvening = true; // bloccato attivo
+
+      const tasks = targets.map(type=>{
+        let due = addDays(start, days[type]);
+        if(useWeekend) due = avoidWeekend(due);
+        return { type, due: due.toISOString() };
+      });
+
+      const id = Date.now()+Math.random().toString(16).slice(2);
+      items.unshift({
+        id, name, phone, brand,
+        start: start.toISOString(),
+        createdAt: new Date().toISOString(),
+        activated:[...activated],
+        tasks, done:false,
+        optWeekend: useWeekend, optEvening: addEvening,
+        muteDate: null, activeChatUntil: null, doneAt: null
+      });
+      save(items);
+      form.reset(); startI.valueAsDate = new Date();
+      dEnergyI.value=5; dFiberI.value=12; dSIMI.value=4; dPhoneI.value=7;
+      render();
+      const preview = tasks.map(t=>`${labelOf(t.type)}: ${fmtDate(new Date(t.due))}`).join(' • ');
+      maybeNotify(`Aggiunto ${name}. Promemoria → ${preview} • (notifiche smart attive)`);
+    });
+
+    // --- Notifiche locali opzionali ---
+    $('#enableNoti').addEventListener('click', async ()=>{
+      if('Notification' in window){
+        const perm = await Notification.requestPermission();
+        if(perm==='granted') new Notification('Notifiche attive per lo scadenzario ReLong ✅');
+      } else alert('Notifiche non supportate su questo dispositivo.');
+    });
+
+    function maybeNotify(text){
+      if('Notification' in window && Notification.permission==='granted' && document.visibilityState==='visible')
+        new Notification(text);
+    }
+
+    // --- Filtro ---
+    let filter = 'all';
+    $$('.pill').forEach(p=>p.addEventListener('click',()=>{
+      $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active');
+      filter = p.dataset.filter; render();
+    }));
+
+    // --- Render lista + stats ---
+    function render(){
+      const list = $('#list'); list.innerHTML='';
+      const now = today();
+      const tStr = fmtDate(now);
+
+      const data = items.filter(it=>{
+        if(filter==='done') return it.done;
+        if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
+        if(filter==='today'){
+          return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
+        }
+        return true;
+      });
+
+      data.forEach(it=>list.appendChild(renderItem(it)));
+
+      // Stats
+      const createdToday = items.filter(it=>fmtDate(new Date(it.createdAt||it.start))===tStr).length;
+      const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
+      const doneToday = items.filter(it=>it.done && fmtDate(new Date(it.doneAt||it.start))===tStr).length;
+      const late = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>new Date(tsk.due)<now).length), 0);
+      const repairsToday = items.filter(it=> (it.activated||[]).includes('riparazione') && fmtDate(new Date(it.createdAt||it.start))===tStr).length;
+
+      $('#st-created').textContent = createdToday;
+      $('#st-due').textContent = dueToday;
+      $('#st-done').textContent = doneToday;
+      $('#st-late').textContent = late;
+      $('#st-repairs').textContent = repairsToday;
+    }
+
+    function renderItem(it){
+      const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
+      if(it.done) t.classList.add('done');
+
+      t.querySelector('.h').textContent = `${it.name} • ${it.phone}`;
+      const tags = t.querySelector('.tags');
+      tags.innerHTML = '';
+      it.activated.forEach(a=>tags.append(tag('Attivato: '+labelOf(a))));
+      if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
+      if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
+      if(it.done) tags.append(tag('Completato'));
+
+      const tasksWrap = t.querySelector('.tasks');
+      tasksWrap.innerHTML='';
+      it.tasks.forEach(task=>tasksWrap.appendChild(renderTask(it, task)));
+
+      // Toggle silenzio oggi
+      const muteBtn = document.createElement('button');
+      muteBtn.className='btn gray';
+      muteBtn.textContent = isMutedToday(it)? 'Riattiva notifiche oggi' : 'Sto già chattando (silenzia oggi)';
+      muteBtn.addEventListener('click',()=>{
+        it.muteDate = isMutedToday(it)? null : fmtDate(new Date());
+        save(items); render();
+      });
+      t.appendChild(muteBtn);
+
+      return t;
+    }
+
+    function renderTask(it, task){
+      const el = $('#tpl-task').content.firstElementChild.cloneNode(true);
+      const due = new Date(task.due);
+      const late = !it.done && due<today();
+
+      el.querySelector('.tname').textContent = `Follow‑up ${labelOf(task.type)}`;
+      el.querySelector('.due').innerHTML = ` • scadenza: <b class="${late?'over':''}">${fmtDate(due)}</b>`;
+
+      const cta = el.querySelector('.cta');
+      const wa = waFor(it, task.type);
+      if(wa){
+        const a = aBtn(wa.href, wa.text, 'ok');
+        a.dataset.wa = '1';
+        a.dataset.id = it.id;
+        cta.append(a);
+      }
+
+      // Calendar 10:00
+      const s = new Date(task.due); s.setHours(10,0,0,0);
+      const e = new Date(s.getTime()+30*60000);
+      const title = encodeURIComponent(`Follow‑up ${labelOf(task.type)} • ${it.name}`);
+      const calUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${fmtDateTimeParam(s)}/${fmtDateTimeParam(e)}&details=${encodeURIComponent('Promemoria generato da Scadenzario ReLong')}`;
+      cta.append(aBtn(calUrl, 'Calendar 10:00', 'primary'));
+
+      // Calendar 18:00
+      const s2 = new Date(task.due); s2.setHours(18,0,0,0);
+      const e2 = new Date(s2.getTime()+30*60000);
+      const calUrl2 = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}%20(Secondo%20richiamo)&dates=${fmtDateTimeParam(s2)}/${fmtDateTimeParam(e2)}&details=${encodeURIComponent('Richiamo serale (notifiche smart)')}`;
+      cta.append(aBtn(calUrl2, 'Calendar 18:00', 'primary'));
+
+      // Stato
+      const btnDone = document.createElement('button');
+      btnDone.textContent = 'Segna cliente completato';
+      btnDone.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
+      cta.append(btnDone);
+
+      const btnDel = document.createElement('button');
+      btnDel.textContent = 'Elimina cliente';
+      btnDel.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); });
+      cta.append(btnDel);
+
+      return el;
+    }
+
+    function labelOf(type){
+      return ({energia:'Energia', fisso:'Internet Casa', sim:'SIM', smartphone:'Smartphone a rate', riparazione:'Riparazione'})[type] || type;
+    }
+
+    function waFor(it, type){
+      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
+      const map = {
+        energia: `${base}
+Essendo cliente ${it.brand} hai diritto allo sconto Energia dedicato. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?
+Hub: ${decodeURIComponent(site)}`,
+        fisso: `${base}
+Abbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?
+Hub: ${decodeURIComponent(site)}`,
+        sim: `${base}
+Se ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?
+Hub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}
+Possiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?
+Hub: ${decodeURIComponent(site)}`,
+      };
+      const txt = encodeURIComponent(map[type]);
+      return { href:`https://wa.me/39${it.phone}?text=${txt}`, text:`WhatsApp ${labelOf(type)}` };
+    }
+
+    function tag(txt, extraClass=''){ const s=document.createElement('span'); s.className='tag'; if(extraClass) s.classList.add(extraClass); s.textContent=txt; return s }
+    function aBtn(href, txt, cls=''){ const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener'; a.textContent=txt; if(cls) a.classList.add(cls); return a }
+
+    // Delego click su WhatsApp per marcare "in chat"
+    $('#list').addEventListener('click', (e)=>{
+      const a = e.target.closest('a[data-wa="1"]');
+      if(!a) return;
+      const id = a.dataset.id;
+      const it = items.find(x=>x.id===id);
+      if(it){
+        const until = new Date(Date.now()+45*60*1000); // 45 minuti
+        it.activeChatUntil = until.toISOString();
+        // toglie eventuale silenzio per oggi (stai già lavorando)
+        it.muteDate = fmtDate(new Date());
+        save(items); render();
+      }
+    });
+
+    function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
+    function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
+
+    // Boot
+    render();
+
+    // --- Notifiche intelligenti ---
+    setTimeout(()=>{
+      const now = new Date();
+      const tStr = fmtDate(now);
+      const dueList = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr));
+      if(dueList.length) maybeNotify(`Follow‑up di oggi: ${dueList.length} clienti (notifiche smart)`);
+
+      // Evening 18:00 (solo se pagina aperta)
+      const anyEvening = items.some(it=>!it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr));
+      if(anyEvening){
+        const at18 = new Date(); at18.setHours(18,0,0,0);
+        const ms = at18 - now;
+        if(ms>0 && ms < 14*60*60*1000){
+          setTimeout(()=>{
+            const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===fmtDate(new Date())));
+            if(pending.length) maybeNotify(`Richiamo 18:00: ${pending.length} clienti ancora da contattare (smart)`);
+          }, ms);
+        }
+      }
+    }, 800);
+  </script></body>
+</html>
