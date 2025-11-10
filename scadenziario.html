@@ -104,7 +104,7 @@
   </style>
 </head>
 <body>
-  <!-- ===== PIN GATE ===== -->
+  <!-- PIN -->
   <div id="pinGate" hidden>
     <div id="pinCard">
       <h3>Accesso protetto</h3>
@@ -117,7 +117,7 @@
   </div>
   <div id="errBar"></div>
 
-  <!-- ===== HOTFIX PIN: ESEGUITO SUBITO DOPO <body> ===== -->
+  <!-- HOTFIX PIN -->
   <script>
     (function PIN_HOTFIX(){
       const KEY='relong-pin-ok';
@@ -139,30 +139,24 @@
         document.querySelectorAll('[aria-hidden]').forEach(n=> n.removeAttribute('aria-hidden'));
         if(gate){ hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
         window.__PIN_OK__ = true;
-        // Notifica gli altri script di avviare il boot solo ora
         try{ window.dispatchEvent(new CustomEvent('relong:pin:unlocked')); }catch{}
       }
 
       const bypass = /(?:\?|#).*pin=1990\b/.test(location.href);
       const already = (()=>{ try{ return sessionStorage.getItem(KEY)==='1'; }catch{ return false; }})();
-      if(already || bypass){ unlock(); }
-      else { lock(); }
+      if(already || bypass){ unlock(); } else { lock(); }
 
       function tryUnlock(){
         const val=(input && input.value || '').trim();
         if(val==='1990'){ unlock(); }
-        else{
-          if(err) err.textContent='PIN errato. Riprova.';
-          if(input){ input.value=''; input.focus(); }
-        }
+        else{ if(err) err.textContent='PIN errato. Riprova.'; if(input){ input.value=''; input.focus(); } }
       }
-
-      if(btn) btn.addEventListener('click', tryUnlock);
-      if(input) input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+      btn && btn.addEventListener('click', tryUnlock);
+      input && input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
     })();
   </script>
 
-  <!-- ===== HEADER ===== -->
+  <!-- Header -->
   <header class="title" aria-hidden="true">
     <div>
       <h1>ReLong • Scadenziario + Accettazione</h1>
@@ -170,7 +164,7 @@
     </div>
   </header>
 
-  <!-- ===== DATI CLIENTE ===== -->
+  <!-- Dati cliente -->
   <section class="card" style="max-width:1200px;margin:0 auto" aria-hidden="true">
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
@@ -187,7 +181,10 @@
         <div class="grid2">
           <div>
             <label>Data</label>
-            <input id="start" type="date" />
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="start" type="date" />
+              <button id="startTodayBtn" class="btn ghost" type="button">Oggi</button>
+            </div>
           </div>
           <div class="full">
             <label>Cosa vuoi inserire</label>
@@ -205,7 +202,7 @@
       </div>
     </section>
 
-    <!-- Accettazione -->
+    <!-- Accettazione (solo con riparazione) -->
     <aside class="card" id="acceptWrap">
       <h2>Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
@@ -248,7 +245,7 @@
     </div>
   </section>
 
-  <!-- Elenco -->
+  <!-- Elenco (nascosto finché non aperto) -->
   <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden aria-hidden="true">
     <div class="content">
       <div class="toolbar">
@@ -289,7 +286,7 @@
     </div>
   </template>
 
-  <!-- ===== APP SCRIPT ===== -->
+  <!-- APP -->
   <script>
     /* Error bar */
     (function(){ const bar=document.getElementById('errBar'); window.addEventListener('error',e=>{bar.textContent='Errore JavaScript: '+(e.message||'sconosciuto'); bar.style.display='block';}); })();
@@ -297,27 +294,30 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
+    // === COSTANTI STORAGE
     const storeKey = 'relong-scadenzario-v29';
     const backupPrefix = 'relong-backup-';
     const PACCHI_KEYS = ['relong-pacchi-v1','relong-pacchi-v2'];
     const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
+    const START_KEY = 'relong-start-date';
 
+    // === UTILS
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
-    const fmtDateTimeShort = (d) => { try { return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch { return fmtDate(d); } };
     const isoDay = (d)=> d.toISOString().slice(0,10);
     const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
     const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
+    function todayISO_IT(){ const now=new Date(); const y=now.getFullYear(); const m=String(now.getMonth()+1).padStart(2,'0'); const d=String(now.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
 
     const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivi:5 };
     const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
-    let items = load();
+    let items = [];
 
     function nextPraticaId(){
       const key='relong-pratica-seq';
@@ -329,10 +329,8 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
-    /* ===== Indici autocompilazione ===== */
     function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
-    let idxByPhone = new Map();
-    let idxByName  = new Map();
+    let idxByPhone = new Map(), idxByName  = new Map();
     function buildIndexes(){
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
@@ -345,72 +343,152 @@
         if(nm && (!b || ts > new Date(b.createdAt||b.start||0).getTime())) idxByName.set(nm, it);
       }
     }
-    buildIndexes();
 
-    // Inputs
-    const c_name = $('#c_name');
-    const c_phone = $('#c_phone');
+    // ====== APP BOOT ======
+    function initApp(){
+      // Carica dati
+      items = load(); buildIndexes();
 
-    const acceptWrap = $('#acceptWrap');
-    const aForm = $('#acceptForm');
-    const a_type = $('#a_type');
-    const a_brand = $('#a_brand');
-    const a_model = $('#a_model');
-    const a_issue = $('#a_issue');
+      // Riferimenti
+      const c_name = $('#c_name');
+      const c_phone = $('#c_phone');
+      const acceptWrap = $('#acceptWrap');
+      const aForm = $('#acceptForm');
+      const a_type = $('#a_type');
+      const a_brand = $('#a_brand');
+      const a_model = $('#a_model');
+      const a_issue = $('#a_issue');
+      const toggles = $('#toggles');
+      const insertBtn = $('#insertBtn');
+      const startI = $('#start');
 
-    const toggles = $('#toggles');
-    const activeSet = new Set();
+      // Stato pulsanti attivi
+      const activeSet = new Set();
 
-    function updateAcceptanceUI(){
-      const isRepair = activeSet.has('riparazione');
-      acceptWrap.classList.toggle('show', isRepair);
-      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
-      if(!isRepair){ aForm.reset(); }
-    }
+      // === Data persistente
+      (function initStartDate(){
+        if(!startI) return;
+        let saved = null;
+        try { saved = localStorage.getItem(START_KEY) || null; } catch {}
+        const initial = saved || todayISO_IT();
+        startI.value = initial;
+        startI.addEventListener('change', ()=>{ try { localStorage.setItem(START_KEY, startI.value || todayISO_IT()); } catch {} });
+        // Pulsante "Oggi"
+        $('#startTodayBtn')?.addEventListener('click', ()=>{
+          const iso = todayISO_IT(); startI.value = iso;
+          try { localStorage.setItem(START_KEY, iso); } catch {}
+        });
+        if(!saved){ try { localStorage.setItem(START_KEY, initial); } catch {} }
+      })();
 
-    toggles.addEventListener('click', (e)=>{
-      const b = e.target.closest('.tbtn'); if(!b) return;
-      const key=b.dataset.key;
-      b.classList.toggle('active');
-      if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
-      updateAcceptanceUI();
-    });
-
-    // Inserisci
-    const insertBtn = $('#insertBtn');
-    const startI = $('#start');
-
-    // Data = oggi
-    try{
-      const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-      if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
-      else if(startI){ startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-    }catch{}
-
-    /* ===== AUTO-COMPILAZIONE ===== */
-    function autofillFromPhone(){
-      const ph = normalizePhone(c_phone.value||'');
-      if(!ph) return;
-      const hit = idxByPhone.get(ph);
-      if(hit && (!c_name.value || c_name.value.trim().length===0)){
-        c_name.value = hit.name || '';
+      // === UI Accettazione
+      function updateAcceptanceUI(){
+        const isRepair = activeSet.has('riparazione');
+        acceptWrap.classList.toggle('show', isRepair);
+        $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
+        if(!isRepair){ aForm.reset(); }
       }
-    }
-    function autofillFromName(){
-      const nm  = normalizeName(c_name.value||'');
-      if(!nm) return;
-      if(nm.split(' ').length < 2) return;
-      const hit = idxByName.get(nm);
-      if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){
-        c_phone.value = hit.phone || '';
-      }
-    }
-    c_phone.addEventListener('blur', autofillFromPhone);
-    c_phone.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
-    c_name.addEventListener('blur', autofillFromName);
-    c_name.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
 
-    /* ====== Doppioni: modal ====== */
+      // === Toggle listeners (SIM, Fisso, ecc.)
+      toggles?.addEventListener('click', (e)=>{
+        const b = e.target.closest('.tbtn'); if(!b) return;
+        const key=b.dataset.key;
+        b.classList.toggle('active');
+        if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
+        updateAcceptanceUI();
+      });
+
+      // === Auto-compilazione
+      function autofillFromPhone(){
+        const ph = normalizePhone(c_phone.value||''); if(!ph) return;
+        const hit = idxByPhone.get(ph);
+        if(hit && (!c_name.value || c_name.value.trim().length===0)){ c_name.value = hit.name || ''; }
+      }
+      function autofillFromName(){
+        const nm  = normalizeName(c_name.value||''); if(!nm) return;
+        if(nm.split(' ').length < 2) return;
+        const hit = idxByName.get(nm);
+        if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){ c_phone.value = hit.phone || ''; }
+      }
+      c_phone?.addEventListener('blur', autofillFromPhone);
+      c_phone?.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
+      c_name?.addEventListener('blur', autofillFromName);
+      c_name?.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
+
+      // === Inserimento
+      insertBtn?.addEventListener('click', async ()=>{
+        try{
+          const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
+          if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
+        }catch{}
+
+        const name = (c_name.value||'').trim();
+        let phone = normalizePhone(c_phone.value||'');
+        if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
+
+        const startStr = startI?.value || localStorage.getItem(START_KEY) || todayISO_IT();
+        const start = new Date(startStr + 'T00:00:00');
+        const activated = new Set(activeSet);
+
+        let pending;
+        const baseObj = {
+          name, phone,
+          start: start.toISOString(),
+          createdAt: new Date().toISOString(),
+          activated:[...activated],
+          done:false, optWeekend:true, optEvening:true,
+          muteDate:null, activeChatUntil:null, doneAt:null,
+          acceptance:false, praticaId:null, source:null,
+        };
+
+        if(activated.has('riparazione')){
+          const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
+          if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
+          const all = ['energia','fisso','sim','smartphone'];
+          const tasks = all.map(type=>{ let due=addDays(new Date(), ACCEPT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+          pending = {
+            ...baseObj,
+            id: Date.now()+Math.random().toString(16).slice(2),
+            activated:['riparazione'],
+            tasks,
+            acceptance:true,
+            praticaId: nextPraticaId(),
+            device, repairStatus:'diagnostica',
+            quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
+          };
+        } else {
+          const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
+          const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+          if(activated.has('preventivi')){
+            let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
+            tasks.push({ type:'preventivi', due:due.toISOString() });
+          }
+          pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
+        }
+
+        const matches = items.filter(x=> normalizePhone(x.phone) === phone);
+        if(matches.length){ openDupModal(matches, pending); }
+        else { items.unshift(pending); save(items); buildIndexes(); render(); aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI(); }
+      });
+
+      // === Apri/chiudi elenco
+      const listSection = $('#listSection');
+      const toggleListBtn = $('#toggleListBtn');
+      toggleListBtn?.addEventListener('click', ()=> setListOpen(listSection.hidden));
+      setListOpen(false);
+
+      // === Pacchi ingest + dedup
+      $('#syncPacchiBtn')?.addEventListener('click', ()=> ingestPacchi({silent:false}));
+      ingestPacchi({silent:true});
+      window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
+      setInterval(()=> ingestPacchi({silent:true}), 15000);
+
+      // === Filtri & ricerca
+      $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
+      $('#q')?.addEventListener('input', render);
+    }
+
+    // ===== Doppioni: modal & merge (come prima)
     const dupGate = $('#dupGate');
     const dupList = $('#dupList');
     const dupOpen = $('#dupOpen');
@@ -425,15 +503,16 @@
         primary: existingItems.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))[0],
         pendingNew
       };
+      if(!dupList) return;
       dupList.innerHTML = existingItems.map(it=>(
         `<div style="padding:8px;border-bottom:1px solid var(--stroke)">
           <b>${it.name||'-'}</b> • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}
           <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.source==='pacchi'?' • Da pacchi':''}</div>
         </div>`
       )).join('') || '<div>Nessun dettaglio</div>';
-      dupGate.style.display='grid';
+      $('#dupGate').style.display='grid';
     }
-    function closeDupModal(){ dupGate.style.display='none'; dupContext=null; }
+    function closeDupModal(){ $('#dupGate').style.display='none'; dupContext=null; }
 
     function mergeItems(existing, pending){
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]); existing.activated = [...actSet];
@@ -448,7 +527,7 @@
           if(d2 < d1) byType[t.type]=t;
         }
       });
-      existing.tasks = Object.values(byType];
+      existing.tasks = Object.values(byType);
 
       if(pending.acceptance){
         existing.acceptance = true;
@@ -464,17 +543,8 @@
       return existing;
     }
 
-    function setListOpen(open){
-      const listSection = $('#listSection');
-      const toggleListBtn = $('#toggleListBtn');
-      listSection.hidden = !open;
-      listSection.setAttribute('aria-hidden', open?'false':'true');
-      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
-      if(open) render();
-    }
-
-    dupOpen.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
-    dupMerge.addEventListener('click', ()=>{
+    dupOpen?.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
+    dupMerge?.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { primary, pendingNew } = dupContext;
       const idx = items.findIndex(x=>x.id===primary.id);
@@ -484,83 +554,14 @@
         closeDupModal(); setListOpen(true);
       }
     });
-    dupInsertAnyway.addEventListener('click', ()=>{
+    dupInsertAnyway?.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { pendingNew } = dupContext;
       items.unshift(pendingNew); save(items); buildIndexes(); render(); closeDupModal();
     });
-    dupCancel.addEventListener('click', closeDupModal);
+    dupCancel?.addEventListener('click', closeDupModal);
 
-    insertBtn.addEventListener('click', async ()=>{
-      try{
-        const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-        if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
-      }catch{}
-
-      const name = c_name.value.trim();
-      let phone = normalizePhone(c_phone.value||'');
-      if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
-
-      const start = startI.value ? new Date(startI.value) : new Date();
-      const activated = new Set(activeSet);
-
-      let pending;
-      const baseObj = {
-        name, phone,
-        start: start.toISOString(),
-        createdAt: new Date().toISOString(),
-        activated:[...activated],
-        done:false, optWeekend:true, optEvening:true,
-        muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, source:null,
-      };
-
-      if(activated.has('riparazione')){
-        const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
-        if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
-        const all = ['energia','fisso','sim','smartphone'];
-        const tasks = all.map(type=>{ let due=addDays(new Date(), ACCEPT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        pending = {
-          ...baseObj,
-          id: Date.now()+Math.random().toString(16).slice(2),
-          activated:['riparazione'],
-          tasks,
-          acceptance:true,
-          praticaId: nextPraticaId(),
-          device, repairStatus:'diagnostica',
-          quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
-        };
-      } else {
-        const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
-        const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        if(activated.has('preventivi')){
-          let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
-          tasks.push({ type:'preventivi', due:due.toISOString() });
-        }
-        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
-      }
-
-      const matches = items.filter(x=> normalizePhone(x.phone) === phone);
-      if(matches.length){ openDupModal(matches, pending); }
-      else { items.unshift(pending); save(items); buildIndexes(); render(); aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI(); }
-    });
-
-    // Filtro & ricerca
-    let filter='all';
-    const qI=$('#q');
-    $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
-    qI?.addEventListener('input', render);
-
-    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
-
-    function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
-    function statusChip(status){
-      const mapCls={diagnostica:'st-diagnostica','attesa-ricambi':'st-attesa-ricambi',lavorazione:'st-lavorazione',pronto:'st-pronto',consegnato:'st-consegnato'};
-      const label={diagnostica:'Diagnostica','attesa-ricambi':'Ricambi',lavorazione:'Lavorazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
-      const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
-    }
-
-    /* ===== WhatsApp helper (preventivo / stati) ===== */
+    // ===== WhatsApp helper (stati e preventivi)
     function waForRepairState(it){
       const name=it.name;
       const base=`Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
@@ -612,10 +613,16 @@ Grazie!`;
       }
     }
 
-    /* ===== PACCHI ingest con dedup ===== */
+    function waIcon(){
+      return `<span class="wa-ico" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
+      </span>`;
+    }
+
+    // ===== PACCHI ingest + dedup
     function readPacchiRaw(){
       let all=[];
-      for(const k of ['relong-pacchi-v1','relong-pacchi-v2']){
+      for(const k of PACCHI_KEYS){
         try{
           const raw=localStorage.getItem(k);
           if(!raw) continue;
@@ -626,8 +633,8 @@ Grazie!`;
       }
       return all;
     }
-    function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem('relong-pacchi-ingested')||'[]')); }catch{ return new Set(); } }
-    function savePacchiIngested(set){ try{ localStorage.setItem('relong-pacchi-ingested', JSON.stringify([...set])); }catch{} }
+    function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem(PACCHI_INGESTED_KEY)||'[]')); }catch{ return new Set(); } }
+    function savePacchiIngested(set){ try{ localStorage.setItem(PACCHI_INGESTED_KEY, JSON.stringify([...set])); }catch{} }
     function convertPacchiRecordToItem(rec){
       const name=(rec.name||rec.nome||'Cliente Pacchi').toString().trim();
       const phone=normalizePhone(rec.phone||rec.telefono||'');
@@ -655,9 +662,27 @@ Grazie!`;
       return added;
     }
 
-    // RENDER
-    const listSection = $('#listSection');
+    // ===== LISTA / RENDER
+    let filter='all';
+    function setListOpen(open){
+      const listSection = $('#listSection');
+      const toggleListBtn = $('#toggleListBtn');
+      listSection.hidden = !open;
+      listSection.setAttribute('aria-hidden', open?'false':'true');
+      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
+      if(open) render();
+    }
+
+    function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
+    function statusChip(status){
+      const mapCls={diagnostica:'st-diagnostica','attesa-ricambi':'st-attesa-ricambi',lavorazione:'st-lavorazione',pronto:'st-pronto',consegnato:'st-consegnato'};
+      const label={diagnostica:'Diagnostica','attesa-ricambi':'Ricambi',lavorazione:'Lavorazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
+      const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
+    }
+    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
+
     function render(){
+      const listSection = $('#listSection');
       if(listSection.hidden) return;
       const listStd = $('#listStandard'); listStd.innerHTML='';
       const listPac = $('#listPacchi'); listPac.innerHTML='';
@@ -696,26 +721,6 @@ Grazie!`;
       pac.forEach(it=> listPac.appendChild(renderItem(it, counts)));
     }
 
-    function waIcon(){
-      return `<span class="wa-ico" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
-      </span>`;
-    }
-
-    function waFor(it,type){
-      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
-        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
-        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
-      };
-      const txt = encodeURIComponent(map[type]);
-      return { href:`https://wa.me/39${it.phone}?text=${txt}` };
-    }
-
     function renderItem(it, counts){
       const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
       t.querySelector('.h').textContent = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
@@ -723,8 +728,13 @@ Grazie!`;
       const tags = t.querySelector('.tags'); tags.innerHTML='';
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
-      if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
-
+      if(it.acceptance){
+        tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione'));
+        tags.append(statusChip(it.repairStatus||'diagnostica'));
+        if(it.quotePrice) tags.append(tag(`Prev: ${it.quotePrice}`, 'quote'));
+        if(it.quoteStatus==='accepted') tags.append(tag('Preventivo OK','quote-ok'));
+        if(it.quoteStatus==='rejected') tags.append(tag('Preventivo KO','quote-ko'));
+      }
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
@@ -738,7 +748,7 @@ Grazie!`;
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
         div.append(top);
 
-        // PREVENTIVO
+        // PREVENTIVO (prezzo + invio)
         const quoteRow=document.createElement('div'); quoteRow.className='row-slim';
         const left=document.createElement('div');
         left.innerHTML=`<small style="color:var(--muted)">Invia preventivo (prezzo)</small>`;
@@ -878,7 +888,7 @@ Grazie!`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // Notifiche + backup giornaliero
+    // Notifiche + backup giornaliero (come prima)
     (function smartPush(){
       function maybeNotify(text){
         const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
@@ -907,23 +917,50 @@ Grazie!`;
       scheduleBackup();
     })();
 
-    // ===== BOOT ritardato finché non sblocchi il PIN =====
-    function BOOT(){
-      // Sync pacchi
-      document.getElementById('syncPacchiBtn')?.addEventListener('click', ()=> ingestPacchi({silent:false}));
-      ingestPacchi({silent:true});
-      window.addEventListener('storage', (ev)=>{ if(['relong-pacchi-v1','relong-pacchi-v2'].includes(ev.key)) ingestPacchi({silent:false}); });
-      setInterval(()=> ingestPacchi({silent:true}), 15000);
-
-      // Apri/chiudi elenco
-      const listSection = document.getElementById('listSection');
-      const toggleListBtn = document.getElementById('toggleListBtn');
-      toggleListBtn?.addEventListener('click', ()=> setListOpen(listSection.hidden));
-      setListOpen(false);
+    // ===== Helper elenco =====
+    function waFor(it,type){
+      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
+      const map = {
+        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
+        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
+        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
+      };
+      const txt = encodeURIComponent(map[type]);
+      return { href:`https://wa.me/39${it.phone}?text=${txt}` };
     }
 
+    // ===== Stato lista
+    function setListOpen(open){
+      const listSection = $('#listSection');
+      const toggleListBtn = $('#toggleListBtn');
+      listSection.hidden = !open;
+      listSection.setAttribute('aria-hidden', open?'false':'true');
+      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
+      if(open) render();
+    }
+
+    // ===== BOOT: parte solo dopo PIN
+    function BOOT(){ initApp(); }
     if(window.__PIN_OK__) BOOT();
     else window.addEventListener('relong:pin:unlocked', BOOT);
   </script>
+
+  <!-- Modale Doppioni -->
+  <div id="dupGate" role="dialog" aria-modal="true" aria-labelledby="dupTitle">
+    <div id="dupCard">
+      <h3 id="dupTitle">Numero già presente</h3>
+      <p id="dupMsg">Abbiamo trovato contatti con lo stesso numero. Scegli cosa fare:</p>
+      <div id="dupList"></div>
+      <div id="dupActions">
+        <button id="dupOpen" class="btn ghost">Apri scheda esistente</button>
+        <button id="dupMerge" class="btn ok">Unisci</button>
+        <button id="dupInsertAnyway" class="btn primary">Inserisci comunque</button>
+        <button id="dupCancel" class="btn ghost">Annulla</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
