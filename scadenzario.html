@@ -15,6 +15,12 @@
       --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
       --ok:#25D366; --danger:#ff4d4f;
       --shadow:0 10px 40px rgba(0,140,255,.18), inset 0 1px 0 rgba(255,255,255,.04);
+      /* Stato colors */
+      --st-diagnostica:#ffd666;
+      --st-ricambi:#ffa940;
+      --st-lavorazione:#69c0ff;
+      --st-pronto:#95de64;
+      --st-consegnato:#bfbfbf;
     }
     body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
       background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
@@ -74,14 +80,25 @@
     .muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
 
+    /* Stato chip */
+    .st-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#0a0a0a}
+    .st-diagnostica{background:var(--st-diagnostica)}
+    .st-attesa-ricambi{background:var(--st-ricambi)}
+    .st-lavorazione{background:var(--st-lavorazione)}
+    .st-pronto{background:var(--st-pronto)}
+    .st-consegnato{background:var(--st-consegnato)}
+
     /* Riepilogo reminders */
     .summary{display:grid;gap:8px}
-    .accept-brief{background:#091019;border:1px solid rgba(0,140,255,.2);border-radius:10px;padding:8px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .accept-brief{background:#091019;border:1px solid rgba(0,140,255,.2);border-radius:10px;padding:8px;display:grid;gap:8px}
+    .row-slim{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
     .accept-brief small{color:var(--muted)}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
-    .r-wa{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none}
-    .r-wa.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
+    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+    .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .wa-ico{width:14px;height:14px;display:inline-block}
+    .wa-ico svg{width:14px;height:14px;display:block}
 
     /* Visibilità accettazione: nascosta di default */
     #acceptWrap{display:none}
@@ -250,12 +267,14 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v16';
+    const storeKey = 'relong-scadenzario-v20';
+    const backupPrefix = 'relong-backup-'; // + YYYY-MM-DD
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato, azzero lo scadenzario:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT', {year:'numeric', month:'2-digit', day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT', {month:'2-digit', day:'2-digit'});
+    const isoDay = (d)=> d.toISOString().slice(0,10);
     const fmtDateTimeParam = (d) => {
       const pad = (n)=>String(n).padStart(2,'0');
       const z = new Date(d.getTime());
@@ -444,8 +463,46 @@ ${site}`;
     $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter = p.dataset.filter; render(); }));
     qI?.addEventListener('input', render);
 
+    function iconName(type){ return ({energia:'Energia', fisso:'Internet Casa', sim:'SIM', smartphone:'Smartphone a rate', riparazione:'Riparazione'})[type] || type; }
+
+    function waIcon(){
+      return `<span class="wa-ico" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
+      </span>`;
+    }
+
+    function waFor(it, type){
+      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
+      const map = {
+        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
+        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
+        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+      };
+      const txt = encodeURIComponent(map[type]);
+      return { href:`https://wa.me/39${it.phone}?text=${txt}` };
+    }
+
+    // WhatsApp per stato riparazione (Smart Follow-Up)
+    function waForRepairState(it){
+      const name = it.name;
+      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
+      const suffix = `\nID pratica: ${it.praticaId || '-'}\nSe hai bisogno scrivimi qui.`;
+      const map = {
+        diagnostica: `${base}\nIl tuo dispositivo è in diagnostica. Ti aggiorno appena definisco il preventivo.${suffix}`,
+        'attesa-ricambi': `${base}\nSiamo in attesa dei ricambi. Ti aggiorno non appena arrivano e procediamo alla riparazione.${suffix}`,
+        lavorazione: `${base}\nIl tuo dispositivo è in lavorazione in questo momento. Ti avviso appena è pronto.${suffix}`,
+        pronto: `${base}\nIl tuo dispositivo è PRONTO per il ritiro. Puoi passare quando vuoi. Grazie!\nRe Long Informatica – 08119578844${suffix}`,
+        consegnato: `${base}\nGrazie per esserti affidato a noi! Se ti va lasciaci una recensione ⭐⭐⭐⭐⭐ su Google: cerca “Re Long Informatica Marano”.${suffix}`
+      };
+      const txt = encodeURIComponent(map[it.repairStatus || 'diagnostica']);
+      return `https://wa.me/39${it.phone}?text=${txt}`;
+    }
+
+    // Rendering
     function render(){
-      if(listSection.hidden) return; // non renderizzare se elenco chiuso
+      if(listSection.hidden) return;
       const list = $('#list'); list.innerHTML='';
       const now = today(); const tStr = fmtDate(now);
       const q = (qI?.value||'').trim().toLowerCase();
@@ -463,21 +520,47 @@ ${site}`;
           (it.phone||'').toLowerCase().includes(q) ||
           (it.praticaId||'').toLowerCase().includes(q) ||
           (it.device?.brand||'').toLowerCase().includes(q) ||
-          (it.device?.model||'').toLowerCase().includes(q)
+          (it.device?.model||'').toLowerCase().includes(q) ||
+          (it.repairStatus||'').toLowerCase().includes(q)
         );
       });
 
       data.forEach(it=>list.appendChild(renderItem(it)));
     }
 
-    function iconName(type){ return ({energia:'Energia', fisso:'Internet Casa', sim:'SIM', smartphone:'Smartphone a rate', riparazione:'Riparazione'})[type] || type; }
+    function tag(txt, extraClass=''){ const s=document.createElement('span'); s.className='tag'; if(extraClass) s.classList.add(extraClass); s.textContent=txt; return s }
+
+    function statusChip(status){
+      const mapCls = {
+        diagnostica:'st-diagnostica',
+        'attesa-ricambi':'st-attesa-ricambi',
+        lavorazione:'st-lavorazione',
+        pronto:'st-pronto',
+        consegnato:'st-consegnato'
+      };
+      const label = {
+        diagnostica:'Diagnostica',
+        'attesa-ricambi':'Ricambi',
+        lavorazione:'Lavorazione',
+        pronto:'Pronto',
+        consegnato:'Consegnato'
+      }[status] || status;
+      const span = document.createElement('span');
+      span.className = `st-chip ${mapCls[status]||''}`;
+      span.textContent = label;
+      return span;
+    }
 
     function renderItem(it){
       const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
       t.querySelector('.h').textContent = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
 
       const tags = t.querySelector('.tags'); tags.innerHTML='';
-      if(it.acceptance) tags.append(tag('Accettazione'));
+      if(it.acceptance){
+        tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'Accettazione'));
+        // Stato chip colorato
+        tags.append(statusChip(it.repairStatus || 'diagnostica'));
+      }
       it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
@@ -485,23 +568,43 @@ ${site}`;
 
       const sum = t.querySelector('.summary'); sum.innerHTML='';
 
-      // Riquadro compatto accettazione (se presente)
+      // Riquadro accettazione + select stato + WA stato
       if(it.acceptance){
-        const div = document.createElement('div');
-        div.className = 'accept-brief';
-        div.innerHTML = `
-          <div>
-            <b>${it.device?.type || ''}</b> • ${it.device?.brand || ''} ${it.device?.model || ''}<br>
-            <small>Difetto: ${it.device?.issue || '-'}</small>
-          </div>
-          <div>
-            <button class="r-wa" type="button" data-waacc="${it.id}">WA accettazione</button>
-          </div>
-        `;
+        const div = document.createElement('div'); div.className='accept-brief';
+        const top = document.createElement('div'); top.className='row-slim';
+        top.innerHTML = `<div><b>${it.device?.type || ''}</b> • ${it.device?.brand || ''} ${it.device?.model || ''}<br><small>Difetto: ${it.device?.issue || '-'}</small></div>`;
+        const controls = document.createElement('div'); controls.className='r-line';
+        // Select stato compatta
+        const sel = document.createElement('select');
+        sel.innerHTML = `
+          <option value="diagnostica">Diagnostica</option>
+          <option value="attesa-ricambi">Attesa ricambi</option>
+          <option value="lavorazione">Lavorazione</option>
+          <option value="pronto">Pronto al ritiro</option>
+          <option value="consegnato">Consegnato</option>`;
+        sel.value = it.repairStatus || 'diagnostica';
+        sel.addEventListener('change', ()=>{
+          const prev = it.repairStatus;
+          it.repairStatus = sel.value; save(items); render();
+          // Push + WA quando diventa PRONTO
+          if(prev !== 'pronto' && sel.value === 'pronto'){
+            maybeNotify(`"${it.name}" è PRONTO al ritiro`);
+            const href = waForRepairState(it);
+            try{ window.open(href, '_blank'); }catch{}
+          }
+        });
+        // WA stato
+        const waBtn = document.createElement('a');
+        waBtn.href = waForRepairState(it);
+        waBtn.target = '_blank'; waBtn.rel='noopener';
+        waBtn.className='wa-btn ok'; waBtn.innerHTML = `${waIcon()}WA stato`;
+        controls.append(sel, waBtn);
+        top.append(controls);
+        div.append(top);
         sum.append(div);
       }
 
-      // Riepilogo 3 remind (più vicini)
+      // Riepilogo 3 remind (più vicini) con icona WA
       const next3 = [...(it.tasks||[])]
         .sort((a,b)=> new Date(a.due)-new Date(b.due))
         .filter(tsk=>!it.done)
@@ -521,7 +624,7 @@ ${site}`;
           if(wa){
             const a=document.createElement('a');
             a.href=wa.href; a.target='_blank'; a.rel='noopener';
-            a.className='r-wa ok'; a.textContent='WhatsApp';
+            a.className='wa-btn ok'; a.innerHTML=`${waIcon()}WhatsApp`;
             a.dataset.wa='1'; a.dataset.id=it.id;
             line.append(a);
           }
@@ -531,57 +634,23 @@ ${site}`;
 
       // Azioni rapide compatte
       const actions = document.createElement('div'); actions.className='r-line';
-      const snooze = document.createElement('button'); snooze.className='r-wa'; snooze.textContent='Snooze +1g';
+      const snooze = document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
       snooze.addEventListener('click',()=>{
         const all = (it.tasks||[]).map(tsk=>{
           let nd = addDays(new Date(tsk.due), 1); nd = avoidWeekend(nd); tsk.due = nd.toISOString(); return tsk;
         });
         it.tasks = all; save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️');
       });
-      const done = document.createElement('button'); done.className='r-wa'; done.textContent='Completato';
+      const done = document.createElement('button'); done.className='wa-btn'; done.textContent='Completato';
       done.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
 
-      const del = document.createElement('button'); del.className='r-wa'; del.textContent='Elimina';
+      const del = document.createElement('button'); del.className='wa-btn'; del.textContent='Elimina';
       del.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); });
 
       actions.append(snooze, done, del);
       sum.append(actions);
 
-      // Click su WA accettazione + copia ID
-      t.addEventListener('click',(ev)=>{
-        const b1 = ev.target.closest('button[data-waacc]');
-        if(b1){
-          const itx = items.find(x=>x.id===b1.getAttribute('data-waacc')); if(!itx) return;
-          const site = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-          const msg = `Ciao, ${itx.name}, abbiamo accettato il tuo prodotto in assistenza.
-Marchio: ${itx.device?.brand || '-'}
-Modello: ${itx.device?.model || '-'}
-Difetto dichiarato: ${itx.device?.issue || '-'}
-
-Ti aggiorneremo noi per il ritiro. Grazie!
-Nel frattempo puoi visionare qui i nostri servizi:
-${site}`;
-          const wa = `https://wa.me/39${itx.phone}?text=${encodeURIComponent(msg)}`;
-          try{ window.open(wa, '_blank'); }catch{}
-        }
-      });
-
       return t;
-    }
-
-    function tag(txt, extraClass=''){ const s=document.createElement('span'); s.className='tag'; if(extraClass) s.classList.add(extraClass); s.textContent=txt; return s }
-
-    function waFor(it, type){
-      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
-        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
-        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-      };
-      const txt = encodeURIComponent(map[type]);
-      return { href:`https://wa.me/39${it.phone}?text=${txt}`, text:`WhatsApp ${iconName(type)}` };
     }
 
     // Click su WhatsApp per marcare in chat
@@ -628,6 +697,54 @@ ${site}`;
 
       ok.addEventListener('click', tryUnlock);
       input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
+    })();
+
+    // --- Push intelligenti 10:00 & 18:00 ---
+    (function smartPush(){
+      const httpsOk = (typeof isSecureContext !== 'undefined' ? isSecureContext : (location.protocol === 'https:' || location.hostname === 'localhost'));
+      if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
+
+      function scheduleAt(hour){
+        const now = new Date();
+        const when = new Date(); when.setHours(hour,0,0,0);
+        if(when <= now) when.setDate(when.getDate()+1);
+        setTimeout(()=>{ fire(hour); scheduleAt(hour); }, when - now);
+      }
+
+      function fire(hour){
+        const tStr = fmtDate(new Date());
+        const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
+        if(hour===10){
+          if(dueToday) maybeNotify(`Alle 10: hai ${dueToday} follow-up da fare oggi`);
+        }else if(hour===18){
+          const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr)).length;
+          if(pending) maybeNotify(`Ore 18: ${pending} clienti ancora da contattare`);
+        }
+      }
+
+      // programma entrambe
+      scheduleAt(10);
+      scheduleAt(18);
+    })();
+
+    // --- Backup automatico giornaliero alle 23:59 ---
+    (function autoBackup(){
+      function schedule(){
+        const now = new Date();
+        const when = new Date(); when.setHours(23,59,0,0);
+        if(when <= now) when.setDate(when.getDate()+1);
+        setTimeout(()=>{ doBackup(); schedule(); }, when - now);
+      }
+      function doBackup(){
+        try{
+          const key = backupPrefix + isoDay(new Date());
+          localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items }));
+          maybeNotify('Backup giornaliero salvato ✔️');
+        }catch(e){
+          console.warn('Backup failed', e);
+        }
+      }
+      schedule();
     })();
 
     // Boot: elenco chiuso di default
