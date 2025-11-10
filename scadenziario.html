@@ -46,7 +46,6 @@
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ghost{background:transparent;border:1px solid var(--stroke);color:#eef3ff}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
-    .btn.danger{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#230a0a}
 
     .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
     .filters{display:flex;gap:8px;flex-wrap:wrap}
@@ -64,6 +63,7 @@
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
     .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
     .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
+    /* Nuovi badge preventivo */
     .quote{background:linear-gradient(135deg,#b388ff,#7aa3ff)!important;color:#0a0a0a}
     .quote-ok{background:linear-gradient(135deg,#5be37a,#26d07c)!important;color:#082012}
     .quote-ko{background:linear-gradient(135deg,#ff7a7a,#ff4d4f)!important;color:#250909}
@@ -78,12 +78,21 @@
     .summary{display:grid;gap:8px}
     .accept-brief{background:#091019;border:1px solid rgba(0,140,255,.2);border-radius:10px;padding:8px;display:grid;gap:8px}
     .row-slim{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+    .accept-brief small{color:var(--muted)}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
     .wa-btn.danger{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#230a0a;border-color:transparent}
     .wa-btn[disabled]{opacity:.55;pointer-events:none;filter:saturate(.35)}
+
+    #acceptWrap{display:none}
+    #acceptWrap.show{display:block}
+    #listSection[hidden]{display:none}
+    .openListCard{max-width:1200px;margin:0 auto}
+
+    .subsection{margin:6px 0 12px}
+    .subsection h3{font-size:15px;opacity:.9;margin-bottom:8px}
 
     #pinGate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95));backdrop-filter:blur(6px);display:grid;place-items:center;z-index:9999}
     #pinCard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px}
@@ -104,57 +113,34 @@
   </style>
 </head>
 <body>
-  <!-- PIN -->
+  <!-- PIN (FIX integrato) -->
   <div id="pinGate" hidden>
-    <div id="pinCard">
-      <h3>Accesso protetto</h3>
-      <p>Inserisci il PIN.</p>
-      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
+    <div id="pinCard" style="background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px">
+      <h3 style="margin:0;font-size:18px">Accesso protetto</h3>
+      <p style="color:var(--muted);font-size:13px;margin:0">Inserisci il PIN.</p>
+      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••"
+             style="letter-spacing:6px;text-align:center;font-weight:800;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0a0d14;color:#eef3ff"/>
       <div class="actions"><button id="pinOk" class="btn primary" style="flex:1">Sblocca</button></div>
-      <div id="pinError"></div>
-      <p style="font-size:11px">Nota: blocco base lato client (per blocco serio serve lato server).</p>
+      <div id="pinError" style="color:#ff7676;min-height:18px;font-size:12px"></div>
+      <p style="font-size:11px;margin:0">Nota: blocco base lato client (per blocco serio serve lato server).</p>
     </div>
   </div>
   <div id="errBar"></div>
 
-  <!-- HOTFIX PIN -->
-  <script>
-    (function PIN_HOTFIX(){
-      const KEY='relong-pin-ok';
-      const gate=document.getElementById('pinGate');
-      const input=document.getElementById('pinInput');
-      const btn=document.getElementById('pinOk');
-      const err=document.getElementById('pinError');
-
-      function show(el){ el && el.removeAttribute('hidden'); }
-      function hide(el){ el && el.setAttribute('hidden',''); }
-
-      function lock(){
-        show(gate);
-        document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden','true'));
-        setTimeout(()=> input && input.focus(), 30);
-      }
-      function unlock(){
-        try{ sessionStorage.setItem(KEY,'1'); }catch{}
-        document.querySelectorAll('[aria-hidden]').forEach(n=> n.removeAttribute('aria-hidden'));
-        if(gate){ hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
-        window.__PIN_OK__ = true;
-        try{ window.dispatchEvent(new CustomEvent('relong:pin:unlocked')); }catch{}
-      }
-
-      const bypass = /(?:\?|#).*pin=1990\b/.test(location.href);
-      const already = (()=>{ try{ return sessionStorage.getItem(KEY)==='1'; }catch{ return false; }})();
-      if(already || bypass){ unlock(); } else { lock(); }
-
-      function tryUnlock(){
-        const val=(input && input.value || '').trim();
-        if(val==='1990'){ unlock(); }
-        else{ if(err) err.textContent='PIN errato. Riprova.'; if(input){ input.value=''; input.focus(); } }
-      }
-      btn && btn.addEventListener('click', tryUnlock);
-      input && input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
-    })();
-  </script>
+  <!-- Modal Doppioni -->
+  <div id="dupGate" role="dialog" aria-modal="true" aria-labelledby="dupTitle">
+    <div id="dupCard">
+      <h3 id="dupTitle">Numero già presente</h3>
+      <p id="dupMsg">Abbiamo trovato contatti con lo stesso numero. Scegli cosa fare:</p>
+      <div id="dupList"></div>
+      <div id="dupActions">
+        <button id="dupOpen" class="btn ghost">Apri scheda esistente</button>
+        <button id="dupMerge" class="btn ok">Unisci</button>
+        <button id="dupInsertAnyway" class="btn primary">Inserisci comunque</button>
+        <button id="dupCancel" class="btn ghost">Annulla</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="title" aria-hidden="true">
@@ -181,10 +167,7 @@
         <div class="grid2">
           <div>
             <label>Data</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="start" type="date" />
-              <button id="startTodayBtn" class="btn ghost" type="button">Oggi</button>
-            </div>
+            <input id="start" type="date" />
           </div>
           <div class="full">
             <label>Cosa vuoi inserire</label>
@@ -286,7 +269,6 @@
     </div>
   </template>
 
-  <!-- APP -->
   <script>
     /* Error bar */
     (function(){ const bar=document.getElementById('errBar'); window.addEventListener('error',e=>{bar.textContent='Errore JavaScript: '+(e.message||'sconosciuto'); bar.style.display='block';}); })();
@@ -294,30 +276,27 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    // === COSTANTI STORAGE
     const storeKey = 'relong-scadenzario-v29';
     const backupPrefix = 'relong-backup-';
     const PACCHI_KEYS = ['relong-pacchi-v1','relong-pacchi-v2'];
     const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
-    const START_KEY = 'relong-start-date';
 
-    // === UTILS
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
+    const fmtDateTimeShort = (d) => { try { return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch { return fmtDate(d); } };
     const isoDay = (d)=> d.toISOString().slice(0,10);
     const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
     const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
-    function todayISO_IT(){ const now=new Date(); const y=now.getFullYear(); const m=String(now.getMonth()+1).padStart(2,'0'); const d=String(now.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
 
     const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivi:5 };
     const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
-    let items = [];
+    let items = load();
 
     function nextPraticaId(){
       const key='relong-pratica-seq';
@@ -329,8 +308,10 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
+    /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
     function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
-    let idxByPhone = new Map(), idxByName  = new Map();
+    let idxByPhone = new Map();  // phone -> latest item
+    let idxByName  = new Map();  // normalized "nome cognome" -> latest item
     function buildIndexes(){
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
@@ -343,159 +324,80 @@
         if(nm && (!b || ts > new Date(b.createdAt||b.start||0).getTime())) idxByName.set(nm, it);
       }
     }
+    buildIndexes();
 
-    // ====== APP BOOT ======
-    function initApp(){
-      // Carica dati
-      items = load(); buildIndexes();
+    // Inputs
+    const c_name = $('#c_name');
+    const c_phone = $('#c_phone');
 
-      // Riferimenti
-      const c_name = $('#c_name');
-      const c_phone = $('#c_phone');
-      const acceptWrap = $('#acceptWrap');
-      const aForm = $('#acceptForm');
-      const a_type = $('#a_type');
-      const a_brand = $('#a_brand');
-      const a_model = $('#a_model');
-      const a_issue = $('#a_issue');
-      const toggles = $('#toggles');
-      const insertBtn = $('#insertBtn');
-      const startI = $('#start');
+    const acceptWrap = $('#acceptWrap');
+    const aForm = $('#acceptForm');
+    const a_type = $('#a_type');
+    const a_brand = $('#a_brand');
+    const a_model = $('#a_model');
+    const a_issue = $('#a_issue');
 
-      // Stato pulsanti attivi
-      const activeSet = new Set();
+    const toggles = $('#toggles');
+    const activeSet = new Set();
 
-      // === Data persistente
-      (function initStartDate(){
-        if(!startI) return;
-        let saved = null;
-        try { saved = localStorage.getItem(START_KEY) || null; } catch {}
-        const initial = saved || todayISO_IT();
-        startI.value = initial;
-        startI.addEventListener('change', ()=>{ try { localStorage.setItem(START_KEY, startI.value || todayISO_IT()); } catch {} });
-        // Pulsante "Oggi"
-        $('#startTodayBtn')?.addEventListener('click', ()=>{
-          const iso = todayISO_IT(); startI.value = iso;
-          try { localStorage.setItem(START_KEY, iso); } catch {}
-        });
-        if(!saved){ try { localStorage.setItem(START_KEY, initial); } catch {} }
-      })();
-
-      // === UI Accettazione
-      function updateAcceptanceUI(){
-        const isRepair = activeSet.has('riparazione');
-        acceptWrap.classList.toggle('show', isRepair);
-        $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
-        if(!isRepair){ aForm.reset(); }
-      }
-
-      // === Toggle listeners (SIM, Fisso, ecc.)
-      toggles?.addEventListener('click', (e)=>{
-        const b = e.target.closest('.tbtn'); if(!b) return;
-        const key=b.dataset.key;
-        b.classList.toggle('active');
-        if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
-        updateAcceptanceUI();
-      });
-
-      // === Auto-compilazione
-      function autofillFromPhone(){
-        const ph = normalizePhone(c_phone.value||''); if(!ph) return;
-        const hit = idxByPhone.get(ph);
-        if(hit && (!c_name.value || c_name.value.trim().length===0)){ c_name.value = hit.name || ''; }
-      }
-      function autofillFromName(){
-        const nm  = normalizeName(c_name.value||''); if(!nm) return;
-        if(nm.split(' ').length < 2) return;
-        const hit = idxByName.get(nm);
-        if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){ c_phone.value = hit.phone || ''; }
-      }
-      c_phone?.addEventListener('blur', autofillFromPhone);
-      c_phone?.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
-      c_name?.addEventListener('blur', autofillFromName);
-      c_name?.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
-
-      // === Inserimento
-      insertBtn?.addEventListener('click', async ()=>{
-        try{
-          const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-          if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
-        }catch{}
-
-        const name = (c_name.value||'').trim();
-        let phone = normalizePhone(c_phone.value||'');
-        if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
-
-        const startStr = startI?.value || localStorage.getItem(START_KEY) || todayISO_IT();
-        const start = new Date(startStr + 'T00:00:00');
-        const activated = new Set(activeSet);
-
-        let pending;
-        const baseObj = {
-          name, phone,
-          start: start.toISOString(),
-          createdAt: new Date().toISOString(),
-          activated:[...activated],
-          done:false, optWeekend:true, optEvening:true,
-          muteDate:null, activeChatUntil:null, doneAt:null,
-          acceptance:false, praticaId:null, source:null,
-        };
-
-        if(activated.has('riparazione')){
-          const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
-          if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
-          const all = ['energia','fisso','sim','smartphone'];
-          const tasks = all.map(type=>{ let due=addDays(new Date(), ACCEPT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-          pending = {
-            ...baseObj,
-            id: Date.now()+Math.random().toString(16).slice(2),
-            activated:['riparazione'],
-            tasks,
-            acceptance:true,
-            praticaId: nextPraticaId(),
-            device, repairStatus:'diagnostica',
-            quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
-          };
-        } else {
-          const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
-          const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-          if(activated.has('preventivi')){
-            let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
-            tasks.push({ type:'preventivi', due:due.toISOString() });
-          }
-          pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
-        }
-
-        const matches = items.filter(x=> normalizePhone(x.phone) === phone);
-        if(matches.length){ openDupModal(matches, pending); }
-        else { items.unshift(pending); save(items); buildIndexes(); render(); aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI(); }
-      });
-
-      // === Apri/chiudi elenco
-      const listSection = $('#listSection');
-      const toggleListBtn = $('#toggleListBtn');
-      toggleListBtn?.addEventListener('click', ()=> setListOpen(listSection.hidden));
-      setListOpen(false);
-
-      // === Pacchi ingest + dedup
-      $('#syncPacchiBtn')?.addEventListener('click', ()=> ingestPacchi({silent:false}));
-      ingestPacchi({silent:true});
-      window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
-      setInterval(()=> ingestPacchi({silent:true}), 15000);
-
-      // === Filtri & ricerca
-      $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
-      $('#q')?.addEventListener('input', render);
+    function updateAcceptanceUI(){
+      const isRepair = activeSet.has('riparazione');
+      acceptWrap.classList.toggle('show', isRepair);
+      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
+      if(!isRepair){ aForm.reset(); }
     }
 
-    // ===== Doppioni: modal & merge (come prima)
+    toggles.addEventListener('click', (e)=>{
+      const b = e.target.closest('.tbtn'); if(!b) return;
+      const key=b.dataset.key;
+      b.classList.toggle('active');
+      if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
+      updateAcceptanceUI();
+    });
+
+    // Inserisci
+    const insertBtn = $('#insertBtn');
+    const startI = $('#start');
+
+    // Data = oggi
+    try{
+      const d=new Date(); const pad=n=>String(n).padStart(2,'0');
+      if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
+      else if(startI){ startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+    }catch{}
+
+    /* ====== AUTO-COMPILAZIONE ====== */
+    function autofillFromPhone(){
+      const ph = normalizePhone(c_phone.value||'');
+      if(!ph) return;
+      const hit = idxByPhone.get(ph);
+      if(hit && (!c_name.value || c_name.value.trim().length===0)){
+        c_name.value = hit.name || '';
+      }
+    }
+    function autofillFromName(){
+      const nm  = normalizeName(c_name.value||'');
+      if(!nm) return;
+      const parts = nm.split(' ');
+      if(parts.length < 2) return;
+      const hit = idxByName.get(nm);
+      if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){
+        c_phone.value = hit.phone || '';
+      }
+    }
+    c_phone.addEventListener('blur', autofillFromPhone);
+    c_phone.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
+    c_name.addEventListener('blur', autofillFromName);
+    c_name.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
+
+    /* ====== Doppioni: modal ====== */
     const dupGate = $('#dupGate');
     const dupList = $('#dupList');
     const dupOpen = $('#dupOpen');
     const dupMerge = $('#dupMerge');
     const dupInsertAnyway = $('#dupInsertAnyway');
     const dupCancel = $('#dupCancel');
-    let dupContext = null;
+    let dupContext = null; // {existingItems:[], primary, pendingNew}
 
     function openDupModal(existingItems, pendingNew){
       dupContext = {
@@ -503,16 +405,15 @@
         primary: existingItems.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))[0],
         pendingNew
       };
-      if(!dupList) return;
       dupList.innerHTML = existingItems.map(it=>(
         `<div style="padding:8px;border-bottom:1px solid var(--stroke)">
           <b>${it.name||'-'}</b> • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}
           <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.source==='pacchi'?' • Da pacchi':''}</div>
         </div>`
       )).join('') || '<div>Nessun dettaglio</div>';
-      $('#dupGate').style.display='grid';
+      dupGate.style.display='grid';
     }
-    function closeDupModal(){ $('#dupGate').style.display='none'; dupContext=null; }
+    function closeDupModal(){ dupGate.style.display='none'; dupContext=null; }
 
     function mergeItems(existing, pending){
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]); existing.activated = [...actSet];
@@ -543,25 +444,166 @@
       return existing;
     }
 
-    dupOpen?.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
-    dupMerge?.addEventListener('click', ()=>{
+    function setListOpen(open){
+      const listSection = $('#listSection');
+      const toggleListBtn = $('#toggleListBtn');
+      listSection.hidden = !open;
+      listSection.setAttribute('aria-hidden', open?'false':'true');
+      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
+      if(open) render();
+    }
+
+    dupOpen.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
+    dupMerge.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { primary, pendingNew } = dupContext;
       const idx = items.findIndex(x=>x.id===primary.id);
       if(idx>-1){
         items[idx] = mergeItems(items[idx], pendingNew);
         save(items); buildIndexes(); render();
-        closeDupModal(); setListOpen(true);
+        closeDupModal();
+        setListOpen(true);
+        if(pendingNew.acceptance){
+          const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+          const msg=`Ciao, ${pendingNew.name}, abbiamo accettato il tuo prodotto in assistenza.
+Marchio: ${pendingNew.device.brand}
+Modello: ${pendingNew.device.model || '-'}
+Difetto dichiarato: ${pendingNew.device.issue || '-'}
+
+Ti aggiorneremo noi per il ritiro. Grazie!
+Nel frattempo puoi visionare qui i nostri servizi:
+${site}`;
+          try{ window.open(`https://wa.me/39${normalizePhone(pendingNew.phone)}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
+        }
       }
     });
-    dupInsertAnyway?.addEventListener('click', ()=>{
+    dupInsertAnyway.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { pendingNew } = dupContext;
       items.unshift(pendingNew); save(items); buildIndexes(); render(); closeDupModal();
-    });
-    dupCancel?.addEventListener('click', closeDupModal);
+      if(pendingNew.acceptance){
+        const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+        const msg=`Ciao, ${pendingNew.name}, abbiamo accettato il tuo prodotto in assistenza.
+Marchio: ${pendingNew.device.brand}
+Modello: ${pendingNew.device.model || '-'}
+Difetto dichiarato: ${pendingNew.device.issue || '-'}
 
-    // ===== WhatsApp helper (stati e preventivi)
+Ti aggiorneremo noi per il ritiro. Grazie!
+Nel frattempo puoi visionare qui i nostri servizi:
+${site}`;
+        try{ window.open(`https://wa.me/39${normalizePhone(pendingNew.phone)}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
+      }
+    });
+    dupCancel.addEventListener('click', closeDupModal);
+
+    insertBtn.addEventListener('click', async ()=>{
+      try{
+        const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
+        if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
+      }catch{}
+
+      const name = c_name.value.trim();
+      let phone = normalizePhone(c_phone.value||'');
+      if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
+
+      const start = startI.value ? new Date(startI.value) : new Date();
+      const activated = new Set(activeSet);
+
+      let pending;
+      const baseObj = {
+        name, phone,
+        start: start.toISOString(),
+        createdAt: new Date().toISOString(),
+        activated:[...activated],
+        done:false, optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false, praticaId:null, source:null,
+        quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
+      };
+
+      if(activated.has('riparazione')){
+        const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
+        if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
+        const all = ['energia','fisso','sim','smartphone'];
+        const tasks = all.map(type=>{ let due=addDays(new Date(), ACCEPT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+        pending = {
+          ...baseObj,
+          id: Date.now()+Math.random().toString(16).slice(2),
+          activated:['riparazione'],
+          tasks,
+          acceptance:true,
+          praticaId: nextPraticaId(),
+          device, repairStatus:'diagnostica'
+        };
+      } else {
+        const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
+        const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+        if(activated.has('preventivi')){
+          let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
+          tasks.push({ type:'preventivi', due:due.toISOString() });
+        }
+        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
+      }
+
+      const matches = items.filter(x=> normalizePhone(x.phone) === phone);
+      if(matches.length){
+        openDupModal(matches, pending);
+      } else {
+        items.unshift(pending); save(items); buildIndexes(); render();
+        if(pending.acceptance){
+          const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+          const msg=`Ciao, ${name}, abbiamo accettato il tuo prodotto in assistenza.
+Marchio: ${pending.device.brand}
+Modello: ${pending.device.model || '-'}
+Difetto dichiarato: ${pending.device.issue || '-'}
+
+Ti aggiorneremo noi per il ritiro. Grazie!
+Nel frattempo puoi visionare qui i nostri servizi:
+${site}`;
+          try{ window.open(`https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
+        }
+        aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI();
+      }
+    });
+
+    // Apri/chiudi elenco
+    const listSection = $('#listSection');
+    const toggleListBtn = $('#toggleListBtn');
+    toggleListBtn.addEventListener('click', ()=> setListOpen(listSection.hidden));
+
+    function maybeNotify(text){
+      const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
+      if('Notification' in window && httpsOk && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text);
+    }
+
+    // Filtro & ricerca
+    let filter='all';
+    const qI=$('#q');
+    $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
+    qI?.addEventListener('input', render);
+
+    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
+
+    function waIcon(){
+      return `<span class="wa-ico" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
+      </span>`;
+    }
+
+    function waFor(it,type){
+      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
+      const map = {
+        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
+        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
+        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
+      };
+      const txt = encodeURIComponent(map[type]);
+      return { href:`https://wa.me/39${it.phone}?text=${txt}` };
+    }
+
     function waForRepairState(it){
       const name=it.name;
       const base=`Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
@@ -576,6 +618,8 @@
       const txt=encodeURIComponent(map[it.repairStatus||'diagnostica']);
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
+
+    /* === WhatsApp preventivo + salvataggio prezzo === */
     function waForQuote(it, priceRaw){
       const price = String(priceRaw || '').trim() || (it.quotePrice || '');
       const pretty = price ? (/[€]/.test(price) ? price : `${price} €`) : '—';
@@ -590,6 +634,8 @@ ID pratica: ${it.praticaId || '-'}
 Se hai domande scrivimi pure qui.`;
       return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
     }
+
+    /* === Nuovo: messaggi decisione preventivo (accettato/rifiutato) === */
     function waForQuoteDecision(it, decision){
       const name = it.name;
       const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
@@ -613,13 +659,7 @@ Grazie!`;
       }
     }
 
-    function waIcon(){
-      return `<span class="wa-ico" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
-      </span>`;
-    }
-
-    // ===== PACCHI ingest + dedup
+    /* --------- PACCHI: ingest (dedup) --------- */
     function readPacchiRaw(){
       let all=[];
       for(const k of PACCHI_KEYS){
@@ -644,34 +684,41 @@ Grazie!`;
       const id=Date.now()+Math.random().toString(16).slice(2);
       return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||''), quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null };
     }
-    function ingestPacchi({silent=false}={}){
-      const raw=readPacchiRaw(); if(!raw.length) return 0;
-      const ing=pacchiIngestedSet(); let added=0;
-      for(const rec of raw){
-        const phone=normalizePhone(rec.phone||rec.telefono||''); if(!phone) continue;
-        const created=rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
-        const kind=(rec.kind||rec.tipo||rec.service||'').toLowerCase();
-        const stableId=`${phone}|${created}|${kind||'na'}`;
-        if(ing.has(stableId)) continue;
+    function ingestPacchi({silent=false}={}) {
+      const raw = readPacchiRaw();
+      if (!raw.length) return 0;
+
+      const ing = pacchiIngestedSet();
+      let added = 0;
+
+      for (const rec of raw) {
+        const phone = normalizePhone(rec.phone || rec.telefono || '');
+        if (!phone) continue;
+
+        const created = rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
+        const kind = (rec.kind || rec.tipo || rec.service || '').toLowerCase();
+        const stableId = `${phone}|${created}|${kind || 'na'}`;
+        if (ing.has(stableId)) continue;
+
         const exists = items.some(x => normalizePhone(x.phone) === phone);
-        if(!exists) { items.unshift(convertPacchiRecordToItem(rec)); added++; }
+        if (!exists) { items.unshift(convertPacchiRecordToItem(rec)); added++; }
+
         ing.add(stableId);
       }
-      if(added){ save(items); buildIndexes(); if(!silent){ try{ new Notification(`Import Pacchi: ${added} nuovo/i contatto/i`) }catch{} } render(); }
+
+      if (added) {
+        save(items); buildIndexes();
+        if (!silent) { maybeNotify(`Import Pacchi: ${added} nuovo/i contatto/i`); }
+        render();
+      }
       savePacchiIngested(ing);
       return added;
     }
 
-    // ===== LISTA / RENDER
-    let filter='all';
-    function setListOpen(open){
-      const listSection = $('#listSection');
-      const toggleListBtn = $('#toggleListBtn');
-      listSection.hidden = !open;
-      listSection.setAttribute('aria-hidden', open?'false':'true');
-      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
-      if(open) render();
-    }
+    $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
+    ingestPacchi({silent:true});
+    window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
+    setInterval(()=> ingestPacchi({silent:true}), 15000);
 
     function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
     function statusChip(status){
@@ -679,16 +726,20 @@ Grazie!`;
       const label={diagnostica:'Diagnostica','attesa-ricambi':'Ricambi',lavorazione:'Lavorazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
-    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
+
+    /* ====== RENDER ====== */
+    let filter='all';
+    const qI=$('#q');
+    const listSection = $('#listSection');
 
     function render(){
-      const listSection = $('#listSection');
       if(listSection.hidden) return;
       const listStd = $('#listStandard'); listStd.innerHTML='';
       const listPac = $('#listPacchi'); listPac.innerHTML='';
 
       const now=today(); const tStr=fmtDate(now);
-      const q=(($('#q')?.value)||'').trim().toLowerCase();
+      const q=(qI?.value||'').trim().toLowerCase();
+
       const filtered = items.filter(it=>{
         if(filter==='done') return it.done;
         if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
@@ -728,19 +779,29 @@ Grazie!`;
       const tags = t.querySelector('.tags'); tags.innerHTML='';
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
-      if(it.acceptance){
-        tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione'));
-        tags.append(statusChip(it.repairStatus||'diagnostica'));
-        if(it.quotePrice) tags.append(tag(`Prev: ${it.quotePrice}`, 'quote'));
-        if(it.quoteStatus==='accepted') tags.append(tag('Preventivo OK','quote-ok'));
-        if(it.quoteStatus==='rejected') tags.append(tag('Preventivo KO','quote-ko'));
+      if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
+      (it.activated||[]).forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
+
+      // Badge preventivo: inviato / accettato / rifiutato
+      if (it.quoteSentAt || it.quoteStatus){
+        const when = it.quoteDecisionAt ? fmtDateTimeShort(new Date(it.quoteDecisionAt))
+                    : it.quoteSentAt ? fmtDateTimeShort(new Date(it.quoteSentAt)) : null;
+        const price = (it.quotePrice && it.quotePrice.trim()) ? it.quotePrice.trim() : null;
+        let label = '';
+        let cls = 'quote';
+        if(it.quoteStatus==='accepted'){ label = `Preventivo ACCETTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ok'; }
+        else if(it.quoteStatus==='rejected'){ label = `Preventivo RIFIUTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ko'; }
+        else { label = `Preventivo${price?` ${price}`:''}${when?` • ${when}`:''}`; }
+        tags.append(tag(label, cls));
       }
+
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
 
       const sum=t.querySelector('.summary'); sum.innerHTML='';
 
+      /* ====== BLOCCO ACCETTAZIONE (diagnostica minimale) ====== */
       if(it.acceptance){
         const div=document.createElement('div'); div.className='accept-brief';
 
@@ -748,7 +809,7 @@ Grazie!`;
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
         div.append(top);
 
-        // PREVENTIVO (prezzo + invio)
+        // PREVENTIVO: input prezzo + invio WA + salvataggio
         const quoteRow=document.createElement('div'); quoteRow.className='row-slim';
         const left=document.createElement('div');
         left.innerHTML=`<small style="color:var(--muted)">Invia preventivo (prezzo)</small>`;
@@ -758,6 +819,15 @@ Grazie!`;
         priceInput.placeholder='Es. 129,90 €';
         priceInput.value = it.quotePrice || '';
         priceInput.style.cssText='min-width:140px;border-radius:9px;padding:6px 10px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;font-size:13px';
+        priceInput.addEventListener('blur',()=>{
+          let v=priceInput.value.trim();
+          if(!v){ it.quotePrice=null; save(items); return; }
+          v = v.replace(',', '.').replace(/[^\d.]/g,'');
+          if(v){
+            const num = Number(v);
+            if(!isNaN(num)) priceInput.value = (num % 1 ? num.toString().replace('.', ',') : `${num},00`) + ' €';
+          }
+        });
 
         const sendQuote=document.createElement('a');
         sendQuote.className='wa-btn ok';
@@ -767,9 +837,10 @@ Grazie!`;
           e.preventDefault();
           const href=waForQuote(it, priceInput.value);
           try{ window.open(href,'_blank','noopener'); }catch{}
+          // salva prezzo + timestamp invio
           it.quotePrice = priceInput.value.trim() || it.quotePrice || null;
           it.quoteSentAt = new Date().toISOString();
-          it.quoteStatus = null; it.quoteDecisionAt = null;
+          it.quoteStatus = null; it.quoteDecisionAt = null; // reset decisione
           save(items); render();
         });
 
@@ -777,7 +848,7 @@ Grazie!`;
         quoteRow.append(left, right);
         div.append(quoteRow);
 
-        // DECISIONE
+        // DECISIONE PREVENTIVO: ACCETTATO / RIFIUTATO
         const decideRow=document.createElement('div'); decideRow.className='row-slim';
         const dLeft=document.createElement('div');
         dLeft.innerHTML=`<small style="color:var(--muted)">Decisione cliente</small>`;
@@ -791,7 +862,7 @@ Grazie!`;
           if(!it.quoteSentAt) return;
           it.quoteStatus='accepted';
           it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='lavorazione';
+          it.repairStatus='lavorazione'; // si procede
           save(items); render();
           const href=waForQuoteDecision(it,'accepted'); try{ window.open(href,'_blank'); }catch{}
         });
@@ -804,7 +875,7 @@ Grazie!`;
           if(!it.quoteSentAt) return;
           it.quoteStatus='rejected';
           it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='pronto';
+          it.repairStatus='pronto'; // pronto per ritiro non riparato
           save(items); render();
           const href=waForQuoteDecision(it,'rejected'); try{ window.open(href,'_blank'); }catch{}
         });
@@ -813,7 +884,7 @@ Grazie!`;
         decideRow.append(dLeft, dRight);
         div.append(decideRow);
 
-        // Stato: PRONTO / CONSEGNATO
+        // Stato: PRONTO (bloccato finché non c'è quoteSentAt) + CONSEGNATO
         const stateRow=document.createElement('div'); stateRow.className='row-slim';
         const sLeft=document.createElement('div');
         sLeft.innerHTML=`<small style="color:var(--muted)">Stato riparazione</small>`;
@@ -830,6 +901,7 @@ Grazie!`;
           it.repairStatus='pronto';
           save(items); render();
           if(prev!=='pronto'){
+            maybeNotify(`"${it.name}" è PRONTO al ritiro`);
             const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{}
           }
         });
@@ -849,6 +921,7 @@ Grazie!`;
 
         sum.append(div);
       }
+      /* ====== FINE BLOCCO ACCETTAZIONE ====== */
 
       // Prossimi task
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
@@ -865,10 +938,10 @@ Grazie!`;
         sum.append(line);
       }
 
-      // Azioni
+      // Azioni comuni
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
-      snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); });
+      snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
       const done=document.createElement('button'); done.className='wa-btn'; done.textContent='Completato';
       done.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
       const del=document.createElement('button'); del.className='wa-btn'; del.textContent='Elimina';
@@ -878,7 +951,7 @@ Grazie!`;
       return t;
     }
 
-    // Click su WA = muto fino a +45min
+    // Click su WA task = muto fino a +45min
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
@@ -888,79 +961,84 @@ Grazie!`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // Notifiche + backup giornaliero (come prima)
-    (function smartPush(){
-      function maybeNotify(text){
-        const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-        if('Notification' in window && httpsOk && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text);
+    /* ===== PIN HOTFIX ===== */
+    (function(){
+      const KEY='relong-pin-ok';
+      const gate=document.getElementById('pinGate');
+      const input=document.getElementById('pinInput');
+      const btn=document.getElementById('pinOk');
+      const err=document.getElementById('pinError');
+
+      function show(el){ el && el.removeAttribute('hidden'); }
+      function hide(el){ el && el.setAttribute('hidden',''); }
+      function setAppHidden(hidden){
+        document.querySelectorAll('[aria-hidden]').forEach(n=>{
+          n.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+        });
       }
+
+      function lock(){
+        show(gate);
+        setAppHidden(true);
+        gate.style.position='fixed';
+        gate.style.inset='0';
+        gate.style.background='linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95))';
+        gate.style.backdropFilter='blur(6px)';
+        gate.style.display='grid';
+        gate.style.placeItems='center';
+        setTimeout(()=> input && input.focus(), 30);
+      }
+
+      function unlock(){
+        try{ sessionStorage.setItem(KEY,'1'); }catch{}
+        setAppHidden(false);
+        hide(gate);
+        window.__PIN_OK__ = true;
+        try{ window.dispatchEvent(new CustomEvent('relong:pin:unlocked')); }catch{}
+      }
+
+      const bypass = /(?:\?|#).*pin=1990\b/.test(location.href);
+      const already = (()=>{ try{ return sessionStorage.getItem(KEY)==='1'; }catch{ return false; }})();
+      if(already || bypass){ unlock(); } else { lock(); }
+
+      function tryUnlock(){
+        const val=(input && input.value || '').trim();
+        if(val==='1990'){ unlock(); }
+        else{
+          if(err) err.textContent='PIN errato. Riprova.';
+          if(input){ input.value=''; input.focus(); }
+        }
+      }
+
+      btn && btn.addEventListener('click', tryUnlock);
+      input && input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+    })();
+
+    // Push intelligenti 10/18 + Backup 23:59
+    (function smartPush(){
+      const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
+      if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
       function scheduleAt(hour){ const now=new Date(); const when=new Date(); when.setHours(hour,0,0,0); if(when<=now) when.setDate(when.getDate()+1); setTimeout(()=>{ fire(hour); scheduleAt(hour); }, when-now); }
       function fire(hour){
         const tStr = fmtDate(new Date());
         const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
         if(hour===10){ if(dueToday) maybeNotify(`Alle 10: hai ${dueToday} follow-up da fare oggi`); }
         if(hour===18){
-          const pending = items.filter(it=>!it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr)).length;
+          const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr)).length;
           if(pending) maybeNotify(`Ore 18: ${pending} clienti ancora da contattare`);
         }
       }
-      try{
-        const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-        if('Notification' in window && httpsOk && Notification.permission==='default'){ Notification.requestPermission(); }
-      }catch{}
       scheduleAt(10); scheduleAt(18);
 
       function scheduleBackup(){
         const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
-        setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
+        setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); maybeNotify('Backup giornaliero salvato ✔️'); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
     })();
 
-    // ===== Helper elenco =====
-    function waFor(it,type){
-      const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
-        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
-        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
-      };
-      const txt = encodeURIComponent(map[type]);
-      return { href:`https://wa.me/39${it.phone}?text=${txt}` };
-    }
-
-    // ===== Stato lista
-    function setListOpen(open){
-      const listSection = $('#listSection');
-      const toggleListBtn = $('#toggleListBtn');
-      listSection.hidden = !open;
-      listSection.setAttribute('aria-hidden', open?'false':'true');
-      toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
-      if(open) render();
-    }
-
-    // ===== BOOT: parte solo dopo PIN
-    function BOOT(){ initApp(); }
-    if(window.__PIN_OK__) BOOT();
-    else window.addEventListener('relong:pin:unlocked', BOOT);
+    function boot(){ const toggleListBtn = $('#toggleListBtn'); toggleListBtn.addEventListener('click', ()=> setListOpen(listSection.hidden)); setListOpen(false); }
+    boot();
   </script>
-
-  <!-- Modale Doppioni -->
-  <div id="dupGate" role="dialog" aria-modal="true" aria-labelledby="dupTitle">
-    <div id="dupCard">
-      <h3 id="dupTitle">Numero già presente</h3>
-      <p id="dupMsg">Abbiamo trovato contatti con lo stesso numero. Scegli cosa fare:</p>
-      <div id="dupList"></div>
-      <div id="dupActions">
-        <button id="dupOpen" class="btn ghost">Apri scheda esistente</button>
-        <button id="dupMerge" class="btn ok">Unisci</button>
-        <button id="dupInsertAnyway" class="btn primary">Inserisci comunque</button>
-        <button id="dupCancel" class="btn ghost">Annulla</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
