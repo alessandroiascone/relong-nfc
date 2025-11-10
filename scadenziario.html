@@ -29,9 +29,19 @@
     .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
-    .title{display:flex;align-items:flex-start;gap:14px}
+    .title{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
     .title h1{font-size:26px;letter-spacing:.2px}
     .subtitle{color:var(--muted);font-size:14px}
+
+    /* SYNC badge */
+    .sync-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--stroke);padding:8px 12px;border-radius:999px;font-weight:800;cursor:pointer}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.idle{background:#6c757d}
+    .dot.pull{background:#0aa2ff}
+    .dot.push{background:#25D366}
+    .dot.err{background:#ff4d4f}
+    .sync-badge small{color:var(--muted);font-weight:600}
+
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .full{grid-column:1/-1}
     label{font-size:12px;color:var(--muted)}
@@ -62,13 +72,19 @@
     /* ITEM compatto + dettagli a tendina */
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
     .item .head{
-      width:100%; display:flex; justify-content:space-between; align-items:center;
+      width:100%; display:flex; gap:10px; align-items:center;
       padding:12px 14px; background:transparent; color:#eaf2ff; border:0; cursor:pointer;
-      font-weight:800; letter-spacing:.2px; text-align:left
+      font-weight:800; letter-spacing:.2px; text-align:left; justify-content:space-between
     }
-    .item .head:focus{outline:2px solid rgba(0,140,255,.35); outline-offset:2px; border-radius:12px}
+    .head-left{display:flex;align-items:center;gap:10px;min-width:0}
     .item .h{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .item .chev{transition:transform .18s ease; opacity:.9}
+    .mini-badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
+    .mini{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#0a0a0a;opacity:.95}
+    .mini.diagnostica{background:var(--st-diagnostica)}
+    .mini.inriparazione{background:var(--st-inrip)}
+    .mini.pronto{background:var(--st-pronto)}
+    .mini.consegnato{background:var(--st-consegnato)}
+    .item .chev{transition:transform .18s ease; opacity:.9; flex-shrink:0}
     .item.open .chev{transform:rotate(90deg)}
 
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
@@ -133,6 +149,8 @@
     }
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
+    .toast .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .toast .row .btn-mini{border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px;cursor:pointer}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
   </style>
@@ -158,6 +176,12 @@
       <h1>ReLong • Scadenzario + Accettazione</h1>
       <div class="subtitle">Attivazioni, Riparazioni & Gestione Pacchi.</div>
     </div>
+
+    <!-- Sync badge (clic per impostazioni) -->
+    <button id="syncBadge" class="sync-badge" type="button" title="Impostazioni Sync">
+      <span id="syncDot" class="dot idle"></span>
+      <span>Sync • <small id="syncState">Idle</small></span>
+    </button>
   </header>
 
   <!-- Dati cliente -->
@@ -281,11 +305,13 @@
     </div>
   </section>
 
-  <!-- Template item con head + details -->
   <template id="tpl-item">
     <div class="item">
       <button class="head" type="button">
-        <div class="h"></div>
+        <div class="head-left">
+          <div class="h"></div>
+        </div>
+        <div class="mini-badges"></div>
         <div class="chev">▶</div>
       </button>
       <div class="details" hidden>
@@ -294,6 +320,23 @@
       </div>
     </div>
   </template>
+
+  <!-- Modal settings SYNC -->
+  <dialog id="syncDialog">
+    <form method="dialog" style="background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:16px;min-width:320px;color:#eaf2ff">
+      <h3 style="margin-bottom:10px">Sync GitHub Gist</h3>
+      <p class="subtitle" style="margin-bottom:8px">Incolla una sola volta su questo PC.</p>
+      <label>Personal Access Token (scope: <b>gist</b>)</label>
+      <input id="syncToken" placeholder="ghp_..." style="margin-bottom:10px">
+      <label>Gist ID</label>
+      <input id="syncGist" placeholder="abcdef123456..." style="margin-bottom:14px">
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" value="cancel">Annulla</button>
+        <button id="syncSave" class="btn primary" value="default">Salva</button>
+      </div>
+      <p class="subtitle" style="margin-top:10px">File usato nel Gist: <code>relong-scadenzario.json</code></p>
+    </form>
+  </dialog>
 
   <script>
     /* ---- CONFIGURABILI ---- */
@@ -312,7 +355,7 @@
     const backupPrefix = 'relong-backup-';
 
     const load = () => { try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(STORE_KEY); return []; } };
-    const save = (arr) => localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+    const saveLocal = (arr) => localStorage.setItem(STORE_KEY, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
@@ -379,13 +422,22 @@
     const acceptWrap = $('#acceptWrap'); const pacchiWrap = $('#pacchiWrap');
     const toggles = $('#toggles'); const activeSet = new Set();
 
-    function showToast(text, type='ok'){
+    function showToast(text, type='ok', withAction=null){
       const wrap = $('#toast'); if(!wrap) return;
       const el = document.createElement('div');
       el.className = `toast ${type==='ok'?'ok':type==='err'?'err':''}`;
-      el.textContent = text;
-      wrap.appendChild(el);
-      setTimeout(()=>{ el.remove(); }, 3600);
+      if(withAction){
+        el.innerHTML = `<div class="row"><span>${text}</span><button class="btn-mini" id="tact_${Date.now()}">${withAction.label}</button></div>`;
+        wrap.appendChild(el);
+        const id = el.querySelector('button').id;
+        setTimeout(()=>{ el.remove(); }, 4600);
+        return { el, btn: document.getElementById(id) };
+      } else {
+        el.textContent = text;
+        wrap.appendChild(el);
+        setTimeout(()=>{ el.remove(); }, 3600);
+        return { el, btn:null };
+      }
     }
 
     function updateAcceptanceUI(){
@@ -409,7 +461,7 @@
         activeSet.delete(otherKey);
         $(`.tbtn[data-key="${otherKey}"]`)?.classList.remove('active');
       }
-      b.classList.toggle('active', toActive);
+      b.classList.toggle('active,', toActive);
       if(toActive) activeSet.add(key); else activeSet.delete(key);
       updateAcceptanceUI();
     });
@@ -422,8 +474,25 @@
     setStartToToday();
     (function scheduleMidnightRefresh(){ const now=new Date(); const next=new Date(now); next.setHours(24,0,5,0); setTimeout(()=>{ setStartToToday(); scheduleMidnightRefresh(); }, next-now); })();
 
-    function autofillFromPhone(){ const ph = normalizePhone(c_phone.value||''); if(!ph) return; const hit = idxByPhone.get(ph); if(hit && (!c_name.value || c_name.value.trim().length===0)){ c_name.value = hit.name || ''; } }
-    function autofillFromName(){ const nm  = normalizeName(c_name.value||''); if(!nm) return; if(nm.split(' ').length < 2) return; const hit = idxByName.get(nm); if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){ c_phone.value = hit.phone || ''; } }
+    function autofillFromPhone(){
+      const ph = normalizePhone(c_phone.value||''); if(!ph) return;
+      const hit = idxByPhone.get(ph);
+      if(hit && (!c_name.value || c_name.value.trim().length===0)){
+        c_name.value = hit.name || '';
+        const t = showToast('Cliente già presente. Apri la scheda?', 'ok', {label:'Apri scheda'});
+        t.btn?.addEventListener('click', ()=>{ setListOpen(true); render(); highlightByPhone(ph); });
+      }
+    }
+    function autofillFromName(){
+      const nm  = normalizeName(c_name.value||''); if(!nm) return;
+      if(nm.split(' ').length < 2) return;
+      const hit = idxByName.get(nm);
+      if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){
+        c_phone.value = hit.phone || '';
+        const t = showToast('Cliente già presente. Apri la scheda?', 'ok', {label:'Apri scheda'});
+        t.btn?.addEventListener('click', ()=>{ setListOpen(true); render(); highlightByPhone(hit.phone); });
+      }
+    }
     c_phone.addEventListener('blur', autofillFromPhone);
     c_phone.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
     c_name.addEventListener('blur', autofillFromName);
@@ -522,7 +591,7 @@
 
       const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
       if(idx>-1){ items[idx] = mergeItems(items[idx], pending); } else { items.unshift(pending); }
-      save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
+      saveAll(); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
 
       if(pending.acceptance){
         try{ window.open(waForRepairIntake(pending.name, pending.phone, pending.device), '_blank', 'noopener'); }catch{}
@@ -551,7 +620,7 @@
 
       const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
       if(idx>-1){ items[idx] = mergeItems(items[idx], pending); } else { items.unshift(pending); }
-      save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
+      saveAll(); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
       clearClientInputs(); resetSelections(); showToast('Cliente inserito ✅','ok');
       try{ 
         const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
@@ -640,6 +709,15 @@
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
 
+    /* Mini-badge stato sulla riga chiusa */
+    function miniBadge(status){
+      const s = (status||'').toLowerCase();
+      const span=document.createElement('span');
+      span.className = `mini ${s}`;
+      span.textContent = ({diagnostica:'Diagnostica',inriparazione:'In riparazione',pronto:'Pronto',consegnato:'Consegnato'})[s] || s || '';
+      return span;
+    }
+
     // Stato apertura a tendina per item
     const expandedIds = new Set();
 
@@ -648,7 +726,6 @@
       const listStd = $('#listStandard'); listStd.innerHTML='';
       const listPac = $('#listPacchi'); listPac.innerHTML='';
 
-      const now=today(); const tStr=fmtDate(now);
       const q=(qI?.value||'').trim().toLowerCase();
 
       const filtered = items
@@ -681,15 +758,19 @@
       const headBtn = t.querySelector('.head');
       const details = t.querySelector('.details');
 
-      // Header compatto
       const headerText = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
       t.querySelector('.h').textContent = headerText;
+
+      // micro badge sulla riga chiusa
+      const miniWrap = t.querySelector('.mini-badges');
+      miniWrap.innerHTML='';
+      if(it.acceptance && it.repairStatus) miniWrap.append(miniBadge(it.repairStatus));
 
       // Apri/chiudi conservando stato
       const open = expandedIds.has(it.id);
       if(open){ t.classList.add('open'); details.hidden = false; }
 
-      headBtn.addEventListener('click', (e)=>{
+      headBtn.addEventListener('click', ()=>{
         const isOpen = t.classList.toggle('open');
         details.hidden = !isOpen;
         if(isOpen) expandedIds.add(it.id); else expandedIds.delete(it.id);
@@ -731,17 +812,11 @@
         sel.addEventListener('change',()=>{
           const prev=it.repairStatus;
           it.repairStatus=sel.value;
-          if (it.repairStatus === 'consegnato' && !it.deliveredAt) {
-            it.deliveredAt = new Date().toISOString();
-            scheduleReview(it);
-          }
+          if (it.repairStatus === 'consegnato' && !it.deliveredAt) { it.deliveredAt = new Date().toISOString(); scheduleReview(it); }
           it.updatedAt=new Date().toISOString();
-          save(items); 
+          saveAll(); 
           render();
-
-          if(prev!=='pronto' && sel.value==='pronto'){ 
-            maybeNotify(`"${it.name}" è PRONTO al ritiro`); 
-          }
+          if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); }
         });
         controls.append(sel);
         top.append(controls);
@@ -783,20 +858,20 @@
             bSend?.addEventListener('click', ()=>{
               const val = parseFloat(ip?.value?.replace(',', '.') || '0');
               if(!(val>=0)) return alert('Inserisci un importo valido');
-              it.quotePrice = val; it.updatedAt=new Date().toISOString(); save(items);
+              it.quotePrice = val; it.updatedAt=new Date().toISOString(); saveAll();
               try{ window.open(waForPreventivo(val), '_blank', 'noopener'); }catch{}
-              if(ip) ip.value = ''; it.quotePrice = null; save(items); render();
+              if(ip) ip.value = ''; it.quotePrice = null; saveAll(); render();
               showToast('Preventivo inviato ✅','ok');
             });
 
             bAcc?.addEventListener('click', ()=>{
               it.quoteStatus = 'accepted';
               it.repairStatus = 'inriparazione';
-              it.updatedAt=new Date().toISOString(); save(items); render();
+              it.updatedAt=new Date().toISOString(); saveAll(); render();
             });
             bRef?.addEventListener('click', ()=>{
               it.quoteStatus = 'refused';
-              it.updatedAt=new Date().toISOString(); save(items); render();
+              it.updatedAt=new Date().toISOString(); saveAll(); render();
             });
           },0);
         }
@@ -807,7 +882,7 @@
           callReady.addEventListener('click', (ev)=>{
             ev.stopPropagation();
             try{ window.open(waForPickupReady(it.name, it.phone), '_blank', 'noopener'); }catch{}
-            it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); save(items); render();
+            it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveAll(); render();
           });
           actions.append(callReady);
           div.append(actions);
@@ -833,18 +908,18 @@
 
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
-      snooze.addEventListener('click',(ev)=>{ ev.stopPropagation(); (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
+      snooze.addEventListener('click',(ev)=>{ ev.stopPropagation(); (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); saveAll(); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
       const done=document.createElement('button'); done.className='wa-btn'; done.textContent='Completato';
-      done.addEventListener('click',(ev)=>{ ev.stopPropagation(); it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
+      done.addEventListener('click',(ev)=>{ ev.stopPropagation(); it.done=true; it.doneAt=new Date().toISOString(); saveAll(); render(); });
       const del=document.createElement('button'); del.className='wa-btn'; del.textContent='Elimina';
-      del.addEventListener('click',(ev)=>{ ev.stopPropagation(); items=items.filter(x=>x.id!==it.id); save(items); render(); buildIndexes(); });
+      del.addEventListener('click',(ev)=>{ ev.stopPropagation(); items=items.filter(x=>x.id!==it.id); saveAll(); render(); buildIndexes(); });
       actions.append(snooze,done,del); sum.append(actions);
 
       if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt) <= new Date()){
         const rev=document.createElement('div'); rev.className='r-line';
         const btn=document.createElement('a'); btn.className='wa-btn ok'; btn.textContent='WhatsApp: ringrazia + recensione';
         btn.href = waForThankReview(it.name, it.phone); btn.target='_blank'; btn.rel='noopener';
-        btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); save(items); render(); });
+        btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveAll(); render(); });
         rev.append(btn); sum.append(rev);
       }
 
@@ -854,7 +929,7 @@
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
-      const until=new Date(Date.now()+45*60*1000); it.activeChatUntil=until.toISOString(); it.muteDate=fmtDate(new Date()); save(items); render();
+      const until=new Date(Date.now()+45*60*1000); it.activeChatUntil=until.toISOString(); it.muteDate=fmtDate(new Date()); saveAll(); render();
     });
 
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
@@ -864,7 +939,7 @@
       it.postReviewAt = addHours(new Date(), 3).toISOString();
       it.postReviewSent = false;
       it.updatedAt = new Date().toISOString();
-      save(items);
+      saveAll();
 
       const ms = new Date(it.postReviewAt) - new Date();
       if(ms > 0 && ms < 24*60*60*1000){
@@ -884,6 +959,137 @@
     }
     setInterval(scanOverdueReviews, 60*1000);
     setTimeout(scanOverdueReviews, 1500);
+
+    // ---- SYNC via GitHub Gist (Token incollato dall'utente su ogni PC) ----
+    const SYNC_FILE = 'relong-scadenzario.json';
+    const KEY_TOKEN = 'relong-sync-token';
+    const KEY_GIST  = 'relong-sync-gist';
+    const KEY_ETAG  = 'relong-sync-etag';
+    const syncBadge = $('#syncBadge'); const syncDialog = $('#syncDialog');
+    const syncStateEl = $('#syncState'); const syncDot = $('#syncDot');
+    const tokenI = $('#syncToken'); const gistI = $('#syncGist'); const saveBtn = $('#syncSave');
+
+    function setSyncState(state){
+      syncStateEl.textContent = state;
+      syncDot.className = 'dot ' + (state==='Pushing'?'push':state==='Pulling'?'pull':state==='Error'?'err':'idle');
+    }
+    function getToken(){ return localStorage.getItem(KEY_TOKEN)||''; }
+    function getGist(){ return localStorage.getItem(KEY_GIST)||''; }
+    function getETag(){ return localStorage.getItem(KEY_ETAG)||''; }
+    function setETag(e){ if(e) localStorage.setItem(KEY_ETAG,e); }
+
+    syncBadge.addEventListener('click', ()=>{
+      tokenI.value = getToken(); gistI.value = getGist();
+      syncDialog.showModal();
+    });
+    saveBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      localStorage.setItem(KEY_TOKEN, tokenI.value.trim());
+      localStorage.setItem(KEY_GIST,  gistI.value.trim());
+      setSyncState('Idle');
+      syncDialog.close();
+      initialPull(); // appena salvi, prova subito a sincronizzare
+    });
+
+    async function gistFetch(path, opts={}){
+      const token = getToken();
+      const headers = Object.assign({
+        'Accept':'application/vnd.github+json',
+        'X-GitHub-Api-Version':'2022-11-28'
+      }, opts.headers||{});
+      if(token) headers['Authorization'] = `token ${token}`;
+      const res = await fetch(`https://api.github.com${path}`, {...opts, headers});
+      return res;
+    }
+
+    // Pull iniziale + polling
+    async function initialPull(){
+      if(!getToken() || !getGist()){ setSyncState('Idle'); return; }
+      try{
+        setSyncState('Pulling');
+        const et = getETag();
+        const res = await gistFetch(`/gists/${getGist()}`, { headers: et ? {'If-None-Match': et} : {} });
+        if(res.status===304){ setSyncState('Idle'); return; }
+        if(!res.ok) throw new Error('Pull failed '+res.status);
+        const etag = res.headers.get('ETag'); if(etag) setETag(etag);
+        const j = await res.json();
+        const file = j.files[SYNC_FILE];
+        if(file && file.content){
+          const incoming = JSON.parse(file.content);
+          // merge per telefono (più recente vince)
+          items = mergeCollections(items, incoming);
+          saveLocal(items);
+          buildIndexes();
+          render();
+        }
+        setSyncState('Idle');
+      }catch(err){ console.error(err); setSyncState('Error'); }
+    }
+
+    function mergeCollections(localArr, remoteArr){
+      const byPhone = new Map();
+      [...localArr, ...remoteArr].forEach(it=>{
+        const ph = normalizePhone(it.phone);
+        const cur = byPhone.get(ph);
+        const curTs = cur ? new Date(cur.updatedAt||cur.createdAt||0).getTime() : -1;
+        const nxtTs = new Date(it.updatedAt||it.createdAt||0).getTime();
+        if(!cur || nxtTs > curTs){
+          byPhone.set(ph, cur ? mergeItems(structuredClone(cur), structuredClone(it)) : structuredClone(it));
+        }
+      });
+      return [...byPhone.values()].sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt));
+    }
+
+    let pushTimer=null, pushing=false, pollTimer=null;
+    function schedulePush(){
+      if(!getToken() || !getGist()) return;
+      if(pushTimer) clearTimeout(pushTimer);
+      pushTimer = setTimeout(pushToGist, 1200);
+    }
+
+    async function pushToGist(){
+      if(pushing) return;
+      if(!getToken() || !getGist()) return;
+      try{
+        pushing = true; setSyncState('Pushing');
+        // leggi gist per preservare altri file e fare un merge lato client se serve
+        const current = await gistFetch(`/gists/${getGist()}`);
+        if(!current.ok) throw new Error('Read-before-patch failed');
+        const etag = current.headers.get('ETag'); if(etag) setETag(etag);
+        const j = await current.json();
+        let remoteItems = [];
+        if(j.files[SYNC_FILE] && j.files[SYNC_FILE].content){
+          try{ remoteItems = JSON.parse(j.files[SYNC_FILE].content); }catch{}
+        }
+        const merged = mergeCollections(remoteItems, items);
+        const body = {
+          files: {
+            [SYNC_FILE]: { content: JSON.stringify(merged) }
+          }
+        };
+        const res = await gistFetch(`/gists/${getGist()}`, {
+          method:'PATCH',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        if(!res.ok) throw new Error('Patch failed '+res.status);
+        const et = res.headers.get('ETag'); if(et) setETag(et);
+        setSyncState('Idle');
+      }catch(err){ console.error(err); setSyncState('Error'); }
+      finally{ pushing=false; }
+    }
+
+    function startPolling(){
+      if(pollTimer) clearInterval(pollTimer);
+      if(!getToken() || !getGist()) return;
+      pollTimer = setInterval(()=>{ initialPull(); }, 15000);
+    }
+
+    function saveAll(){
+      saveLocal(items);
+      buildIndexes();
+      schedulePush(); // trigger sync
+    }
 
     // PIN: chiedilo una sola volta al giorno
     (function pinGateInit(){
@@ -928,7 +1134,13 @@
       scheduleBackup();
     })();
 
-    function boot(){ setListOpen(false); }
+    // Boot
+    function boot(){
+      setListOpen(false);
+      initialPull();
+      startPolling();
+      setSyncState('Idle');
+    }
     boot();
   </script>
 </body>
