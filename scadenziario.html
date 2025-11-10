@@ -63,6 +63,10 @@
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
     .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
     .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
+    /* Nuovi badge preventivo */
+    .quote{background:linear-gradient(135deg,#b388ff,#7aa3ff)!important;color:#0a0a0a}
+    .quote-ok{background:linear-gradient(135deg,#5be37a,#26d07c)!important;color:#082012}
+    .quote-ko{background:linear-gradient(135deg,#ff7a7a,#ff4d4f)!important;color:#250909}
 
     .st-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#0a0a0a}
     .st-diagnostica{background:var(--st-diagnostica)}
@@ -79,6 +83,8 @@
     .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .wa-btn.danger{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#230a0a;border-color:transparent}
+    .wa-btn[disabled]{opacity:.55;pointer-events:none;filter:saturate(.35)}
 
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
@@ -279,6 +285,7 @@
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
+    const fmtDateTimeShort = (d) => { try { return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch { return fmtDate(d); } };
     const isoDay = (d)=> d.toISOString().slice(0,10);
     const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
     const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
@@ -301,9 +308,7 @@
     }
 
     /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
-    function normalizeName(s){
-      return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
-    }
+    function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
     let idxByPhone = new Map();  // phone -> latest item
     let idxByName  = new Map();  // normalized "nome cognome" -> latest item
     function buildIndexes(){
@@ -372,7 +377,6 @@
     function autofillFromName(){
       const nm  = normalizeName(c_name.value||'');
       if(!nm) return;
-      // richiedi almeno 2 parole (nome+cognome) e match esatto
       const parts = nm.split(' ');
       if(parts.length < 2) return;
       const hit = idxByName.get(nm);
@@ -411,8 +415,7 @@
     function closeDupModal(){ dupGate.style.display='none'; dupContext=null; }
 
     function mergeItems(existing, pending){
-      const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
-      existing.activated = [...actSet];
+      const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]); existing.activated = [...actSet];
 
       const byType = {};
       (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
@@ -448,20 +451,8 @@
       toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
       if(open) render();
     }
-    function highlightItemById(id){
-      setListOpen(true);
-      requestAnimationFrame(()=>{
-        const listNodes = $$('#listStandard .item, #listPacchi .item');
-        const node = listNodes.find(n => (n.querySelector('.h')?.textContent||'').includes(id) );
-        (node||$('#listSection')).classList.add('flash');
-        setTimeout(()=> (node||$('#listSection')).classList.remove('flash'), 1400);
-      });
-    }
 
-    dupOpen.addEventListener('click', ()=>{
-      if(!dupContext) return;
-      closeDupModal(); setListOpen(true);
-    });
+    dupOpen.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
     dupMerge.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { primary, pendingNew } = dupContext;
@@ -525,7 +516,8 @@ ${site}`;
         activated:[...activated],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, source:null
+        acceptance:false, praticaId:null, source:null,
+        quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
       };
 
       if(activated.has('riparazione')){
@@ -626,7 +618,47 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    /* --------- PACCHI: ingest --------- */
+    /* === WhatsApp preventivo + salvataggio prezzo === */
+    function waForQuote(it, priceRaw){
+      const price = String(priceRaw || '').trim() || (it.quotePrice || '');
+      const pretty = price ? (/[€]/.test(price) ? price : `${price} €`) : '—';
+      const name = it.name;
+      const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
+      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
+      const msg = `${base}
+Ecco il preventivo per la riparazione di ${device}: ${pretty}.
+Confermi che procediamo?
+
+ID pratica: ${it.praticaId || '-'}
+Se hai domande scrivimi pure qui.`;
+      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
+    }
+
+    /* === Nuovo: messaggi decisione preventivo (accettato/rifiutato) === */
+    function waForQuoteDecision(it, decision){
+      const name = it.name;
+      const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
+      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
+      if(decision==='accepted'){
+        const msg = `${base}
+Perfetto, procediamo con la riparazione di ${device}.
+Appena pronto ti avviso per il ritiro.
+
+ID pratica: ${it.praticaId || '-'}
+Grazie!`;
+        return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
+      } else {
+        const msg = `${base}
+Ricevuto: NON procediamo con la riparazione di ${device}.
+Puoi passare a ritirarlo quando vuoi. Rimane pronto in accettazione.
+
+ID pratica: ${it.praticaId || '-'}
+Grazie!`;
+        return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
+      }
+    }
+
+    /* --------- PACCHI: ingest (dedup) --------- */
     function readPacchiRaw(){
       let all=[];
       for(const k of PACCHI_KEYS){
@@ -649,9 +681,8 @@ ${site}`;
       const all=['energia','fisso','sim','smartphone'];
       const tasks=all.map(type=>{ let due=addDays(created, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
       const id=Date.now()+Math.random().toString(16).slice(2);
-      return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||'') };
+      return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||''), quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null };
     }
-    // >>>>>>> VERSIONE SENZA DUPLICATI <<<<<<<<
     function ingestPacchi({silent=false}={}) {
       const raw = readPacchiRaw();
       if (!raw.length) return 0;
@@ -663,39 +694,25 @@ ${site}`;
         const phone = normalizePhone(rec.phone || rec.telefono || '');
         if (!phone) continue;
 
-        const created = rec.createdAt
-          ? new Date(rec.createdAt).toISOString()
-          : isoDay(new Date());
-
+        const created = rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
         const kind = (rec.kind || rec.tipo || rec.service || '').toLowerCase();
-
-        // ID univoco dell’evento pacchi (per non re-importare lo stesso evento)
         const stableId = `${phone}|${created}|${kind || 'na'}`;
         if (ing.has(stableId)) continue;
 
-        // DEDUP: se esiste già un cliente con lo stesso telefono, NON creare un nuovo item
         const exists = items.some(x => normalizePhone(x.phone) === phone);
+        if (!exists) { items.unshift(convertPacchiRecordToItem(rec)); added++; }
 
-        if (!exists) {
-          items.unshift(convertPacchiRecordToItem(rec));
-          added++;
-        }
-
-        // segna l’evento come processato
         ing.add(stableId);
       }
 
       if (added) {
-        save(items);
-        buildIndexes();
+        save(items); buildIndexes();
         if (!silent) { maybeNotify(`Import Pacchi: ${added} nuovo/i contatto/i`); }
         render();
       }
-
       savePacchiIngested(ing);
       return added;
     }
-    // <<<<<<<< FINE MODIFICA DEDUP <<<<<<<<
 
     $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
     ingestPacchi({silent:true});
@@ -708,6 +725,11 @@ ${site}`;
       const label={diagnostica:'Diagnostica','attesa-ricambi':'Ricambi',lavorazione:'Lavorazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
+
+    /* ====== RENDER ====== */
+    let filter='all';
+    const qI=$('#q');
+    const listSection = $('#listSection');
 
     function render(){
       if(listSection.hidden) return;
@@ -757,29 +779,150 @@ ${site}`;
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
       if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
-      it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
+      (it.activated||[]).forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
+
+      // Badge preventivo: inviato / accettato / rifiutato
+      if (it.quoteSentAt || it.quoteStatus){
+        const when = it.quoteDecisionAt ? fmtDateTimeShort(new Date(it.quoteDecisionAt))
+                    : it.quoteSentAt ? fmtDateTimeShort(new Date(it.quoteSentAt)) : null;
+        const price = (it.quotePrice && it.quotePrice.trim()) ? it.quotePrice.trim() : null;
+        let label = '';
+        let cls = 'quote';
+        if(it.quoteStatus==='accepted'){ label = `Preventivo ACCETTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ok'; }
+        else if(it.quoteStatus==='rejected'){ label = `Preventivo RIFIUTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ko'; }
+        else { label = `Preventivo${price?` ${price}`:''}${when?` • ${when}`:''}`; }
+        tags.append(tag(label, cls));
+      }
+
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
 
       const sum=t.querySelector('.summary'); sum.innerHTML='';
 
+      /* ====== BLOCCO ACCETTAZIONE (diagnostica minimale) ====== */
       if(it.acceptance){
         const div=document.createElement('div'); div.className='accept-brief';
+
         const top=document.createElement('div'); top.className='row-slim';
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
-        const controls=document.createElement('div'); controls.className='r-line';
-        const sel=document.createElement('select');
-        sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="attesa-ricambi">Attesa ricambi</option><option value="lavorazione">Lavorazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
-        sel.value=it.repairStatus||'diagnostica';
-        sel.addEventListener('change',()=>{
-          const prev=it.repairStatus; it.repairStatus=sel.value; save(items); render();
-          if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{} }
-        });
-        const waState=document.createElement('a'); waState.href=waForRepairState(it); waState.target='_blank'; waState.rel='noopener'; waState.className='wa-btn ok'; waState.innerHTML=`${waIcon()}WhatsApp stato`;
-        controls.append(sel, waState); top.append(controls); div.append(top); sum.append(div);
-      }
+        div.append(top);
 
+        // PREVENTIVO: input prezzo + invio WA + salvataggio
+        const quoteRow=document.createElement('div'); quoteRow.className='row-slim';
+        const left=document.createElement('div');
+        left.innerHTML=`<small style="color:var(--muted)">Invia preventivo (prezzo)</small>`;
+        const right=document.createElement('div'); right.className='r-line';
+
+        const priceInput=document.createElement('input');
+        priceInput.placeholder='Es. 129,90 €';
+        priceInput.value = it.quotePrice || '';
+        priceInput.style.cssText='min-width:140px;border-radius:9px;padding:6px 10px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;font-size:13px';
+        priceInput.addEventListener('blur',()=>{
+          let v=priceInput.value.trim();
+          if(!v){ it.quotePrice=null; save(items); return; }
+          v = v.replace(',', '.').replace(/[^\d.]/g,'');
+          if(v){
+            const num = Number(v);
+            if(!isNaN(num)) priceInput.value = (num % 1 ? num.toString().replace('.', ',') : `${num},00`) + ' €';
+          }
+        });
+
+        const sendQuote=document.createElement('a');
+        sendQuote.className='wa-btn ok';
+        sendQuote.innerHTML=`${waIcon()}Invia preventivo`;
+        sendQuote.href='#';
+        sendQuote.addEventListener('click',(e)=>{
+          e.preventDefault();
+          const href=waForQuote(it, priceInput.value);
+          try{ window.open(href,'_blank','noopener'); }catch{}
+          // salva prezzo + timestamp invio
+          it.quotePrice = priceInput.value.trim() || it.quotePrice || null;
+          it.quoteSentAt = new Date().toISOString();
+          it.quoteStatus = null; it.quoteDecisionAt = null; // reset decisione
+          save(items); render();
+        });
+
+        right.append(priceInput, sendQuote);
+        quoteRow.append(left, right);
+        div.append(quoteRow);
+
+        // DECISIONE PREVENTIVO: ACCETTATO / RIFIUTATO
+        const decideRow=document.createElement('div'); decideRow.className='row-slim';
+        const dLeft=document.createElement('div');
+        dLeft.innerHTML=`<small style="color:var(--muted)">Decisione cliente</small>`;
+        const dRight=document.createElement('div'); dRight.className='r-line';
+
+        const btnAcc=document.createElement('button');
+        btnAcc.className='wa-btn ok';
+        btnAcc.textContent='Preventivo ACCETTATO';
+        if(!it.quoteSentAt) btnAcc.setAttribute('disabled','');
+        btnAcc.addEventListener('click',()=>{
+          if(!it.quoteSentAt) return;
+          it.quoteStatus='accepted';
+          it.quoteDecisionAt=new Date().toISOString();
+          it.repairStatus='lavorazione'; // si procede
+          save(items); render();
+          const href=waForQuoteDecision(it,'accepted'); try{ window.open(href,'_blank'); }catch{}
+        });
+
+        const btnRif=document.createElement('button');
+        btnRif.className='wa-btn danger';
+        btnRif.textContent='Preventivo RIFIUTATO';
+        if(!it.quoteSentAt) btnRif.setAttribute('disabled','');
+        btnRif.addEventListener('click',()=>{
+          if(!it.quoteSentAt) return;
+          it.quoteStatus='rejected';
+          it.quoteDecisionAt=new Date().toISOString();
+          it.repairStatus='pronto'; // pronto per ritiro non riparato
+          save(items); render();
+          const href=waForQuoteDecision(it,'rejected'); try{ window.open(href,'_blank'); }catch{}
+        });
+
+        dRight.append(btnAcc, btnRif);
+        decideRow.append(dLeft, dRight);
+        div.append(decideRow);
+
+        // Stato: PRONTO (bloccato finché non c'è quoteSentAt) + CONSEGNATO
+        const stateRow=document.createElement('div'); stateRow.className='row-slim';
+        const sLeft=document.createElement('div');
+        sLeft.innerHTML=`<small style="color:var(--muted)">Stato riparazione</small>`;
+        const sRight=document.createElement('div'); sRight.className='r-line';
+
+        const btnPronto=document.createElement('button');
+        btnPronto.className='wa-btn ok';
+        btnPronto.textContent='Disponibile al ritiro';
+        const prontoBlocked = !it.quoteSentAt;
+        if(prontoBlocked){ btnPronto.setAttribute('disabled',''); btnPronto.title='Invia prima il preventivo'; }
+        btnPronto.addEventListener('click',()=>{
+          if(btnPronto.hasAttribute('disabled')) return;
+          const prev=it.repairStatus;
+          it.repairStatus='pronto';
+          save(items); render();
+          if(prev!=='pronto'){
+            maybeNotify(`"${it.name}" è PRONTO al ritiro`);
+            const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{}
+          }
+        });
+
+        const btnConsegnato=document.createElement('button');
+        btnConsegnato.className='wa-btn';
+        btnConsegnato.textContent='Consegnato';
+        btnConsegnato.addEventListener('click',()=>{
+          it.repairStatus='consegnato';
+          save(items); render();
+          const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{}
+        });
+
+        sRight.append(btnPronto, btnConsegnato);
+        stateRow.append(sLeft, sRight);
+        div.append(stateRow);
+
+        sum.append(div);
+      }
+      /* ====== FINE BLOCCO ACCETTAZIONE ====== */
+
+      // Prossimi task
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
       if(next3.length){
         const line=document.createElement('div'); line.className='r-line';
@@ -794,6 +937,7 @@ ${site}`;
         sum.append(line);
       }
 
+      // Azioni comuni
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
       snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
@@ -806,7 +950,7 @@ ${site}`;
       return t;
     }
 
-    // Click su WA = muto fino a +45min
+    // Click su WA task = muto fino a +45min
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
@@ -856,7 +1000,7 @@ ${site}`;
       scheduleBackup();
     })();
 
-    function boot(){ setListOpen(false); }
+    function boot(){ const toggleListBtn = $('#toggleListBtn'); toggleListBtn.addEventListener('click', ()=> setListOpen(listSection.hidden)); setListOpen(false); }
     boot();
   </script>
 </body>
