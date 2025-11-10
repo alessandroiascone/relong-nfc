@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenziario + Accettazione + Pacchi</title>
+  <title>ReLong • Scadenzario + Accettazione + Pacchi</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -17,18 +17,15 @@
       --st-diagnostica:#ffd666; --st-ricambi:#ffa940; --st-lavorazione:#69c0ff; --st-pronto:#95de64; --st-consegnato:#bfbfbf;
       --pacchi:#00d1b2;
     }
-
-    html,body{min-height:100%;overflow-x:hidden}
     body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
       background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
       padding:24px;display:flex;flex-direction:column;gap:24px}
-
-    .shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;padding:0 8px}
+    .shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
     @media (max-width:980px){.shell{grid-template-columns:1fr;}}
     .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
-    .title{display:flex;align-items:flex-start;gap:14px;max-width:1200px;margin:0 auto;padding:0 8px}
+    .title{display:flex;align-items:flex-start;gap:14px}
     .title h1{font-size:26px;letter-spacing:.2px}
     .subtitle{color:var(--muted);font-size:14px}
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -66,10 +63,6 @@
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
     .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
     .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
-    /* Badge preventivo */
-    .quote{background:linear-gradient(135deg,#b388ff,#7aa3ff)!important;color:#0a0a0a}
-    .quote-ok{background:linear-gradient(135deg,#5be37a,#26d07c)!important;color:#082012}
-    .quote-ko{background:linear-gradient(135deg,#ff7a7a,#ff4d4f)!important;color:#250909}
 
     .st-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#0a0a0a}
     .st-diagnostica{background:var(--st-diagnostica)}
@@ -86,25 +79,21 @@
     .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
-    .wa-btn.danger{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#230a0a;border-color:transparent}
-    .wa-btn[disabled]{opacity:.55;pointer-events:none;filter:saturate(.35)}
 
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
     #listSection[hidden]{display:none}
-    .openListCard{max-width:1200px;margin:0 auto;padding:0 8px}
+    .openListCard{max-width:1200px;margin:0 auto}
 
     .subsection{margin:6px 0 12px}
     .subsection h3{font-size:15px;opacity:.9;margin-bottom:8px}
 
-    /* PIN */
     #pinGate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95));backdrop-filter:blur(6px);display:grid;place-items:center;z-index:9999}
     #pinCard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px}
     #pinCard h3{margin:0;font-size:18px}
     #pinCard p{color:var(--muted);font-size:13px}
     #pinInput{letter-spacing:6px;text-align:center;font-weight:800}
     #pinError{color:#ff7676;min-height:18px;font-size:12px}
-
     #errBar{position:fixed;left:0;right:0;bottom:0;background:#c0392b;color:#fff;padding:8px 12px;font-size:12px;display:none;z-index:99999}
 
     #dupGate{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:9998}
@@ -122,7 +111,7 @@
   <div id="pinGate" hidden>
     <div id="pinCard">
       <h3>Accesso protetto</h3>
-      <p>Inserisci il PIN.</p>
+      <p>Inserisci il PIN a 4 cifre per aprire lo scadenzario.</p>
       <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
       <div class="actions"><button id="pinOk" class="btn primary" style="flex:1">Sblocca</button></div>
       <div id="pinError"></div>
@@ -149,17 +138,17 @@
   <!-- Header -->
   <header class="title" aria-hidden="true">
     <div>
-      <h1>ReLong • Scadenziario + Accettazione</h1>
-      <div class="subtitle">Gestionale → reminder smart con WhatsApp.</div>
+      <h1>ReLong • Scadenzario + Accettazione</h1>
+      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp + Google Calendar.</div>
     </div>
   </header>
 
   <!-- Dati cliente -->
-  <section class="card" style="max-width:1200px;margin:0 auto;padding:0 8px" aria-hidden="true">
+  <section class="card" style="max-width:1200px;margin:0 auto" aria-hidden="true">
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
-      <div><label>Telefono (solo cifre)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
+      <div><label>Telefono (solo cifre, WhatsApp)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
     </div>
   </section>
 
@@ -170,11 +159,11 @@
       <div class="content">
         <div class="grid2">
           <div>
-            <label>Data</label>
+            <label>Data attivazione</label>
             <input id="start" type="date" />
           </div>
           <div class="full">
-            <label>Cosa vuoi inserire</label>
+            <label>Cosa hai attivato ORA</label>
             <div class="toggle-grid" id="toggles">
               <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
               <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
@@ -210,7 +199,7 @@
               <option>Redmi</option><option>Xiaomi</option><option>Honor</option><option>Other</option>
             </select>
           </div>
-          <div><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax, Galaxy S25…" /></div>
+          <div><label>Modello</label><input id="a_model" placeholder="iPhone 15, Galaxy S23…" /></div>
           <div class="full"><label>Difetto / Problema</label><textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea></div>
           <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
         </form>
@@ -222,8 +211,8 @@
   <section class="card openListCard" aria-hidden="true">
     <div class="content" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
-        <h2 style="padding:0">Clienti</h2>
-        <div class="subtitle">Elenco completo visibile solo su richiesta.</div>
+        <h2 style="padding:0">Clienti & Promemoria</h2>
+        <div class="subtitle">Elenco completo e sezione “Da Pacchi” visibili solo su richiesta.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="syncPacchiBtn" class="btn ghost" title="Importa subito eventuali nuovi contatti da Ritiro/Consegna Pacchi">Forza Sync Pacchi</button>
@@ -233,7 +222,7 @@
   </section>
 
   <!-- Elenco (nascosto finché non aperto) -->
-  <section class="card" id="listSection" style="max-width:1200px;margin:0 auto;padding:0 8px" hidden aria-hidden="true">
+  <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden aria-hidden="true">
     <div class="content">
       <div class="toolbar">
         <div class="filters">
@@ -290,7 +279,6 @@
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
-    const fmtDateTimeShort = (d) => { try { return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch { return fmtDate(d); } };
     const isoDay = (d)=> d.toISOString().slice(0,10);
     const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
     const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
@@ -313,7 +301,9 @@
     }
 
     /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
-    function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+    function normalizeName(s){
+      return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+    }
     let idxByPhone = new Map();  // phone -> latest item
     let idxByName  = new Map();  // normalized "nome cognome" -> latest item
     function buildIndexes(){
@@ -382,6 +372,7 @@
     function autofillFromName(){
       const nm  = normalizeName(c_name.value||'');
       if(!nm) return;
+      // Richiedi almeno 2 parole (nome+cognome) e match esatto
       const parts = nm.split(' ');
       if(parts.length < 2) return;
       const hit = idxByName.get(nm);
@@ -409,8 +400,8 @@
         primary: existingItems.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))[0],
         pendingNew
       };
-      dupList.innerHTML = existingItems.map(it=>(`
-        <div style="padding:8px;border-bottom:1px solid var(--stroke)">
+      dupList.innerHTML = existingItems.map(it=>(
+        `<div style="padding:8px;border-bottom:1px solid var(--stroke)">
           <b>${it.name||'-'}</b> • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}
           <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.source==='pacchi'?' • Da pacchi':''}</div>
         </div>`
@@ -420,7 +411,8 @@
     function closeDupModal(){ dupGate.style.display='none'; dupContext=null; }
 
     function mergeItems(existing, pending){
-      const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]); existing.activated = [...actSet];
+      const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
+      existing.activated = [...actSet];
 
       const byType = {};
       (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
@@ -456,8 +448,20 @@
       toggleListBtn.textContent = open ? 'Chiudi elenco' : 'Apri elenco';
       if(open) render();
     }
+    function highlightItemById(id){
+      setListOpen(true);
+      requestAnimationFrame(()=>{
+        const listNodes = $$('#listStandard .item, #listPacchi .item');
+        const node = listNodes.find(n => (n.querySelector('.h')?.textContent||'').includes(id) );
+        (node||$('#listSection')).classList.add('flash');
+        setTimeout(()=> (node||$('#listSection')).classList.remove('flash'), 1400);
+      });
+    }
 
-    dupOpen.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
+    dupOpen.addEventListener('click', ()=>{
+      if(!dupContext) return;
+      closeDupModal(); setListOpen(true);
+    });
     dupMerge.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { primary, pendingNew } = dupContext;
@@ -521,8 +525,7 @@ ${site}`;
         activated:[...activated],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, source:null,
-        quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null
+        acceptance:false, praticaId:null, source:null
       };
 
       if(activated.has('riparazione')){
@@ -623,47 +626,7 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    /* === WhatsApp preventivo + salvataggio prezzo === */
-    function waForQuote(it, priceRaw){
-      const price = String(priceRaw || '').trim() || (it.quotePrice || '');
-      const pretty = price ? (/[€]/.test(price) ? price : `${price} €`) : '—';
-      const name = it.name;
-      const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
-      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
-      const msg = `${base}
-Ecco il preventivo per la riparazione di ${device}: ${pretty}.
-Confermi che procediamo?
-
-ID pratica: ${it.praticaId || '-'}
-Se hai domande scrivimi pure qui.`;
-      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
-    }
-
-    /* === Messaggi decisione preventivo === */
-    function waForQuoteDecision(it, decision){
-      const name = it.name;
-      const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
-      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
-      if(decision==='accepted'){
-        const msg = `${base}
-Perfetto, procediamo con la riparazione di ${device}.
-Appena pronto ti avviso per il ritiro.
-
-ID pratica: ${it.praticaId || '-'}
-Grazie!`;
-        return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
-      } else {
-        const msg = `${base}
-Ricevuto: NON procediamo con la riparazione di ${device}.
-Puoi passare a ritirarlo quando vuoi. Rimane pronto in accettazione.
-
-ID pratica: ${it.praticaId || '-'}
-Grazie!`;
-        return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
-      }
-    }
-
-    /* --------- PACCHI: ingest (dedup su numero) --------- */
+    /* --------- PACCHI: ingest --------- */
     function readPacchiRaw(){
       let all=[];
       for(const k of PACCHI_KEYS){
@@ -686,39 +649,23 @@ Grazie!`;
       const all=['energia','fisso','sim','smartphone'];
       const tasks=all.map(type=>{ let due=addDays(created, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
       const id=Date.now()+Math.random().toString(16).slice(2);
-      return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||''), quotePrice:null, quoteSentAt:null, quoteStatus:null, quoteDecisionAt:null };
+      return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||'') };
     }
-    function ingestPacchi({silent=false}={}) {
-      const raw = readPacchiRaw();
-      if (!raw.length) return 0;
-
-      const ing = pacchiIngestedSet();
-      let added = 0;
-
-      for (const rec of raw) {
-        const phone = normalizePhone(rec.phone || rec.telefono || '');
-        if (!phone) continue;
-
-        const created = rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
-        const kind = (rec.kind || rec.tipo || rec.service || '').toLowerCase();
-        const stableId = `${phone}|${created}|${kind || 'na'}`;
-        if (ing.has(stableId)) continue;
-
-        const exists = items.some(x => normalizePhone(x.phone) === phone);
-        if (!exists) { items.unshift(convertPacchiRecordToItem(rec)); added++; }
-
-        ing.add(stableId);
+    function ingestPacchi({silent=false}={}){
+      const raw=readPacchiRaw(); if(!raw.length) return 0;
+      const ing=pacchiIngestedSet(); let added=0;
+      for(const rec of raw){
+        const phone=normalizePhone(rec.phone||rec.telefono||''); if(!phone) continue;
+        const created=rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
+        const kind=(rec.kind||rec.tipo||'').toLowerCase();
+        const stableId=`${phone}|${created}|${kind||'na'}`;
+        if(ing.has(stableId)) continue;
+        items.unshift(convertPacchiRecordToItem(rec));
+        ing.add(stableId); added++;
       }
-
-      if (added) {
-        save(items); buildIndexes();
-        if (!silent) { maybeNotify(`Import Pacchi: ${added} nuovo/i contatto/i`); }
-        render();
-      }
-      savePacchiIngested(ing);
+      if(added){ save(items); buildIndexes(); if(!silent){ maybeNotify(`Import Pacchi: ${added} contatto/i aggiunto/i`); } render(); }
       return added;
     }
-
     $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
     ingestPacchi({silent:true});
     window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
@@ -731,7 +678,6 @@ Grazie!`;
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
 
-    /* ====== RENDER ====== */
     function render(){
       if(listSection.hidden) return;
       const listStd = $('#listStandard'); listStd.innerHTML='';
@@ -780,150 +726,29 @@ Grazie!`;
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
       if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
-      (it.activated||[]).forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
-
-      // Badge preventivo: inviato / accettato / rifiutato
-      if (it.quoteSentAt || it.quoteStatus){
-        const when = it.quoteDecisionAt ? fmtDateTimeShort(new Date(it.quoteDecisionAt))
-                    : it.quoteSentAt ? fmtDateTimeShort(new Date(it.quoteSentAt)) : null;
-        const price = (it.quotePrice && it.quotePrice.trim()) ? it.quotePrice.trim() : null;
-        let label = '';
-        let cls = 'quote';
-        if(it.quoteStatus==='accepted'){ label = `Preventivo ACCETTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ok'; }
-        else if(it.quoteStatus==='rejected'){ label = `Preventivo RIFIUTATO${price?` ${price}`:''}${when?` • ${when}`:''}`; cls='quote-ko'; }
-        else { label = `Preventivo${price?` ${price}`:''}${when?` • ${when}`:''}`; }
-        tags.append(tag(label, cls));
-      }
-
+      it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
       if(it.done) tags.append(tag('Completato'));
 
       const sum=t.querySelector('.summary'); sum.innerHTML='';
 
-      /* ====== BLOCCO ACCETTAZIONE (diagnostica minimale) ====== */
       if(it.acceptance){
         const div=document.createElement('div'); div.className='accept-brief';
-
         const top=document.createElement('div'); top.className='row-slim';
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
-        div.append(top);
-
-        // PREVENTIVO: input prezzo + invio WA + salvataggio
-        const quoteRow=document.createElement('div'); quoteRow.className='row-slim';
-        const left=document.createElement('div');
-        left.innerHTML=`<small style="color:var(--muted)">Invia preventivo (prezzo)</small>`;
-        const right=document.createElement('div'); right.className='r-line';
-
-        const priceInput=document.createElement('input');
-        priceInput.placeholder='Es. 129,90 €';
-        priceInput.value = it.quotePrice || '';
-        priceInput.style.cssText='min-width:140px;border-radius:9px;padding:6px 10px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;font-size:13px';
-        priceInput.addEventListener('blur',()=>{
-          let v=priceInput.value.trim();
-          if(!v){ it.quotePrice=null; save(items); return; }
-          v = v.replace(',', '.').replace(/[^\d.]/g,'');
-          if(v){
-            const num = Number(v);
-            if(!isNaN(num)) priceInput.value = (num % 1 ? num.toString().replace('.', ',') : `${num},00`) + ' €';
-          }
+        const controls=document.createElement('div'); controls.className='r-line';
+        const sel=document.createElement('select');
+        sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="attesa-ricambi">Attesa ricambi</option><option value="lavorazione">Lavorazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
+        sel.value=it.repairStatus||'diagnostica';
+        sel.addEventListener('change',()=>{
+          const prev=it.repairStatus; it.repairStatus=sel.value; save(items); render();
+          if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{} }
         });
-
-        const sendQuote=document.createElement('a');
-        sendQuote.className='wa-btn ok';
-        sendQuote.innerHTML=`${waIcon()}Invia preventivo`;
-        sendQuote.href='#';
-        sendQuote.addEventListener('click',(e)=>{
-          e.preventDefault();
-          const href=waForQuote(it, priceInput.value);
-          try{ window.open(href,'_blank','noopener'); }catch{}
-          // salva prezzo + timestamp invio
-          it.quotePrice = priceInput.value.trim() || it.quotePrice || null;
-          it.quoteSentAt = new Date().toISOString();
-          it.quoteStatus = null; it.quoteDecisionAt = null; // reset decisione
-          save(items); render();
-        });
-
-        right.append(priceInput, sendQuote);
-        quoteRow.append(left, right);
-        div.append(quoteRow);
-
-        // DECISIONE PREVENTIVO
-        const decideRow=document.createElement('div'); decideRow.className='row-slim';
-        const dLeft=document.createElement('div');
-        dLeft.innerHTML=`<small style="color:var(--muted)">Decisione cliente</small>`;
-        const dRight=document.createElement('div'); dRight.className='r-line';
-
-        const btnAcc=document.createElement('button');
-        btnAcc.className='wa-btn ok';
-        btnAcc.textContent='Preventivo ACCETTATO';
-        if(!it.quoteSentAt) btnAcc.setAttribute('disabled','');
-        btnAcc.addEventListener('click',()=>{
-          if(!it.quoteSentAt) return;
-          it.quoteStatus='accepted';
-          it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='lavorazione';
-          save(items); render();
-          const href=waForQuoteDecision(it,'accepted'); try{ window.open(href,'_blank'); }catch{}
-        });
-
-        const btnRif=document.createElement('button');
-        btnRif.className='wa-btn danger';
-        btnRif.textContent='Preventivo RIFIUTATO';
-        if(!it.quoteSentAt) btnRif.setAttribute('disabled','');
-        btnRif.addEventListener('click',()=>{
-          if(!it.quoteSentAt) return;
-          it.quoteStatus='rejected';
-          it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='pronto';
-          save(items); render();
-          const href=waForQuoteDecision(it,'rejected'); try{ window.open(href,'_blank'); }catch{}
-        });
-
-        dRight.append(btnAcc, btnRif);
-        decideRow.append(dLeft, dRight);
-        div.append(decideRow);
-
-        // Stato: PRONTO + CONSEGNATO
-        const stateRow=document.createElement('div'); stateRow.className='row-slim';
-        const sLeft=document.createElement('div');
-        sLeft.innerHTML=`<small style="color:var(--muted)">Stato riparazione</small>`;
-        const sRight=document.createElement('div'); sRight.className='r-line';
-
-        const btnPronto=document.createElement('button');
-        btnPronto.className='wa-btn ok';
-        btnPronto.textContent='Disponibile al ritiro';
-        const prontoBlocked = !it.quoteSentAt;
-        if(prontoBlocked){ btnPronto.setAttribute('disabled',''); btnPronto.title='Invia prima il preventivo'; }
-        btnPronto.addEventListener('click',()=>{
-          if(btnPronto.hasAttribute('disabled')) return;
-          const prev=it.repairStatus;
-          it.repairStatus='pronto';
-          save(items); render();
-          if(prev!=='pronto'){
-            maybeNotify(`"${it.name}" è PRONTO al ritiro`);
-            const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{}
-          }
-        });
-
-        const btnConsegnato=document.createElement('button');
-        btnConsegnato.className='wa-btn';
-        btnConsegnato.textContent='Consegnato';
-        btnConsegnato.addEventListener('click',()=>{
-          it.repairStatus='consegnato';
-          save(items); render();
-          const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{}
-        });
-
-        sRight.append(btnPronto, btnConsegnato);
-        stateRow.append(sLeft, sRight);
-        div.append(stateRow);
-
-        sum.append(div);
+        const waState=document.createElement('a'); waState.href=waForRepairState(it); waState.target='_blank'; waState.rel='noopener'; waState.className='wa-btn ok'; waState.innerHTML=`${waIcon()}WhatsApp stato`;
+        controls.append(sel, waState); top.append(controls); div.append(top); sum.append(div);
       }
-      /* ====== FINE BLOCCO ACCETTAZIONE ====== */
 
-      // Prossimi task
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
       if(next3.length){
         const line=document.createElement('div'); line.className='r-line';
@@ -938,7 +763,6 @@ Grazie!`;
         sum.append(line);
       }
 
-      // Azioni comuni
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
       snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
@@ -951,7 +775,7 @@ Grazie!`;
       return t;
     }
 
-    // Click su WA task = muto fino a +45min
+    // Click su WA = muto fino a +45min
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
@@ -961,43 +785,21 @@ Grazie!`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // === PIN GATE (robusto) ===
+    // PIN
     (function pinGateInit(){
-      const gate  = document.getElementById('pinGate');
-      const ok    = document.getElementById('pinOk');
-      const input = document.getElementById('pinInput');
-      const err   = document.getElementById('pinError');
-
-      const PIN_CODE   = '1990';
-      const PIN_ALWAYS = true;            // true = chiedi ad ogni apertura
-      const KEY_OK     = 'relong-pin-ok'; // sessionStorage key
-
+      const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
+      const unlocked=sessionStorage.getItem('relong-pin-ok')==='1';
       function show(el){ el && el.removeAttribute('hidden'); }
       function hide(el){ el && el.setAttribute('hidden',''); }
-      function setAppHidden(h){
-        document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false'));
-      }
-
-      const unlocked = (!PIN_ALWAYS) && (sessionStorage.getItem(KEY_OK)==='1');
-
-      if(unlocked){ hide(gate); setAppHidden(false); }
-      else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(), 60); }
-
+      function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
+      if(unlocked){ hide(gate); setAppHidden(false); } else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50); }
       function tryUnlock(){
         const val=(input.value||'').trim();
-        if(val===PIN_CODE){
-          sessionStorage.setItem(KEY_OK,'1');
-          setAppHidden(false);
-          hide(gate);
-          gate.parentNode && gate.parentNode.removeChild(gate); // rimuove overlay
-        }else{
-          err.textContent='PIN errato. Riprova.';
-          input.value=''; input.focus();
-        }
+        if(val==='1990'){ sessionStorage.setItem('relong-pin-ok','1'); setAppHidden(false); hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
+        else { err.textContent='PIN errato. Riprova.'; input.value=''; input.focus(); }
       }
-
       ok.addEventListener('click', tryUnlock);
-      input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+      input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
     })();
 
     // Push intelligenti 10/18 + Backup 23:59
