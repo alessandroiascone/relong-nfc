@@ -120,7 +120,7 @@
   </div>
   <div id="errBar"></div>
 
-  <!-- Modal Doppioni -->
+  <!-- Modal Doppioni (per inserimenti manuali) -->
   <div id="dupGate" role="dialog" aria-modal="true" aria-labelledby="dupTitle">
     <div id="dupCard">
       <h3 id="dupTitle">Numero già presente</h3>
@@ -178,7 +178,7 @@
       </div>
     </section>
 
-    <!-- Accettazione (solo con riparazione) -->
+    <!-- Accettazione -->
     <aside class="card" id="acceptWrap">
       <h2>Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
@@ -221,7 +221,7 @@
     </div>
   </section>
 
-  <!-- Elenco (nascosto finché non aperto) -->
+  <!-- Elenco -->
   <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden aria-hidden="true">
     <div class="content">
       <div class="toolbar">
@@ -299,22 +299,20 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
-    /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
-    function normalizeName(s){
-      return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
-    }
-    let idxByPhone = new Map();  // phone -> latest item
-    let idxByName  = new Map();  // normalized "nome cognome" -> latest item
+    /* ====== Indici per auto-compilazione ====== */
+    function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+    let idxByPhone = new Map();
+    let idxByName  = new Map();
     function buildIndexes(){
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
         const ph = normalizePhone(it.phone);
         const nm = normalizeName(it.name);
-        const ts = new Date(it.createdAt||it.start||0).getTime();
+        const ts = new Date(it.updatedAt||it.createdAt||it.start||0).getTime();
         const a = idxByPhone.get(ph);
-        if(ph && (!a || ts > new Date(a.createdAt||a.start||0).getTime())) idxByPhone.set(ph, it);
+        if(ph && (!a || ts > new Date(a.updatedAt||a.createdAt||a.start||0).getTime())) idxByPhone.set(ph, it);
         const b = idxByName.get(nm);
-        if(nm && (!b || ts > new Date(b.createdAt||b.start||0).getTime())) idxByName.set(nm, it);
+        if(nm && (!b || ts > new Date(b.updatedAt||b.createdAt||b.start||0).getTime())) idxByName.set(nm, it);
       }
     }
     buildIndexes();
@@ -352,7 +350,6 @@
     const insertBtn = $('#insertBtn');
     const startI = $('#start');
 
-    // Data = oggi
     try{
       const d=new Date(); const pad=n=>String(n).padStart(2,'0');
       if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
@@ -371,7 +368,6 @@
     function autofillFromName(){
       const nm  = normalizeName(c_name.value||'');
       if(!nm) return;
-      // Richiedi almeno 2 parole (nome+cognome) e match esatto
       const parts = nm.split(' ');
       if(parts.length < 2) return;
       const hit = idxByName.get(nm);
@@ -384,14 +380,14 @@
     c_name.addEventListener('blur', autofillFromName);
     c_name.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
 
-    /* ====== Doppioni: modal ====== */
+    /* ====== Doppioni (manuale): modal ====== */
     const dupGate = $('#dupGate');
     const dupList = $('#dupList');
     const dupOpen = $('#dupOpen');
     const dupMerge = $('#dupMerge');
     const dupInsertAnyway = $('#dupInsertAnyway');
     const dupCancel = $('#dupCancel');
-    let dupContext = null; // {existingItems:[], primary, pendingNew}
+    let dupContext = null;
 
     function openDupModal(existingItems, pendingNew){
       dupContext = {
@@ -402,7 +398,7 @@
       dupList.innerHTML = existingItems.map(it=>(
         `<div style="padding:8px;border-bottom:1px solid var(--stroke)">
           <b>${it.name||'-'}</b> • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}
-          <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.source==='pacchi'?' • Da pacchi':''}</div>
+          <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.fromPacchi?' • Da pacchi':''}</div>
         </div>`
       )).join('') || '<div>Nessun dettaglio</div>';
       dupGate.style.display='grid';
@@ -430,6 +426,14 @@
         existing.device = pending.device;
         existing.repairStatus = pending.repairStatus || existing.repairStatus || 'diagnostica';
         if(!existing.praticaId) existing.praticaId = pending.praticaId || nextPraticaId();
+      }
+
+      // merge pacchi meta
+      if(pending.fromPacchi){
+        existing.fromPacchi = true;
+        existing.pacchiCount = (existing.pacchiCount||0) + 1;
+        const kinds = new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]);
+        existing.pacchiKinds = [...kinds].filter(Boolean);
       }
 
       existing.name = pending.name || existing.name;
@@ -470,36 +474,12 @@
         save(items); buildIndexes(); render();
         closeDupModal();
         setListOpen(true);
-        if(pendingNew.acceptance){
-          const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-          const msg=`Ciao, ${pendingNew.name}, abbiamo accettato il tuo prodotto in assistenza.
-Marchio: ${pendingNew.device.brand}
-Modello: ${pendingNew.device.model || '-'}
-Difetto dichiarato: ${pendingNew.device.issue || '-'}
-
-Ti aggiorneremo noi per il ritiro. Grazie!
-Nel frattempo puoi visionare qui i nostri servizi:
-${site}`;
-          try{ window.open(`https://wa.me/39${normalizePhone(pendingNew.phone)}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
-        }
       }
     });
     dupInsertAnyway.addEventListener('click', ()=>{
       if(!dupContext) return;
       const { pendingNew } = dupContext;
       items.unshift(pendingNew); save(items); buildIndexes(); render(); closeDupModal();
-      if(pendingNew.acceptance){
-        const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-        const msg=`Ciao, ${pendingNew.name}, abbiamo accettato il tuo prodotto in assistenza.
-Marchio: ${pendingNew.device.brand}
-Modello: ${pendingNew.device.model || '-'}
-Difetto dichiarato: ${pendingNew.device.issue || '-'}
-
-Ti aggiorneremo noi per il ritiro. Grazie!
-Nel frattempo puoi visionare qui i nostri servizi:
-${site}`;
-        try{ window.open(`https://wa.me/39${normalizePhone(pendingNew.phone)}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
-      }
     });
     dupCancel.addEventListener('click', closeDupModal);
 
@@ -509,7 +489,7 @@ ${site}`;
         if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
       }catch{}
 
-      const name = c_name.value.trim();
+      const name = (c_name.value||'').trim();
       let phone = normalizePhone(c_phone.value||'');
       if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
 
@@ -524,7 +504,7 @@ ${site}`;
         activated:[...activated],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, source:null
+        acceptance:false, praticaId:null, fromPacchi:false, pacchiCount:0, pacchiKinds:[]
       };
 
       if(activated.has('riparazione')){
@@ -556,18 +536,6 @@ ${site}`;
         openDupModal(matches, pending);
       } else {
         items.unshift(pending); save(items); buildIndexes(); render();
-        if(pending.acceptance){
-          const site='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-          const msg=`Ciao, ${name}, abbiamo accettato il tuo prodotto in assistenza.
-Marchio: ${pending.device.brand}
-Modello: ${pending.device.model || '-'}
-Difetto dichiarato: ${pending.device.issue || '-'}
-
-Ti aggiorneremo noi per il ritiro. Grazie!
-Nel frattempo puoi visionare qui i nostri servizi:
-${site}`;
-          try{ window.open(`https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
-        }
         aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI();
       }
     });
@@ -625,7 +593,7 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    /* --------- PACCHI: ingest (auto-discovery & compat) --------- */
+    /* --------- PACCHI: ingest (auto-discovery & dedup rigoroso) --------- */
     function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem(PACCHI_INGESTED_KEY)||'[]')); }catch{ return new Set(); } }
     function savePacchiIngested(set){ try{ localStorage.setItem(PACCHI_INGESTED_KEY, JSON.stringify([...set])); }catch{} }
 
@@ -635,7 +603,8 @@ ${site}`;
       for(let i=0;i<localStorage.length;i++){
         const k = localStorage.key(i);
         if(!k) continue;
-        let looksPacchiName = /pacchi/i.test(k); // nel nome
+        // nome che contiene pacchi/ritiro/consegna/corriere/spedizione
+        let looksPacchiName = /(pacchi|ritiro|consegna|corriere|spedizion)/i.test(k);
         let looksPacchiData = false;
         try{
           const raw = localStorage.getItem(k);
@@ -644,7 +613,7 @@ ${site}`;
           const isArr = Array.isArray(parsed) && parsed.some(x => x && (x.phone||x.telefono||x.name||x.nome));
           const isObjItems = parsed && Array.isArray(parsed.items) && parsed.items.some(x => x && (x.phone||x.telefono||x.name||x.nome));
           looksPacchiData = isArr || isObjItems;
-        }catch(e){ /* non JSON, ignora */ }
+        }catch(e){ /* non JSON */ }
         if(looksPacchiName || looksPacchiData) keys.push(k);
       }
       return [...new Set(keys)];
@@ -665,62 +634,96 @@ ${site}`;
       return all;
     }
 
-    function convertPacchiRecordToItem(rec){
+    function convertPacchiRecord(rec){
       const name=(rec.name||rec.nome||'Cliente Pacchi').toString().trim();
       const phone=normalizePhone(rec.phone||rec.telefono||'');
       const created=rec.createdAt ? new Date(rec.createdAt) : new Date();
+      const kind=(rec.kind||rec.tipo||rec.service||'').toString().trim();
+      return { name, phone, created, kind };
+    }
+
+    function ensureTasksForPacchi(baseDate, existingTasks){
+      // non creiamo duplicati di task: se già esiste un tipo, lo lasciamo; se manca, lo aggiungiamo
+      const types = new Set((existingTasks||[]).map(t=>t.type));
       const all=['energia','fisso','sim','smartphone'];
-      const tasks=all.map(type=>{
-        let due=addDays(created, DEFAULT_DAYS[type]);
-        due=avoidWeekend(due);
-        return {type, due:due.toISOString()};
-      });
-      const id=Date.now()+Math.random().toString(16).slice(2);
-      return {
-        id, name, phone,
-        start:created.toISOString(),
-        createdAt:new Date().toISOString(),
-        activated:[], tasks,
-        done:false, optWeekend:true, optEvening:true,
-        muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null,
-        source:'pacchi',
-        pacchiKind:(rec.kind||rec.tipo||rec.service||'')
-      };
+      const tasks=[...(existingTasks||[])];
+      for(const type of all){
+        if(!types.has(type)){
+          let due=addDays(baseDate, DEFAULT_DAYS[type]); due=avoidWeekend(due);
+          tasks.push({ type, due:due.toISOString() });
+        }
+      }
+      return tasks;
     }
 
     function ingestPacchi({silent=false}={}){
       const raw=readPacchiRaw(); if(!raw.length) return 0;
-      const ing=pacchiIngestedSet(); let added=0;
+      const ing=pacchiIngestedSet(); let addedOrMerged=0;
+
       for(const rec of raw){
-        const phone=normalizePhone(rec.phone||rec.telefono||''); if(!phone) continue;
-        const created=rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
-        const kind=(rec.kind||rec.tipo||'').toLowerCase();
-        const stableId=`${phone}|${created}|${kind||'na'}`;
+        const {name, phone, created, kind} = convertPacchiRecord(rec);
+        if(!phone) continue;
+
+        // id stabile per evitare re-process
+        const stableId=`${phone}|${isoDay(created)}|${(kind||'na').toLowerCase()}`;
         if(ing.has(stableId)) continue;
-        items.unshift(convertPacchiRecordToItem(rec));
-        ing.add(stableId); added++;
+
+        // cerca contatto già esistente per telefono
+        const ph = normalizePhone(phone);
+        const idx = items.findIndex(x=> normalizePhone(x.phone)===ph);
+
+        if(idx>-1){
+          // MERGE su contatto esistente — NO nuovo record
+          const it = items[idx];
+          it.fromPacchi = true;
+          it.pacchiCount = (it.pacchiCount||0) + 1;
+          const kinds = new Set([...(it.pacchiKinds||[]), kind]);
+          it.pacchiKinds = [...kinds].filter(Boolean);
+          it.tasks = ensureTasksForPacchi(created, it.tasks);
+          it.updatedAt = new Date().toISOString();
+          items[idx] = it;
+        } else {
+          // crea UNICO nuovo contatto derivante da pacchi
+          const baseTasks = ensureTasksForPacchi(created, []);
+          items.unshift({
+            id: Date.now()+Math.random().toString(16).slice(2),
+            name, phone,
+            start: created.toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            activated:[],
+            tasks: baseTasks,
+            done:false, optWeekend:true, optEvening:true,
+            muteDate:null, activeChatUntil:null, doneAt:null,
+            acceptance:false, praticaId:null,
+            fromPacchi:true, pacchiCount:1, pacchiKinds: kind ? [kind] : []
+          });
+        }
+
+        ing.add(stableId);
+        addedOrMerged++;
       }
-      if(added){
+
+      if(addedOrMerged){
         save(items); buildIndexes();
-        if(!silent){ maybeNotify(`Import Pacchi: ${added} contatto/i aggiunto/i`); }
+        if(!silent){ maybeNotify(`Pacchi sync: ${addedOrMerged} aggiornamento/i`); }
         render();
         savePacchiIngested(ing);
       }
-      return added;
+      return addedOrMerged;
     }
 
     // Bottone "Forza Sync Pacchi"
-    $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
+    $('#syncPacchiBtn')?.addEventListener('click', ()=> ingestPacchi({silent:false}));
     // Import silenzioso al boot
     ingestPacchi({silent:true});
-    // Ascolta QUALSIASI cambiamento storage che sembri "pacchi"
+    // Ascolta cambiamenti storage che sembrano "pacchi"
     window.addEventListener('storage', (ev)=>{
       if(!ev || !ev.key) return;
-      if(/pacchi/i.test(ev.key)){ ingestPacchi({silent:false}); }
+      if(/(pacchi|ritiro|consegna|corriere|spedizion)/i.test(ev.key)){ ingestPacchi({silent:false}); }
     });
-    // Poll leggero di sicurezza (15s)
-    setInterval(()=> ingestPacchi({silent:true}), 15000);
+    // Poll più frequente (5s) per sicurezza anche nella stessa tab
+    setInterval(()=> ingestPacchi({silent:true}), 5000);
 
     function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
     function statusChip(status){
@@ -742,7 +745,7 @@ ${site}`;
         if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
         if(filter==='today') return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
         if(filter==='only-acc') return !!it.acceptance;
-        if(filter==='pacchi') return it.source==='pacchi';
+        if(filter==='pacchi') return !!it.fromPacchi;
         if(filter==='preventivi') return (it.activated||[]).includes('preventivi') || (it.tasks||[]).some(tsk=>tsk.type==='preventivi');
         return true;
       }).filter(it=>{
@@ -754,16 +757,16 @@ ${site}`;
           (it.device?.brand||'').toLowerCase().includes(q) ||
           (it.device?.model||'').toLowerCase().includes(q) ||
           (it.repairStatus||'').toLowerCase().includes(q) ||
-          (it.source||'').toLowerCase().includes(q) ||
-          (it.pacchiKind||'').toLowerCase().includes(q)
+          (it.fromPacchi?'pacchi':'').includes(q) ||
+          (it.pacchiKinds||[]).some(k=> String(k).toLowerCase().includes(q))
         );
       });
 
       const counts = {};
       items.forEach(it=>{ const ph=normalizePhone(it.phone); counts[ph]=(counts[ph]||0)+1; });
 
-      const std = filtered.filter(it=>it.source!=='pacchi');
-      const pac = filtered.filter(it=>it.source==='pacchi');
+      const std = filtered.filter(it=>!it.fromPacchi);
+      const pac = filtered.filter(it=>it.fromPacchi);
 
       std.forEach(it=> listStd.appendChild(renderItem(it, counts)));
       pac.forEach(it=> listPac.appendChild(renderItem(it, counts)));
@@ -775,7 +778,11 @@ ${site}`;
 
       const tags = t.querySelector('.tags'); tags.innerHTML='';
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
-      if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
+      if(it.fromPacchi){
+        const k = (it.pacchiKinds&&it.pacchiKinds.length)? `: ${it.pacchiKinds.join(', ')}` : '';
+        const cnt = it.pacchiCount? ` ×${it.pacchiCount}` : '';
+        tags.append(tag(`Pacchi${k}${cnt}`,'pacchi'));
+      }
       if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
       it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
