@@ -97,12 +97,6 @@
     #pinError{color:#ff7676;min-height:18px;font-size:12px}
     #errBar{position:fixed;left:0;right:0;bottom:0;background:#c0392b;color:#fff;padding:8px 12px;font-size:12px;display:none;z-index:99999}
 
-    #dupGate{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;place-items:center;z-index:9998}
-    #dupCard{background:var(--card);border:1px solid var(--stroke);border-radius:18px;box-shadow:var(--shadow);padding:18px;max-width:520px;width:92%;display:grid;gap:12px}
-    #dupCard h3{margin:0;font-size:18px}
-    #dupCard p{color:var(--muted);font-size:13px}
-    #dupList{background:#0a0d14;border:1px solid var(--stroke);border-radius:12px;padding:10px;max-height:200px;overflow:auto}
-    #dupActions{display:flex;gap:8px;flex-wrap:wrap}
     .flash{animation:flash 1.4s ease}
     @keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}30%{box-shadow:0 0 0 4px rgba(0,140,255,.35)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}}
   </style>
@@ -120,21 +114,6 @@
     </div>
   </div>
   <div id="errBar"></div>
-
-  <!-- Modal Doppioni -->
-  <div id="dupGate" role="dialog" aria-modal="true" aria-labelledby="dupTitle">
-    <div id="dupCard">
-      <h3 id="dupTitle">Numero già presente</h3>
-      <p id="dupMsg">Abbiamo trovato contatti con lo stesso numero. Scegli cosa fare:</p>
-      <div id="dupList"></div>
-      <div id="dupActions">
-        <button id="dupOpen" class="btn ghost">Apri scheda esistente</button>
-        <button id="dupMerge" class="btn ok">Unisci</button>
-        <button id="dupInsertAnyway" class="btn primary">Inserisci comunque</button>
-        <button id="dupCancel" class="btn ghost">Annulla</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Header -->
   <header class="title" aria-hidden="true">
@@ -216,7 +195,6 @@
         <div class="subtitle">Elenco completo e sezione “Da Pacchi” visibili solo su richiesta.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button id="syncPacchiBtn" class="btn ghost" title="Importa subito eventuali nuovi contatti da Ritiro/Consegna Pacchi">Forza Sync Pacchi</button>
         <button id="toggleListBtn" class="btn ghost">Apri elenco</button>
       </div>
     </div>
@@ -270,11 +248,12 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v30';
+    const STORE_KEY = 'relong-scadenzario-v30';
+    const BC_RELOAD = 'relong-scadenzario-reload';
     const backupPrefix = 'relong-backup-';
 
-    const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(storeKey); return []; } };
-    const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
+    const load = () => { try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(STORE_KEY); return []; } };
+    const save = (arr) => localStorage.setItem(STORE_KEY, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
@@ -285,7 +264,6 @@
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
 
     const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivi:5 };
-    const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
     let items = load();
 
@@ -299,7 +277,6 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
-    /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
     function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
     let idxByPhone = new Map();  // phone -> latest item
     let idxByName  = new Map();  // normalized "nome cognome" -> latest item
@@ -346,7 +323,6 @@
       else if(startI){ startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
     }catch{}
 
-    /* ====== AUTO-COMPILAZIONE ====== */
     function autofillFromPhone(){
       const ph = normalizePhone(c_phone.value||''); if(!ph) return;
       const hit = idxByPhone.get(ph);
@@ -363,33 +339,54 @@
     c_name.addEventListener('blur', autofillFromName);
     c_name.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
 
-    /* ====== Doppioni: modal ====== */
-    const dupGate = $('#dupGate'); const dupList = $('#dupList');
-    const dupOpen = $('#dupOpen'); const dupMerge = $('#dupMerge');
-    const dupInsertAnyway = $('#dupInsertAnyway'); const dupCancel = $('#dupCancel');
-    let dupContext = null; // {existingItems:[], primary, pendingNew}
+    // Inserimento/merge manuale
+    insertBtn.addEventListener('click', ()=>{
+      const name = (c_name.value||'').trim();
+      let phone = normalizePhone(c_phone.value||'');
+      if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
+      const start = startI.value ? new Date(startI.value) : new Date();
+      const activated = new Set(activeSet);
 
-    function openDupModal(existingItems, pendingNew){
-      dupContext = {
-        existingItems,
-        primary: existingItems.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))[0],
-        pendingNew
+      const baseObj = {
+        name, phone,
+        start: start.toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        activated:[...activated],
+        done:false, optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false, praticaId:null, fromPacchi:false,
+        pacchiCount:0, pacchiKinds:[]
       };
-      dupList.innerHTML = existingItems.map(it=>(
-        `<div style="padding:8px;border-bottom:1px solid var(--stroke)">
-          <b>${it.name||'-'}</b> • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}
-          <div style="font-size:12px;color:var(--muted)">Creato: ${fmtDate(new Date(it.createdAt||it.start))}${it.acceptance?' • Accettazione':''}${it.fromPacchi?' • Da pacchi':''}</div>
-        </div>`
-      )).join('') || '<div>Nessun dettaglio</div>';
-      dupGate.style.display='grid';
-    }
-    function closeDupModal(){ dupGate.style.display='none'; dupContext=null; }
+
+      let pending;
+      if(activated.has('riparazione')){
+        const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
+        if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
+        const all = ['energia','fisso','sim','smartphone'];
+        const tasks = all.map(type=>{ let due=addDays(new Date(), 15); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), activated:['riparazione'], tasks, acceptance:true, praticaId: nextPraticaId(), device, repairStatus:'diagnostica', quotePrice:null, quoteStatus:null };
+      } else {
+        const upsellTargets = ['energia','fisso','sim','smartphone'];
+        const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+        if(activated.has('preventivi')){ let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due); tasks.push({ type:'preventivi', due:due.toISOString() }); }
+        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
+      }
+
+      // merge by phone
+      const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
+      if(idx>-1){
+        items[idx] = mergeItems(items[idx], pending);
+      } else {
+        items.unshift(pending);
+      }
+      save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
+    });
 
     function mergeItems(existing, pending){
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
       existing.activated = [...actSet];
 
-      // merge tasks (scegli la più vicina)
       const byType = {};
       (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
       (pending.tasks||[]).forEach(t=>{
@@ -399,20 +396,18 @@
       });
       existing.tasks = Object.values(byType);
 
-      // merge pacchi meta
-      if(pending.fromPacchi){ existing.fromPacchi = true; }
-      if(pending.pacchiCount){ existing.pacchiCount = (existing.pacchiCount||0) + (pending.pacchiCount||0); }
-      if(pending.pacchiKinds){ const kinds=new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]); existing.pacchiKinds=[...kinds]; }
-
-      // merge accettazione (mantieni praticaId se già presente)
       if(pending.acceptance){
         existing.acceptance = true;
         existing.device = pending.device;
         existing.repairStatus = existing.repairStatus || pending.repairStatus || 'diagnostica';
         existing.quotePrice = existing.quotePrice ?? pending.quotePrice ?? null;
         existing.quoteStatus = existing.quoteStatus ?? pending.quoteStatus ?? null;
-        if(!existing.praticaId) existing.praticaId = pending.praticaId || nextPraticaId();
+        if(!existing.praticaId) existing.praticaId = pending.praticaId;
       }
+
+      if(pending.fromPacchi){ existing.fromPacchi = true; }
+      if(pending.pacchiCount){ existing.pacchiCount = (existing.pacchiCount||0) + pending.pacchiCount; }
+      if(pending.pacchiKinds){ const kinds=new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]); existing.pacchiKinds=[...kinds]; }
 
       existing.name = pending.name || existing.name;
       existing.phone = existing.phone || pending.phone;
@@ -429,82 +424,28 @@
       if(open) render();
     }
 
-    dupOpen.addEventListener('click', ()=>{ if(!dupContext) return; closeDupModal(); setListOpen(true); });
-    dupMerge.addEventListener('click', ()=>{ if(!dupContext) return;
-      const { primary, pendingNew } = dupContext;
-      const idx = items.findIndex(x=>x.id===primary.id);
-      if(idx>-1){
-        items[idx] = mergeItems(items[idx], pendingNew);
-        save(items); buildIndexes(); render();
-        closeDupModal(); setListOpen(true);
-      }
-    });
-    dupInsertAnyway.addEventListener('click', ()=>{ if(!dupContext) return;
-      const { pendingNew } = dupContext;
-      items.unshift(pendingNew); save(items); buildIndexes(); render(); closeDupModal();
-    });
-    dupCancel.addEventListener('click', closeDupModal);
+    function highlightByPhone(phone){
+      const ph = (phone||'').replace(/\D/g,'');
+      requestAnimationFrame(()=>{
+        const nodes = $$('#listStandard .item, #listPacchi .item');
+        const node = nodes.find(n => (n.querySelector('.h')?.textContent||'').includes(ph));
+        (node||$('#listSection')).classList.add('flash');
+        setTimeout(()=> (node||$('#listSection')).classList.remove('flash'), 1400);
+      });
+    }
 
-    insertBtn.addEventListener('click', async ()=>{
-      try{
-        const httpsOk = (typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-        if('Notification' in window && httpsOk && Notification.permission==='default'){ await Notification.requestPermission(); }
-      }catch{}
-
-      const name = (c_name.value||'').trim();
-      let phone = normalizePhone(c_phone.value||'');
-      if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
-
-      const start = startI.value ? new Date(startI.value) : new Date();
-      const activated = new Set(activeSet);
-
-      let pending;
-      const baseObj = {
-        name, phone,
-        start: start.toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        activated:[...activated],
-        done:false, optWeekend:true, optEvening:true,
-        muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, fromPacchi:false,
-        pacchiCount:0, pacchiKinds:[]
-      };
-
-      if(activated.has('riparazione')){
-        const device = { type:a_type.value, brand:a_brand.value, model:a_model.value.trim(), issue:a_issue.value.trim() };
-        if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
-        const all = ['energia','fisso','sim','smartphone'];
-        const tasks = all.map(type=>{ let due=addDays(new Date(), ACCEPT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        pending = {
-          ...baseObj,
-          id: Date.now()+Math.random().toString(16).slice(2),
-          activated:['riparazione'],
-          tasks,
-          acceptance:true,
-          praticaId: nextPraticaId(),
-          device,
-          repairStatus:'diagnostica',
-          quotePrice:null,
-          quoteStatus:null
-        };
-      } else {
-        const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
-        const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        if(activated.has('preventivi')){
-          let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
-          tasks.push({ type:'preventivi', due:due.toISOString() });
+    // Reload diretto via BroadcastChannel
+    try{
+      const bc = new BroadcastChannel(BC_RELOAD);
+      bc.onmessage = (ev) => {
+        if(!ev || !ev.data) return;
+        if(ev.data.type === 'reload-scad' && ev.data.phone){
+          items = load(); buildIndexes();
+          if($('#listSection').hidden) setListOpen(true); else render();
+          highlightByPhone(ev.data.phone);
         }
-        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
-      }
-
-      const matches = items.filter(x=> normalizePhone(x.phone) === phone);
-      if(matches.length){ openDupModal(matches, pending); }
-      else {
-        items.unshift(pending); save(items); buildIndexes(); render();
-        aForm.reset(); activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active')); updateAcceptanceUI();
-      }
-    });
+      };
+    }catch{}
 
     // Apri/chiudi elenco
     const listSection = $('#listSection'); const toggleListBtn = $('#toggleListBtn');
@@ -528,16 +469,6 @@
       </span>`;
     }
 
-    function waForPreventivo(it, priceEuro){
-      const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(priceEuro||0);
-      const base=`Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.`;
-      const dev = `\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}`;
-      const prx = `\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.`;
-      const hub = `\n\nI nostri servizi: https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html`;
-      const txt = encodeURIComponent(base+dev+prx+hub);
-      return `https://wa.me/39${it.phone}?text=${txt}`;
-    }
-
     function waForUpsell(it,type){
       const site = encodeURIComponent('https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html');
       const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
@@ -550,97 +481,6 @@
       };
       return `https://wa.me/39${it.phone}?text=${encodeURIComponent(map[type])}`;
     }
-
-    /* --------- PACCHI SYNC (Queue + BroadcastChannel + Poll) --------- */
-    const PACCHI_QUEUE_KEY = 'relong-pacchi-queue-v1';
-    const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
-    const PACCHI_BC_NAME = 'relong-pacchi';
-
-    function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem(PACCHI_INGESTED_KEY)||'[]')); }catch{ return new Set(); } }
-    function savePacchiIngested(set){ try{ localStorage.setItem(PACCHI_INGESTED_KEY, JSON.stringify([...set])); }catch{} }
-
-    function ensureTasksForPacchi(baseDate, existingTasks){
-      const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12 };
-      const types = new Set((existingTasks||[]).map(t=>t.type));
-      const all=['energia','fisso','sim','smartphone'];
-      const tasks=[...(existingTasks||[])];
-      for(const type of all){
-        if(!types.has(type)){
-          let due=addDays(baseDate, DEFAULT_DAYS[type]); due=avoidWeekend(due);
-          tasks.push({type, due:due.toISOString()});
-        }
-      }
-      return tasks;
-    }
-
-    function drainPacchiQueue({silent=true}={}){
-      let changed = 0; let queue = [];
-      try{ queue = JSON.parse(localStorage.getItem(PACCHI_QUEUE_KEY)||'[]'); }catch{ queue = []; }
-      if(!Array.isArray(queue) || queue.length===0) return 0;
-
-      const ing = pacchiIngestedSet();
-
-      for(const rec of queue){
-        const name = (rec?.name || 'Cliente Pacchi').toString().trim();
-        const ph   = normalizePhone(rec?.phone);
-        if(!ph) continue;
-        const created = rec?.createdAt ? new Date(rec.createdAt) : new Date();
-        const kind = (rec?.kind || '').toString().trim();
-        const stableId = `${ph}|${isoDay(created)}|${(kind||'na').toLowerCase()}`;
-        if(ing.has(stableId)) continue;
-
-        // merge per telefono
-        const idx = items.findIndex(x => normalizePhone(x.phone)===ph);
-        if(idx>-1){
-          const it = items[idx];
-          it.fromPacchi = true;
-          it.pacchiCount = (it.pacchiCount||0) + 1;
-          const kinds = new Set([...(it.pacchiKinds||[]), kind]);
-          it.pacchiKinds = [...kinds].filter(Boolean);
-          it.tasks = ensureTasksForPacchi(created, it.tasks);
-          it.updatedAt = new Date().toISOString();
-          items[idx] = it;
-        } else {
-          items.unshift({
-            id: Date.now()+Math.random().toString(16).slice(2),
-            name, phone: ph,
-            start: created.toISOString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            activated:[],
-            tasks: ensureTasksForPacchi(created, []),
-            done:false, optWeekend:true, optEvening:true,
-            muteDate:null, activeChatUntil:null, doneAt:null,
-            acceptance:false, praticaId:null,
-            fromPacchi:true, pacchiCount:1, pacchiKinds: kind ? [kind] : []
-          });
-        }
-
-        ing.add(stableId);
-        changed++;
-      }
-
-      if(changed){ save(items); buildIndexes(); render(); if(!silent){ maybeNotify(`Pacchi sync: ${changed} aggiornamento/i`); } savePacchiIngested(ing); }
-      try{ localStorage.setItem(PACCHI_QUEUE_KEY, JSON.stringify([])); }catch{}
-      return changed;
-    }
-
-    $('#syncPacchiBtn').addEventListener('click', ()=> drainPacchiQueue({silent:false}));
-
-    try{
-      const bc = new BroadcastChannel(PACCHI_BC_NAME);
-      bc.onmessage = (ev) => {
-        const rec = ev?.data;
-        if(!rec || typeof rec !== 'object') return;
-        let q = []; try{ q = JSON.parse(localStorage.getItem(PACCHI_QUEUE_KEY)||'[]'); }catch{ q = []; }
-        q.push(rec); try{ localStorage.setItem(PACCHI_QUEUE_KEY, JSON.stringify(q)); }catch{}
-        drainPacchiQueue({silent:false});
-      };
-    }catch{}
-
-    window.addEventListener('storage', (e)=>{ if(e && e.key === PACCHI_QUEUE_KEY){ drainPacchiQueue({silent:false}); } });
-    setInterval(()=> drainPacchiQueue({silent:true}), 3000);
-    drainPacchiQueue({silent:true});
 
     function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
     function statusChip(status){
@@ -712,7 +552,6 @@
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
         const controls=document.createElement('div'); controls.className='r-line';
 
-        // Stato riparazione: solo Diagnostica -> Pronto -> Consegnato
         const sel=document.createElement('select');
         sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
         sel.value=it.repairStatus||'diagnostica';
@@ -724,7 +563,7 @@
         top.append(controls);
         div.append(top);
 
-        // PANNELLO PREVENTIVO (solo se in Diagnostica)
+        // Pannello Preventivo in Diagnostica
         if((it.repairStatus||'diagnostica')==='diagnostica'){
           const pv = document.createElement('div'); pv.className='row-slim';
           pv.style.marginTop='8px';
@@ -740,39 +579,38 @@
             </div>`;
           div.append(pv);
 
-          // valorizza input se già presente
           setTimeout(()=>{
             const ip = document.getElementById(`q_${it.id}`);
             if(ip && it.quotePrice!=null){ ip.value = Number(it.quotePrice); }
-          },0);
-
-          // handlers
-          setTimeout(()=>{
-            const ip = document.getElementById(`q_${it.id}`);
             const bSend = document.getElementById(`qsend_${it.id}`);
             const bAcc  = document.getElementById(`qacc_${it.id}`);
             const bRef  = document.getElementById(`qref_${it.id}`);
+
+            function waForPreventivo(priceEuro){
+              const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(priceEuro||0);
+              const base=`Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.`;
+              const dev = `\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}`;
+              const prx = `\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.`;
+              const hub = `\n\nI nostri servizi: https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html`;
+              const txt = encodeURIComponent(base+dev+prx+hub);
+              return `https://wa.me/39${it.phone}?text=${txt}`;
+            }
 
             bSend?.addEventListener('click', ()=>{
               const val = parseFloat(ip?.value?.replace(',', '.') || '0');
               if(!(val>=0)) return alert('Inserisci un importo valido');
               it.quotePrice = val; it.updatedAt=new Date().toISOString(); save(items);
-              try{ window.open(waForPreventivo(it, val), '_blank', 'noopener'); }catch{}
+              try{ window.open(waForPreventivo(val), '_blank', 'noopener'); }catch{}
             });
 
-            bAcc?.addEventListener('click', ()=>{
-              it.quoteStatus = 'accepted'; it.updatedAt=new Date().toISOString(); save(items); render();
-            });
-            bRef?.addEventListener('click', ()=>{
-              it.quoteStatus = 'refused'; it.updatedAt=new Date().toISOString(); save(items); render();
-            });
+            bAcc?.addEventListener('click', ()=>{ it.quoteStatus = 'accepted'; it.updatedAt=new Date().toISOString(); save(items); render(); });
+            bRef?.addEventListener('click', ()=>{ it.quoteStatus = 'refused'; it.updatedAt=new Date().toISOString(); save(items); render(); });
           },0);
         }
 
         sum.append(div);
       }
 
-      // Prossimi 3 task
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
       if(next3.length){
         const line=document.createElement('div'); line.className='r-line';
@@ -798,7 +636,6 @@
       return t;
     }
 
-    // Click su WA = muto fino a +45min
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
@@ -825,7 +662,7 @@
       input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
     })();
 
-    // Push intelligenti 10/18 + Backup 23:59
+    // Notifiche orarie + backup
     (function smartPush(){
       const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
       if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
@@ -833,16 +670,16 @@
       function fire(hour){
         const tStr = fmtDate(new Date());
         const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
-        if(hour===10){ if(dueToday) maybeNotify(`Alle 10: hai ${dueToday} follow-up da fare oggi`); }
+        if(hour===10){ if(dueToday) new Notification(`Alle 10: hai ${dueToday} follow-up da fare oggi`); }
         if(hour===18){
           const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr)).length;
-          if(pending) maybeNotify(`Ore 18: ${pending} clienti ancora da contattare`);
+          if(pending) new Notification(`Ore 18: ${pending} clienti ancora da contattare`);
         }
       }
       scheduleAt(10); scheduleAt(18);
       function scheduleBackup(){
         const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
-        setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); maybeNotify('Backup giornaliero salvato ✔️'); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
+        setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
     })();
