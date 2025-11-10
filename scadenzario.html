@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario + Accettazione Riparazioni</title>
+  <title>ReLong • Scadenzario + Accettazione + Pacchi Sync</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     /* --- Theme: Premium Dark + Electric Blue --- */
@@ -21,6 +21,7 @@
       --st-lavorazione:#69c0ff;
       --st-pronto:#95de64;
       --st-consegnato:#bfbfbf;
+      --pacchi:#00d1b2;
     }
     body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
       background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
@@ -54,9 +55,7 @@
     .tbtn small{opacity:.9;font-weight:600}
 
     .actions{display:flex;gap:10px;flex-wrap:wrap}
-    /* Bottone principale full-width */
     #insertBtn{width:100%;display:block}
-
     .btn{appearance:none;border:0;border-radius:16px;padding:12px 16px;font-weight:800;letter-spacing:.25px;cursor:pointer}
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ghost{background:transparent;border:1px solid var(--stroke);color:#eef3ff}
@@ -67,9 +66,14 @@
     .filters{display:flex;gap:8px;flex-wrap:wrap}
     .pill{border:1px solid rgba(0,140,255,.22);color:#dbeaff;padding:8px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02))}
     .pill.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 8px 24px rgba(0,140,255,.25)}
-
     .search{display:flex;gap:8px;align-items:center}
     .search input{min-width:220px}
+
+    /* Stats mini-dashboard */
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0 0}
+    .stat{background:#090c12;border:1px solid rgba(0,140,255,.18);border-radius:14px;padding:10px;display:grid;gap:4px}
+    .stat .n{font-size:20px;font-weight:800}
+    @media (max-width:680px){.stats{grid-template-columns:1fr}}
 
     /* Item compatto */
     .item{display:grid;grid-template-columns:1fr;gap:10px;border:1px solid var(--stroke);border-radius:16px;padding:12px;margin-bottom:10px;background:#0a0d14}
@@ -79,6 +83,7 @@
     .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:4px 8px;border-radius:999px}
     .muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
+    .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
 
     /* Stato chip */
     .st-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#0a0a0a}
@@ -137,7 +142,7 @@
     <input id="logoPicker" type="file" accept="image/*" hidden />
     <div>
       <h1>ReLong • Scadenzario + Accettazione</h1>
-      <div class="subtitle">Attivazioni & Riparazioni → reminder smart con WhatsApp + Google Calendar.</div>
+      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp + Google Calendar.</div>
     </div>
   </header>
 
@@ -222,14 +227,28 @@
     </aside>
   </div>
 
-  <!-- Pulsante Apri/Chiudi elenco -->
+  <!-- Pulsante Apri/Chiudi elenco + Sync Pacchi -->
   <section class="card openListCard" aria-hidden="true">
     <div class="content" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
         <h2 style="padding:0">Clienti & Promemoria</h2>
         <div class="subtitle">Apri l’elenco solo quando ti serve cercare o contattare.</div>
+        <!-- Mini dashboard -->
+        <div class="stats" id="stats">
+          <div class="stat">
+            <div class="l">Oggi da Pacchi</div>
+            <div class="n" id="st-pacchi-today">0</div>
+          </div>
+          <div class="stat">
+            <div class="l">Totale da Pacchi</div>
+            <div class="n" id="st-pacchi-total">0</div>
+          </div>
+        </div>
       </div>
-      <button id="toggleListBtn" class="btn ghost">Apri elenco</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="syncPacchiBtn" class="btn ghost" title="Importa subito eventuali nuovi contatti da Ritiro/Consegna Pacchi">Forza Sync Pacchi</button>
+        <button id="toggleListBtn" class="btn ghost">Apri elenco</button>
+      </div>
     </div>
   </section>
 
@@ -267,19 +286,16 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v20';
+    const storeKey = 'relong-scadenzario-v22';
     const backupPrefix = 'relong-backup-'; // + YYYY-MM-DD
+    const PACCHI_KEYS = ['relong-pacchi-v1', 'relong-pacchi-v2'];
+    const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato, azzero lo scadenzario:', e); localStorage.removeItem(storeKey); return []; } };
     const save = (arr) => localStorage.setItem(storeKey, JSON.stringify(arr));
 
     const fmtDate = (d) => d.toLocaleDateString('it-IT', {year:'numeric', month:'2-digit', day:'2-digit'});
     const fmtDateShort = (d) => d.toLocaleDateString('it-IT', {month:'2-digit', day:'2-digit'});
     const isoDay = (d)=> d.toISOString().slice(0,10);
-    const fmtDateTimeParam = (d) => {
-      const pad = (n)=>String(n).padStart(2,'0');
-      const z = new Date(d.getTime());
-      return z.getUTCFullYear()+pad(z.getUTCMonth()+1)+pad(z.getUTCDate())+'T'+pad(z.getUTCHours())+pad(z.getUTCMinutes())+pad(z.getUTCSeconds())+'Z';
-    }
 
     const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
     const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x }
@@ -429,16 +445,12 @@ ${site}`;
         activated:[...activated], tasks, done:false,
         optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null
+        acceptance:false, praticaId:null, source:null
       });
       save(items);
       activeSet.clear(); $$('.tbtn.active').forEach(b=>b.classList.remove('active'));
       updateAcceptanceUI();
       render();
-      try{
-        const httpsOk = (typeof isSecureContext !== 'undefined' ? isSecureContext : (location.protocol === 'https:' || location.hostname === 'localhost'));
-        if('Notification' in window && httpsOk && Notification.permission==='granted') new Notification('Cliente inserito nello scadenzario ✅');
-      }catch{}
     });
 
     // --- Apri/Chiudi elenco ---
@@ -500,7 +512,87 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    // Rendering
+    /* ---------- PACCHI: lettura e ingest automatico ---------- */
+    const PACCHI_KEYS = ['relong-pacchi-v1', 'relong-pacchi-v2'];
+    function readPacchiRaw(){
+      let all = [];
+      for(const k of PACCHI_KEYS){
+        try{
+          const raw = localStorage.getItem(k);
+          if(!raw) continue;
+          const parsed = JSON.parse(raw);
+          if(Array.isArray(parsed)) all = all.concat(parsed);
+          else if(parsed && Array.isArray(parsed.items)) all = all.concat(parsed.items);
+        }catch(e){ console.warn('Pacchi parse fail', k, e); }
+      }
+      return all;
+    }
+    function pacchiIngestedSet(){
+      try{ return new Set(JSON.parse(localStorage.getItem('relong-pacchi-ingested') || '[]')); }
+      catch{ return new Set(); }
+    }
+    function savePacchiIngested(set){
+      try{ localStorage.setItem('relong-pacchi-ingested', JSON.stringify([...set])); }catch{}
+    }
+    function normalizePhone(p){
+      let phone = String(p||'').trim().replace(/\D/g,'');
+      if(phone.startsWith('0')) phone = phone.slice(1);
+      return phone;
+    }
+    function convertPacchiRecordToItem(rec){
+      const name = (rec.name||rec.nome||'Cliente Pacchi').toString().trim();
+      const phone = normalizePhone(rec.phone || rec.telefono || '');
+      const created = rec.createdAt ? new Date(rec.createdAt) : new Date();
+      const all = ['energia','fisso','sim','smartphone'];
+      const tasks = all.map(type=>{
+        let due = addDays(created, DEFAULT_DAYS[type]);
+        due = avoidWeekend(due);
+        return { type, due: due.toISOString() };
+      });
+      const id = Date.now()+Math.random().toString(16).slice(2);
+      return {
+        id, name, phone,
+        start: created.toISOString(), createdAt: new Date().toISOString(),
+        activated:[], tasks, done:false,
+        optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false, praticaId:null,
+        source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||'')
+      };
+    }
+    function ingestPacchi({silent=false}={}){
+      const raw = readPacchiRaw();
+      if(!raw.length) return 0;
+      const ing = pacchiIngestedSet();
+      let added = 0;
+      for(const rec of raw){
+        const phone = normalizePhone(rec.phone || rec.telefono || '');
+        const created = rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
+        const kind = (rec.kind||rec.tipo||'').toLowerCase();
+        const stableId = `${phone}|${created}|${kind||'na'}`;
+        if(!phone) continue;
+        if(ing.has(stableId)) continue;
+        items.unshift(convertPacchiRecordToItem(rec));
+        ing.add(stableId);
+        added++;
+      }
+      if(added){
+        save(items);
+        savePacchiIngested(ing);
+        if(!silent){ maybeNotify(`Import Pacchi: ${added} nuovo/i contatto/i aggiunto/i`); }
+        render();
+        updateStats();
+      }
+      return added;
+    }
+
+    // Trigger manuale + sync live
+    $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
+    ingestPacchi({silent:true});
+    window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
+    setInterval(()=> ingestPacchi({silent:true}), 15000);
+
+    /* ---------- Rendering elenco ---------- */
     function render(){
       if(listSection.hidden) return;
       const list = $('#list'); list.innerHTML='';
@@ -521,7 +613,9 @@ ${site}`;
           (it.praticaId||'').toLowerCase().includes(q) ||
           (it.device?.brand||'').toLowerCase().includes(q) ||
           (it.device?.model||'').toLowerCase().includes(q) ||
-          (it.repairStatus||'').toLowerCase().includes(q)
+          (it.repairStatus||'').toLowerCase().includes(q) ||
+          (it.source||'').toLowerCase().includes(q) ||
+          (it.pacchiKind||'').toLowerCase().includes(q)
         );
       });
 
@@ -551,14 +645,18 @@ ${site}`;
       return span;
     }
 
+    function waBtnIcon(){ return `<span class="wa-ico" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg></span>`; }
+
     function renderItem(it){
       const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
       t.querySelector('.h').textContent = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
 
       const tags = t.querySelector('.tags'); tags.innerHTML='';
+      if(it.source==='pacchi'){
+        tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`, 'pacchi'));
+      }
       if(it.acceptance){
         tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'Accettazione'));
-        // Stato chip colorato
         tags.append(statusChip(it.repairStatus || 'diagnostica'));
       }
       it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
@@ -568,13 +666,12 @@ ${site}`;
 
       const sum = t.querySelector('.summary'); sum.innerHTML='';
 
-      // Riquadro accettazione + select stato + WA stato
+      // Riquadro accettazione (se presente)
       if(it.acceptance){
         const div = document.createElement('div'); div.className='accept-brief';
         const top = document.createElement('div'); top.className='row-slim';
         top.innerHTML = `<div><b>${it.device?.type || ''}</b> • ${it.device?.brand || ''} ${it.device?.model || ''}<br><small>Difetto: ${it.device?.issue || '-'}</small></div>`;
         const controls = document.createElement('div'); controls.className='r-line';
-        // Select stato compatta
         const sel = document.createElement('select');
         sel.innerHTML = `
           <option value="diagnostica">Diagnostica</option>
@@ -586,25 +683,24 @@ ${site}`;
         sel.addEventListener('change', ()=>{
           const prev = it.repairStatus;
           it.repairStatus = sel.value; save(items); render();
-          // Push + WA quando diventa PRONTO
           if(prev !== 'pronto' && sel.value === 'pronto'){
             maybeNotify(`"${it.name}" è PRONTO al ritiro`);
             const href = waForRepairState(it);
             try{ window.open(href, '_blank'); }catch{}
           }
+          updateStats();
         });
-        // WA stato
-        const waBtn = document.createElement('a');
-        waBtn.href = waForRepairState(it);
-        waBtn.target = '_blank'; waBtn.rel='noopener';
-        waBtn.className='wa-btn ok'; waBtn.innerHTML = `${waIcon()}WA stato`;
-        controls.append(sel, waBtn);
+        const waState = document.createElement('a');
+        waState.href = waForRepairState(it);
+        waState.target = '_blank'; waState.rel='noopener';
+        waState.className='wa-btn ok'; waState.innerHTML = `${waBtnIcon()}WA stato`;
+        controls.append(sel, waState);
         top.append(controls);
         div.append(top);
         sum.append(div);
       }
 
-      // Riepilogo 3 remind (più vicini) con icona WA
+      // Riepilogo 3 remind (più vicini)
       const next3 = [...(it.tasks||[])]
         .sort((a,b)=> new Date(a.due)-new Date(b.due))
         .filter(tsk=>!it.done)
@@ -632,7 +728,7 @@ ${site}`;
         sum.append(line);
       }
 
-      // Azioni rapide compatte
+      // Azioni rapide
       const actions = document.createElement('div'); actions.className='r-line';
       const snooze = document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
       snooze.addEventListener('click',()=>{
@@ -642,11 +738,9 @@ ${site}`;
         it.tasks = all; save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️');
       });
       const done = document.createElement('button'); done.className='wa-btn'; done.textContent='Completato';
-      done.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
-
+      done.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); updateStats(); });
       const del = document.createElement('button'); del.className='wa-btn'; del.textContent='Elimina';
-      del.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); });
-
+      del.addEventListener('click',()=>{ items = items.filter(x=>x.id!==it.id); save(items); render(); updateStats(); });
       actions.append(snooze, done, del);
       sum.append(actions);
 
@@ -664,7 +758,7 @@ ${site}`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // --- PIN Gate Logic (robusta) ---
+    /* ---------- PIN Gate ---------- */
     (function pinGateInit(){
       const gate = document.getElementById('pinGate');
       const ok = document.getElementById('pinOk');
@@ -699,7 +793,7 @@ ${site}`;
       input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
     })();
 
-    // --- Push intelligenti 10:00 & 18:00 ---
+    /* ---------- Push intelligenti 10:00 & 18:00 ---------- */
     (function smartPush(){
       const httpsOk = (typeof isSecureContext !== 'undefined' ? isSecureContext : (location.protocol === 'https:' || location.hostname === 'localhost'));
       if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
@@ -722,12 +816,11 @@ ${site}`;
         }
       }
 
-      // programma entrambe
       scheduleAt(10);
       scheduleAt(18);
     })();
 
-    // --- Backup automatico giornaliero alle 23:59 ---
+    /* ---------- Backup automatico giornaliero ---------- */
     (function autoBackup(){
       function schedule(){
         const now = new Date();
@@ -740,15 +833,28 @@ ${site}`;
           const key = backupPrefix + isoDay(new Date());
           localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items }));
           maybeNotify('Backup giornaliero salvato ✔️');
-        }catch(e){
-          console.warn('Backup failed', e);
-        }
+        }catch(e){ console.warn('Backup failed', e); }
       }
       schedule();
     })();
 
-    // Boot: elenco chiuso di default
-    setListOpen(false);
+    /* ---------- Mini dashboard Pacchi ---------- */
+    function updateStats(){
+      try{
+        const tStr = fmtDate(new Date());
+        const pacchiAll = items.filter(it=>it.source==='pacchi');
+        const pacchiToday = items.filter(it=>it.source==='pacchi' && fmtDate(new Date(it.createdAt||it.start))===tStr);
+        $('#st-pacchi-total').textContent = String(pacchiAll.length);
+        $('#st-pacchi-today').textContent = String(pacchiToday.length);
+      }catch(e){}
+    }
+
+    // Boot
+    function boot(){
+      setListOpen(false);
+      updateStats();
+    }
+    boot();
   </script>
 </body>
 </html>
