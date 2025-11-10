@@ -25,7 +25,6 @@
     .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
-    /* Header senza logo */
     .title{display:flex;align-items:flex-start;gap:14px}
     .title h1{font-size:26px;letter-spacing:.2px}
     .subtitle{color:var(--muted);font-size:14px}
@@ -55,7 +54,6 @@
     .search{display:flex;gap:8px;align-items:center}
     .search input{min-width:220px}
 
-    /* Item compatto */
     .item{display:grid;grid-template-columns:1fr;gap:10px;border:1px solid var(--stroke);border-radius:16px;padding:12px;margin-bottom:10px;background:#0a0d14}
     .meta{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .h{font-weight:800}
@@ -81,17 +79,14 @@
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
 
-    /* Visibilità */
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
     #listSection[hidden]{display:none}
     .openListCard{max-width:1200px;margin:0 auto}
 
-    /* Sub-sections in elenco */
     .subsection{margin:6px 0 12px}
     .subsection h3{font-size:15px;opacity:.9;margin-bottom:8px}
 
-    /* PIN Gate */
     #pinGate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95));backdrop-filter:blur(6px);display:grid;place-items:center;z-index:9999}
     #pinCard{background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px}
     #pinCard h3{margin:0;font-size:18px}
@@ -118,8 +113,8 @@
   <!-- Header senza logo -->
   <header class="title" aria-hidden="true">
     <div>
-      <h1>ReLong • Scadenzario + Accettazione</h1>
-      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp + Google Calendar.</div>
+      <h1>ReLong • Scadenziario + Accettazione</h1>
+      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp.</div>
     </div>
   </header>
 
@@ -128,7 +123,7 @@
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
-      <div><label>Telefono (solo cifre, WhatsApp)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
+      <div><label>Telefono (solo cifre)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
     </div>
   </section>
 
@@ -143,13 +138,13 @@
             <input id="start" type="date" />
           </div>
           <div class="full">
-            <label>Cosa hai attivato ORA</label>
+            <label>Cosa ha scelto</label>
             <div class="toggle-grid" id="toggles">
               <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
               <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
               <button type="button" class="tbtn" data-key="energia">Energia</button>
               <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
-              <button type="button" class="tbtn" data-key="preventivo">Preventivo</button>
+              <button type="button" class="tbtn" data-key="preventivi">Preventivi acquisti</button>
               <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
             </div>
           </div>
@@ -179,7 +174,7 @@
               <option>Redmi</option><option>Xiaomi</option><option>Honor</option><option>Other</option>
             </select>
           </div>
-          <div><label>Modello</label><input id="a_model" placeholder="iPhone 15, Galaxy S23…" /></div>
+          <div><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax, Galaxy S25…" /></div>
           <div class="full"><label>Difetto / Problema</label><textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea></div>
           <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
         </form>
@@ -211,6 +206,8 @@
           <button class="pill" data-filter="late">In ritardo</button>
           <button class="pill" data-filter="done">Completati</button>
           <button class="pill" data-filter="only-acc">Solo accettazioni</button>
+          <button class="pill" data-filter="pacchi">Da Pacchi</button>
+          <button class="pill" data-filter="preventivi">Solo preventivi acquisti</button>
         </div>
         <div class="search">
           <label>Cerca</label>
@@ -249,7 +246,7 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-    const storeKey = 'relong-scadenzario-v24';
+    const storeKey = 'relong-scadenzario-v26';
     const backupPrefix = 'relong-backup-';
     const PACCHI_KEYS = ['relong-pacchi-v1','relong-pacchi-v2'];
     const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
@@ -264,7 +261,7 @@
     const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
 
-    const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivo:5 };
+    const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivi:5 };
     const ACCEPT_DAYS   = { energia:15, fisso:20, sim:12, smartphone:15 };
 
     let items = load();
@@ -363,10 +360,10 @@ ${site}`;
       const upsellTargets = ['energia','fisso','sim','smartphone'].filter(t=>!activated.has(t));
       const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
 
-      // Se è stato selezionato "preventivo", aggiungo anche un task dedicato
-      if(activated.has('preventivo')){
-        let due=addDays(start, DEFAULT_DAYS.preventivo); due=avoidWeekend(due);
-        tasks.push({ type:'preventivo', due:due.toISOString() });
+      // Se è stato selezionato "Preventivi acquisti", aggiungo anche un task dedicato
+      if(activated.has('preventivi')){
+        let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due);
+        tasks.push({ type:'preventivi', due:due.toISOString() });
       }
 
       const id = Date.now()+Math.random().toString(16).slice(2);
@@ -399,7 +396,7 @@ ${site}`;
     $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
     qI?.addEventListener('input', render);
 
-    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivo:'Preventivo',riparazione:'Riparazione'})[type]||type; }
+    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
 
     function waIcon(){
       return `<span class="wa-ico" aria-hidden="true">
@@ -415,7 +412,7 @@ ${site}`;
         fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
         sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
         smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-        preventivo: `${base}\nTi inoltro il promemoria per il preventivo richiesto. Vuoi che ti invii ora la simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
+        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
       };
       const txt = encodeURIComponent(map[type]);
       return { href:`https://wa.me/39${it.phone}?text=${txt}` };
@@ -502,6 +499,8 @@ ${site}`;
         if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
         if(filter==='today') return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
         if(filter==='only-acc') return !!it.acceptance;
+        if(filter==='pacchi') return it.source==='pacchi';
+        if(filter==='preventivi') return (it.activated||[]).includes('preventivi') || (it.tasks||[]).some(tsk=>tsk.type==='preventivi');
         return true;
       }).filter(it=>{
         if(!q) return true;
