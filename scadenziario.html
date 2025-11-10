@@ -20,8 +20,16 @@
     body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
       background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
       padding:24px;display:flex;flex-direction:column;gap:24px}
-    .shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
-    @media (max-width:980px){.shell{grid-template-columns:1fr}}
+    /* Layout 2 colonne: sinistra (attivazioni) + destra (pannello) */
+    .shell{
+      max-width:1200px;margin:0 auto;
+      display:grid;grid-template-columns:minmax(480px, 640px) 1fr;gap:20px;
+      align-items:start
+    }
+    @media (max-width:980px){
+      .shell{grid-template-columns:1fr}
+    }
+
     .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
@@ -81,10 +89,21 @@
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
 
-    #acceptWrap{display:none}
-    #acceptWrap.show{display:block}
-    #pacchiWrap{display:none}
-    #pacchiWrap.show{display:block}
+    /* Colonna sinistra/destra nel grid */
+    #activationCard{grid-column:1}
+    #acceptWrap,#pacchiWrap{grid-column:2}
+
+    /* Pannelli destri nascosti di default con animazione */
+    #acceptWrap,#pacchiWrap{
+      display:none; opacity:0; transform:translateX(8px);
+      transition:opacity .18s ease, transform .18s ease;
+      position:relative;
+    }
+    #acceptWrap.show,#pacchiWrap.show{
+      display:block; opacity:1; transform:translateX(0);
+    }
+    /* Stickiness pannello destro per compilazione comoda */
+    .sticky-panel{position:sticky; top:16px}
 
     #listSection[hidden]{display:none}
     .openListCard{max-width:1200px;margin:0 auto}
@@ -106,8 +125,8 @@
     /* Data disabilitata aspetto */
     input[disabled]{opacity:1; color:#eef3ff; cursor:not-allowed;}
 
-    /* Adattamento sezione Attivazioni quando pannelli aperti */
-    .panel-open #activationCard .content{padding-bottom:10px}
+    /* Quando pannello destro aperto: regolo padding/margini della sinistra */
+    .panel-open #activationCard .content{padding-bottom:12px}
     .panel-open #activationCard{margin-bottom:8px}
 
     /* Toast */
@@ -159,7 +178,7 @@
   </section>
 
   <div class="shell" aria-hidden="true">
-    <!-- Attivazioni -->
+    <!-- Attivazioni (colonna sinistra) -->
     <section class="card" id="activationCard">
       <h2>Attivazioni</h2>
       <div class="content">
@@ -185,8 +204,8 @@
       </div>
     </section>
 
-    <!-- Accettazione (solo con riparazione) -->
-    <aside class="card" id="acceptWrap">
+    <!-- Accettazione (colonna destra) -->
+    <aside class="card sticky-panel" id="acceptWrap">
       <h2>Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
         <form id="acceptForm" class="grid2" onsubmit="return false;">
@@ -213,8 +232,8 @@
       </div>
     </aside>
 
-    <!-- Pacchi -->
-    <aside class="card" id="pacchiWrap">
+    <!-- Pacchi (colonna destra) -->
+    <aside class="card sticky-panel" id="pacchiWrap">
       <h2>Pacchi (Ricezione/Ritiro)</h2>
       <div class="content">
         <div class="grid2 full">
@@ -373,20 +392,44 @@
     }
 
     function updateAcceptanceUI(){
-      const isRepair = activeSet.has('riparazione');
-      const isPacchi = activeSet.has('pacchi');
+      let isRepair = activeSet.has('riparazione');
+      let isPacchi = activeSet.has('pacchi');
+
+      // se accendi uno, spegni l'altro (mutuamente esclusivi per chiarezza)
+      if(isRepair && isPacchi){
+        // mantieni SOLO l'ultimo cliccato (gestito nel click handler)
+        isRepair = activeSet.has('riparazione');
+        isPacchi = !isRepair && activeSet.has('pacchi');
+      }
+
       acceptWrap.classList.toggle('show', isRepair);
       pacchiWrap.classList.toggle('show', isPacchi);
+
       $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
       document.body.classList.toggle('panel-open', isRepair || isPacchi);
+
+      // porta in vista il pannello destro
       const target = isRepair ? acceptWrap : (isPacchi ? pacchiWrap : null);
       if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
     }
+
     toggles.addEventListener('click', (e)=>{
       const b = e.target.closest('.tbtn'); if(!b) return;
       const key=b.dataset.key;
-      b.classList.toggle('active');
-      if(b.classList.contains('active')) activeSet.add(key); else activeSet.delete(key);
+
+      // toggle attuale
+      const toActive = !b.classList.contains('active');
+      // se attivo riparazione, spengo pacchi (e viceversa)
+      if(toActive && (key==='riparazione' || key==='pacchi')){
+        const otherKey = key==='riparazione' ? 'pacchi' : 'riparazione';
+        activeSet.delete(otherKey);
+        const otherBtn = $(`.tbtn[data-key="${otherKey}"]`);
+        otherBtn?.classList.remove('active');
+      }
+
+      b.classList.toggle('active', toActive);
+      if(toActive) activeSet.add(key); else activeSet.delete(key);
+
       updateAcceptanceUI();
     });
 
@@ -770,9 +813,7 @@
               if(!(val>=0)) return alert('Inserisci un importo valido');
               it.quotePrice = val; it.updatedAt=new Date().toISOString(); save(items);
               try{ window.open(waForPreventivo(val), '_blank', 'noopener'); }catch{}
-              // Reset campo preventivo e stato, piccolo toast
-              if(ip) ip.value = '';
-              it.quotePrice = null; save(items); render();
+              if(ip) ip.value = ''; it.quotePrice = null; save(items); render();
               showToast('Preventivo inviato ✅','ok');
             });
 
@@ -818,22 +859,21 @@
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    /* PIN: una volta al giorno */
+    /* PIN: una volta al giorno (data locale) */
     (function pinGateInit(){
       const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
       const KEY='relong-pin-date';
-      const todayStr = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+      const pad=n=>String(n).padStart(2,'0');
+      function localDayKey(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+      const todayStr = localDayKey();
       const last = localStorage.getItem(KEY);
 
       function show(el){ el && el.removeAttribute('hidden'); }
       function hide(el){ el && el.setAttribute('hidden',''); }
       function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
 
-      if(last === todayStr){
-        hide(gate); setAppHidden(false);
-      } else {
-        show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50);
-      }
+      if(last === todayStr){ hide(gate); setAppHidden(false); }
+      else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50); }
 
       function tryUnlock(){
         const val=(input.value||'').trim();
@@ -864,7 +904,7 @@
       }
       scheduleAt(10); scheduleAt(18);
       function scheduleBackup(){
-        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(now.getDate()+1);
+        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
         setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
