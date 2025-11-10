@@ -338,11 +338,42 @@
       lo=Math.max(3,Math.min(lo,28)); hi=Math.max(lo,Math.min(hi,35));
       const seed=`${ctx.phone}|${type}`; return rngInt(seed,lo,hi);
     }
-    function computeMixedTasks({startDate, phone, priorActivated, includePreventivi=false, contextKind=null}){
-      const upsellTargets=['energia','fisso','sim','smartphone'];
-      const ctx={ phone:normalizePhone(phone||''), prior:new Set(priorActivated||[]), kind:contextKind };
-      const baseTasks=upsellTargets.map(type=>{ const off=offsetDaysFor(type,ctx); let due=addDays(startDate,off); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-      if(includePreventivi){ const off=offsetDaysFor('preventivi',ctx); let due=addDays(startDate,off); due=avoidWeekend(due); baseTasks.push({type:'preventivi', due:due.toISOString()}); }
+
+    // Remind per prodotti residui (esclude quelli attivati ORA)
+    function computeMixedTasks({
+      startDate,
+      phone,
+      priorActivated,
+      includePreventivi = false,
+      contextKind = null,
+      activatedNow = [] // nuovi: tipi selezionati ora
+    }){
+      const upsellTargets = ['energia','fisso','sim','smartphone'];
+
+      // escludi dai remind i tipi già attivati ORA
+      const excludeSet = new Set(
+        (activatedNow || []).map(x => String(x).toLowerCase())
+          .filter(x => upsellTargets.includes(x))
+      );
+
+      const ctx = { phone: normalizePhone(phone||''), prior:new Set(priorActivated||[]), kind:contextKind };
+
+      const baseTasks = upsellTargets
+        .filter(type => !excludeSet.has(type))
+        .map(type => {
+          const off = offsetDaysFor(type, ctx);
+          let due = addDays(startDate, off);
+          due = avoidWeekend(due);
+          return { type, due: due.toISOString() };
+        });
+
+      if(includePreventivi){
+        const off = offsetDaysFor('preventivi', ctx);
+        let due = addDays(startDate, off);
+        due = avoidWeekend(due);
+        baseTasks.push({ type:'preventivi', due: due.toISOString() });
+      }
+
       return baseTasks;
     }
     /* ====== /CADENZA MISTA ====== */
@@ -397,7 +428,6 @@
 
       // se accendi uno, spegni l'altro (mutuamente esclusivi per chiarezza)
       if(isRepair && isPacchi){
-        // mantieni SOLO l'ultimo cliccato (gestito nel click handler)
         isRepair = activeSet.has('riparazione');
         isPacchi = !isRepair && activeSet.has('pacchi');
       }
@@ -408,7 +438,6 @@
       $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
       document.body.classList.toggle('panel-open', isRepair || isPacchi);
 
-      // porta in vista il pannello destro
       const target = isRepair ? acceptWrap : (isPacchi ? pacchiWrap : null);
       if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
     }
@@ -417,9 +446,7 @@
       const b = e.target.closest('.tbtn'); if(!b) return;
       const key=b.dataset.key;
 
-      // toggle attuale
       const toActive = !b.classList.contains('active');
-      // se attivo riparazione, spengo pacchi (e viceversa)
       if(toActive && (key==='riparazione' || key==='pacchi')){
         const otherKey = key==='riparazione' ? 'pacchi' : 'riparazione';
         activeSet.delete(otherKey);
@@ -466,23 +493,36 @@
 
     // WhatsApp utils
     const HUB_URL = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-    function waIcon(){
-      return `<span class="wa-ico" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
-      </span>`;
-    }
-    function waForUpsell(it,type){
-      const site = encodeURIComponent(HUB_URL);
+
+    // WhatsApp upsell: messaggi sempre valorizzati (con fallback)
+    function waForUpsell(it, type){
+      const hub = HUB_URL;
       const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
-        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
-        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
+      const t = (type || '').toLowerCase();
+      const is = {
+        energia: t === 'energia',
+        fisso:   t === 'fisso',
+        sim:     t === 'sim',
+        smart:   t === 'smartphone',
+        prev:    t === 'preventivi'
       };
-      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(map[type])}`;
+      let txt = '';
+      if(is.energia){
+        txt = `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${hub}`;
+      } else if(is.fisso){
+        txt = `${base}\nAbbiamo offerte Internet Casa dedicate (FTTC/FTTH) con prezzi riservati ai nostri clienti. Vuoi una verifica copertura + simulazione rapida?\nHub: ${hub}`;
+      } else if(is.sim){
+        txt = `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo dedicate in store. Vuoi i dettagli e la portabilità?\nHub: ${hub}`;
+      } else if(is.smart){
+        txt = `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${hub}`;
+      } else if(is.prev){
+        txt = `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${hub}`;
+      } else {
+        txt = `${base}\nHo una promo dedicata per te. Ti va se te la spiego in 1 minuto?\nHub: ${hub}`;
+      }
+      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`;
     }
+
     function waForPacchi(name, phone, stato){
       const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
       const msg = `${base}\nAggiornamento pacco: ${stato.toUpperCase()}.\n\nVisita il nostro Hub servizi: ${HUB_URL}`;
@@ -537,7 +577,8 @@
           phone,
           priorActivated,
           includePreventivi: activatedNow.has('preventivi'),
-          contextKind: 'repair'
+          contextKind: 'repair',
+          activatedNow: [...activatedNow]   // escludo i selezionati ora
         });
         const device = { type:$('#a_type').value, brand:$('#a_brand').value, model:($('#a_model').value||'').trim(), issue:($('#a_issue').value||'').trim() };
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), activated:['riparazione', ...(activatedNow.has('preventivi')?['preventivi']:[])], tasks, acceptance:true, praticaId: nextPraticaId(), device, repairStatus:'diagnostica', quotePrice:null, quoteStatus:null };
@@ -547,7 +588,8 @@
           phone,
           priorActivated,
           includePreventivi: activatedNow.has('preventivi'),
-          contextKind: null
+          contextKind: null,
+          activatedNow: [...activatedNow]   // escludo i selezionati ora
         });
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
       }
@@ -581,7 +623,8 @@
         phone,
         priorActivated,
         includePreventivi: false,
-        contextKind: 'pacchi'
+        contextKind: 'pacchi',
+        activatedNow: []  // per pacchi: upsell completo (tutti e 4 i servizi)
       });
 
       const pending = {
@@ -614,7 +657,7 @@
     }
 
     p_received.addEventListener('click', ()=> handlePacchi('Ricevuto'));
-    p_picked.addEventListener('click',   ()=> handlePacchi('Ritirato'));
+    p_picked   .addEventListener('click', ()=> handlePacchi('Ritirato'));
 
     function mergeItems(existing, pending){
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
@@ -783,7 +826,7 @@
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <label style="min-width:120px">Preventivo (€)</label>
               <input type="number" step="0.01" min="0" id="q_${it.id}" placeholder="0,00" style="width:140px">
-              <button class="wa-btn ok" id="qsend_${it.id}">${waIcon()}Invia preventivo WA</button>
+              <button class="wa-btn ok" id="qsend_${it.id}">WhatsApp preventivo</button>
             </div>
             <div class="r-line">
               <button class="btn ok" id="qacc_${it.id}">Accetta</button>
@@ -833,7 +876,7 @@
           const badge=document.createElement('span'); badge.className='r-badge';
           badge.innerHTML=`${iconName(tsk.type)} • <b${late?' style="color:#ffb3b3"':''}>${fmtDateShort(due)}</b>`;
           line.append(badge);
-          const a=document.createElement('a'); a.href=waForUpsell(it, tsk.type); a.target='_blank'; a.rel='noopener'; a.className='wa-btn ok'; a.innerHTML=`${waIcon()}WhatsApp`; a.dataset.wa='1'; a.dataset.id=it.id; line.append(a);
+          const a=document.createElement('a'); a.href=waForUpsell(it, tsk.type); a.target='_blank'; a.rel='noopener'; a.className='wa-btn ok'; a.textContent='WhatsApp'; a.dataset.wa='1'; a.dataset.id=it.id; line.append(a);
         });
         sum.append(line);
       }
@@ -904,7 +947,7 @@
       }
       scheduleAt(10); scheduleAt(18);
       function scheduleBackup(){
-        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
+        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(now.getDate()+1);
         setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
