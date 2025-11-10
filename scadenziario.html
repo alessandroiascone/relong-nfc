@@ -29,9 +29,10 @@
     .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
-    .title{display:flex;align-items:flex-start;gap:14px}
+    .title{display:flex;align-items:flex-start;gap:14px;justify-content:space-between}
     .title h1{font-size:26px;letter-spacing:.2px}
     .subtitle{color:var(--muted);font-size:14px}
+
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .full{grid-column:1/-1}
     label{font-size:12px;color:var(--muted)}
@@ -62,13 +63,19 @@
     /* ITEM compatto + dettagli a tendina */
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
     .item .head{
-      width:100%; display:flex; justify-content:space-between; align-items:center;
+      width:100%; display:flex; gap:10px; align-items:center;
       padding:12px 14px; background:transparent; color:#eaf2ff; border:0; cursor:pointer;
-      font-weight:800; letter-spacing:.2px; text-align:left
+      font-weight:800; letter-spacing:.2px; text-align:left; justify-content:space-between
     }
-    .item .head:focus{outline:2px solid rgba(0,140,255,.35); outline-offset:2px; border-radius:12px}
+    .head-left{display:flex;align-items:center;gap:10px;min-width:0}
     .item .h{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .item .chev{transition:transform .18s ease; opacity:.9}
+    .mini-badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
+    .mini{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#0a0a0a;opacity:.95}
+    .mini.diagnostica{background:var(--st-diagnostica)}
+    .mini.inriparazione{background:var(--st-inrip)}
+    .mini.pronto{background:var(--st-pronto)}
+    .mini.consegnato{background:var(--st-consegnato)}
+    .item .chev{transition:transform .18s ease; opacity:.9; flex-shrink:0}
     .item.open .chev{transform:rotate(90deg)}
 
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
@@ -133,6 +140,8 @@
     }
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
+    .toast .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .toast .row .btn-mini{border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px;cursor:pointer}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
   </style>
@@ -281,11 +290,13 @@
     </div>
   </section>
 
-  <!-- Template item con head + details -->
   <template id="tpl-item">
     <div class="item">
       <button class="head" type="button">
-        <div class="h"></div>
+        <div class="head-left">
+          <div class="h"></div>
+        </div>
+        <div class="mini-badges"></div>
         <div class="chev">▶</div>
       </button>
       <div class="details" hidden>
@@ -322,6 +333,7 @@
     const addHours = (d,n)=>{ const x=new Date(d); x.setHours(x.getHours()+n); return x }
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
+    function daysBetween(a,b){ const ms=24*60*60*1000; return Math.ceil((b.getTime()-a.getTime())/ms); }
 
     const BASE_RANGES = { energia:[9,16], fisso:[12,20], sim:[6,12], smartphone:[10,18], preventivi:[3,7] };
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
@@ -365,7 +377,7 @@
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
         const ph = normalizePhone(it.phone);
-        const nm = normalizeName(it.name);
+               const nm = normalizeName(it.name);
         const ts = new Date(it.updatedAt||it.createdAt||it.start||0).getTime();
         const a = idxByPhone.get(ph);
         if(ph && (!a || ts > new Date(a.updatedAt||a.createdAt||a.start||0).getTime())) idxByPhone.set(ph, it);
@@ -379,13 +391,22 @@
     const acceptWrap = $('#acceptWrap'); const pacchiWrap = $('#pacchiWrap');
     const toggles = $('#toggles'); const activeSet = new Set();
 
-    function showToast(text, type='ok'){
+    function showToast(text, type='ok', withAction=null){
       const wrap = $('#toast'); if(!wrap) return;
       const el = document.createElement('div');
       el.className = `toast ${type==='ok'?'ok':type==='err'?'err':''}`;
-      el.textContent = text;
-      wrap.appendChild(el);
-      setTimeout(()=>{ el.remove(); }, 3600);
+      if(withAction){
+        el.innerHTML = `<div class="row"><span>${text}</span><button class="btn-mini" id="tact_${Date.now()}">${withAction.label}</button></div>`;
+        wrap.appendChild(el);
+        const id = el.querySelector('button').id;
+        setTimeout(()=>{ el.remove(); }, 4600);
+        return { el, btn: document.getElementById(id) };
+      } else {
+        el.textContent = text;
+        wrap.appendChild(el);
+        setTimeout(()=>{ el.remove(); }, 3600);
+        return { el, btn:null };
+      }
     }
 
     function updateAcceptanceUI(){
@@ -409,7 +430,7 @@
         activeSet.delete(otherKey);
         $(`.tbtn[data-key="${otherKey}"]`)?.classList.remove('active');
       }
-      b.classList.toggle('active', toActive);
+      b.classList.toggle('active', toActive);  /* fix */
       if(toActive) activeSet.add(key); else activeSet.delete(key);
       updateAcceptanceUI();
     });
@@ -422,8 +443,25 @@
     setStartToToday();
     (function scheduleMidnightRefresh(){ const now=new Date(); const next=new Date(now); next.setHours(24,0,5,0); setTimeout(()=>{ setStartToToday(); scheduleMidnightRefresh(); }, next-now); })();
 
-    function autofillFromPhone(){ const ph = normalizePhone(c_phone.value||''); if(!ph) return; const hit = idxByPhone.get(ph); if(hit && (!c_name.value || c_name.value.trim().length===0)){ c_name.value = hit.name || ''; } }
-    function autofillFromName(){ const nm  = normalizeName(c_name.value||''); if(!nm) return; if(nm.split(' ').length < 2) return; const hit = idxByName.get(nm); if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){ c_phone.value = hit.phone || ''; } }
+    function autofillFromPhone(){
+      const ph = normalizePhone(c_phone.value||''); if(!ph) return;
+      const hit = idxByPhone.get(ph);
+      if(hit && (!c_name.value || c_name.value.trim().length===0)){
+        c_name.value = hit.name || '';
+        const t = showToast('Cliente già presente. Apri la scheda?', 'ok', {label:'Apri scheda'});
+        t.btn?.addEventListener('click', ()=>{ setListOpen(true); render(); highlightByPhone(ph); });
+      }
+    }
+    function autofillFromName(){
+      const nm  = normalizeName(c_name.value||''); if(!nm) return;
+      if(nm.split(' ').length < 2) return;
+      const hit = idxByName.get(nm);
+      if(hit && (!c_phone.value || normalizePhone(c_phone.value).length===0)){
+        c_phone.value = hit.phone || '';
+        const t = showToast('Cliente già presente. Apri la scheda?', 'ok', {label:'Apri scheda'});
+        t.btn?.addEventListener('click', ()=>{ setListOpen(true); render(); highlightByPhone(hit.phone); });
+      }
+    }
     c_phone.addEventListener('blur', autofillFromPhone);
     c_phone.addEventListener('input', ()=>{ const v=normalizePhone(c_phone.value); if(v.length>=7) autofillFromPhone(); });
     c_name.addEventListener('blur', autofillFromName);
@@ -518,6 +556,22 @@
           contextKind: null, activatedNow: [...activatedNow]
         });
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
+      }
+
+      /* NEW: SIM/FISSO -> recensione +5gg (feriale) + buffer +2gg, poi shift di tutti gli altri task */
+      if (activatedNow.has('sim') || activatedNow.has('fisso')) {
+        const reviewBase = avoidWeekend( addDays(start, 5) );        // +5 giorni feriale
+        const startAfterReview = avoidWeekend( addDays(reviewBase, 2) ); // buffer +2 giorni (feriale)
+        pending.postReviewAt = reviewBase.toISOString();
+        pending.postReviewSent = false;
+
+        const delta = daysBetween(start, startAfterReview);
+        if (Array.isArray(pending.tasks)) {
+          pending.tasks = pending.tasks.map(tsk => {
+            const newDue = addDays(new Date(tsk.due), delta);
+            return { ...tsk, due: avoidWeekend(newDue).toISOString() };
+          });
+        }
       }
 
       const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
@@ -639,8 +693,14 @@
       const label={diagnostica:'Diagnostica',inriparazione:'In riparazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
+    function miniBadge(status){
+      const s = (status||'').toLowerCase();
+      const span=document.createElement('span');
+      span.className = `mini ${s}`;
+      span.textContent = ({diagnostica:'Diagnostica',inriparazione:'In riparazione',pronto:'Pronto',consegnato:'Consegnato'})[s] || s || '';
+      return span;
+    }
 
-    // Stato apertura a tendina per item
     const expandedIds = new Set();
 
     function render(){
@@ -648,7 +708,6 @@
       const listStd = $('#listStandard'); listStd.innerHTML='';
       const listPac = $('#listPacchi'); listPac.innerHTML='';
 
-      const now=today(); const tStr=fmtDate(now);
       const q=(qI?.value||'').trim().toLowerCase();
 
       const filtered = items
@@ -681,21 +740,22 @@
       const headBtn = t.querySelector('.head');
       const details = t.querySelector('.details');
 
-      // Header compatto
       const headerText = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
       t.querySelector('.h').textContent = headerText;
 
-      // Apri/chiudi conservando stato
+      const miniWrap = t.querySelector('.mini-badges');
+      miniWrap.innerHTML='';
+      if(it.acceptance && it.repairStatus) miniWrap.append(miniBadge(it.repairStatus));
+
       const open = expandedIds.has(it.id);
       if(open){ t.classList.add('open'); details.hidden = false; }
 
-      headBtn.addEventListener('click', (e)=>{
+      headBtn.addEventListener('click', ()=>{
         const isOpen = t.classList.toggle('open');
         details.hidden = !isOpen;
         if(isOpen) expandedIds.add(it.id); else expandedIds.delete(it.id);
       });
 
-      // DETTAGLI: tag + summary
       const tags = t.querySelector('.tags'); tags.innerHTML='';
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.fromPacchi){ tags.append(tag(`Pacchi${it.pacchiCount? ' ×'+it.pacchiCount:''}`,'pacchi')); if((it.pacchiKinds||[]).length){ tags.append(tag((it.pacchiKinds||[]).join(', '),'pacchi')); } }
@@ -731,17 +791,11 @@
         sel.addEventListener('change',()=>{
           const prev=it.repairStatus;
           it.repairStatus=sel.value;
-          if (it.repairStatus === 'consegnato' && !it.deliveredAt) {
-            it.deliveredAt = new Date().toISOString();
-            scheduleReview(it);
-          }
+          if (it.repairStatus === 'consegnato' && !it.deliveredAt) { it.deliveredAt = new Date().toISOString(); scheduleReview(it); }
           it.updatedAt=new Date().toISOString();
           save(items); 
           render();
-
-          if(prev!=='pronto' && sel.value==='pronto'){ 
-            maybeNotify(`"${it.name}" è PRONTO al ritiro`); 
-          }
+          if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); }
         });
         controls.append(sel);
         top.append(controls);
@@ -885,28 +939,7 @@
     setInterval(scanOverdueReviews, 60*1000);
     setTimeout(scanOverdueReviews, 1500);
 
-    // PIN: chiedilo una sola volta al giorno
-    (function pinGateInit(){
-      const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
-      const KEY='relong-pin-date';
-      const pad=n=>String(n).padStart(2,'0');
-      function localDayKey(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-      const todayStr = localDayKey(); const last = localStorage.getItem(KEY);
-      function show(el){ el && el.removeAttribute('hidden'); }
-      function hide(el){ el && el.setAttribute('hidden',''); }
-      function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
-      if(last === todayStr){ hide(gate); setAppHidden(false); }
-      else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50); }
-      function tryUnlock(){
-        const val=(input.value||'').trim();
-        if(val==='1990'){ localStorage.setItem(KEY, todayStr); setAppHidden(false); hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
-        else { err.textContent='PIN errato. Riprova.'; input.value=''; input.focus(); }
-      }
-      ok.addEventListener('click', tryUnlock);
-      input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
-    })();
-
-    // Notifiche orarie + backup
+    // Notifiche orarie + backup locale
     (function smartPush(){
       const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
       if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
@@ -930,6 +963,28 @@
 
     function boot(){ setListOpen(false); }
     boot();
+
+    // PIN: chiedilo una sola volta al giorno
+    (function pinGateInit(){
+      const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
+      const KEY='relong-pin-date';
+      const pad=n=>String(n).padStart(2,'0');
+      function localDayKey(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+      const todayStr = localDayKey(); const last = localStorage.getItem(KEY);
+      function show(el){ el && el.removeAttribute('hidden'); }
+      function hide(el){ el && el.setAttribute('hidden',''); }
+      function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
+      if(last === todayStr){ hide(gate); setAppHidden(false); }
+      else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50); }
+      function tryUnlock(){
+        const val=(input.value||'').trim();
+        if(val==='1990'){ localStorage.setItem(KEY, todayStr); setAppHidden(false); hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
+        else { err.textContent='PIN errato. Riprova.'; input.value=''; input.focus(); }
+      }
+      ok.addEventListener('click', tryUnlock);
+      input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
+    })();
+
   </script>
 </body>
 </html>
