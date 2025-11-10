@@ -59,10 +59,21 @@
     .search{display:flex;gap:8px;align-items:center}
     .search input{min-width:220px}
 
-    .item{display:grid;grid-template-columns:1fr;gap:10px;border:1px solid var(--stroke);border-radius:16px;padding:12px;margin-bottom:10px;background:#0a0d14}
+    /* ITEM compatto + dettagli a tendina */
+    .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
+    .item .head{
+      width:100%; display:flex; justify-content:space-between; align-items:center;
+      padding:12px 14px; background:transparent; color:#eaf2ff; border:0; cursor:pointer;
+      font-weight:800; letter-spacing:.2px; text-align:left
+    }
+    .item .head:focus{outline:2px solid rgba(0,140,255,.35); outline-offset:2px; border-radius:12px}
+    .item .h{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .item .chev{transition:transform .18s ease; opacity:.9}
+    .item.open .chev{transform:rotate(90deg)}
+
+    .details{padding:12px 14px; border-top:1px solid var(--stroke)}
     .meta{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .h{font-weight:800}
-    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
     .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:4px 8px;border-radius:999px}
     .muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
@@ -80,7 +91,6 @@
     .summary{display:grid;gap:8px}
     .accept-brief{background:#091019;border:1px solid rgba(0,140,255,.2);border-radius:10px;padding:8px;display:grid;gap:8px}
     .row-slim{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-    .accept-brief small{color:var(--muted)}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
@@ -271,13 +281,17 @@
     </div>
   </section>
 
+  <!-- Template item con head + details -->
   <template id="tpl-item">
     <div class="item">
-      <div class="meta">
+      <button class="head" type="button">
         <div class="h"></div>
+        <div class="chev">▶</div>
+      </button>
+      <div class="details" hidden>
         <div class="tags"></div>
+        <div class="summary"></div>
       </div>
-      <div class="summary"></div>
     </div>
   </template>
 
@@ -626,6 +640,9 @@
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
 
+    // Stato apertura a tendina per item
+    const expandedIds = new Set();
+
     function render(){
       if(listSection.hidden) return;
       const listStd = $('#listStandard'); listStd.innerHTML='';
@@ -661,8 +678,24 @@
 
     function renderItem(it, counts){
       const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
-      t.querySelector('.h').textContent = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
+      const headBtn = t.querySelector('.head');
+      const details = t.querySelector('.details');
 
+      // Header compatto
+      const headerText = `${it.name} • ${it.phone}${it.praticaId? ' • '+it.praticaId:''}`;
+      t.querySelector('.h').textContent = headerText;
+
+      // Apri/chiudi conservando stato
+      const open = expandedIds.has(it.id);
+      if(open){ t.classList.add('open'); details.hidden = false; }
+
+      headBtn.addEventListener('click', (e)=>{
+        const isOpen = t.classList.toggle('open');
+        details.hidden = !isOpen;
+        if(isOpen) expandedIds.add(it.id); else expandedIds.delete(it.id);
+      });
+
+      // DETTAGLI: tag + summary
       const tags = t.querySelector('.tags'); tags.innerHTML='';
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.fromPacchi){ tags.append(tag(`Pacchi${it.pacchiCount? ' ×'+it.pacchiCount:''}`,'pacchi')); if((it.pacchiKinds||[]).length){ tags.append(tag((it.pacchiKinds||[]).join(', '),'pacchi')); } }
@@ -694,12 +727,13 @@
         const sel=document.createElement('select');
         sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="inriparazione">In riparazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
         sel.value=it.repairStatus||'diagnostica';
+        sel.addEventListener('click', ev=>ev.stopPropagation());
         sel.addEventListener('change',()=>{
           const prev=it.repairStatus;
           it.repairStatus=sel.value;
           if (it.repairStatus === 'consegnato' && !it.deliveredAt) {
-            it.deliveredAt = new Date().toISOString();     // salva data consegna
-            scheduleReview(it);                            // programma ringraziamento tra 3h
+            it.deliveredAt = new Date().toISOString();
+            scheduleReview(it);
           }
           it.updatedAt=new Date().toISOString();
           save(items); 
@@ -733,6 +767,8 @@
             const bSend = document.getElementById(`qsend_${it.id}`);
             const bAcc  = document.getElementById(`qacc_${it.id}`);
             const bRef  = document.getElementById(`qref_${it.id}`);
+
+            [ip,bSend,bAcc,bRef].forEach(el=> el && el.addEventListener('click', ev=>ev.stopPropagation()));
 
             function waForPreventivo(priceEuro){
               const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(priceEuro||0);
@@ -768,7 +804,8 @@
         if((it.repairStatus||'')==='inriparazione'){
           const actions=document.createElement('div'); actions.className='r-line'; actions.style.marginTop='6px';
           const callReady=document.createElement('button'); callReady.className='btn ok'; callReady.textContent='Contatta per il ritiro';
-          callReady.addEventListener('click', ()=>{
+          callReady.addEventListener('click', (ev)=>{
+            ev.stopPropagation();
             try{ window.open(waForPickupReady(it.name, it.phone), '_blank', 'noopener'); }catch{}
             it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); save(items); render();
           });
@@ -787,25 +824,27 @@
           const badge=document.createElement('span'); badge.className='r-badge';
           badge.innerHTML=`${iconName(tsk.type)} • <b${late?' style="color:#ffb3b3"':''}>${fmtDateShort(due)}</b>`;
           line.append(badge);
-          const a=document.createElement('a'); a.href=waForUpsell(it, tsk.type); a.target='_blank'; a.rel='noopener'; a.className='wa-btn ok'; a.textContent='WhatsApp'; a.dataset.wa='1'; a.dataset.id=it.id; line.append(a);
+          const a=document.createElement('a'); a.href=waForUpsell(it, tsk.type); a.target='_blank'; a.rel='noopener'; a.className='wa-btn ok'; a.textContent='WhatsApp'; a.dataset.wa='1'; a.dataset.id=it.id; 
+          a.addEventListener('click', ev=>ev.stopPropagation());
+          line.append(a);
         });
         sum.append(line);
       }
 
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
-      snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
+      snooze.addEventListener('click',(ev)=>{ ev.stopPropagation(); (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
       const done=document.createElement('button'); done.className='wa-btn'; done.textContent='Completato';
-      done.addEventListener('click',()=>{ it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
+      done.addEventListener('click',(ev)=>{ ev.stopPropagation(); it.done=true; it.doneAt=new Date().toISOString(); save(items); render(); });
       const del=document.createElement('button'); del.className='wa-btn'; del.textContent='Elimina';
-      del.addEventListener('click',()=>{ items=items.filter(x=>x.id!==it.id); save(items); render(); buildIndexes(); });
+      del.addEventListener('click',(ev)=>{ ev.stopPropagation(); items=items.filter(x=>x.id!==it.id); save(items); render(); buildIndexes(); });
       actions.append(snooze,done,del); sum.append(actions);
 
       if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt) <= new Date()){
         const rev=document.createElement('div'); rev.className='r-line';
         const btn=document.createElement('a'); btn.className='wa-btn ok'; btn.textContent='WhatsApp: ringrazia + recensione';
         btn.href = waForThankReview(it.name, it.phone); btn.target='_blank'; btn.rel='noopener';
-        btn.addEventListener('click', ()=>{ it.postReviewSent=true; it.updatedAt=new Date().toISOString(); save(items); render(); });
+        btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); save(items); render(); });
         rev.append(btn); sum.append(rev);
       }
 
