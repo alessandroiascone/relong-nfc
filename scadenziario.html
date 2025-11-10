@@ -287,6 +287,7 @@
     const MAPS_URL  = 'https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL= 'http://g.page/r/CeN076xNHzDmEAE/review';
 
+    /* Error bar */
     (function(){ const bar=document.getElementById('errBar'); window.addEventListener('error',e=>{bar.textContent='Errore JavaScript: '+(e.message||'sconosciuto'); bar.style.display='block';}); })();
 
     const $ = (s, r=document) => r.querySelector(s);
@@ -678,16 +679,35 @@
       if(it.acceptance){
         const div=document.createElement('div'); div.className='accept-brief';
         const top=document.createElement('div'); top.className='row-slim';
-        top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
+
+        top.innerHTML = `<div>
+          <b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}
+          <br>
+          <small>
+            Difetto: ${it.device?.issue||'-'}
+            ${it.deliveredAt ? ` • Consegnato: ${fmtDate(new Date(it.deliveredAt))}` : ''}
+          </small>
+        </div>`;
+
         const controls=document.createElement('div'); controls.className='r-line';
 
         const sel=document.createElement('select');
         sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="inriparazione">In riparazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
         sel.value=it.repairStatus||'diagnostica';
         sel.addEventListener('change',()=>{
-          const prev=it.repairStatus; it.repairStatus=sel.value; it.updatedAt=new Date().toISOString(); save(items); render();
-          if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); }
-          if(sel.value==='consegnato'){ scheduleReview(it); }
+          const prev=it.repairStatus;
+          it.repairStatus=sel.value;
+          if (it.repairStatus === 'consegnato' && !it.deliveredAt) {
+            it.deliveredAt = new Date().toISOString();     // salva data consegna
+            scheduleReview(it);                            // programma ringraziamento tra 3h
+          }
+          it.updatedAt=new Date().toISOString();
+          save(items); 
+          render();
+
+          if(prev!=='pronto' && sel.value==='pronto'){ 
+            maybeNotify(`"${it.name}" è PRONTO al ritiro`); 
+          }
         });
         controls.append(sel);
         top.append(controls);
@@ -826,6 +846,7 @@
     setInterval(scanOverdueReviews, 60*1000);
     setTimeout(scanOverdueReviews, 1500);
 
+    // PIN: chiedilo una sola volta al giorno
     (function pinGateInit(){
       const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
       const KEY='relong-pin-date';
@@ -846,6 +867,7 @@
       input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
     })();
 
+    // Notifiche orarie + backup
     (function smartPush(){
       const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
       if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
