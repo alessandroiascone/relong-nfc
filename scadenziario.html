@@ -83,7 +83,6 @@
 
     #acceptWrap{display:none}
     #acceptWrap.show{display:block}
-    /* Nuovo: pannello Pacchi */
     #pacchiWrap{display:none}
     #pacchiWrap.show{display:block}
 
@@ -155,7 +154,6 @@
               <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
               <button type="button" class="tbtn" data-key="preventivi">Preventivi acquisti</button>
               <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
-              <!-- Nuovo -->
               <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
             </div>
           </div>
@@ -192,7 +190,7 @@
       </div>
     </aside>
 
-    <!-- Nuovo: Pacchi -->
+    <!-- Pacchi -->
     <aside class="card" id="pacchiWrap">
       <h2>Pacchi (Ricezione/Ritiro)</h2>
       <div class="content">
@@ -202,7 +200,7 @@
             <button class="btn ghost" id="p_picked">📦 Pacco RITIRATO</button>
           </div>
           <p class="subtitle full" style="margin-top:4px">
-            Al clic: parte WhatsApp con messaggio precompilato e il contatto viene inserito in elenco con 4 reminder (Energia, Fisso, SIM, Smartphone) a +15 giorni.
+            Al clic: parte WhatsApp con messaggio precompilato e il contatto viene inserito in elenco con reminder “misti” in base alla storia del cliente.
           </p>
         </div>
       </div>
@@ -285,7 +283,81 @@
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
 
-    const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12, preventivi:5 };
+    /* ====== CADENZA MISTA (nuovo) ====== */
+    // Ranges base (giorni) per il primo reminder di ogni tipo
+    const BASE_RANGES = {
+      energia:   [9,16],   // centrato medio
+      fisso:     [12,20],
+      sim:       [6,12],
+      smartphone:[10,18],
+      preventivi:[3,7]
+    };
+
+    // Hash deterministico stringa -> intero
+    function hashStr(s){
+      let h=2166136261>>>0;
+      for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h>>>0;
+    }
+    // Random deterministico in [min,max] intero
+    function rngInt(seedStr, min, max){
+      const h = hashStr(seedStr);
+      const span = Math.max(0, (max-min));
+      return min + (h % (span+1));
+    }
+
+    // Calcolo offset in giorni per tipo, in base a storia cliente
+    function offsetDaysFor(type, ctx){
+      let [lo,hi] = BASE_RANGES[type] || [12,18];
+
+      // Se proviene da riparazione o pacchi, centriamo vicino a ~15
+      if(ctx.kind==='repair' || ctx.kind==='pacchi'){
+        lo = Math.max(10, Math.min(lo, 13));
+        hi = Math.max(16, Math.min(hi+2, 19));
+      }
+
+      // Se già aveva quel tipo attivo in passato -> sposta in avanti per non stressare
+      if(ctx.prior.has(type)){
+        lo += 5; hi += 9;
+      }
+
+      // Sinergie semplici
+      if(ctx.prior.has('fisso') && type==='sim'){ lo += 3; hi += 4; }
+      if(ctx.prior.has('sim') && type==='fisso'){ lo += 3; }
+      if(ctx.prior.has('smartphone') && type==='energia'){ lo += 2; }
+      if(ctx.prior.has('energia') && type==='smartphone'){ lo += 1; }
+
+      // Clamp sensato
+      lo = Math.max(3, Math.min(lo, 28));
+      hi = Math.max(lo, Math.min(hi, 35));
+
+      // Seed = telefono + tipo (deterministico per cliente)
+      const seed = `${ctx.phone}|${type}`;
+      return rngInt(seed, lo, hi);
+    }
+
+    function computeMixedTasks({startDate, phone, priorActivated, includePreventivi=false, contextKind=null}){
+      const upsellTargets = ['energia','fisso','sim','smartphone'];
+      const ctx = {
+        phone: normalizePhone(phone||''),
+        prior: new Set(priorActivated||[]),
+        kind: contextKind // 'repair' | 'pacchi' | null
+      };
+      const baseTasks = upsellTargets.map(type=>{
+        const off = offsetDaysFor(type, ctx);
+        let due = addDays(startDate, off);
+        due = avoidWeekend(due);
+        return { type, due: due.toISOString() };
+      });
+      if(includePreventivi){
+        const off = offsetDaysFor('preventivi', ctx);
+        let due = addDays(startDate, off);
+        due = avoidWeekend(due);
+        baseTasks.push({ type:'preventivi', due:due.toISOString() });
+      }
+      return baseTasks;
+    }
+    /* ====== /CADENZA MISTA ====== */
 
     let items = load();
 
@@ -318,13 +390,8 @@
 
     // Inputs
     const c_name = $('#c_name'); const c_phone = $('#c_phone');
-    const acceptWrap = $('#acceptWrap');
+    const acceptWrap = $('#acceptWrap'); const pacchiWrap = $('#pacchiWrap');
     const toggles = $('#toggles'); const activeSet = new Set();
-
-    // Nuovo: sezione Pacchi
-    const pacchiWrap = $('#pacchiWrap');
-    const p_received = $('#p_received');
-    const p_picked   = $('#p_picked');
 
     function updateAcceptanceUI(){
       const isRepair = activeSet.has('riparazione');
@@ -333,7 +400,6 @@
       pacchiWrap.classList.toggle('show', isPacchi);
       $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
     }
-
     toggles.addEventListener('click', (e)=>{
       const b = e.target.closest('.tbtn'); if(!b) return;
       const key=b.dataset.key;
@@ -342,7 +408,7 @@
       updateAcceptanceUI();
     });
 
-    // Set data odierna nel datepicker
+    // Date di default
     const startI = $('#start');
     try{
       const d=new Date(); const pad=n=>String(n).padStart(2,'0');
@@ -366,36 +432,50 @@
     c_name.addEventListener('blur', autofillFromName);
     c_name.addEventListener('input', ()=>{ const nm=normalizeName(c_name.value||''); if(nm.split(' ').length>=2) autofillFromName(); });
 
-    // WA helper
+    // WhatsApp utils
+    const HUB_URL = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
     function waIcon(){
       return `<span class="wa-ico" aria-hidden="true">
         <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9.38 3 4 8.38 4 15c0 2.53.82 4.86 2.21 6.77L5 28l6.4-1.67A11.94 11.94 0 0 0 16 27c6.62 0 12-5.38 12-12S22.62 3 16 3Z" fill="#25D366"/><path d="M22.55 18.79c-.37-.18-2.18-1.07-2.52-1.19-.34-.13-.59-.18-.84.18-.25.37-.97 1.19-1.19 1.43-.22.25-.44.28-.81.09-.37-.19-1.54-.57-2.94-1.82-1.09-.97-1.83-2.18-2.05-2.55-.22-.37-.02-.57.16-.75.16-.16.37-.43.56-.65.19-.22.25-.37.37-.62.13-.25.06-.47-.03-.65-.09-.18-.84-2.02-1.15-2.76-.3-.72-.59-.62-.81-.63-.22-.01-.47-.01-.72-.01-.25 0-.65.09-.99.47-.34.37-1.3 1.28-1.3 3.12 0 1.84 1.33 3.62 1.52 3.87.19.25 2.61 3.98 6.31 5.44.88.38 1.57.6 2.11.77.88.28 1.68.24 2.31.15.71-.11 2.18-.89 2.49-1.75.31-.86.31-1.61.22-1.75-.09-.13-.34-.22-.71-.4Z" fill="#fff"/></svg>
       </span>`;
     }
-
-    const HUB_URL = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-
+    function waForUpsell(it,type){
+      const site = encodeURIComponent(HUB_URL);
+      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
+      const map = {
+        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
+        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
+        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
+        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
+        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
+      };
+      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(map[type])}`;
+    }
     function waForPacchi(name, phone, stato){
       const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
       const msg = `${base}\nAggiornamento pacco: ${stato.toUpperCase()}.\n\nVisita il nostro Hub servizi: ${HUB_URL}`;
       return `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
     }
 
-    // Inserimento/merge manuale (tasto principale esistente)
+    // Inserimento/merge: tasto principale
     const insertBtn = $('#insertBtn');
     insertBtn.addEventListener('click', ()=>{
       const name = (c_name.value||'').trim();
       let phone = normalizePhone(c_phone.value||'');
       if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
       const start = startI.value ? new Date(startI.value) : new Date();
-      const activated = new Set(activeSet);
+      const activatedNow = new Set(activeSet);
+
+      // storia pregressa
+      const prev = idxByPhone.get(phone);
+      const priorActivated = prev?.activated || [];
 
       const baseObj = {
         name, phone,
         start: start.toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        activated:[...activated],
+        activated:[...activatedNow],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
         acceptance:false, praticaId:null, fromPacchi:false,
@@ -403,16 +483,26 @@
       };
 
       let pending;
-      if(activated.has('riparazione')){
+      if(activatedNow.has('riparazione')){
+        // Riparazione: tasks con cadenza mista (context 'repair')
+        const tasks = computeMixedTasks({
+          startDate: new Date(),
+          phone,
+          priorActivated,
+          includePreventivi: activatedNow.has('preventivi'),
+          contextKind: 'repair'
+        });
         const device = { type:$('#a_type').value, brand:$('#a_brand').value, model:($('#a_model').value||'').trim(), issue:($('#a_issue').value||'').trim() };
-        if(!device.type){ return alert('Seleziona il tipo dispositivo'); }
-        const all = ['energia','fisso','sim','smartphone'];
-        const tasks = all.map(type=>{ let due=addDays(new Date(), 15); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), activated:['riparazione'], tasks, acceptance:true, praticaId: nextPraticaId(), device, repairStatus:'diagnostica', quotePrice:null, quoteStatus:null };
+        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), activated:['riparazione', ...(activatedNow.has('preventivi')?['preventivi']:[])], tasks, acceptance:true, praticaId: nextPraticaId(), device, repairStatus:'diagnostica', quotePrice:null, quoteStatus:null };
       } else {
-        const upsellTargets = ['energia','fisso','sim','smartphone'];
-        const tasks = upsellTargets.map(type=>{ let due=addDays(start, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-        if(activated.has('preventivi')){ let due=addDays(start, DEFAULT_DAYS.preventivi); due=avoidWeekend(due); tasks.push({ type:'preventivi', due:due.toISOString() }); }
+        // Attivazioni normali: tasks con cadenza mista
+        const tasks = computeMixedTasks({
+          startDate: start,
+          phone,
+          priorActivated,
+          includePreventivi: activatedNow.has('preventivi'),
+          contextKind: null
+        });
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
       }
 
@@ -426,41 +516,51 @@
       save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
     });
 
-    // Nuovo: handler Pacchi (Ricevuto/Ritirato)
+    // PACCHI
+    const p_received = $('#p_received');
+    const p_picked   = $('#p_picked');
+
     function handlePacchi(kind){
       const name = (c_name.value||'').trim();
       let phone = normalizePhone(c_phone.value||'');
       if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
 
-      // tasks come riparazioni: 4 reminder a +15 gg
-      const all = ['energia','fisso','sim','smartphone'];
-      const tasks = all.map(type=>{ let due=addDays(new Date(), 15); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+      const prev = idxByPhone.get(phone);
+      const priorActivated = prev?.activated || [];
+
+      // Tasks “misti” (context 'pacchi'), senza segnare come acceptance
+      const tasks = computeMixedTasks({
+        startDate: new Date(),
+        phone,
+        priorActivated,
+        includePreventivi: false,
+        contextKind: 'pacchi'
+      });
 
       const pending = {
         name, phone,
         start: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        activated:[], // non è riparazione, ma generiamo i task upsell
+        activated:[],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
         acceptance:false, praticaId:null,
         fromPacchi:true,
         pacchiCount:1,
         pacchiKinds:[kind],
-        tasks
+        tasks,
+        id: Date.now()+Math.random().toString(16).slice(2)
       };
 
       const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
       if(idx>-1){
         items[idx] = mergeItems(items[idx], pending);
       } else {
-        pending.id = Date.now()+Math.random().toString(16).slice(2);
         items.unshift(pending);
       }
       save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
 
-      // Apri WhatsApp con messaggio
       try{ window.open(waForPacchi(name, phone, kind), '_blank', 'noopener'); }catch{}
     }
 
@@ -468,9 +568,11 @@
     p_picked.addEventListener('click',   ()=> handlePacchi('Ritirato'));
 
     function mergeItems(existing, pending){
+      // activated (unione)
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
       existing.activated = [...actSet];
 
+      // tasks (mantieni il più vicino per tipo, come prima)
       const byType = {};
       (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
       (pending.tasks||[]).forEach(t=>{
@@ -480,12 +582,12 @@
       });
       existing.tasks = Object.values(byType);
 
-      // Propagazioni "Pacchi"
+      // Pacchi
       if(pending.fromPacchi){ existing.fromPacchi = true; }
       if(pending.pacchiCount){ existing.pacchiCount = (existing.pacchiCount||0) + pending.pacchiCount; }
       if(pending.pacchiKinds){ const kinds=new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]); existing.pacchiKinds=[...kinds]; }
 
-      // Accettazione (se arrivasse anche da riparazione)
+      // Accettazione (se arriva)
       if(pending.acceptance){
         existing.acceptance = true;
         existing.device = pending.device;
@@ -548,19 +650,6 @@
     qI?.addEventListener('input', render);
 
     function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
-
-    function waForUpsell(it,type){
-      const site = encodeURIComponent(HUB_URL);
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${decodeURIComponent(site)}`,
-        fisso: `${base}\nAbbiamo offerte Internet Casa dedicate: FTTC/FTTH con prezzi riservati ai nostri clienti. Vuoi una verifica copertura+simulazione rapida?\nHub: ${decodeURIComponent(site)}`,
-        sim: `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo per clienti in store. Vuoi i dettagli e la portabilità?\nHub: ${decodeURIComponent(site)}`,
-        smartphone: `${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${decodeURIComponent(site)}`,
-        preventivi: `${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${decodeURIComponent(site)}`
-      };
-      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(map[type])}`;
-    }
 
     function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
     function statusChip(status){
@@ -758,14 +847,14 @@
       }
       scheduleAt(10); scheduleAt(18);
       function scheduleBackup(){
-        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
+        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(now.getDate()+1);
         setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
     })();
 
-    function setListOpenOnBoot(){ setListOpen(false); }
-    setListOpenOnBoot();
+    function boot(){ setListOpen(false); }
+    boot();
   </script>
 </body>
 </html>
