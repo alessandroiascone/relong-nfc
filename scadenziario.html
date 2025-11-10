@@ -63,7 +63,6 @@
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
     .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
     .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
-    /* Nuovi badge preventivo */
     .quote{background:linear-gradient(135deg,#b388ff,#7aa3ff)!important;color:#0a0a0a}
     .quote-ok{background:linear-gradient(135deg,#5be37a,#26d07c)!important;color:#082012}
     .quote-ko{background:linear-gradient(135deg,#ff7a7a,#ff4d4f)!important;color:#250909}
@@ -113,16 +112,15 @@
   </style>
 </head>
 <body>
-  <!-- PIN (FIX integrato) -->
+  <!-- PIN -->
   <div id="pinGate" hidden>
-    <div id="pinCard" style="background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px">
-      <h3 style="margin:0;font-size:18px">Accesso protetto</h3>
-      <p style="color:var(--muted);font-size:13px;margin:0">Inserisci il PIN.</p>
-      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••"
-             style="letter-spacing:6px;text-align:center;font-weight:800;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#0a0d14;color:#eef3ff"/>
+    <div id="pinCard">
+      <h3>Accesso protetto</h3>
+      <p>Inserisci il PIN.</p>
+      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
       <div class="actions"><button id="pinOk" class="btn primary" style="flex:1">Sblocca</button></div>
-      <div id="pinError" style="color:#ff7676;min-height:18px;font-size:12px"></div>
-      <p style="font-size:11px;margin:0">Nota: blocco base lato client (per blocco serio serve lato server).</p>
+      <div id="pinError"></div>
+      <p style="font-size:11px">Nota: blocco base lato client (per blocco serio serve lato server).</p>
     </div>
   </div>
   <div id="errBar"></div>
@@ -308,10 +306,9 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
-    /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
     function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
-    let idxByPhone = new Map();  // phone -> latest item
-    let idxByName  = new Map();  // normalized "nome cognome" -> latest item
+    let idxByPhone = new Map();
+    let idxByName  = new Map();
     function buildIndexes(){
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
@@ -359,7 +356,7 @@
     const insertBtn = $('#insertBtn');
     const startI = $('#start');
 
-    // Data = oggi
+    // Data = oggi (compatibile ovunque)
     try{
       const d=new Date(); const pad=n=>String(n).padStart(2,'0');
       if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
@@ -397,7 +394,7 @@
     const dupMerge = $('#dupMerge');
     const dupInsertAnyway = $('#dupInsertAnyway');
     const dupCancel = $('#dupCancel');
-    let dupContext = null; // {existingItems:[], primary, pendingNew}
+    let dupContext = null;
 
     function openDupModal(existingItems, pendingNew){
       dupContext = {
@@ -566,19 +563,10 @@ ${site}`;
       }
     });
 
-    // Apri/chiudi elenco
-    const listSection = $('#listSection');
-    const toggleListBtn = $('#toggleListBtn');
-    toggleListBtn.addEventListener('click', ()=> setListOpen(listSection.hidden));
-
-    function maybeNotify(text){
-      const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-      if('Notification' in window && httpsOk && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text);
-    }
-
-    // Filtro & ricerca
+    /* ====== Filtro & ricerca (una sola dichiarazione!) ====== */
     let filter='all';
     const qI=$('#q');
+    const listSection = $('#listSection');
     $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
     qI?.addEventListener('input', render);
 
@@ -619,7 +607,6 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    /* === WhatsApp preventivo + salvataggio prezzo === */
     function waForQuote(it, priceRaw){
       const price = String(priceRaw || '').trim() || (it.quotePrice || '');
       const pretty = price ? (/[€]/.test(price) ? price : `${price} €`) : '—';
@@ -635,7 +622,6 @@ Se hai domande scrivimi pure qui.`;
       return `https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`;
     }
 
-    /* === Nuovo: messaggi decisione preventivo (accettato/rifiutato) === */
     function waForQuoteDecision(it, decision){
       const name = it.name;
       const device = `${it.device?.brand||''} ${it.device?.model||''}`.trim() || 'il dispositivo';
@@ -728,10 +714,6 @@ Grazie!`;
     }
 
     /* ====== RENDER ====== */
-    let filter='all';
-    const qI=$('#q');
-    const listSection = $('#listSection');
-
     function render(){
       if(listSection.hidden) return;
       const listStd = $('#listStandard'); listStd.innerHTML='';
@@ -782,7 +764,6 @@ Grazie!`;
       if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
       (it.activated||[]).forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
 
-      // Badge preventivo: inviato / accettato / rifiutato
       if (it.quoteSentAt || it.quoteStatus){
         const when = it.quoteDecisionAt ? fmtDateTimeShort(new Date(it.quoteDecisionAt))
                     : it.quoteSentAt ? fmtDateTimeShort(new Date(it.quoteSentAt)) : null;
@@ -801,7 +782,6 @@ Grazie!`;
 
       const sum=t.querySelector('.summary'); sum.innerHTML='';
 
-      /* ====== BLOCCO ACCETTAZIONE (diagnostica minimale) ====== */
       if(it.acceptance){
         const div=document.createElement('div'); div.className='accept-brief';
 
@@ -809,7 +789,6 @@ Grazie!`;
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
         div.append(top);
 
-        // PREVENTIVO: input prezzo + invio WA + salvataggio
         const quoteRow=document.createElement('div'); quoteRow.className='row-slim';
         const left=document.createElement('div');
         left.innerHTML=`<small style="color:var(--muted)">Invia preventivo (prezzo)</small>`;
@@ -837,10 +816,9 @@ Grazie!`;
           e.preventDefault();
           const href=waForQuote(it, priceInput.value);
           try{ window.open(href,'_blank','noopener'); }catch{}
-          // salva prezzo + timestamp invio
           it.quotePrice = priceInput.value.trim() || it.quotePrice || null;
           it.quoteSentAt = new Date().toISOString();
-          it.quoteStatus = null; it.quoteDecisionAt = null; // reset decisione
+          it.quoteStatus = null; it.quoteDecisionAt = null;
           save(items); render();
         });
 
@@ -848,7 +826,6 @@ Grazie!`;
         quoteRow.append(left, right);
         div.append(quoteRow);
 
-        // DECISIONE PREVENTIVO: ACCETTATO / RIFIUTATO
         const decideRow=document.createElement('div'); decideRow.className='row-slim';
         const dLeft=document.createElement('div');
         dLeft.innerHTML=`<small style="color:var(--muted)">Decisione cliente</small>`;
@@ -862,7 +839,7 @@ Grazie!`;
           if(!it.quoteSentAt) return;
           it.quoteStatus='accepted';
           it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='lavorazione'; // si procede
+          it.repairStatus='lavorazione';
           save(items); render();
           const href=waForQuoteDecision(it,'accepted'); try{ window.open(href,'_blank'); }catch{}
         });
@@ -875,7 +852,7 @@ Grazie!`;
           if(!it.quoteSentAt) return;
           it.quoteStatus='rejected';
           it.quoteDecisionAt=new Date().toISOString();
-          it.repairStatus='pronto'; // pronto per ritiro non riparato
+          it.repairStatus='pronto';
           save(items); render();
           const href=waForQuoteDecision(it,'rejected'); try{ window.open(href,'_blank'); }catch{}
         });
@@ -884,7 +861,6 @@ Grazie!`;
         decideRow.append(dLeft, dRight);
         div.append(decideRow);
 
-        // Stato: PRONTO (bloccato finché non c'è quoteSentAt) + CONSEGNATO
         const stateRow=document.createElement('div'); stateRow.className='row-slim';
         const sLeft=document.createElement('div');
         sLeft.innerHTML=`<small style="color:var(--muted)">Stato riparazione</small>`;
@@ -921,9 +897,7 @@ Grazie!`;
 
         sum.append(div);
       }
-      /* ====== FINE BLOCCO ACCETTAZIONE ====== */
 
-      // Prossimi task
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
       if(next3.length){
         const line=document.createElement('div'); line.className='r-line';
@@ -938,7 +912,6 @@ Grazie!`;
         sum.append(line);
       }
 
-      // Azioni comuni
       const actions=document.createElement('div'); actions.className='r-line';
       const snooze=document.createElement('button'); snooze.className='wa-btn'; snooze.textContent='Snooze +1g';
       snooze.addEventListener('click',()=>{ (it.tasks||[]).forEach(tsk=>{ let nd=addDays(new Date(tsk.due),1); nd=avoidWeekend(nd); tsk.due=nd.toISOString(); }); save(items); render(); maybeNotify('Spostato tutto di 1 giorno ✔️'); });
@@ -951,7 +924,6 @@ Grazie!`;
       return t;
     }
 
-    // Click su WA task = muto fino a +45min
     document.body.addEventListener('click', (e)=>{
       const a=e.target.closest('a[data-wa="1"]'); if(!a) return;
       const id=a.dataset.id; const it=items.find(x=>x.id===id); if(!it) return;
@@ -961,64 +933,49 @@ Grazie!`;
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    /* ===== PIN HOTFIX ===== */
+    /* ===== PIN robusto (niente variabili duplicate) ===== */
     (function(){
       const KEY='relong-pin-ok';
-      const gate=document.getElementById('pinGate');
-      const input=document.getElementById('pinInput');
-      const btn=document.getElementById('pinOk');
-      const err=document.getElementById('pinError');
+      const gate=$('#pinGate'), input=$('#pinInput'), btn=$('#pinOk'), err=$('#pinError');
 
       function show(el){ el && el.removeAttribute('hidden'); }
       function hide(el){ el && el.setAttribute('hidden',''); }
-      function setAppHidden(hidden){
-        document.querySelectorAll('[aria-hidden]').forEach(n=>{
-          n.setAttribute('aria-hidden', hidden ? 'true' : 'false');
-        });
-      }
-
-      function lock(){
-        show(gate);
-        setAppHidden(true);
-        gate.style.position='fixed';
-        gate.style.inset='0';
-        gate.style.background='linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95))';
-        gate.style.backdropFilter='blur(6px)';
-        gate.style.display='grid';
-        gate.style.placeItems='center';
-        setTimeout(()=> input && input.focus(), 30);
-      }
+      function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
 
       function unlock(){
         try{ sessionStorage.setItem(KEY,'1'); }catch{}
         setAppHidden(false);
         hide(gate);
-        window.__PIN_OK__ = true;
-        try{ window.dispatchEvent(new CustomEvent('relong:pin:unlocked')); }catch{}
+        try{ gate.remove(); }catch{}
+      }
+      function lock(){
+        show(gate); setAppHidden(true);
+        setTimeout(()=> input?.focus(), 30);
       }
 
-      const bypass = /(?:\?|#).*pin=1990\b/.test(location.href);
-      const already = (()=>{ try{ return sessionStorage.getItem(KEY)==='1'; }catch{ return false; }})();
-      if(already || bypass){ unlock(); } else { lock(); }
+      const bypass=/(?:\?|#).*pin=1990\b/.test(location.href);
+      const already=(()=>{ try{return sessionStorage.getItem(KEY)==='1'}catch{return false} })();
+
+      if(already || bypass) unlock(); else lock();
 
       function tryUnlock(){
-        const val=(input && input.value || '').trim();
+        const val=(input?.value||'').trim();
         if(val==='1990'){ unlock(); }
-        else{
-          if(err) err.textContent='PIN errato. Riprova.';
-          if(input){ input.value=''; input.focus(); }
-        }
+        else { if(err) err.textContent='PIN errato. Riprova.'; if(input){ input.value=''; input.focus(); } }
       }
-
-      btn && btn.addEventListener('click', tryUnlock);
-      input && input.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+      btn?.addEventListener('click', tryUnlock);
+      input?.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
     })();
 
-    // Push intelligenti 10/18 + Backup 23:59
+    function maybeNotify(text){
+      const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
+      if('Notification' in window && httpsOk && Notification.permission==='granted' && document.visibilityState==='visible') new Notification(text);
+    }
+
     (function smartPush(){
       const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
       if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
-      function scheduleAt(hour){ const now=new Date(); const when=new Date(); when.setHours(hour,0,0,0); if(when<=now) when.setDate(when.getDate()+1); setTimeout(()=>{ fire(hour); scheduleAt(hour); }, when-now); }
+      function scheduleAt(hour){ const now=new Date(); const when=new Date(); when.setHours(hour,0,0,0); if(when<=now) when.setDate(now.getDate()+1); setTimeout(()=>{ fire(hour); scheduleAt(hour); }, when-now); }
       function fire(hour){
         const tStr = fmtDate(new Date());
         const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
@@ -1031,7 +988,7 @@ Grazie!`;
       scheduleAt(10); scheduleAt(18);
 
       function scheduleBackup(){
-        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(when.getDate()+1);
+        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(now.getDate()+1);
         setTimeout(()=>{ try{ const key=backupPrefix+isoDay(new Date()); localStorage.setItem(key, JSON.stringify({ when:new Date().toISOString(), items })); maybeNotify('Backup giornaliero salvato ✔️'); }catch(e){ console.warn('Backup failed',e); } scheduleBackup(); }, when-now);
       }
       scheduleBackup();
