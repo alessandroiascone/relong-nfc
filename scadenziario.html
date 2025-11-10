@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario + Accettazione + Pacchi</title>
+  <title>ReLong • Scadenziario + Accettazione + Pacchi</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -111,7 +111,7 @@
   <div id="pinGate" hidden>
     <div id="pinCard">
       <h3>Accesso protetto</h3>
-      <p>Inserisci il PIN a 4 cifre per aprire lo scadenzario.</p>
+      <p>Inserisci il PIN.</p>
       <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
       <div class="actions"><button id="pinOk" class="btn primary" style="flex:1">Sblocca</button></div>
       <div id="pinError"></div>
@@ -138,8 +138,8 @@
   <!-- Header -->
   <header class="title" aria-hidden="true">
     <div>
-      <h1>ReLong • Scadenzario + Accettazione</h1>
-      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp + Google Calendar.</div>
+      <h1>ReLong • Scadenziario + Accettazione</h1>
+      <div class="subtitle">Gestionale → reminder smart con WhatsApp.</div>
     </div>
   </header>
 
@@ -148,7 +148,7 @@
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
-      <div><label>Telefono (solo cifre, WhatsApp)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
+      <div><label>Telefono (solo cifre)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
     </div>
   </section>
 
@@ -159,11 +159,11 @@
       <div class="content">
         <div class="grid2">
           <div>
-            <label>Data attivazione</label>
+            <label>Data</label>
             <input id="start" type="date" />
           </div>
           <div class="full">
-            <label>Cosa hai attivato ORA</label>
+            <label>Cosa vuoi inserire</label>
             <div class="toggle-grid" id="toggles">
               <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
               <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
@@ -199,7 +199,7 @@
               <option>Redmi</option><option>Xiaomi</option><option>Honor</option><option>Other</option>
             </select>
           </div>
-          <div><label>Modello</label><input id="a_model" placeholder="iPhone 15, Galaxy S23…" /></div>
+          <div><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax, Galaxy S25…" /></div>
           <div class="full"><label>Difetto / Problema</label><textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea></div>
           <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
         </form>
