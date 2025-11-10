@@ -102,6 +102,28 @@
 
     .flash{animation:flash 1.4s ease}
     @keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}30%{box-shadow:0 0 0 4px rgba(0,140,255,.35)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}}
+
+    /* Data disabilitata aspetto */
+    input[disabled]{opacity:1; color:#eef3ff; cursor:not-allowed;}
+
+    /* Adattamento sezione Attivazioni quando pannelli aperti */
+    .panel-open #activationCard .content{padding-bottom:10px}
+    .panel-open #activationCard{margin-bottom:8px}
+
+    /* Toast */
+    #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
+    .toast{
+      background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));
+      border:1px solid rgba(0,140,255,.25);
+      color:#e6f1ff;
+      padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);
+      animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;
+      font-size:13px;letter-spacing:.2px
+    }
+    .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
+    .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
+    @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
   </style>
 </head>
 <body>
@@ -117,6 +139,7 @@
     </div>
   </div>
   <div id="errBar"></div>
+  <div id="toast" aria-live="polite"></div>
 
   <!-- Header -->
   <header class="title" aria-hidden="true">
@@ -137,13 +160,13 @@
 
   <div class="shell" aria-hidden="true">
     <!-- Attivazioni -->
-    <section class="card">
+    <section class="card" id="activationCard">
       <h2>Attivazioni</h2>
       <div class="content">
         <div class="grid2">
           <div>
             <label>Data attivazione</label>
-            <input id="start" type="date" />
+            <input id="start" type="date" disabled aria-readonly="true" title="Impostata automaticamente alla data di oggi" />
           </div>
           <div class="full">
             <label>Cosa hai attivato ORA</label>
@@ -200,7 +223,7 @@
             <button class="btn ghost" id="p_picked">📦 Pacco RITIRATO</button>
           </div>
           <p class="subtitle full" style="margin-top:4px">
-            Al clic: parte WhatsApp con messaggio precompilato e il contatto viene inserito in elenco con reminder “misti” in base alla storia del cliente.
+            Al clic: parte WhatsApp con messaggio precompilato e il contatto viene inserito in elenco.
           </p>
         </div>
       </div>
@@ -212,7 +235,7 @@
     <div class="content" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
         <h2 style="padding:0">Clienti & Promemoria</h2>
-        <div class="subtitle">Elenco completo e sezione “Da Pacchi” visibili solo su richiesta.</div>
+        <div class="subtitle">Elenco completo con filtri essenziali.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="toggleListBtn" class="btn ghost">Apri elenco</button>
@@ -226,12 +249,8 @@
       <div class="toolbar">
         <div class="filters">
           <button class="pill active" data-filter="all">Tutti</button>
-          <button class="pill" data-filter="today">Oggi</button>
-          <button class="pill" data-filter="late">In ritardo</button>
-          <button class="pill" data-filter="done">Completati</button>
-          <button class="pill" data-filter="only-acc">Solo accettazioni</button>
           <button class="pill" data-filter="pacchi">Da Pacchi</button>
-          <button class="pill" data-filter="preventivi">Solo preventivi acquisti</button>
+          <button class="pill" data-filter="desk">Acquisizioni al banco</button>
         </div>
         <div class="search">
           <label>Cerca</label>
@@ -283,78 +302,28 @@
     const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
     const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
 
-    /* ====== CADENZA MISTA (nuovo) ====== */
-    // Ranges base (giorni) per il primo reminder di ogni tipo
+    /* ====== CADENZA MISTA (deterministica) ====== */
     const BASE_RANGES = {
-      energia:   [9,16],   // centrato medio
-      fisso:     [12,20],
-      sim:       [6,12],
-      smartphone:[10,18],
-      preventivi:[3,7]
+      energia:[9,16], fisso:[12,20], sim:[6,12], smartphone:[10,18], preventivi:[3,7]
     };
-
-    // Hash deterministico stringa -> intero
-    function hashStr(s){
-      let h=2166136261>>>0;
-      for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-      return h>>>0;
-    }
-    // Random deterministico in [min,max] intero
-    function rngInt(seedStr, min, max){
-      const h = hashStr(seedStr);
-      const span = Math.max(0, (max-min));
-      return min + (h % (span+1));
-    }
-
-    // Calcolo offset in giorni per tipo, in base a storia cliente
+    function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+    function rngInt(seedStr,min,max){ const h=hashStr(seedStr); const span=Math.max(0,(max-min)); return min + (h % (span+1)); }
     function offsetDaysFor(type, ctx){
-      let [lo,hi] = BASE_RANGES[type] || [12,18];
-
-      // Se proviene da riparazione o pacchi, centriamo vicino a ~15
-      if(ctx.kind==='repair' || ctx.kind==='pacchi'){
-        lo = Math.max(10, Math.min(lo, 13));
-        hi = Math.max(16, Math.min(hi+2, 19));
-      }
-
-      // Se già aveva quel tipo attivo in passato -> sposta in avanti per non stressare
-      if(ctx.prior.has(type)){
-        lo += 5; hi += 9;
-      }
-
-      // Sinergie semplici
-      if(ctx.prior.has('fisso') && type==='sim'){ lo += 3; hi += 4; }
-      if(ctx.prior.has('sim') && type==='fisso'){ lo += 3; }
-      if(ctx.prior.has('smartphone') && type==='energia'){ lo += 2; }
-      if(ctx.prior.has('energia') && type==='smartphone'){ lo += 1; }
-
-      // Clamp sensato
-      lo = Math.max(3, Math.min(lo, 28));
-      hi = Math.max(lo, Math.min(hi, 35));
-
-      // Seed = telefono + tipo (deterministico per cliente)
-      const seed = `${ctx.phone}|${type}`;
-      return rngInt(seed, lo, hi);
+      let [lo,hi]=BASE_RANGES[type]||[12,18];
+      if(ctx.kind==='repair' || ctx.kind==='pacchi'){ lo=Math.max(10,Math.min(lo,13)); hi=Math.max(16,Math.min(hi+2,19)); }
+      if(ctx.prior.has(type)){ lo+=5; hi+=9; }
+      if(ctx.prior.has('fisso') && type==='sim'){ lo+=3; hi+=4; }
+      if(ctx.prior.has('sim') && type==='fisso'){ lo+=3; }
+      if(ctx.prior.has('smartphone') && type==='energia'){ lo+=2; }
+      if(ctx.prior.has('energia') && type==='smartphone'){ lo+=1; }
+      lo=Math.max(3,Math.min(lo,28)); hi=Math.max(lo,Math.min(hi,35));
+      const seed=`${ctx.phone}|${type}`; return rngInt(seed,lo,hi);
     }
-
     function computeMixedTasks({startDate, phone, priorActivated, includePreventivi=false, contextKind=null}){
-      const upsellTargets = ['energia','fisso','sim','smartphone'];
-      const ctx = {
-        phone: normalizePhone(phone||''),
-        prior: new Set(priorActivated||[]),
-        kind: contextKind // 'repair' | 'pacchi' | null
-      };
-      const baseTasks = upsellTargets.map(type=>{
-        const off = offsetDaysFor(type, ctx);
-        let due = addDays(startDate, off);
-        due = avoidWeekend(due);
-        return { type, due: due.toISOString() };
-      });
-      if(includePreventivi){
-        const off = offsetDaysFor('preventivi', ctx);
-        let due = addDays(startDate, off);
-        due = avoidWeekend(due);
-        baseTasks.push({ type:'preventivi', due:due.toISOString() });
-      }
+      const upsellTargets=['energia','fisso','sim','smartphone'];
+      const ctx={ phone:normalizePhone(phone||''), prior:new Set(priorActivated||[]), kind:contextKind };
+      const baseTasks=upsellTargets.map(type=>{ const off=offsetDaysFor(type,ctx); let due=addDays(startDate,off); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+      if(includePreventivi){ const off=offsetDaysFor('preventivi',ctx); let due=addDays(startDate,off); due=avoidWeekend(due); baseTasks.push({type:'preventivi', due:due.toISOString()}); }
       return baseTasks;
     }
     /* ====== /CADENZA MISTA ====== */
@@ -393,12 +362,25 @@
     const acceptWrap = $('#acceptWrap'); const pacchiWrap = $('#pacchiWrap');
     const toggles = $('#toggles'); const activeSet = new Set();
 
+    /* Toast utility */
+    function showToast(text, type='ok'){
+      const wrap = $('#toast'); if(!wrap) return;
+      const el = document.createElement('div');
+      el.className = `toast ${type==='ok'?'ok':type==='err'?'err':''}`;
+      el.textContent = text;
+      wrap.appendChild(el);
+      setTimeout(()=>{ el.remove(); }, 3600);
+    }
+
     function updateAcceptanceUI(){
       const isRepair = activeSet.has('riparazione');
       const isPacchi = activeSet.has('pacchi');
       acceptWrap.classList.toggle('show', isRepair);
       pacchiWrap.classList.toggle('show', isPacchi);
       $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
+      document.body.classList.toggle('panel-open', isRepair || isPacchi);
+      const target = isRepair ? acceptWrap : (isPacchi ? pacchiWrap : null);
+      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
     }
     toggles.addEventListener('click', (e)=>{
       const b = e.target.closest('.tbtn'); if(!b) return;
@@ -408,13 +390,20 @@
       updateAcceptanceUI();
     });
 
-    // Date di default
+    // Data attivazione (bloccata su oggi + refresh a mezzanotte)
     const startI = $('#start');
-    try{
+    function setStartToToday(){
       const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-      if(startI && 'valueAsDate' in startI) startI.valueAsDate = d;
-      else if(startI){ startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-    }catch{}
+      if(startI){
+        if('valueAsDate' in startI) startI.valueAsDate = d;
+        else startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      }
+    }
+    setStartToToday();
+    (function scheduleMidnightRefresh(){
+      const now=new Date(); const next=new Date(now); next.setHours(24,0,5,0);
+      setTimeout(()=>{ setStartToToday(); scheduleMidnightRefresh(); }, next-now);
+    })();
 
     function autofillFromPhone(){
       const ph = normalizePhone(c_phone.value||''); if(!ph) return;
@@ -457,16 +446,32 @@
       return `https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`;
     }
 
+    // Utility: svuota input e reset selezioni
+    function clearClientInputs(){
+      c_name.value = '';
+      c_phone.value = '';
+      c_name.focus();
+    }
+    function resetSelections(){
+      activeSet.clear();
+      $$('#toggles .tbtn').forEach(b => b.classList.remove('active'));
+      acceptWrap.classList.remove('show');
+      pacchiWrap.classList.remove('show');
+      try { $('#acceptForm')?.reset(); } catch {}
+      const btn = $('#insertBtn'); if(btn) btn.textContent = 'Inserisci cliente';
+      document.body.classList.remove('panel-open');
+    }
+
     // Inserimento/merge: tasto principale
     const insertBtn = $('#insertBtn');
     insertBtn.addEventListener('click', ()=>{
       const name = (c_name.value||'').trim();
       let phone = normalizePhone(c_phone.value||'');
       if(!name || !phone) return alert('Inserisci nome e telefono cliente (solo cifre)');
-      const start = startI.value ? new Date(startI.value) : new Date();
+
+      const start = new Date(); // sempre "oggi"
       const activatedNow = new Set(activeSet);
 
-      // storia pregressa
       const prev = idxByPhone.get(phone);
       const priorActivated = prev?.activated || [];
 
@@ -484,7 +489,6 @@
 
       let pending;
       if(activatedNow.has('riparazione')){
-        // Riparazione: tasks con cadenza mista (context 'repair')
         const tasks = computeMixedTasks({
           startDate: new Date(),
           phone,
@@ -495,7 +499,6 @@
         const device = { type:$('#a_type').value, brand:$('#a_brand').value, model:($('#a_model').value||'').trim(), issue:($('#a_issue').value||'').trim() };
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), activated:['riparazione', ...(activatedNow.has('preventivi')?['preventivi']:[])], tasks, acceptance:true, praticaId: nextPraticaId(), device, repairStatus:'diagnostica', quotePrice:null, quoteStatus:null };
       } else {
-        // Attivazioni normali: tasks con cadenza mista
         const tasks = computeMixedTasks({
           startDate: start,
           phone,
@@ -506,7 +509,6 @@
         pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
       }
 
-      // merge by phone
       const idx = items.findIndex(x=> normalizePhone(x.phone) === phone);
       if(idx>-1){
         items[idx] = mergeItems(items[idx], pending);
@@ -514,6 +516,9 @@
         items.unshift(pending);
       }
       save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
+      clearClientInputs();
+      resetSelections();
+      showToast('Cliente inserito ✅','ok');
     });
 
     // PACCHI
@@ -528,7 +533,6 @@
       const prev = idxByPhone.get(phone);
       const priorActivated = prev?.activated || [];
 
-      // Tasks “misti” (context 'pacchi'), senza segnare come acceptance
       const tasks = computeMixedTasks({
         startDate: new Date(),
         phone,
@@ -560,7 +564,9 @@
         items.unshift(pending);
       }
       save(items); buildIndexes(); setListOpen(true); render(); highlightByPhone(phone);
-
+      clearClientInputs();
+      resetSelections();
+      showToast('Cliente inserito ✅','ok');
       try{ window.open(waForPacchi(name, phone, kind), '_blank', 'noopener'); }catch{}
     }
 
@@ -568,11 +574,9 @@
     p_picked.addEventListener('click',   ()=> handlePacchi('Ritirato'));
 
     function mergeItems(existing, pending){
-      // activated (unione)
       const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]);
       existing.activated = [...actSet];
 
-      // tasks (mantieni il più vicino per tipo, come prima)
       const byType = {};
       (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
       (pending.tasks||[]).forEach(t=>{
@@ -582,12 +586,10 @@
       });
       existing.tasks = Object.values(byType);
 
-      // Pacchi
       if(pending.fromPacchi){ existing.fromPacchi = true; }
       if(pending.pacchiCount){ existing.pacchiCount = (existing.pacchiCount||0) + pending.pacchiCount; }
       if(pending.pacchiKinds){ const kinds=new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]); existing.pacchiKinds=[...kinds]; }
 
-      // Accettazione (se arriva)
       if(pending.acceptance){
         existing.acceptance = true;
         existing.device = pending.device;
@@ -666,27 +668,25 @@
       const now=today(); const tStr=fmtDate(now);
       const q=(qI?.value||'').trim().toLowerCase();
 
-      const filtered = items.filter(it=>{
-        if(filter==='done') return it.done;
-        if(filter==='late') return !it.done && it.tasks.some(tsk=>new Date(tsk.due)<now);
-        if(filter==='today') return !it.done && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr);
-        if(filter==='only-acc') return !!it.acceptance;
-        if(filter==='pacchi') return it.fromPacchi===true;
-        if(filter==='preventivi') return (it.activated||[]).includes('preventivi') || (it.tasks||[]).some(tsk=>tsk.type==='preventivi');
-        return true;
-      }).filter(it=>{
-        if(!q) return true;
-        return (
-          it.name.toLowerCase().includes(q) ||
-          (it.phone||'').toLowerCase().includes(q) ||
-          (it.praticaId||'').toLowerCase().includes(q) ||
-          (it.device?.brand||'').toLowerCase().includes(q) ||
-          (it.device?.model||'').toLowerCase().includes(q) ||
-          (it.repairStatus||'').toLowerCase().includes(q) ||
-          (it.fromPacchi?'pacchi':'').includes(q) ||
-          (it.pacchiKinds||[]).join(' ').toLowerCase().includes(q)
-        );
-      });
+      const filtered = items
+        .filter(it => {
+          if (filter === 'pacchi') return it.fromPacchi === true;
+          if (filter === 'desk')   return it.fromPacchi !== true; // attivazioni + riparazioni
+          return true; // 'all'
+        })
+        .filter(it => {
+          if (!q) return true;
+          return (
+            it.name.toLowerCase().includes(q) ||
+            (it.phone||'').toLowerCase().includes(q) ||
+            (it.praticaId||'').toLowerCase().includes(q) ||
+            (it.device?.brand||'').toLowerCase().includes(q) ||
+            (it.device?.model||'').toLowerCase().includes(q) ||
+            (it.repairStatus||'').toLowerCase().includes(q) ||
+            (it.fromPacchi ? 'pacchi' : '').includes(q) ||
+            (it.pacchiKinds||[]).join(' ').toLowerCase().includes(q)
+          );
+        });
 
       const counts = {};
       items.forEach(it=>{ const ph=normalizePhone(it.phone); counts[ph]=(counts[ph]||0)+1; });
@@ -770,6 +770,10 @@
               if(!(val>=0)) return alert('Inserisci un importo valido');
               it.quotePrice = val; it.updatedAt=new Date().toISOString(); save(items);
               try{ window.open(waForPreventivo(val), '_blank', 'noopener'); }catch{}
+              // Reset campo preventivo e stato, piccolo toast
+              if(ip) ip.value = '';
+              it.quotePrice = null; save(items); render();
+              showToast('Preventivo inviato ✅','ok');
             });
 
             bAcc?.addEventListener('click', ()=>{ it.quoteStatus = 'accepted'; it.updatedAt=new Date().toISOString(); save(items); render(); });
@@ -814,18 +818,31 @@
     function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
     function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
 
-    // PIN
+    /* PIN: una volta al giorno */
     (function pinGateInit(){
       const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput'), err=$('#pinError');
-      const unlocked=sessionStorage.getItem('relong-pin-ok')==='1';
+      const KEY='relong-pin-date';
+      const todayStr = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+      const last = localStorage.getItem(KEY);
+
       function show(el){ el && el.removeAttribute('hidden'); }
       function hide(el){ el && el.setAttribute('hidden',''); }
       function setAppHidden(h){ document.querySelectorAll('[aria-hidden]').forEach(n=> n.setAttribute('aria-hidden', h?'true':'false')); }
-      if(unlocked){ hide(gate); setAppHidden(false); } else { show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50); }
+
+      if(last === todayStr){
+        hide(gate); setAppHidden(false);
+      } else {
+        show(gate); setAppHidden(true); setTimeout(()=>input?.focus(),50);
+      }
+
       function tryUnlock(){
         const val=(input.value||'').trim();
-        if(val==='1990'){ sessionStorage.setItem('relong-pin-ok','1'); setAppHidden(false); hide(gate); gate.parentNode && gate.parentNode.removeChild(gate); }
-        else { err.textContent='PIN errato. Riprova.'; input.value=''; input.focus(); }
+        if(val==='1990'){
+          localStorage.setItem(KEY, todayStr);
+          setAppHidden(false); hide(gate); gate.parentNode && gate.parentNode.removeChild(gate);
+        } else {
+          err.textContent='PIN errato. Riprova.'; input.value=''; input.focus();
+        }
       }
       ok.addEventListener('click', tryUnlock);
       input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ tryUnlock(); } });
