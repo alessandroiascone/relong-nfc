@@ -59,7 +59,7 @@
 <body>
   <section class="card" role="form" aria-labelledby="tit">
     <h1 id="tit">Ritiro & Consegna Pacchi 📦</h1>
-    <p class="sub">Inserisci <b>Nome e Cognome</b> e <b>Telefono</b>, poi indica l’azione. Si aprirà WhatsApp per conferma Consegna/Ritiro.</p>
+    <p class="sub">Inserisci <b>Nome e Cognome</b> e <b>Telefono</b>, poi indica l’azione. Viene aggiornato <b>subito</b> lo scadenzario.</p>
 
     <div class="idbox">
       <label class="field" aria-label="Nome e Cognome">
@@ -68,7 +68,7 @@
       <label class="field" aria-label="Telefono (solo cifre)">
         <input id="phone" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Telefono (solo cifre)" maxlength="20" />
       </label>
-      <div class="hint">I dati restano solo su questo dispositivo (Gdpr).</div>
+      <div class="hint">I dati restano solo su questo dispositivo (GDPR).</div>
     </div>
 
     <div class="box" aria-labelledby="scelte">
@@ -80,105 +80,119 @@
     </div>
 
     <div class="ok-wrap" id="okWrap" style="display:none">
-      <span class="ok"> Ho inviato allo Scadenzario ✅</span>
+      <span class="ok"> Aggiunto nello Scadenzario ✅</span>
     </div>
   </section>
 
 <script>
-/* ===== EMITTER verso Scadenzario (Queue + BroadcastChannel) ===== */
 (function(){
-  const PACCHI_QUEUE_KEY = 'relong-pacchi-queue-v1';
-  const PACCHI_BC_NAME   = 'relong-pacchi';
+  const STORE_KEY = 'relong-scadenzario-v30';
+  const BC_RELOAD = 'relong-scadenzario-reload';
+  const WA_SHOP = '3908119578844'; // +39 08119578844
 
-  // funzione globale richiamata al click dei pulsanti
-  window.relongPacchiAdd = function({name, phone, kind}){
-    const rec = {
-      name: (name||'').toString().trim(),
-      phone: (phone||'').toString().trim(),
-      kind: (kind||'').toString().trim(),
-      createdAt: new Date().toISOString()
-    };
-    // 1) Accoda in localStorage
-    let q = [];
-    try{ q = JSON.parse(localStorage.getItem(PACCHI_QUEUE_KEY)||'[]'); }catch{ q = []; }
-    q.push(rec);
-    try{ localStorage.setItem(PACCHI_QUEUE_KEY, JSON.stringify(q)); }catch{}
+  function load(){ try{ const raw=localStorage.getItem(STORE_KEY); return raw? JSON.parse(raw):[];}catch(e){ console.warn(e); return []; } }
+  function save(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+  function bcNotify(phone){
+    try{ const bc=new BroadcastChannel(BC_RELOAD); bc.postMessage({type:'reload-scad', phone}); setTimeout(()=>bc.close(),0);}catch{}
+  }
 
-    // 2) Notifica realtime via BroadcastChannel
-    try{
-      const bc = new BroadcastChannel(PACCHI_BC_NAME);
-      bc.postMessage(rec);
-      setTimeout(()=> bc.close(), 0);
-    }catch{}
-  };
-})();
-</script>
+  function normalizePhone(t){ let p=String(t||'').replace(/\D/g,'').trim(); if(p.startsWith('0')) p = p.slice(1); return p; }
+  function cleanName(t){ return String(t||'').trim().replace(/\s+/g,' ').split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' '); }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function avoidWeekend(d){ const x=new Date(d); const day=x.getDay(); if(day===0)x.setDate(x.getDate()+1); if(day===6)x.setDate(x.getDate()+2); return x; }
+  const DEFAULT_DAYS = { energia:10, fisso:17, sim:9, smartphone:12 };
 
-<script>
-(function(){
+  function ensureTasks(baseDate, existingTasks){
+    const types = new Set((existingTasks||[]).map(t=>t.type));
+    const all=['energia','fisso','sim','smartphone'];
+    const tasks=[...(existingTasks||[])];
+    for(const type of all){
+      if(!types.has(type)){
+        let due=addDays(baseDate, DEFAULT_DAYS[type]); due=avoidWeekend(due);
+        tasks.push({type, due:due.toISOString()});
+      }
+    }
+    return tasks;
+  }
+
+  function upsertFromPacco({name, phone, kind}){
+    const ph = normalizePhone(phone);
+    const nm = cleanName(name);
+    if(!ph || !nm) return false;
+
+    let items = load();
+    const idx = items.findIndex(x => normalizePhone(x.phone)===ph);
+    const created = new Date();
+
+    if(idx>-1){
+      // merge esistente
+      const it = items[idx];
+      it.fromPacchi = true;
+      it.name = it.name || nm;
+      it.pacchiCount = (it.pacchiCount||0) + 1;
+      const kinds = new Set([...(it.pacchiKinds||[]), (kind||'')]);
+      it.pacchiKinds = [...kinds].filter(Boolean);
+      it.tasks = ensureTasks(created, it.tasks);
+      it.updatedAt = new Date().toISOString();
+      items[idx] = it;
+    } else {
+      // crea nuovo contatto da Pacchi
+      items.unshift({
+        id: Date.now()+Math.random().toString(16).slice(2),
+        name: nm,
+        phone: ph,
+        start: created.toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        activated:[],
+        tasks: ensureTasks(created, []),
+        done:false, optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false, praticaId:null,
+        fromPacchi:true, pacchiCount:1, pacchiKinds: (kind? [kind]:[])
+      });
+    }
+    save(items);
+    bcNotify(ph); // aggiorna UI scadenzario in tempo reale
+    return true;
+  }
+
+  function linkWhatsAppToShop(text){ return `https://wa.me/${WA_SHOP}?text=${encodeURIComponent(text)}`; }
+  function timestampIT(){ try{ return new Intl.DateTimeFormat('it-IT',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date()); }catch(_){ return ''; } }
+  function msgToShop(name, action){
+    const when = timestampIT();
+    const act = action === 'ritirato' ? 'ha appena RITIRATO un pacco' : 'ha appena CONSEGNATO un pacco';
+    return `Cliente: ${name}\nHa eseguito: ${act}\nData e ora: ${when}`;
+  }
+
   const tiles = document.querySelectorAll('.tile');
   const fullname = document.getElementById('fullname');
   const phone = document.getElementById('phone');
   const okWrap = document.getElementById('okWrap');
-  const WA_SHOP = '3908119578844'; // +39 08119578844
 
-  function cleanName(t){
-    return t.trim().replace(/\s+/g,' ').split(' ')
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-  }
-  function normalizePhone(t){
-    let p = String(t||'').replace(/\D/g,'').trim();
-    if(p.startsWith('0')) p = p.slice(1);
-    return p;
-  }
-  function timestampIT(){
-    try{
-      return new Intl.DateTimeFormat('it-IT',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date());
-    }catch(_){ return ''; }
-  }
-  function linkWhatsApp(text){ return `https://wa.me/${WA_SHOP}?text=${encodeURIComponent(text)}`; }
-  function msgToShop(name, action){
-    const when = timestampIT();
-    const act = action === 'ritirato'
-      ? 'ha appena RITIRATO un pacco'
-      : 'ha appena CONSEGNATO un pacco';
-    return `Cliente: ${name}\nHa eseguito: ${act}\nData e ora: ${when}`;
-  }
-
-  // effetto shake
   function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
 
   tiles.forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const name = cleanName(fullname.value || '');
-      const ph = normalizePhone(phone.value || '');
-      if(!name || name.length < 3){ shake(fullname); fullname.focus(); return; }
-      if(!ph || ph.length < 7){ shake(phone); phone.focus(); return; }
+      const nm = cleanName(fullname.value||'');
+      const ph = normalizePhone(phone.value||'');
+      if(!nm || nm.length<3){ shake(fullname); fullname.focus(); return; }
+      if(!ph || ph.length<7){ shake(phone); phone.focus(); return; }
 
-      // micro-animazioni
       tiles.forEach(t=>t.classList.remove('press','lift','flash'));
       btn.classList.add('press');
       setTimeout(()=>{ btn.classList.remove('press'); btn.classList.add('lift'); }, 90);
       setTimeout(()=>{ btn.classList.add('flash'); }, 120);
 
-      // 1) invia record allo Scadenzario (queue + broadcast)
-      try{ window.relongPacchiAdd({ name, phone: ph, kind: btn.dataset.action }); }catch{}
+      // 1) scrittura DIRETTA nello scadenzario (merge per telefono)
+      const ok = upsertFromPacco({name:nm, phone:ph, kind:btn.dataset.action});
 
       // 2) feedback
-      okWrap.style.display = 'block';
-      setTimeout(()=> okWrap.style.display = 'none', 1800);
+      if(ok){ okWrap.style.display='block'; setTimeout(()=> okWrap.style.display='none', 1600); }
 
-      // 3) apri WhatsApp verso negozio (facoltativo ma utile)
-      const href = linkWhatsApp(msgToShop(name, btn.dataset.action));
+      // 3) (facoltativo) apri WhatsApp verso negozio per log operativo
+      const href = linkWhatsAppToShop(msgToShop(nm, btn.dataset.action));
       setTimeout(()=>{ window.open(href, '_blank', 'noopener'); }, 200);
-
-      // 4) (opzionale) storico locale leggero per tuo uso
-      try{
-        const key='relong-pacchi-local';
-        const list = JSON.parse(localStorage.getItem(key)||'[]');
-        list.push({name, phone:ph, kind:btn.dataset.action, createdAt:new Date().toISOString()});
-        localStorage.setItem(key, JSON.stringify(list.slice(-200))); // tieni ultimi 200
-      }catch{}
     }, {passive:true});
   });
 })();
