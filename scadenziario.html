@@ -14,7 +14,7 @@
       --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
       --ok:#25D366; --danger:#ff4d4f;
       --shadow:0 10px 40px rgba(0,140,255,.18), inset 0 1px 0 rgba(255,255,255,.04);
-      --st-diagnostica:#ffd666; --st-pronto:#95de64; --st-consegnato:#bfbfbf;
+      --st-diagnostica:#ffd666; --st-ricambi:#ffa940; --st-lavorazione:#69c0ff; --st-pronto:#95de64; --st-consegnato:#bfbfbf;
       --pacchi:#00d1b2;
     }
     body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
@@ -46,7 +46,6 @@
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ghost{background:transparent;border:1px solid var(--stroke);color:#eef3ff}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10}
-    .btn.danger{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#140404}
 
     .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
     .filters{display:flex;gap:8px;flex-wrap:wrap}
@@ -64,11 +63,11 @@
     .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
     .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
     .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
-    .qok{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
-    .qno{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
 
     .st-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#0a0a0a}
     .st-diagnostica{background:var(--st-diagnostica)}
+    .st-attesa-ricambi{background:var(--st-ricambi)}
+    .st-lavorazione{background:var(--st-lavorazione)}
     .st-pronto{background:var(--st-pronto)}
     .st-consegnato{background:var(--st-consegnato)}
 
@@ -222,7 +221,7 @@
     </div>
   </section>
 
-  <!-- Elenco -->
+  <!-- Elenco (nascosto finché non aperto) -->
   <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden aria-hidden="true">
     <div class="content">
       <div class="toolbar">
@@ -272,7 +271,6 @@
 
     const storeKey = 'relong-scadenzario-v29';
     const backupPrefix = 'relong-backup-';
-    const PACCHI_KEYS = ['relong-pacchi-v1','relong-pacchi-v2'];
     const PACCHI_INGESTED_KEY = 'relong-pacchi-ingested';
 
     const load = () => { try { const raw = localStorage.getItem(storeKey); return raw ? JSON.parse(raw) : []; } catch(e){ console.warn('Storage danneggiato:', e); localStorage.removeItem(storeKey); return []; } };
@@ -301,12 +299,12 @@
       return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
     }
 
-    /* ====== Normalizza Nome Cognome + Indici ====== */
+    /* ====== Normalizza Nome Cognome + Indici per auto-compilazione ====== */
     function normalizeName(s){
       return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
     }
-    let idxByPhone = new Map();
-    let idxByName  = new Map();
+    let idxByPhone = new Map();  // phone -> latest item
+    let idxByName  = new Map();  // normalized "nome cognome" -> latest item
     function buildIndexes(){
       idxByPhone.clear(); idxByName.clear();
       for(const it of items){
@@ -373,6 +371,7 @@
     function autofillFromName(){
       const nm  = normalizeName(c_name.value||'');
       if(!nm) return;
+      // Richiedi almeno 2 parole (nome+cognome) e match esatto
       const parts = nm.split(' ');
       if(parts.length < 2) return;
       const hit = idxByName.get(nm);
@@ -392,7 +391,7 @@
     const dupMerge = $('#dupMerge');
     const dupInsertAnyway = $('#dupInsertAnyway');
     const dupCancel = $('#dupCancel');
-    let dupContext = null;
+    let dupContext = null; // {existingItems:[], primary, pendingNew}
 
     function openDupModal(existingItems, pendingNew){
       dupContext = {
@@ -525,8 +524,7 @@ ${site}`;
         activated:[...activated],
         done:false, optWeekend:true, optEvening:true,
         muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, source:null,
-        quote:null, quoteAccepted:false, quoteRejected:false
+        acceptance:false, praticaId:null, source:null
       };
 
       if(activated.has('riparazione')){
@@ -616,11 +614,10 @@ ${site}`;
       const name=it.name;
       const base=`Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
       const suffix=`\nID pratica: ${it.praticaId || '-'}\nSe hai bisogno scrivimi qui.`;
-      const accepted = it.quoteAccepted===true;
       const map={
-        diagnostica: accepted
-          ? `${base}\nPreventivo accettato ✅ Stiamo procedendo con la riparazione. Ti aggiorno appena pronto al ritiro.${suffix}`
-          : `${base}\nIl tuo dispositivo è in diagnostica. Ti invio il preventivo appena pronto.${suffix}`,
+        diagnostica:`${base}\nIl tuo dispositivo è in diagnostica. Ti aggiorno appena definisco il preventivo.${suffix}`,
+        'attesa-ricambi':`${base}\nSiamo in attesa dei ricambi. Ti aggiorno non appena arrivano e procediamo alla riparazione.${suffix}`,
+        lavorazione:`${base}\nIl tuo dispositivo è in lavorazione in questo momento. Ti avviso appena è pronto.${suffix}`,
         pronto:`${base}\nIl tuo dispositivo è PRONTO per il ritiro. Puoi passare quando vuoi. Grazie!\nRe Long Informatica – 08119578844${suffix}`,
         consegnato:`${base}\nGrazie per esserti affidato a noi! Se ti va lasciaci una recensione ⭐⭐⭐⭐⭐ su Google: cerca “Re Long Informatica Marano”.${suffix}`
       };
@@ -628,31 +625,70 @@ ${site}`;
       return `https://wa.me/39${it.phone}?text=${txt}`;
     }
 
-    /* --------- PACCHI: ingest --------- */
-    function readPacchiRaw(){
-      let all=[];
-      for(const k of PACCHI_KEYS){
+    /* --------- PACCHI: ingest (auto-discovery & compat) --------- */
+    function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem(PACCHI_INGESTED_KEY)||'[]')); }catch{ return new Set(); } }
+    function savePacchiIngested(set){ try{ localStorage.setItem(PACCHI_INGESTED_KEY, JSON.stringify([...set])); }catch{} }
+
+    // Scansiona tutte le chiavi e trova quelle che sembrano contenere pacchi
+    function discoverPacchiKeys(){
+      const keys = [];
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(!k) continue;
+        let looksPacchiName = /pacchi/i.test(k); // nel nome
+        let looksPacchiData = false;
         try{
-          const raw=localStorage.getItem(k);
+          const raw = localStorage.getItem(k);
           if(!raw) continue;
-          const parsed=JSON.parse(raw);
-          if(Array.isArray(parsed)) all=all.concat(parsed);
-          else if(parsed && Array.isArray(parsed.items)) all=all.concat(parsed.items);
-        }catch(e){ console.warn('Pacchi parse fail',k,e); }
+          const parsed = JSON.parse(raw);
+          const isArr = Array.isArray(parsed) && parsed.some(x => x && (x.phone||x.telefono||x.name||x.nome));
+          const isObjItems = parsed && Array.isArray(parsed.items) && parsed.items.some(x => x && (x.phone||x.telefono||x.name||x.nome));
+          looksPacchiData = isArr || isObjItems;
+        }catch(e){ /* non JSON, ignora */ }
+        if(looksPacchiName || looksPacchiData) keys.push(k);
+      }
+      return [...new Set(keys)];
+    }
+
+    function readPacchiRaw(){
+      const keys = discoverPacchiKeys();
+      let all = [];
+      for(const k of keys){
+        try{
+          const raw = localStorage.getItem(k);
+          if(!raw) continue;
+          const parsed = JSON.parse(raw);
+          if(Array.isArray(parsed)) all = all.concat(parsed);
+          else if(parsed && Array.isArray(parsed.items)) all = all.concat(parsed.items);
+        }catch(e){ console.warn('Pacchi parse fail', k, e); }
       }
       return all;
     }
-    function pacchiIngestedSet(){ try{ return new Set(JSON.parse(localStorage.getItem(PACCHI_INGESTED_KEY)||'[]')); }catch{ return new Set(); } }
-    function savePacchiIngested(set){ try{ localStorage.setItem(PACCHI_INGESTED_KEY, JSON.stringify([...set])); }catch{} }
+
     function convertPacchiRecordToItem(rec){
       const name=(rec.name||rec.nome||'Cliente Pacchi').toString().trim();
       const phone=normalizePhone(rec.phone||rec.telefono||'');
       const created=rec.createdAt ? new Date(rec.createdAt) : new Date();
       const all=['energia','fisso','sim','smartphone'];
-      const tasks=all.map(type=>{ let due=addDays(created, DEFAULT_DAYS[type]); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
+      const tasks=all.map(type=>{
+        let due=addDays(created, DEFAULT_DAYS[type]);
+        due=avoidWeekend(due);
+        return {type, due:due.toISOString()};
+      });
       const id=Date.now()+Math.random().toString(16).slice(2);
-      return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||'') };
+      return {
+        id, name, phone,
+        start:created.toISOString(),
+        createdAt:new Date().toISOString(),
+        activated:[], tasks,
+        done:false, optWeekend:true, optEvening:true,
+        muteDate:null, activeChatUntil:null, doneAt:null,
+        acceptance:false, praticaId:null,
+        source:'pacchi',
+        pacchiKind:(rec.kind||rec.tipo||rec.service||'')
+      };
     }
+
     function ingestPacchi({silent=false}={}){
       const raw=readPacchiRaw(); if(!raw.length) return 0;
       const ing=pacchiIngestedSet(); let added=0;
@@ -665,18 +701,31 @@ ${site}`;
         items.unshift(convertPacchiRecordToItem(rec));
         ing.add(stableId); added++;
       }
-      if(added){ save(items); buildIndexes(); if(!silent){ maybeNotify(`Import Pacchi: ${added} contatto/i aggiunto/i`); } render(); }
+      if(added){
+        save(items); buildIndexes();
+        if(!silent){ maybeNotify(`Import Pacchi: ${added} contatto/i aggiunto/i`); }
+        render();
+        savePacchiIngested(ing);
+      }
       return added;
     }
+
+    // Bottone "Forza Sync Pacchi"
     $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
+    // Import silenzioso al boot
     ingestPacchi({silent:true});
-    window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
+    // Ascolta QUALSIASI cambiamento storage che sembri "pacchi"
+    window.addEventListener('storage', (ev)=>{
+      if(!ev || !ev.key) return;
+      if(/pacchi/i.test(ev.key)){ ingestPacchi({silent:false}); }
+    });
+    // Poll leggero di sicurezza (15s)
     setInterval(()=> ingestPacchi({silent:true}), 15000);
 
     function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
     function statusChip(status){
-      const mapCls={diagnostica:'st-diagnostica',pronto:'st-pronto',consegnato:'st-consegnato'};
-      const label={diagnostica:'Diagnostica',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
+      const mapCls={diagnostica:'st-diagnostica','attesa-ricambi':'st-attesa-ricambi',lavorazione:'st-lavorazione',pronto:'st-pronto',consegnato:'st-consegnato'};
+      const label={diagnostica:'Diagnostica','attesa-ricambi':'Ricambi',lavorazione:'Lavorazione',pronto:'Pronto',consegnato:'Consegnato'}[status]||status;
       const span=document.createElement('span'); span.className=`st-chip ${mapCls[status]||''}`; span.textContent=label; return span;
     }
 
@@ -728,8 +777,6 @@ ${site}`;
       if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
       if(it.source==='pacchi'){ tags.append(tag(`Pacchi${it.pacchiKind?`: ${String(it.pacchiKind).charAt(0).toUpperCase()+String(it.pacchiKind).slice(1)}`:''}`,'pacchi')); }
       if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(statusChip(it.repairStatus||'diagnostica')); }
-      if(it.quoteAccepted) tags.append(tag('Preventivo ✔︎','qok'));
-      if(it.quoteRejected) tags.append(tag('Preventivo ✖︎','qno'));
       it.activated.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
       if(isMutedToday(it)) tags.append(tag('Silenzioso oggi','muted'));
       if(isActiveChat(it)) tags.append(tag('In chat','activeChat'));
@@ -742,66 +789,15 @@ ${site}`;
         const top=document.createElement('div'); top.className='row-slim';
         top.innerHTML=`<div><b>${it.device?.type||''}</b> • ${it.device?.brand||''} ${it.device?.model||''}<br><small>Difetto: ${it.device?.issue||'-'}</small></div>`;
         const controls=document.createElement('div'); controls.className='r-line';
-
         const sel=document.createElement('select');
-        sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
+        sel.innerHTML=`<option value="diagnostica">Diagnostica</option><option value="attesa-ricambi">Attesa ricambi</option><option value="lavorazione">Lavorazione</option><option value="pronto">Pronto al ritiro</option><option value="consegnato">Consegnato</option>`;
         sel.value=it.repairStatus||'diagnostica';
         sel.addEventListener('change',()=>{
-          const prev=it.repairStatus; it.repairStatus=sel.value; if(sel.value==='consegnato'){ it.done=true; it.doneAt=new Date().toISOString(); }
-          save(items); render();
+          const prev=it.repairStatus; it.repairStatus=sel.value; save(items); render();
           if(prev!=='pronto' && sel.value==='pronto'){ maybeNotify(`"${it.name}" è PRONTO al ritiro`); const href=waForRepairState(it); try{ window.open(href,'_blank'); }catch{} }
         });
         const waState=document.createElement('a'); waState.href=waForRepairState(it); waState.target='_blank'; waState.rel='noopener'; waState.className='wa-btn ok'; waState.innerHTML=`${waIcon()}WhatsApp stato`;
-        controls.append(sel, waState); top.append(controls); div.append(top);
-
-        /* BLOCCO PREVENTIVO SOLO IN DIAGNOSTICA */
-        if((it.repairStatus||'diagnostica')==='diagnostica'){
-          const qWrap=document.createElement('div'); qWrap.className='row-slim';
-          qWrap.style.gap='12px';
-          const left=document.createElement('div');
-          const label=document.createElement('label'); label.style.display='block'; label.style.fontSize='12px'; label.style.color='var(--muted)'; label.textContent='Preventivo (€)';
-          const qInput=document.createElement('input'); qInput.type='number'; qInput.min='0'; qInput.step='0.01'; qInput.placeholder='0,00'; qInput.value = (it.quote ?? '');
-          qInput.style.width='180px';
-          left.append(label,qInput);
-
-          const right=document.createElement('div'); right.className='r-line';
-
-          const btnSend=document.createElement('button'); btnSend.className='wa-btn ok'; btnSend.innerHTML=`${waIcon()}Invia preventivo`;
-          btnSend.addEventListener('click', ()=>{
-            const val=qInput.value.trim();
-            it.quote = val || null; it.quoteSentAt=new Date().toISOString(); save(items);
-            const prezzo = val ? `${val} €` : '—';
-            const txt = `Ciao ${it.name}, ecco il preventivo per la riparazione:\nDispositivo: ${it.device?.brand||''} ${it.device?.model||''}\nProblema: ${it.device?.issue||'-'}\n\nPREZZO: ${prezzo}\n\nSe confermi procediamo subito. In caso contrario nessun costo.\nID pratica: ${it.praticaId||'-'}`;
-            const href = `https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`;
-            try{ window.open(href,'_blank','noopener'); }catch{}
-          });
-
-          const btnOk=document.createElement('button'); btnOk.className='btn ok'; btnOk.textContent='Accetta';
-          btnOk.addEventListener('click', ()=>{
-            it.quote = qInput.value.trim()||it.quote||null;
-            it.quoteAccepted = true; it.quoteRejected = false;
-            /* NON cambiamo stato: resta in diagnostica, passerai tu a "Pronto" */
-            save(items); render();
-            const msg=`Perfetto ${it.name}! Preventivo accettato ✅ Procediamo e ti avviso appena è pronto per il ritiro. ID pratica: ${it.praticaId||'-'}`;
-            try{ window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
-          });
-
-          const btnKo=document.createElement('button'); btnKo.className='btn danger'; btnKo.textContent='Rifiuta';
-          btnKo.addEventListener('click', ()=>{
-            it.quote = qInput.value.trim()||it.quote||null;
-            it.quoteAccepted = false; it.quoteRejected = true;
-            it.repairStatus='consegnato'; it.done=true; it.doneAt=new Date().toISOString();
-            save(items); render();
-            const msg=`Ricevuto ${it.name}, non procediamo con la riparazione. Se vuoi puoi ripassare a ritirare il dispositivo. ID pratica: ${it.praticaId||'-'}`;
-            try{ window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(msg)}`,'_blank'); }catch{}
-          });
-
-          right.append(btnSend, btnOk, btnKo);
-          qWrap.append(left,right);
-          div.append(qWrap);
-        }
-
-        sum.append(div);
+        controls.append(sel, waState); top.append(controls); div.append(top); sum.append(div);
       }
 
       const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
