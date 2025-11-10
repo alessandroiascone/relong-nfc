@@ -146,7 +146,7 @@
   <header class="title" aria-hidden="true">
     <div>
       <h1>ReLong • Scadenzario + Accettazione</h1>
-      <div class="subtitle">Attivazioni, Riparazioni & Pacchi → reminder smart con WhatsApp + Google Calendar.</div>
+      <div class="subtitle">Attivazioni, Riparazioni & Gestione Pacchi.</div>
     </div>
   </header>
 
@@ -155,7 +155,7 @@
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
-      <div><label>Telefono (solo cifre, WhatsApp)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
+      <div><label>Telefono (solo cifre)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
     </div>
   </section>
 
@@ -207,9 +207,9 @@
               <option>Redmi</option><option>Xiaomi</option><option>Honor</option><option>Other</option>
             </select>
           </div>
-          <div><label>Modello</label><input id="a_model" placeholder="iPhone 15, Galaxy S23…" /></div>
+          <div><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax, Galaxy S25 Ultra…" /></div>
           <div class="full"><label>Difetto / Problema</label><textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea></div>
-          <p class="subtitle full" style="margin-top:4px">Con Riparazione attiva il tasto principale diventa “Accetta & Inserisci”.</p>
+          <p class="subtitle full" style="margin-top:4px">Al termine clicca su “Accetta & Inserisci”.</p>
         </form>
       </div>
     </aside>
@@ -419,13 +419,13 @@
       const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
       const t = (type || '').toLowerCase();
       const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va se ti spiego in 1 minuto come risparmiare sulla bolletta?\nHub: ${HUB_URL}`,
+        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va di risparmiare sulla bolletta della Corrente?\nHub: ${HUB_URL}`,
         fisso:   `${base}\nAbbiamo offerte Internet Casa dedicate (FTTC/FTTH) con prezzi riservati ai nostri clienti. Vuoi una verifica copertura + simulazione rapida?\nHub: ${HUB_URL}`,
-        sim:     `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo dedicate in store. Vuoi i dettagli e la portabilità?\nHub: ${HUB_URL}`,
-        smartphone:`${base}\nPossiamo proporti uno smartphone a rate (anche senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è OK. Vuoi una proposta su misura?\nHub: ${HUB_URL}`,
-        preventivi:`${base}\nPromemoria per il tuo preventivo acquisti. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${HUB_URL}`
+        sim:     `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo dedicate in store. Vuoi i dettagli?\nHub: ${HUB_URL}`,
+        smartphone:`${base}\nPossiamo proporti uno smartphone a rate (senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è Accettata. Vuoi una proposta su misura?\nHub: ${HUB_URL}`,
+        preventivi:`${base}\nPromemoria per il tuo preventivo. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${HUB_URL}`
       };
-      const txt = map[t] || `${base}\nHo una promo dedicata per te. Ti va se te la spiego in 1 minuto?\nHub: ${HUB_URL}`;
+      const txt = map[t] || `${base}\nHo una promo dedicata per te. Ti va se te la spiego?\nHub: ${HUB_URL}`;
       return `https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`;
     }
     function waForRepairIntake(name, phone, dev){
