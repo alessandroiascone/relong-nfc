@@ -372,7 +372,7 @@
     function autofillFromName(){
       const nm  = normalizeName(c_name.value||'');
       if(!nm) return;
-      // Richiedi almeno 2 parole (nome+cognome) e match esatto
+      // richiedi almeno 2 parole (nome+cognome) e match esatto
       const parts = nm.split(' ');
       if(parts.length < 2) return;
       const hit = idxByName.get(nm);
@@ -651,21 +651,52 @@ ${site}`;
       const id=Date.now()+Math.random().toString(16).slice(2);
       return { id, name, phone, start:created.toISOString(), createdAt:new Date().toISOString(), activated:[], tasks, done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null, acceptance:false, praticaId:null, source:'pacchi', pacchiKind:(rec.kind||rec.tipo||rec.service||'') };
     }
-    function ingestPacchi({silent=false}={}){
-      const raw=readPacchiRaw(); if(!raw.length) return 0;
-      const ing=pacchiIngestedSet(); let added=0;
-      for(const rec of raw){
-        const phone=normalizePhone(rec.phone||rec.telefono||''); if(!phone) continue;
-        const created=rec.createdAt ? new Date(rec.createdAt).toISOString() : isoDay(new Date());
-        const kind=(rec.kind||rec.tipo||'').toLowerCase();
-        const stableId=`${phone}|${created}|${kind||'na'}`;
-        if(ing.has(stableId)) continue;
-        items.unshift(convertPacchiRecordToItem(rec));
-        ing.add(stableId); added++;
+    // >>>>>>> VERSIONE SENZA DUPLICATI <<<<<<<<
+    function ingestPacchi({silent=false}={}) {
+      const raw = readPacchiRaw();
+      if (!raw.length) return 0;
+
+      const ing = pacchiIngestedSet();
+      let added = 0;
+
+      for (const rec of raw) {
+        const phone = normalizePhone(rec.phone || rec.telefono || '');
+        if (!phone) continue;
+
+        const created = rec.createdAt
+          ? new Date(rec.createdAt).toISOString()
+          : isoDay(new Date());
+
+        const kind = (rec.kind || rec.tipo || rec.service || '').toLowerCase();
+
+        // ID univoco dell’evento pacchi (per non re-importare lo stesso evento)
+        const stableId = `${phone}|${created}|${kind || 'na'}`;
+        if (ing.has(stableId)) continue;
+
+        // DEDUP: se esiste già un cliente con lo stesso telefono, NON creare un nuovo item
+        const exists = items.some(x => normalizePhone(x.phone) === phone);
+
+        if (!exists) {
+          items.unshift(convertPacchiRecordToItem(rec));
+          added++;
+        }
+
+        // segna l’evento come processato
+        ing.add(stableId);
       }
-      if(added){ save(items); buildIndexes(); if(!silent){ maybeNotify(`Import Pacchi: ${added} contatto/i aggiunto/i`); } render(); }
+
+      if (added) {
+        save(items);
+        buildIndexes();
+        if (!silent) { maybeNotify(`Import Pacchi: ${added} nuovo/i contatto/i`); }
+        render();
+      }
+
+      savePacchiIngested(ing);
       return added;
     }
+    // <<<<<<<< FINE MODIFICA DEDUP <<<<<<<<
+
     $('#syncPacchiBtn').addEventListener('click', ()=> ingestPacchi({silent:false}));
     ingestPacchi({silent:true});
     window.addEventListener('storage', (ev)=>{ if(PACCHI_KEYS.includes(ev.key)) ingestPacchi({silent:false}); });
