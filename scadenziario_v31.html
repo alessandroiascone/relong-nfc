@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32 (Assistenza migliorata)</title>
+  <title>ReLong • Scadenzario v32b (Pacchi + Reminder)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -56,8 +56,8 @@
   <div id="toast"></div>
   <header class="title">
     <div>
-      <h1>ReLong • Scadenzario v32</h1>
-      <div class="subtitle">Assistenza: flusso “Da consegnare → Ritirato → Review +3 giorni” • Pacchi: solo Elimina</div>
+      <h1>ReLong • Scadenzario v32b</h1>
+      <div class="subtitle">Pacchi: reminder veloci (energia, SIM, fisso, smartphone a rate) + Elimina • Riparazioni: consegna/ritiro + review</div>
     </div>
     <div class="status">
       <span id="syncState" class="pill bad">Sync: Disconnesso</span>
@@ -116,11 +116,12 @@
   <script>
     /* Utils & UI */
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-    const STORE_KEY='relong-scadenzario-v32';
+    const STORE_KEY='relong-scadenzario-v32b';
     const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
     const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
     const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
+    const RELONG_PHONE='08119578844';
 
     function showToast(t, type='ok'){
       const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
@@ -142,11 +143,10 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32b', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
-          // retry in caso di 409
           if(res.status===409){
             const meta=await this.get(path); const body2={...body,sha:meta.sha};
             const r2=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body2)});
@@ -190,14 +190,21 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32 sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32b sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
 
-    /* WA helpers */
-    function waPickup(name, phone){ const txt=`Ciao ${name}, sono Alessandro di Re Long (08119578844).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nCi trovi qui: ${MAPS_URL}`; return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`; }
-    function waReview(name, phone){ const txt=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`; }
+    /* WA templates */
+    function walink(phone, text){ return `https://wa.me/39${phone}?text=${encodeURIComponent(text)}`; }
+    function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nTi va una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
+    function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata (Vodafone/Wind3) con minuti e Giga top. 📶`; return walink(phone,t); }
+    function waPacchiFisso(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo dedicata. 🏠📡`; return walink(phone,t); }
+    function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate senza busta paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
+    function waPacchiMemo(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`; return walink(phone,t); }
+
+    function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
+    function waReview(name, phone){ const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return walink(phone,t); }
 
     /* Insert logic */
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -244,9 +251,13 @@
         // ACTIONS
         actions.innerHTML='';
         if(it.fromPacchi && !it.acceptance){
-          // Solo elimina
-          const del=btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); });
-          actions.append(del);
+          // PACCHI: reminder rapidi + elimina (niente completato/consegnato)
+          const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+          const a2=aBtn('WA SIM', ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+          const a3=aBtn('WA Fisso', ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+          const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+          const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
+          actions.append(a1,a2,a3,a4,a5, btnDelete(it));
         } else if(it.acceptance){
           // Flusso riparazione
           if(it.repairStatus==='diagnostica'){
@@ -257,7 +268,7 @@
               const val=parseFloat((ip.value||'0').replace(',', '.')); if(!(val>=0)) return alert('Importo non valido');
               it.quotePrice=val; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub();
               const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(val||0);
-              const txt = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.\n\nI nostri servizi: ${HUB_URL}`;
+              const txt = `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nEcco il preventivo per la tua riparazione.\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.\n\nI nostri servizi: ${HUB_URL}`;
               window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`,'_blank','noopener');
             });
             const acc=btn('Segna preventivo ACCETTATO', ()=>{ it.quoteStatus='accepted'; it.repairStatus='inriparazione'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
@@ -310,7 +321,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32 pronta ✅');
+      showToast('v32b pronta ✅');
     })();
   </script>
 </body>
