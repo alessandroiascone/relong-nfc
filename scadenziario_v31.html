@@ -79,6 +79,8 @@
           <button type="button" class="tbtn" data-key="sim">SIM</button>
           <button type="button" class="tbtn" data-key="fisso">Fisso</button>
           <button type="button" class="tbtn" data-key="energia">Energia</button>
+          <!-- NEW: scelta dedicata "Smartphone a rate" -->
+          <button type="button" class="tbtn" data-key="rate">Smartphone a rate</button>
         </div>
       </div>
       <div style="grid-column:1/-1;display:none" id="acceptWrap">
@@ -206,6 +208,11 @@
     function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
     function waReview(name, phone){ const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return walink(phone,t); }
 
+    /* NEW: messaggi automatici conferma/avanzamento */
+    function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno a breve con il preventivo. 🔧`; return walink(phone,t); }
+    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato. Ti scrivo appena è pronto per il ritiro. 📦`; return walink(phone,t); }
+    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, consegna completata. Grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
+
     /* Insert logic */
     const activeSet=new Set(); const toggles=$('#toggles');
     toggles.addEventListener('click', e=>{ const b=e.target.closest('.tbtn'); if(!b) return; const k=b.dataset.key; const on=!b.classList.contains('active'); if(k==='riparazione') $('#acceptWrap').style.display = on? 'block':'none'; b.classList.toggle('active',on); if(on) activeSet.add(k); else activeSet.delete(k); });
@@ -237,6 +244,12 @@
       saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
       $('#c_name').value=''; $('#c_phone').value=''; activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active')); $('#acceptWrap').style.display='none';
       render(); showToast('Cliente inserito ✅');
+
+      /* NEW: invii automatici post-inserimento */
+      try{
+        if(isRepair){ window.open(waRepairIntake(name, phone),'_blank','noopener'); }
+        else if(newItem.fromPacchi){ window.open(waPacchiReceived(name, phone),'_blank','noopener'); }
+      }catch{}
     });
 
     /* Render */
@@ -253,8 +266,8 @@
         if(it.fromPacchi && !it.acceptance){
           // PACCHI: reminder rapidi + elimina (niente completato/consegnato)
           const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-          const a2=aBtn('WA SIM', ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-          const a3=aBtn('WA Fisso', ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+          const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+          const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
           const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
           const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
           actions.append(a1,a2,a3,a4,a5, btnDelete(it));
@@ -291,13 +304,19 @@
                 it.postReviewSent = false;
                 it.updatedAt=new Date().toISOString();
                 saveLocal(); saveToGitHub(); render();
+                // NEW: conferma consegna via WhatsApp
+                try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
               }));
             }
             actions.append(btnDelete(it));
           }
         } else {
           // altri elementi (attivazioni, ecc.): opzionale completato + elimina
-          actions.append(btn('Completato', ()=>{ it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); }));
+          actions.append(btn('Completato', ()=>{
+            // NEW: invio conferma per elementi non-riparazione (es. Pacchi, SIM, Fisso, Energia, Rate, ecc.)
+            try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+            it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+          }));
           actions.append(btnDelete(it));
         }
 
