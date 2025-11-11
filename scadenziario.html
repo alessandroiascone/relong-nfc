@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>ReLong • Scadenzario + Accettazione + Pacchi (UI+Kanban+Sync+PIN fix)</title>
+<title>ReLong • Scadenzario + Accettazione + Pacchi (NO PIN)</title>
 <meta name="theme-color" content="#0a0a0a" />
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -100,10 +100,7 @@
   .dropzone.drag{background:rgba(0,140,255,.08)}
   .kcard{border:1px solid var(--stroke);border-radius:12px;background:#0a0d14;padding:10px;margin-bottom:8px;cursor:grab}
   .kcard:active{cursor:grabbing}
-  /* PIN & toast */
-  #pinGate{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,10,20,.9),rgba(0,0,0,.95));backdrop-filter:blur(6px);display:grid;place-items:center;z-index:9999}
-  #pinCard{background:rgba(14,16,22,.9);border:1px solid var(--stroke);border-radius:20px;box-shadow:var(--shadow);padding:20px 18px;max-width:360px;width:92%;display:grid;gap:12px}
-  #pinInput{letter-spacing:6px;text-align:center;font-weight:800}
+  /* toast & error bar */
   #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
   .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
   .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
@@ -127,22 +124,8 @@
   <div id="errBar"></div>
   <div id="toast" aria-live="polite"></div>
 
-  <!-- PIN (visibile finché non sblocchi) -->
-  <div id="pinGate">
-    <div id="pinCard">
-      <h3>Accesso protetto</h3>
-      <p class="subtitle">Inserisci il PIN a 4 cifre per aprire lo scadenzario.</p>
-      <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
-      <div class="r-line">
-        <!-- Fallback inline: chiama window.__unlock se gli handler non partono -->
-        <button id="pinOk" class="btn primary" type="button" style="flex:1" onclick="window.__unlock && window.__unlock()">Sblocca</button>
-      </div>
-      <p class="subtitle" style="font-size:11px">Nota: blocco base lato client. PIN: 1990</p>
-    </div>
-  </div>
-
   <!-- TOP BAR -->
-  <div class="topbar" aria-hidden="true">
+  <div class="topbar">
     <div class="brand">
       <div class="sync-dot sync-warn" id="syncDot" title="Stato Sync"></div>
       <div>
@@ -165,7 +148,7 @@
   </div>
 
   <!-- Dati cliente -->
-  <section class="card" style="max-width:1200px;margin:0 auto" aria-hidden="true">
+  <section class="card" style="max-width:1200px;margin:0 auto">
     <h2>Dati cliente (unici)</h2>
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
@@ -173,7 +156,7 @@
     </div>
   </section>
 
-  <div class="shell" aria-hidden="true" id="anchorAtt">
+  <div class="shell" id="anchorAtt">
     <!-- Attivazioni -->
     <section class="card" id="activationCard">
       <h2>Attivazioni</h2>
@@ -198,7 +181,7 @@
     </section>
 
     <!-- Accettazione -->
-    <aside class="card sticky-panel" id="acceptWrap">
+    <aside class="card sticky-panel" id="acceptWrap" style="display:none">
       <h2 id="anchorAcc">Accettazione dispositivo (Assistenza)</h2>
       <div class="content">
         <form id="acceptForm" class="grid2" onsubmit="return false;">
@@ -214,7 +197,7 @@
     </aside>
 
     <!-- Pacchi -->
-    <aside class="card sticky-panel" id="pacchiWrap">
+    <aside class="card sticky-panel" id="pacchiWrap" style="display:none">
       <h2 id="anchorPac">Pacchi (Ricezione/Ritiro)</h2>
       <div class="content">
         <div class="grid2 full">
@@ -229,7 +212,7 @@
   </div>
 
   <!-- Apri elenco -->
-  <section class="card" aria-hidden="true">
+  <section class="card">
     <div class="content" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div><h2 style="padding:0">Clienti & Promemoria</h2><div class="subtitle">Elenco completo con filtri essenziali.</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="toggleListBtn" class="btn ghost">Apri elenco</button></div>
@@ -237,7 +220,7 @@
   </section>
 
   <!-- Elenco -->
-  <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden aria-hidden="true">
+  <section class="card" id="listSection" style="max-width:1200px;margin:0 auto" hidden>
     <div class="content">
       <div class="toolbar">
         <div class="filters">
@@ -253,7 +236,7 @@
   </section>
 
   <!-- KANBAN -->
-  <section class="card kanban" id="kanbanSection" hidden aria-hidden="true">
+  <section class="card kanban" id="kanbanSection" hidden>
     <h2 id="anchorKanban">Riparazioni • Kanban</h2>
     <div class="content">
       <div class="cols">
@@ -266,7 +249,7 @@
   </section>
 
   <!-- STATISTICHE -->
-  <section class="card" id="statsSection" hidden aria-hidden="true" style="max-width:1200px;margin:0 auto">
+  <section class="card" id="statsSection" hidden style="max-width:1200px;margin:0 auto">
     <h2 style="padding:16px 16px 0">Statistiche mensili</h2>
     <div class="content">
       <p class="subtitle" style="margin-bottom:10px">Panoramica ultimi 12 mesi: Riparazioni accettate, Pronti/Consegnati e Pacchi.</p>
@@ -327,32 +310,7 @@ const normalizePhone=(p)=>{let ph=String(p||'').trim().replace(/\D/g,'');if(ph.s
 function showToast(text,type='ok'){const wrap=$('#toast');if(!wrap)return;const el=document.createElement('div');el.className=`toast ${type==='ok'?'ok':type==='err'?'err':''}`;el.textContent=text;wrap.appendChild(el);setTimeout(()=>{el.remove();},3600);}
 const startI=$('#start');function setStartToToday(){const d=new Date();const pad=n=>String(n).padStart(2,'0');if(startI){if('valueAsDate'in startI)startI.valueAsDate=d;else startI.value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}}setStartToToday();
 
-/* ===== PIN (fix robusto con fallback inline) */
-(function pinGateInit(){
-  const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput');
-  const KEY='relong-pin-date';
-  function todayKey(){const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${da}`;}
-  function setAppHidden(h){document.querySelectorAll('[aria-hidden]').forEach(n=>n.setAttribute('aria-hidden',h?'true':'false'));}
-
-  function showGate(){gate.hidden=false;setAppHidden(true);setTimeout(()=>input&&input.focus(),80);}
-  function hideGate(){gate.hidden=true;gate.remove();setAppHidden(false);}
-
-  function unlock(){
-    const val=(input.value||'').trim();
-    if(val==='1990'){localStorage.setItem(KEY,todayKey());hideGate();}
-    else{input.value='';input.focus();}
-  }
-  // Espongo il fallback per l'attributo onclick inline del bottone
-  window.__unlock = unlock;
-
-  const saved=localStorage.getItem(KEY);
-  if(saved===todayKey()){ hideGate(); } else { showGate(); }
-
-  ok?.addEventListener('click', unlock);
-  input?.addEventListener('keydown', e=>{ if(e.key==='Enter') unlock(); });
-})();
-
-/* ===== Upsell / tasks */
+/* ===== Upsell / tasks & constants */
 const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
 const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
 const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
@@ -457,9 +415,9 @@ function tag(txt,cls=''){const s=document.createElement('span');s.className='tag
 function miniBadge(status){const s=(status||'').toLowerCase();const span=document.createElement('span');span.className=`mini ${s}`;span.textContent=({diagnostica:'Diagnostica',inriparazione:'In riparazione',pronto:'Pronto',consegnato:'Consegnato'})[s]||s||'';return span;}
 const expandedIds=new Set();
 function highlightByPhone(phone){const ph=(phone||'').replace(/\D/g,'');requestAnimationFrame(()=>{const nodes=$$('#listStandard .item, #listPacchi .item');const node=nodes.find(n=>(n.querySelector('.h')?.textContent||'').includes(ph));(node||$('#listSection')).classList.add('flash');setTimeout(()=> (node||$('#listSection')).classList.remove('flash'),1400);});}
-function setListOpen(open){const s=$('#listSection'),b=$('#toggleListBtn');s.hidden=!open;s.setAttribute('aria-hidden',open?'false':'true');b.textContent=open?'Chiudi elenco':'Apri elenco';if(open)render();}
-function setKanbanOpen(open){const s=$('#kanbanSection');s.hidden=!open;s.setAttribute('aria-hidden',open?'false':'true');if(open)renderKanban();}
-function setStatsOpen(open){const s=$('#statsSection');s.hidden=!open;s.setAttribute('aria-hidden',open?'false':'true');if(open)renderStats();}
+function setListOpen(open){const s=$('#listSection'),b=$('#toggleListBtn');s.hidden=!open;b.textContent=open?'Chiudi elenco':'Apri elenco';if(open)render();}
+function setKanbanOpen(open){const s=$('#kanbanSection');s.hidden=!open;if(open)renderKanban();}
+function setStatsOpen(open){const s=$('#statsSection');s.hidden=!open;if(open)renderStats();}
 
 /* ===== Step helper + progress */
 function stepInfo(it){const st=(it.repairStatus||'diagnostica');if(st==='diagnostica')return{n:1,label:'Step 1/4',desc:'Diagnostica → invio preventivo WA',pct:25};if(st==='inriparazione')return{n:2,label:'Step 2/4',desc:'Riparazione in corso',pct:50};if(st==='pronto')return{n:3,label:'Step 3/4',desc:`Pronto al ritiro → invio WA`,pct:75};if(st==='consegnato')return{n:4,label:'Step 4/4',desc:`Consegnato${it.deliveredAt?' • '+fmtDate(new Date(it.deliveredAt)):''}`,pct:100};return{n:1,label:'Step',desc:'',pct:0};}
@@ -514,7 +472,7 @@ function renderItem(it,counts){
       div.append(pv);
       setTimeout(()=>{
         const ip=$(`#q_${it.id}`);if(ip&&it.quotePrice!=null){ip.value=Number(it.quotePrice);}
-        const bSend=$(`#qsend_${it.id}`), bAcc=$(`#qacc_${it.id}`), bRef=$(`#qref_${it.id}`);
+        const bSend=$(`#qsend_${it.id}`), bAcc=$(`#qacc_${it.id}`), bRef=$(`#qref_${it.id}`)];
         [ip,bSend,bAcc,bRef].forEach(el=>el&&el.addEventListener('click',ev=>ev.stopPropagation()));
         function waForPreventivo(priceEuro){const price=new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(priceEuro||0);const base=`Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.`;const dev=`\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}`;const prx=`\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.`;const hub=`\n\nI nostri servizi: ${HUB_URL}`;return`https://wa.me/39${it.phone}?text=${encodeURIComponent(base+dev+prx+hub)}`;}
         bSend?.addEventListener('click',()=>{const val=parseFloat(ip?.value?.replace(',','.')||'0');if(!(val>=0))return alert('Inserisci un importo valido');it.quotePrice=val;it.quoteStatus='sent';it.updatedAt=new Date().toISOString();addTimeline(it,'wa','Preventivo inviato');save(items);try{window.open(waForPreventivo(val),'_blank','noopener');}catch{}showToast('Preventivo inviato ✅','ok');});
@@ -615,7 +573,13 @@ return{enabled,pull,push,debouncedPush,openDialog,startPolling};})();
 $('#btnSyncCfg').onclick=sync.openDialog;
 
 /* ===== Boot */
-function boot(){setListOpen(false);setKanbanOpen(false);$('#acceptWrap').style.display='none';$('#pacchiWrap').style.display='none';if(sync.enabled())sync.startPolling();}
+function boot(){
+  setListOpen(false);          // elenco chiuso all’avvio
+  setKanbanOpen(false);        // kanban chiuso all’avvio
+  $('#acceptWrap').style.display='none';
+  $('#pacchiWrap').style.display='none';
+  if(sync.enabled())sync.startPolling();
+}
 boot();renderKanban();
 </script>
 </body>
