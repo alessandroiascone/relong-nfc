@@ -1,1 +1,1 @@
-[]
+[{"id":"17628715102683a325be98ab9d","name":"Mimmo dany","phone":"3393697117","createdAt":"2025-11-11T14:31:50.268Z","updatedAt":"2025-11-11T14:31:50.270Z","activated":["sim"],"acceptance":false,"fromPacchi":false,"done":false,"reminders":[{"type":"energia","dueAt":"2025-11-17T14:31:50.268Z","sent":false,"sentAt":null},{"type":"fissomobile","dueAt":"2025-11-24T14:31:50.268Z","sent":false,"sentAt":null},{"type":"rate","dueAt":"2025-12-02T14:31:50.268Z","sent":false,"sentAt":null}],"remindersCycle":1,"responded":false}]
