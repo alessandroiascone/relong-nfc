@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v31 (Sync GitHub + Dashboard + Ricerca Pro)</title>
+  <title>ReLong • Scadenzario v32 (Assistenza migliorata)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -13,1014 +13,305 @@
       --muted:rgba(210,220,255,.70);
       --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
       --ok:#25D366; --danger:#ff4d4f;
-      --shadow:0 10px 40px rgba(0,140,255,.18), inset 0 1px 0 rgba(255,255,255,.04);
-      --st-diagnostica:#ffd666; --st-inrip:#69c0ff; --st-pronto:#95de64; --st-consegnato:#bfbfbf;
-      --pacchi:#00d1b2;
-      --tileGlow:0 14px 36px rgba(0,140,255,.28);
-      --tileStroke:rgba(0,140,255,.35);
     }
-    @media (prefers-color-scheme: dark){
-      :root{ --bg1:#0a0f16; --bg2:#05060a }
-    }
-    @keyframes nightPulse{
-      0%{ box-shadow: 0 0 0 0 rgba(0,140,255,.0) }
-      50%{ box-shadow: 0 0 0 6px rgba(140,0,255,.18) }
-      100%{ box-shadow: 0 0 0 0 rgba(0,140,255,.0) }
-    }
-    body{
-      min-height:100svh;
-      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
-      color:#eef3ff;
+    body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
       background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
-      padding:24px;display:flex;flex-direction:column;gap:16px
-    }
-    .wrap{max-width:1200px;margin:0 auto;display:grid;gap:16px}
-    .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:var(--shadow)}
+      padding:24px;display:flex;flex-direction:column;gap:16px}
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:0 10px 40px rgba(0,140,255,.18)}
     .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
     .card .content{padding:18px}
     header.title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     header .subtitle{color:var(--muted);font-size:14px}
     .status{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .pill{border:1px solid rgba(0,140,255,.22);color:#dbeaff;padding:8px 12px;border-radius:999px;font-size:12px;background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02))}
-    .pill.good{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent;box-shadow:0 8px 24px rgba(37,211,102,.25)}
-    .pill.bad{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#2b0a0a;border-color:transparent;box-shadow:0 8px 24px rgba(255,77,79,.25)}
+    .pill.good{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .pill.bad{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#2b0a0a;border-color:transparent}
     .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
-    .grid{display:grid;gap:16px}
-    .grid.cols-2{grid-template-columns:1.25fr .75fr}
-    @media (max-width:980px){ .grid.cols-2{grid-template-columns:1fr} }
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
     label{font-size:12px;color:var(--muted)}
     input,select,textarea{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
     textarea{min-height:84px;resize:vertical}
-    .toggle-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:8px}
+    .toggle-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:8px}
     @media (max-width:980px){.toggle-grid{grid-template-columns:repeat(2,1fr)}}
     .tbtn{display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease}
-    .tbtn:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(0,140,255,.25)}
     .tbtn.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 10px 30px rgba(0,140,255,.35)}
-    .sticky-panel{position:sticky;top:16px}
-    /* KPI Tiles */
-    .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    @media (max-width:980px){ .tiles{grid-template-columns:repeat(2,1fr)} }
-    .tile{border:1px solid var(--tileStroke);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));border-radius:16px;padding:14px;box-shadow:var(--tileGlow)}
-    .tile h4{font-size:12px;color:var(--muted);letter-spacing:.25px}
-    .tile .val{font-weight:900;font-size:26px;letter-spacing:.2px;margin-top:4px}
-    .tile .sub{font-size:12px;opacity:.9;margin-top:6px}
-    /* Items */
-    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
-    .filters{display:flex;gap:8px;flex-wrap:wrap}
-    .search{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .search input{min-width:240px}
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
     .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
-    .head-left{display:flex;align-items:center;gap:10px;min-width:0}
-    .item .h{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .mini-badges{display:flex;gap:6px;align-items:center;flex-shrink:0}
-    .mini{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#0a0a0a;opacity:.95}
-    .mini.diagnostica{background:var(--st-diagnostica)}
-    .mini.inriparazione{background:var(--st-inrip)}
-    .mini.pronto{background:var(--st-pronto)}
-    .mini.consegnato{background:var(--st-consegnato)}
-    .item .chev{transition:transform .18s ease; opacity:.9; flex-shrink:0}
-    .item.open .chev{transform:rotate(90deg)}
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-    .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#04121f;background:linear-gradient(135deg,var(--elec3),var(--elec2));padding:4px 8px;border-radius:999px}
-    .muted{background:linear-gradient(135deg,#7aa3c7,#a7c6df)!important;color:#0b1b29}
-    .activeChat{background:linear-gradient(135deg,#1fae60,var(--ok))!important;color:#071b10}
-    .pacchi{background:linear-gradient(135deg,var(--pacchi),#7ffbe6)!important;color:#05312a}
-    .dup{background:linear-gradient(135deg,#ff9f43,#ffd56b)!important;color:#3b2700}
-    .q-acc{background:linear-gradient(135deg,#0bd66f,#7ef7b6)!important;color:#052a1e}
-    .q-rif{background:linear-gradient(135deg,#ffa6a6,#ffd6d6)!important;color:#3a0606}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .r-badge{border:1px solid rgba(0,140,255,.25);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.02));color:#dbeaff;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
-    .quick-actions{display:flex;gap:6px;align-items:center}
-    .quick-actions .btn{padding:6px 8px;border-radius:9px;font-size:12px}
-    .timeline{position:relative;margin:6px 0 2px 2px;padding-left:16px}
-    .timeline:before{content:"";position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,rgba(0,140,255,.3),rgba(0,140,255,.05));border-radius:2px}
-    .tl-item{position:relative;margin:6px 0 6px 0}
-    .tl-item:before{content:"";position:absolute;left:-2px;top:6px;width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--elec3),var(--elec2));box-shadow:0 0 0 3px rgba(0,140,255,.18)}
-    .tl-item .t{font-size:12px;color:#a9c2da;margin-left:8px}
-    .tl-item .d{font-size:13px;margin-left:8px}
-    .flash{animation:flash 1.4s ease}
-    @keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}30%{box-shadow:0 0 0 4px rgba(0,140,255,.35)}100%{box-shadow:0 0 0 0 rgba(0,140,255,.0)}}
     #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
     .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
-    .toast .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
-    .toast .row .btn-mini{border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px;cursor:pointer}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
-    /* Night pulse after 20:00 */
-    body.night .tile{animation:nightPulse 4.5s ease-in-out infinite}
   </style>
 </head>
 <body>
-  <div id="toast" aria-live="polite"></div>
+  <div id="toast"></div>
   <header class="title">
     <div>
-      <h1>ReLong • Scadenzario v31</h1>
-      <div class="subtitle">Attivazioni, Riparazioni & Pacchi — Sync GitHub + Dashboard + Ricerca Pro</div>
+      <h1>ReLong • Scadenzario v32</h1>
+      <div class="subtitle">Assistenza: flusso “Da consegnare → Ritirato → Review +3 giorni” • Pacchi: solo Elimina</div>
     </div>
     <div class="status">
       <span id="syncState" class="pill bad">Sync: Disconnesso</span>
       <button id="cfgSync" class="btn">Imposta Sync GitHub</button>
-      <button id="btnDashboard" class="btn primary">Dashboard Staff</button>
     </div>
   </header>
 
-  <!-- KPI / DASHBOARD -->
-  <section class="card" id="dashboard" hidden>
-    <h2>Dashboard Staff</h2>
-    <div class="content">
-      <div class="tiles">
-        <div class="tile"><h4>Riparazioni in Diagnostica</h4><div class="val" id="kpiDiag">0</div><div class="sub" id="kpiDiagSub">—</div></div>
-        <div class="tile"><h4>In Riparazione</h4><div class="val" id="kpiRip">0</div><div class="sub" id="kpiRipSub">—</div></div>
-        <div class="tile"><h4>Pronti al Ritiro</h4><div class="val" id="kpiReady">0</div><div class="sub" id="kpiReadySub">—</div></div>
-        <div class="tile"><h4>Pacchi in Attesa</h4><div class="val" id="kpiPacchi">0</div><div class="sub" id="kpiPacchiSub">—</div></div>
-        <div class="tile"><h4>Attivazioni Oggi</h4><div class="val" id="kpiActDay">0</div><div class="sub" id="kpiActDaySub">—</div></div>
-        <div class="tile"><h4>Attivazioni Settimana</h4><div class="val" id="kpiActWeek">0</div><div class="sub" id="kpiActWeekSub">—</div></div>
-        <div class="tile"><h4>Follow-up Oggi</h4><div class="val" id="kpiFollow">0</div><div class="sub" id="kpiFollowSub">—</div></div>
-        <div class="tile"><h4>Recensioni da Inv.</h4><div class="val" id="kpiReview">0</div><div class="sub" id="kpiReviewSub">—</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Dati cliente -->
   <section class="card">
-    <h2>Dati cliente (unici)</h2>
+    <h2>Dati Cliente</h2>
     <div class="content grid2">
-      <div><label>Nome e Cognome</label><input required id="c_name" placeholder="Mario Rossi" /></div>
-      <div><label>Telefono (solo cifre)</label><input required id="c_phone" placeholder="3331234567" inputmode="numeric" pattern="[0-9]+" /></div>
-    </div>
-  </section>
-
-  <div class="wrap grid cols-2">
-    <!-- Attivazioni -->
-    <section class="card" id="activationCard">
-      <h2>Attivazioni</h2>
-      <div class="content">
+      <div><label>Nome e Cognome</label><input id="c_name" placeholder="Mario Rossi"></div>
+      <div><label>Telefono</label><input id="c_phone" placeholder="3331234567" inputmode="numeric"></div>
+      <div style="grid-column:1/-1">
+        <label>Seleziona operazione</label>
+        <div class="toggle-grid" id="toggles">
+          <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
+          <button type="button" class="tbtn" data-key="preventivi">Preventivo</button>
+          <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
+          <button type="button" class="tbtn" data-key="sim">SIM</button>
+          <button type="button" class="tbtn" data-key="fisso">Fisso</button>
+          <button type="button" class="tbtn" data-key="energia">Energia</button>
+        </div>
+      </div>
+      <div style="grid-column:1/-1;display:none" id="acceptWrap">
         <div class="grid2">
-          <div>
-            <label>Data attivazione</label>
-            <input id="start" type="date" disabled aria-readonly="true" title="Impostata automaticamente alla data di oggi" />
-          </div>
-          <div class="grid2" style="grid-column:1/-1">
-            <div class="grid2" style="grid-column:1/-1">
-              <div class="full">
-                <label>Cosa hai attivato ORA</label>
-                <div class="toggle-grid" id="toggles">
-                  <button type="button" class="tbtn" data-key="sim">SIM Mobile</button>
-                  <button type="button" class="tbtn" data-key="fisso">Linea Fissa</button>
-                  <button type="button" class="tbtn" data-key="energia">Energia</button>
-                  <button type="button" class="tbtn" data-key="smartphone">Smartphone a rate</button>
-                  <button type="button" class="tbtn" data-key="preventivi">Preventivi acquisti</button>
-                  <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
-                  <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-          <button class="btn primary" id="insertBtn">Inserisci cliente</button>
+          <div><label>Tipo</label><select id="a_type"><option>Smartphone</option><option>Computer</option><option>Stampante</option><option>Console</option></select></div>
+          <div><label>Marca</label><input id="a_brand" placeholder="Apple/Samsung…"></div>
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max…"></div>
+          <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
-    </section>
-
-    <!-- Accettazione (Assistenza) -->
-    <aside class="card sticky-panel" id="acceptWrap" hidden>
-      <h2>Accettazione dispositivo (Assistenza)</h2>
-      <div class="content">
-        <form id="acceptForm" class="grid2" onsubmit="return false;">
-          <div>
-            <label>Tipo dispositivo</label>
-            <select id="a_type">
-              <option>Smartphone</option>
-              <option>Computer</option>
-              <option>Stampante</option>
-              <option>Console & Accessori</option>
-            </select>
-          </div>
-          <div>
-            <label>Marca</label>
-            <select id="a_brand">
-              <option>Apple</option><option>Samsung</option><option>Oppo</option>
-              <option>Redmi</option><option>Xiaomi</option><option>Honor</option><option>Other</option>
-            </select>
-          </div>
-          <div><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max, Galaxy S25 Ultra…" /></div>
-          <div class="full"><label>Difetto / Problema</label><textarea id="a_issue" placeholder="Descrivi il problema segnalato…"></textarea></div>
-          <p class="subtitle full" style="margin-top:4px">Al termine clicca su “Accetta & Inserisci”.</p>
-        </form>
-      </div>
-    </aside>
-
-    <!-- Pacchi -->
-    <aside class="card sticky-panel" id="pacchiWrap" hidden>
-      <h2>Pacchi (Ricezione/Ritiro)</h2>
-      <div class="content">
-        <div class="grid2 full">
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <button class="btn ok" id="p_received">📦 Pacco RICEVUTO</button>
-            <button class="btn" id="p_picked">📦 Pacco RITIRATO</button>
-          </div>
-          <p class="subtitle full" style="margin-top:4px">
-            Al clic: parte WhatsApp con messaggio precompilato e il contatto viene inserito/aggiornato in elenco (senza doppioni).
-          </p>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Elenco -->
-  <section class="card" id="listSection" style="max-width:1200px;margin:0 auto">
-    <div class="content">
-      <div class="toolbar">
-        <div class="filters">
-          <button class="pill active" data-filter="all">Tutti</button>
-          <button class="pill" data-filter="pacchi">Da Pacchi</button>
-          <button class="pill" data-filter="desk">Acquisizioni al banco</button>
-        </div>
-        <div class="search">
-          <label>Cerca</label>
-          <input id="q" placeholder="Nome, telefono, ID pratica, modello… (ricerca fuzzy)" />
-        </div>
-      </div>
-      <div id="quickCounters" class="subtitle" style="margin-bottom:8px"></div>
-      <div id="listStandard"></div>
+      <div><button id="insertBtn" class="btn primary">Inserisci</button></div>
     </div>
   </section>
 
-  <template id="tpl-item">
+  <section class="card">
+    <h2>Elenco</h2>
+    <div class="content">
+      <div id="list"></div>
+    </div>
+  </section>
+
+  <template id="tpl">
     <div class="item">
       <button class="head" type="button">
-        <div class="head-left">
-          <div class="h"></div>
-        </div>
-        <div class="quick-actions"></div>
-        <div class="mini-badges"></div>
-        <div class="chev">▶</div>
+        <div class="title"></div>
+        <div>▶</div>
       </button>
       <div class="details" hidden>
-        <div class="tags"></div>
-        <div class="timeline"></div>
-        <div class="summary"></div>
+        <div class="r-line actions"></div>
+        <div class="r-line review"></div>
       </div>
     </div>
   </template>
 
   <script>
-    /* --------------------------- CONFIG --------------------------- */
-    const HUB_URL   = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-    const MAPS_URL  = 'https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
-    const REVIEW_URL= 'http://g.page/r/CeN076xNHzDmEAE/review';
-    const STORE_KEY = 'relong-scadenzario-v31';
-    const BC_RELOAD = 'relong-scadenzario-reload';
-    const backupPrefix = 'relong-backup-';
-    const GH_CFG_KEY = 'relong-gh-config-v31'; // { owner, repo, branch, path, tokenStored:true }
-    const GH_TOKEN_KEY = 'relong-gh-token-v31'; // token in localStorage separato
+    /* Utils & UI */
+    const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+    const STORE_KEY='relong-scadenzario-v32';
+    const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
+    const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+    const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
+    const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
 
-    const $ = (s, r=document) => r.querySelector(s);
-    const $$ = (s, r=document) => [...r.querySelectorAll(s)];
-
-    // Dark/UltraDark by hour
-    (function nightMode(){
-      const now=new Date(); const h=now.getHours();
-      document.body.classList.toggle('night', (h>=20 || h<7));
-    })();
-
-    /* --------------------------- TOAST --------------------------- */
-    function showToast(text, type='ok', withAction=null){
-      const wrap = $('#toast'); if(!wrap) return;
-      const el = document.createElement('div');
-      el.className = `toast ${type==='ok'?'ok':type==='err'?'err':''}`;
-      if(withAction){
-        el.innerHTML = `<div class="row"><span>${text}</span><button class="btn-mini" id="tact_${Date.now()}">${withAction.label}</button></div>`;
-        wrap.appendChild(el);
-        const id = el.querySelector('button').id;
-        setTimeout(()=>{ el.remove(); }, 5600);
-        return { el, btn: document.getElementById(id) };
-      } else {
-        el.textContent = text;
-        wrap.appendChild(el);
-        setTimeout(()=>{ el.remove(); }, 3600);
-        return { el, btn:null };
-      }
+    function showToast(t, type='ok'){
+      const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
     }
+    const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
+    const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
 
-    /* ------------------------ GITHUB SYNC ------------------------ */
-    const GH = {
+    /* GitHub Sync */
+    const syncState=$('#syncState'), cfgBtn=$('#cfgSync');
+    const GH={
       cfg(){ try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||'null'); }catch{return null} },
-      token(){ try{ return localStorage.getItem(GH_TOKEN_KEY)||'' }catch{return ''} },
-      setCfg(c){ localStorage.setItem(GH_CFG_KEY, JSON.stringify(c||{})); },
-      setToken(t){ localStorage.setItem(GH_TOKEN_KEY, t||''); },
-      headers(){ return { 'Accept':'application/vnd.github+json', 'Authorization': 'Bearer '+GH.token() } },
+      token(){ return localStorage.getItem(GH_TOKEN_KEY)||'' },
+      headers(){ return { 'Accept':'application/vnd.github+json', 'Authorization':'Bearer '+this.token() } },
       async get(path){
-        const c=this.cfg(); if(!c) throw new Error('Config mancante');
-        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
-        const res = await fetch(url, { headers:this.headers() });
-        if(!res.ok) throw new Error('GET '+res.status);
-        return res.json();
+        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
+        const res=await fetch(url,{headers:this.headers()}); if(!res.ok) throw new Error('GET '+res.status); return res.json();
       },
-      async put(path, contentText, message){
-        const c=this.cfg(); if(!c) throw new Error('Config mancante');
-        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
-        let sha=null;
-        try{ const meta=await this.get(path); sha=meta.sha; }catch{ /* new file */ }
-        const body={ message: (message||'Update scadenzario v31'), content: btoa(unescape(encodeURIComponent(contentText))), branch: c.branch||'main' };
+      async put(path, text, msg){
+        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
+        let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
+        const body={ message:msg||'Update v32', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
-        const res = await fetch(url, { method:'PUT', headers:{...this.headers(), 'Content-Type':'application/json'}, body: JSON.stringify(body) });
-        if(!res.ok) throw new Error('PUT '+res.status);
+        const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+        if(!res.ok){
+          // retry in caso di 409
+          if(res.status===409){
+            const meta=await this.get(path); const body2={...body,sha:meta.sha};
+            const r2=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body2)});
+            if(!r2.ok) throw new Error('PUT '+r2.status);
+            return r2.json();
+          }
+          throw new Error('PUT '+res.status);
+        }
         return res.json();
       }
     };
+    function syncBadge(ok){ syncState.textContent= ok?'Sync: Connesso':'Sync: Disconnesso'; syncState.classList.toggle('good',ok); syncState.classList.toggle('bad',!ok); }
+    cfgBtn.addEventListener('click', async ()=>{
+      const owner=prompt('Owner GitHub','alessandroiascone')||'';
+      const repo=prompt('Repository','relong-nfc')||'';
+      const branch=prompt('Branch','main')||'main';
+      const path=prompt('Percorso file dati','data/items.json')||'data/items.json';
+      const token=prompt('Token (classic, scope repo)','')||'';
+      if(!owner||!repo||!token) return alert('Compila owner/repo/token');
+      localStorage.setItem(GH_CFG_KEY, JSON.stringify({owner,repo,branch,path,tokenStored:true}));
+      localStorage.setItem(GH_TOKEN_KEY, token);
+      syncBadge(true); showToast('Sync configurato ✅');
+      await saveToGitHub(); // prova un primo push
+    });
 
-    const syncState = $('#syncState');
-    const cfgSyncBtn = $('#cfgSync');
-
-    function updateSyncBadge(ok){
-      syncState.textContent = ok ? 'Sync: Connesso' : 'Sync: Disconnesso';
-      syncState.classList.toggle('good', ok);
-      syncState.classList.toggle('bad', !ok);
-    }
+    let items=[];
+    function loadLocal(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]') }catch{return []} }
+    function saveLocal(){ localStorage.setItem(STORE_KEY, JSON.stringify(items||[])); }
 
     async function loadFromGitHubOrLocal(){
-      const cfg = GH.cfg(); const token = GH.token();
-      if(cfg && token){
+      const cfg=GH.cfg(); const tk=GH.token();
+      if(cfg && tk){
         try{
-          const meta = await GH.get(cfg.path||'data/items.json');
-          const json = JSON.parse(decodeURIComponent(escape(atob(meta.content))));
-          items = Array.isArray(json)? json : [];
-          saveLocal(items);
-          updateSyncBadge(true);
-          showToast('Dati sincronizzati da GitHub ✅','ok');
-          return;
-        }catch(e){
-          console.warn('GitHub load error:', e);
-          updateSyncBadge(false);
-          showToast('Non riesco a leggere da GitHub, uso il backup locale.','err');
-        }
-      } else {
-        updateSyncBadge(false);
+          const meta=await GH.get(cfg.path||'data/items.json');
+          const json=JSON.parse(decodeURIComponent(escape(atob(meta.content))));
+          items=Array.isArray(json)? json:[]; saveLocal(); syncBadge(true); return;
+        }catch(e){ syncBadge(false); showToast('Lettura GitHub KO, uso locale','err'); }
       }
-      items = loadLocal();
+      items=loadLocal();
     }
-
     async function saveToGitHub(){
-      const cfg = GH.cfg(); const token = GH.token();
-      const payload = JSON.stringify(items||[]);
-      if(cfg && token){
-        try{
-          await GH.put(cfg.path||'data/items.json', payload, 'Scadenzario v31: sync');
-          updateSyncBadge(true);
-          return true;
-        }catch(e){
-          console.warn('GitHub write error', e);
-          updateSyncBadge(false);
-          return false;
-        }
+      const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
+      if(cfg && tk){
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32 sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
 
-    cfgSyncBtn.addEventListener('click', async ()=>{
-      const owner = prompt('GitHub owner (es. alessandroiascone)') || '';
-      const repo  = prompt('Repository (es. relong-nfc)') || '';
-      const branch= prompt('Branch (es. main)', 'main') || 'main';
-      const path  = prompt('Percorso file (es. data/items.json)', 'data/items.json') || 'data/items.json';
-      const token = prompt('PAT con permessi repo (non verrà condiviso)', '') || '';
-      if(!owner || !repo || !token){ alert('Compila owner, repo e token.'); return; }
-      GH.setCfg({owner,repo,branch,path,tokenStored:true});
-      GH.setToken(token);
-      await saveToGitHub();
-      await loadFromGitHubOrLocal();
-      render(); kpiRefresh();
-    });
+    /* WA helpers */
+    function waPickup(name, phone){ const txt=`Ciao ${name}, sono Alessandro di Re Long (08119578844).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nCi trovi qui: ${MAPS_URL}`; return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`; }
+    function waReview(name, phone){ const txt=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`; }
 
-    /* -------------------------- STORAGE -------------------------- */
-    function loadLocal(){ try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : []; } catch{ return [] } }
-    function saveLocal(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr||[])); }
+    /* Insert logic */
+    const activeSet=new Set(); const toggles=$('#toggles');
+    toggles.addEventListener('click', e=>{ const b=e.target.closest('.tbtn'); if(!b) return; const k=b.dataset.key; const on=!b.classList.contains('active'); if(k==='riparazione') $('#acceptWrap').style.display = on? 'block':'none'; b.classList.toggle('active',on); if(on) activeSet.add(k); else activeSet.delete(k); });
 
-    /* ------------------------ UTILITIES -------------------------- */
-    const fmtDate = (d) => d.toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
-    const fmtDateShort = (d) => d.toLocaleDateString('it-IT',{month:'2-digit',day:'2-digit'});
-    const isoDay = (d)=> new Date(d).toISOString().slice(0,10);
-    const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d }
-    const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x }
-    const addHours = (d,n)=>{ const x=new Date(d); x.setHours(x.getHours()+n); return x }
-    const avoidWeekend = (d)=>{ const x=new Date(d); const day=x.getDay(); if(day===0) x.setDate(x.getDate()+1); if(day===6) x.setDate(x.getDate()+2); return x }
-    const normalizePhone = (p)=>{ let ph=String(p||'').trim().replace(/\D/g,''); if(ph.startsWith('0')) ph=ph.slice(1); return ph; };
-    function daysBetween(a,b){ const ms=24*60*60*1000; return Math.ceil((b.getTime()-a.getTime())/ms); }
-    function clamp(n,lo,hi){ return Math.max(lo, Math.min(hi,n)); }
-    function pad(n){ return String(n).padStart(2,'0'); }
-
-    // basic fuzzy
-    function fuzzyIncludes(hay, needle){
-      hay = (hay||'').toLowerCase(); needle=(needle||'').toLowerCase();
-      if(hay.includes(needle)) return true;
-      // loosen: remove spaces
-      if(hay.replace(/\s+/g,'').includes(needle.replace(/\s+/g,''))) return true;
-      // initials
-      const parts = hay.split(/\s+/); if(needle.length<=3 && parts.length>=2){ const ini = parts.map(p=>p[0]||'').join(''); if(ini.includes(needle)) return true; }
-      // tolerate one typo
-      function dist(a,b){ const m=[]; for(let i=0;i<=b.length;i++){ m[i]=[i]; } for(let j=0;j<=a.length;j++){ m[0][j]=j; } for(let i=1;i<=b.length;i++){ for(let j=1;j<=a.length;j++){ m[i][j] = b[i-1]==a[j-1] ? m[i-1][j-1] : 1+Math.min(m[i-1][j],m[i][j-1],m[i-1][j-1]); } } return m[b.length][a.length]; }
-      return dist(hay, needle) <= 1;
-    }
-
-    /* --------------------- BUSINESS LOGIC ------------------------ */
-    const BASE_RANGES = { energia:[9,16], fisso:[12,20], sim:[6,12], smartphone:[10,18], preventivi:[3,7] };
-    function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
-    function rngInt(seedStr,min,max){ const h=hashStr(seedStr); const span=Math.max(0,(max-min)); return min + (h % (span+1)); }
-    function offsetDaysFor(type, ctx){
-      let [lo,hi]=BASE_RANGES[type]||[12,18];
-      if(ctx.kind==='repair' || ctx.kind==='pacchi'){ lo=clamp(lo,10,13); hi=clamp(hi+2,16,19); }
-      if(ctx.prior.has(type)){ lo+=5; hi+=9; }
-      if(ctx.prior.has('fisso') && type==='sim'){ lo+=3; hi+=4; }
-      if(ctx.prior.has('sim') && type==='fisso'){ lo+=3; }
-      if(ctx.prior.has('smartphone') && type==='energia'){ lo+=2; }
-      if(ctx.prior.has('energia') && type==='smartphone'){ lo+=1; }
-      lo=clamp(lo,3,28); hi=Math.max(lo, Math.min(hi,35));
-      const seed=`${ctx.phone}|${type}`; return rngInt(seed,lo,hi);
-    }
-    function computeMixedTasks({ startDate, phone, priorActivated, includePreventivi=false, contextKind=null, activatedNow=[] }){
-      const upsellTargets = ['energia','fisso','sim','smartphone'];
-      const excludeSet = new Set((activatedNow||[]).map(x=>String(x).toLowerCase()).filter(x=>upsellTargets.includes(x)));
-      const ctx = { phone: normalizePhone(phone||''), prior:new Set(priorActivated||[]), kind:contextKind };
-      const baseTasks = upsellTargets.filter(t=>!excludeSet.has(t)).map(type=>{ let due=addDays(startDate, offsetDaysFor(type, ctx)); due=avoidWeekend(due); return {type, due:due.toISOString()}; });
-      if(includePreventivi){ let due=addDays(startDate, offsetDaysFor('preventivi', ctx)); due=avoidWeekend(due); baseTasks.push({type:'preventivi', due:due.toISOString()}); }
-      return baseTasks;
-    }
-
-    let items = [];
-
-    function nextPraticaId(){
-      const key='relong-pratica-seq-v31';
-      const y=new Date().getFullYear();
-      let seq; try{ seq=JSON.parse(localStorage.getItem(key)||'[]'); }catch{ seq=[]; }
-      let rec = seq.find(r=>r.year===y);
-      if(!rec){ rec={year:y,n:0}; seq.push(rec); }
-      rec.n += 1; localStorage.setItem(key, JSON.stringify(seq));
-      return `RL-${y}-${String(rec.n).padStart(4,'0')}`;
-    }
-
-    function normalizeName(s){ return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
-    let idxByPhone = new Map();
-    let idxByName  = new Map();
-    function buildIndexes(){
-      idxByPhone.clear(); idxByName.clear();
-      for(const it of items){
-        const ph = normalizePhone(it.phone), nm = normalizeName(it.name);
-        const ts = new Date(it.updatedAt||it.createdAt||it.start||0).getTime();
-        const a = idxByPhone.get(ph);
-        if(ph && (!a || ts > new Date(a.updatedAt||a.createdAt||a.start||0).getTime())) idxByPhone.set(ph, it);
-        const b = idxByName.get(nm);
-        if(nm && (!b || ts > new Date(b.updatedAt||b.createdAt||b.start||0).getTime())) idxByName.set(nm, it);
-      }
-    }
-
-    // UI elements
-    const c_name = $('#c_name'); const c_phone = $('#c_phone');
-    const acceptWrap = $('#acceptWrap'); const pacchiWrap = $('#pacchiWrap');
-    const toggles = $('#toggles'); const activeSet = new Set();
-
-    function updateAcceptanceUI(){
-      let isRepair = activeSet.has('riparazione');
-      let isPacchi = activeSet.has('pacchi');
-      if(isRepair && isPacchi){ const otherKey='pacchi'; activeSet.delete(otherKey); $(`.tbtn[data-key="${otherKey}"]`)?.classList.remove('active'); isPacchi=false; }
-      acceptWrap.hidden = !isRepair;
-      pacchiWrap.hidden = !isPacchi;
-      $('#insertBtn').textContent = isRepair ? 'Accetta & Inserisci' : 'Inserisci cliente';
-      const target = isRepair ? acceptWrap : (isPacchi ? pacchiWrap : null);
-      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
-    }
-
-    toggles.addEventListener('click', (e)=>{
-      const b = e.target.closest('.tbtn'); if(!b) return;
-      const key=b.dataset.key;
-      const toActive = !b.classList.contains('active');
-      if(toActive && (key==='riparazione' || key==='pacchi')){
-        const otherKey = key==='riparazione' ? 'pacchi' : 'riparazione';
-        activeSet.delete(otherKey);
-        $(`.tbtn[data-key="${otherKey}"]`)?.classList.remove('active');
-      }
-      b.classList.toggle('active', toActive);
-      if(toActive) activeSet.add(key); else activeSet.delete(key);
-      updateAcceptanceUI();
-    });
-
-    const startI = $('#start');
-    function setStartToToday(){
-      const d=new Date();
-      if(startI){ if('valueAsDate' in startI) startI.valueAsDate = d; else startI.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-    }
-    setStartToToday();
-    (function scheduleMidnightRefresh(){ const now=new Date(); const next=new Date(now); next.setHours(24,0,5,0); setTimeout(()=>{ setStartToToday(); scheduleMidnightRefresh(); }, next-now); })();
-
-    function waForUpsell(it, type){
-      const base = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).`;
-      const t = (type || '').toLowerCase();
-      const map = {
-        energia: `${base}\nHai diritto ad uno sconto Energia dedicato ai nostri clienti. Ti va di risparmiare sulla bolletta della Corrente?\nHub: ${HUB_URL}`,
-        fisso:   `${base}\nAbbiamo offerte Internet Casa dedicate (FTTC/FTTH) con prezzi riservati ai nostri clienti. Vuoi una verifica copertura + simulazione rapida?\nHub: ${HUB_URL}`,
-        sim:     `${base}\nSe ti serve una linea mobile, abbiamo SIM con Giga/Min illimitati e promo dedicate in store. Vuoi i dettagli?\nHub: ${HUB_URL}`,
-        smartphone:`${base}\nPossiamo proporti uno smartphone a rate (senza busta paga). Valutiamo anche il tuo usato e Postepay Evolution è Accettata. Vuoi una proposta su misura?\nHub: ${HUB_URL}`,
-        preventivi:`${base}\nPromemoria per il tuo preventivo. Vuoi che ti invii ora una simulazione dettagliata?\nHub: ${HUB_URL}`
-      };
-      const txt = map[t] || `${base}\nHo una promo dedicata per te. Ti va se te la spiego?\nHub: ${HUB_URL}`;
-      return `https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`;
-    }
-    function waForRepairIntake(name, phone, dev){
-      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
-      const devTxt = dev ? `\nDispositivo: ${dev.type||'-'} • ${dev.brand||''} ${dev.model||''}` : '';
-      const txt = `${base}\nAbbiamo ritirato il tuo dispositivo per diagnosi del problema.${devTxt}\nTi contatteremo a breve con il preventivo.\nHub: ${HUB_URL}`;
-      return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`;
-    }
-    function waForPickupReady(name, phone){
-      const base = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
-      const txt = `${base}\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nCi trovi qui: ${MAPS_URL}`;
-      return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`;
-    }
-    function waForThankReview(name, phone){
-      const base = `Ciao ${name}, grazie per averci preferito! 🙌`;
-      const txt = `${base}\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`;
-      return `https://wa.me/39${phone}?text=${encodeURIComponent(txt)}`;
-    }
-
-    function validateClient(){
-      const name = (c_name.value||'').trim();
-      let phone = normalizePhone(c_phone.value||'');
-      if(!name){ alert('Inserisci NOME E COGNOME'); return null; }
-      if(!/\s+/.test(name)){ alert('Inserisci NOME e COGNOME (entrambi)'); return null; }
-      if(!phone || phone.length<7){ alert('Inserisci TELEFONO valido (solo cifre)'); return null; }
-      return { name, phone };
-    }
-
-    function clearClientInputs(){ c_name.value = ''; c_phone.value = ''; c_name.focus(); }
-    function resetSelections(){
-      activeSet.clear();
-      $$('#toggles .tbtn').forEach(b => b.classList.remove('active'));
-      $('#acceptWrap').hidden = true; $('#pacchiWrap').hidden = true;
-      try { $('#acceptForm')?.reset(); } catch {}
-      const btn = $('#insertBtn'); if(btn) btn.textContent = 'Inserisci cliente';
-    }
-
-    function mergeItems(existing, pending){
-      const actSet = new Set([...(existing.activated||[]), ...((pending.activated)||[])]); existing.activated = [...actSet];
-
-      const byType = {}; (existing.tasks||[]).forEach(t=>{ byType[t.type] = t; });
-      (pending.tasks||[]).forEach(t=>{ const cur = byType[t.type]; if(!cur){ byType[t.type]=t; } else { const d1=new Date(cur.due), d2=new Date(t.due); if(d2 < d1) byType[t.type]=t; } });
-      existing.tasks = Object.values(byType);
-
-      if(pending.fromPacchi){ existing.fromPacchi = true; }
-      if(pending.pacchiCount){ existing.pacchiCount = (existing.pacchiCount||0) + pending.pacchiCount; }
-      if(pending.pacchiKinds){ const kinds=new Set([...(existing.pacchiKinds||[]), ...(pending.pacchiKinds||[])]); existing.pacchiKinds=[...kinds]; }
-
-      if(pending.acceptance){
-        existing.acceptance = true;
-        existing.device = pending.device;
-        existing.repairStatus = existing.repairStatus || pending.repairStatus || 'diagnostica';
-        existing.quotePrice = existing.quotePrice ?? pending.quotePrice ?? null;
-        existing.quoteStatus = existing.quoteStatus ?? pending.quoteStatus ?? null;
-        if(!existing.praticaId) existing.praticaId = pending.praticaId;
-      }
-
-      existing.name = pending.name || existing.name;
-      existing.phone = existing.phone || pending.phone;
-      existing.updatedAt = new Date().toISOString();
-
-      if(pending.postReviewAt) existing.postReviewAt = pending.postReviewAt;
-      if(typeof pending.postReviewSent === 'boolean') existing.postReviewSent = pending.postReviewSent;
-
-      return existing;
-    }
-
-    // Insert
     $('#insertBtn').addEventListener('click', async ()=>{
-      const base = validateClient(); if(!base) return;
-      const { name, phone } = base;
+      const name=($('#c_name').value||'').trim(); let phone=normalizePhone($('#c_phone').value||'');
+      if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
+      if(!phone || phone.length<7) return alert('Telefono non valido');
+      const act=[...activeSet];
 
-      const start = new Date();
-      const activatedNow = new Set(activeSet);
+      const isRepair=activeSet.has('riparazione');
+      let newItem={ id:Date.now()+Math.random().toString(16).slice(2), name, phone, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), activated:act, acceptance:false, fromPacchi:false, done:false };
 
-      const prev = items.find(x=> normalizePhone(x.phone) === phone);
-      const priorActivated = prev?.activated || [];
-
-      const baseObj = {
-        name, phone,
-        start: start.toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        activated:[...activatedNow],
-        done:false, optWeekend:true, optEvening:true,
-        muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, fromPacchi:false,
-        pacchiCount:0, pacchiKinds:[],
-        postReviewAt:null, postReviewSent:false,
-        history: [{ t:'CREATO', d:new Date().toISOString(), note:'Inserimento cliente' }]
-      };
-
-      let pending;
-      if(activatedNow.has('riparazione')){
-        // Validazioni minime accettazione
-        const model = ($('#a_model').value||'').trim();
-        if(!model){ alert('Inserisci il MODELLO del dispositivo'); return; }
-        const device = {
-          type:$('#a_type').value, brand:$('#a_brand').value,
-          model, issue:($('#a_issue').value||'').trim()
-        };
-        const tasks = computeMixedTasks({
-          startDate: new Date(), phone, priorActivated,
-          includePreventivi: activatedNow.has('preventivi'),
-          contextKind: 'repair', activatedNow: [...activatedNow]
-        });
-        pending = {
-          ...baseObj, id: Date.now()+Math.random().toString(16).slice(2),
-          activated:['riparazione', ...(activatedNow.has('preventivi')?['preventivi']:[])],
-          tasks, acceptance:true, praticaId: nextPraticaId(), device,
-          repairStatus:'diagnostica', quotePrice:null, quoteStatus:null
-        };
-        pending.history.push({ t:'ACCETTAZIONE', d:new Date().toISOString(), note:`${device.type} • ${device.brand} ${device.model}` });
-      } else {
-        const tasks = computeMixedTasks({
-          startDate: start, phone, priorActivated,
-          includePreventivi: activatedNow.has('preventivi'),
-          contextKind: null, activatedNow: [...activatedNow]
-        });
-        pending = { ...baseObj, id: Date.now()+Math.random().toString(16).slice(2), tasks };
+      if(isRepair){
+        const model=($('#a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
+        newItem.acceptance=true; newItem.device={ type:$('#a_type').value, brand:$('#a_brand').value, model, issue:($('#a_issue').value||'').trim() };
+        newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
       }
 
-      if (activatedNow.has('sim') || activatedNow.has('fisso')) {
-        const reviewBase = avoidWeekend( addDays(start, 5) );
-        const startAfterReview = avoidWeekend( addDays(reviewBase, 2) );
-        pending.postReviewAt = reviewBase.toISOString();
-        pending.postReviewSent = false;
-        const delta = daysBetween(start, startAfterReview);
-        if (Array.isArray(pending.tasks)) {
-          pending.tasks = pending.tasks.map(tsk => {
-            const newDue = addDays(new Date(tsk.due), delta);
-            return { ...tsk, due: avoidWeekend(newDue).toISOString() };
-          });
-        }
-        pending.history.push({ t:'PROMEMORIA RECENSIONE', d:pending.postReviewAt });
+      if(activeSet.has('pacchi')){
+        newItem.fromPacchi=true;
       }
 
-      if(prev){ items[items.indexOf(prev)] = mergeItems(prev, pending); }
-      else { items.unshift(pending); }
+      // merge by phone if exists
+      const prev=items.find(x=>normalizePhone(x.phone)===phone);
+      if(prev){ Object.assign(prev, newItem, { updatedAt:new Date().toISOString(), activated:[...(new Set([...(prev.activated||[]), ...act]))] }); }
+      else { items.unshift(newItem); }
 
-      saveLocal(items); buildIndexes();
-      const ok = await saveToGitHub(); if(!ok) showToast('Salvato in locale. Sync GitHub non riuscito.','err');
-      render(); kpiRefresh(); highlightByPhone(phone);
-
-      if(pending.acceptance){
-        try{ window.open(waForRepairIntake(pending.name, pending.phone, pending.device), '_blank', 'noopener'); }catch{}
-      }
-
-      clearClientInputs(); resetSelections(); showToast('Cliente inserito ✅','ok');
+      saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
+      $('#c_name').value=''; $('#c_phone').value=''; activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active')); $('#acceptWrap').style.display='none';
+      render(); showToast('Cliente inserito ✅');
     });
 
-    // Pacchi
-    $('#p_received').addEventListener('click', ()=> handlePacchi('Ricevuto'));
-    $('#p_picked')  .addEventListener('click', ()=> handlePacchi('Ritirato'));
-
-    async function handlePacchi(kind){
-      const base = validateClient(); if(!base) return;
-      const { name, phone } = base;
-
-      const prev = items.find(x=> normalizePhone(x.phone) === phone);
-      const priorActivated = prev?.activated || [];
-
-      const tasks = computeMixedTasks({ startDate:new Date(), phone, priorActivated, includePreventivi:false, contextKind:'pacchi', activatedNow:[] });
-
-      const pending = {
-        name, phone, start:new Date().toISOString(), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(),
-        activated:[], done:false, optWeekend:true, optEvening:true, muteDate:null, activeChatUntil:null, doneAt:null,
-        acceptance:false, praticaId:null, fromPacchi:true, pacchiCount:1, pacchiKinds:[kind],
-        tasks, id: Date.now()+Math.random().toString(16).slice(2), postReviewAt:null, postReviewSent:false,
-        history: [{ t:'PACCHI', d:new Date().toISOString(), note:kind.toUpperCase() }]
-      };
-
-      if(prev){ items[items.indexOf(prev)] = mergeItems(prev, pending); }
-      else { items.unshift(pending); }
-
-      saveLocal(items); buildIndexes();
-      const ok = await saveToGitHub(); if(!ok) showToast('Salvato in locale. Sync GitHub non riuscito.','err');
-      render(); kpiRefresh(); highlightByPhone(phone);
-      try{ 
-        const baseMsg = `Ciao ${name}, sono Alessandro di Re Long (08119578844).`;
-        const msg = `${baseMsg}\nAggiornamento pacco: ${kind.toUpperCase()}.\n\nVisita il nostro Hub servizi: ${HUB_URL}`;
-        window.open(`https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
-      }catch{}
-      clearClientInputs(); resetSelections(); showToast('Cliente inserito ✅','ok');
-    }
-
-    /* ------------------------- LIST & KPIs ----------------------- */
-    const listStd = $('#listStandard'); const qI=$('#q');
-    let filter='all'; $$('.pill').forEach(p=>p.addEventListener('click',()=>{ $$('.pill').forEach(x=>x.classList.remove('active')); p.classList.add('active'); filter=p.dataset.filter; render(); }));
-    qI?.addEventListener('input', render);
-
-    function iconName(type){ return ({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type; }
-    function tag(txt, cls=''){ const s=document.createElement('span'); s.className='tag'; if(cls) s.classList.add(cls); s.textContent=txt; return s }
-    function miniBadge(status){
-      const s = (status||'').toLowerCase();
-      const span=document.createElement('span');
-      span.className = `mini ${s}`;
-      span.textContent = ({diagnostica:'Diagnostica',inriparazione:'In riparazione',pronto:'Pronto',consegnato:'Consegnato'})[s] || s || '';
-      return span;
-    }
-
-    function highlightByPhone(phone){
-      const ph = (phone||'').replace(/\D/g,''); requestAnimationFrame(()=>{
-        const nodes = $$('#listStandard .item'); const node = nodes.find(n => (n.querySelector('.h')?.textContent||'').includes(ph));
-        (node||$('#listSection')).classList.add('flash'); setTimeout(()=> (node||$('#listSection')).classList.remove('flash'), 1400);
-      });
-    }
-
-    function buildTimeline(it){
-      const tl = document.createElement('div'); tl.className='timeline';
-      const events = [];
-      if(it.createdAt) events.push({t:'CREATO', d:new Date(it.createdAt), note:'Inserimento'});
-      if(it.acceptance) events.push({t:'ACCETTAZIONE', d:new Date(it.start), note:`${it?.device?.type||''} ${it?.device?.brand||''} ${it?.device?.model||''}`.trim()});
-      if(it.quotePrice!=null) events.push({t:'PREVENTIVO', d:new Date(it.updatedAt||it.createdAt), note:`€ ${it.quotePrice}`});
-      if(it.quoteStatus==='accepted') events.push({t:'ACCETTATO', d:new Date(it.updatedAt), note:'Preventivo'});
-      if(it.quoteStatus==='refused')  events.push({t:'RIFIUTATO', d:new Date(it.updatedAt), note:'Preventivo'});
-      if(it.repairStatus==='pronto') events.push({t:'PRONTO', d:new Date(it.updatedAt), note:'Ritiro'});
-      if(it.repairStatus==='consegnato') events.push({t:'CONSEGNATO', d:new Date(it.deliveredAt||it.updatedAt)});
-      if(it.postReviewAt) events.push({t:'RECENSIONE', d:new Date(it.postReviewAt), note:(it.postReviewSent?'INV.':'PRONTA')});
-      (it.history||[]).forEach(h=>{ try{ events.push({t:h.t, d:new Date(h.d), note:h.note||''}) }catch{} });
-
-      events.sort((a,b)=> a.d-b.d);
-      events.forEach(ev=>{
-        const row = document.createElement('div'); row.className='tl-item';
-        const dt = fmtDate(ev.d)+' '+pad(ev.d.getHours())+':'+pad(ev.d.getMinutes());
-        row.innerHTML = `<div class="t">${ev.t} • ${dt}</div><div class="d">${ev.note||''}</div>`;
-        tl.append(row);
-      });
-      return tl;
-    }
-
+    /* Render */
     function render(){
-      listStd.innerHTML='';
-      const q=(qI?.value||'').trim().toLowerCase();
+      const list=$('#list'); list.innerHTML='';
+      items.forEach(it=>{
+        const el=$('#tpl').content.firstElementChild.cloneNode(true);
+        el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
+        const head=el.querySelector('.head'), details=el.querySelector('.details'), actions=el.querySelector('.actions'), review=el.querySelector('.review');
+        head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
 
-      // counters and filtering
-      const filtered = items
-        .filter(it => { if (filter === 'pacchi') return it.fromPacchi === true; if (filter === 'desk') return it.fromPacchi !== true; return true; })
-        .filter(it => {
-          if (!q) return true;
-          const hay = [
-            it.name, it.phone, it.praticaId, it.device?.brand, it.device?.model, it.repairStatus,
-            it.fromPacchi ? 'pacchi' : '', ...(it.pacchiKinds||[]),
-            ...(it.activated||[]), ...(it.tasks||[]).map(t=>t.type)
-          ].join(' ').toLowerCase();
-          return fuzzyIncludes(hay, q);
-        });
-
-      $('#quickCounters').textContent = `${filtered.length} risultati — ${items.length} totali`;
-
-      const counts = {}; items.forEach(it=>{ const ph=normalizePhone(it.phone); counts[ph]=(counts[ph]||0)+1; });
-
-      filtered.forEach(it=> listStd.appendChild(renderItem(it, counts)));
-    }
-
-    function renderItem(it, counts){
-      const t = $('#tpl-item').content.firstElementChild.cloneNode(true);
-      const headBtn = t.querySelector('.head');
-      const details = t.querySelector('.details');
-      const qx = t.querySelector('.quick-actions');
-
-      t.querySelector('.h').innerHTML = `${it.name} • <b>${it.phone}</b>${it.praticaId? ' • '+it.praticaId:''}`;
-      const miniWrap = t.querySelector('.mini-badges'); miniWrap.innerHTML='';
-      if(it.acceptance && it.repairStatus) miniWrap.append(miniBadge(it.repairStatus));
-
-      headBtn.addEventListener('click', ()=>{
-        const isOpen = t.classList.toggle('open'); details.hidden = !isOpen;
-      });
-
-      // Quick actions (senza aprire)
-      const qa = [
-        {id:'act-wa', label:'WA Preventivo', click:()=>{ window.open(waForUpsell(it,'preventivi'),'_blank','noopener'); markChat(it); }},
-        {id:'act-ready', label:'WA Ritiro',   click:()=>{ window.open(waForPickupReady(it.name,it.phone),'_blank','noopener'); it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); }},
-        {id:'act-snooze',label:'+1g',         click:()=>{ (it.tasks||[]).forEach(tsk=>{ tsk.due=avoidWeekend(addDays(new Date(tsk.due),1)).toISOString(); }); it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); }},
-        {id:'act-done', label:'Completato',   click:()=>{ it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); }},
-        {id:'act-call', label:'Chiama',       click:()=>{ location.href='tel:+39'+it.phone; }}
-      ];
-      qa.forEach(a=>{ const b=document.createElement('button'); b.className='btn'; b.textContent=a.label; b.addEventListener('click', e=>{ e.stopPropagation(); a.click(); }); qx.append(b); });
-
-      const tags = t.querySelector('.tags'); tags.innerHTML='';
-      if((counts[normalizePhone(it.phone)]||0) > 1) tags.append(tag('Doppione','dup'));
-      if(it.fromPacchi){ tags.append(tag(`Pacchi${it.pacchiCount? ' ×'+it.pacchiCount:''}`,'pacchi')); if((it.pacchiKinds||[]).length){ tags.append(tag((it.pacchiKinds||[]).join(', '),'pacchi')); } }
-      if(it.acceptance){ tags.append(tag(`${it.device?.brand||''} ${it.device?.model||''}`.trim()||'Accettazione')); tags.append(tag(({'diagnostica':'Diagnostica','inriparazione':'In riparazione','pronto':'Pronto','consegnato':'Consegnato'})[it.repairStatus]||it.repairStatus)); }
-      it.activated?.forEach(a=> tags.append(tag('Attivato: '+iconName(a))));
-
-      const tl = buildTimeline(it); details.querySelector('.timeline').append(tl);
-
-      // Summary next tasks + WA buttons
-      const sum=details.querySelector('.summary'); sum.innerHTML='';
-      const next3 = [...(it.tasks||[])].sort((a,b)=> new Date(a.due)-new Date(b.due)).filter(tsk=>!it.done).slice(0,3);
-      if(next3.length){
-        const line=document.createElement('div'); line.className='r-line';
-        next3.forEach(tsk=>{
-          const due=new Date(tsk.due); const late=due<today();
-          const badge=document.createElement('span'); badge.className='r-badge';
-          badge.innerHTML=`${iconName(tsk.type)} • <b${late?' style="color:#ffb3b3"':''}>${fmtDateShort(due)}</b>`;
-          line.append(badge);
-          const a=document.createElement('a'); a.href=waForUpsell(it, tsk.type); a.target='_blank'; a.rel='noopener'; a.className='wa-btn ok'; a.textContent='WhatsApp'; 
-          a.addEventListener('click', ev=>{ ev.stopPropagation(); markChat(it); });
-          line.append(a);
-        });
-        sum.append(line);
-      }
-
-      // Preventivo area se diagnostica
-      if(it.acceptance && (it.repairStatus||'diagnostica')==='diagnostica'){
-        const pv = document.createElement('div'); pv.className='r-line'; pv.style.marginTop='8px';
-        pv.innerHTML = `
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <label style="min-width:120px">Preventivo (€)</label>
-            <input type="number" step="0.01" min="0" id="q_${it.id}" placeholder="0,00" style="width:140px">
-            <a class="wa-btn ok" id="qsend_${it.id}" href="#">Invia WA</a>
-          </div>
-          <div class="r-line">
-            <button class="btn ok" id="qacc_${it.id}">Accetta</button>
-            <button class="btn" id="qref_${it.id}">Rifiuta</button>
-          </div>`;
-        sum.append(pv);
-
-        setTimeout(()=>{
-          const ip = document.getElementById(`q_${it.id}`);
-          if(ip && it.quotePrice!=null){ ip.value = Number(it.quotePrice); }
-          const bSend = document.getElementById(`qsend_${it.id}`);
-          const bAcc  = document.getElementById(`qacc_${it.id}`);
-          const bRef  = document.getElementById(`qref_${it.id}`);
-
-          function waForPreventivo(priceEuro){
-            const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(priceEuro||0);
-            const base=`Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.`;
-            const dev = `\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}`;
-            const prx = `\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.`;
-            const hub = `\n\nI nostri servizi: ${HUB_URL}`;
-            const txt = encodeURIComponent(base+dev+prx+hub);
-            return `https://wa.me/39${it.phone}?text=${txt}`;
+        // ACTIONS
+        actions.innerHTML='';
+        if(it.fromPacchi && !it.acceptance){
+          // Solo elimina
+          const del=btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); });
+          actions.append(del);
+        } else if(it.acceptance){
+          // Flusso riparazione
+          if(it.repairStatus==='diagnostica'){
+            // area preventivo
+            const ip=document.createElement('input'); ip.type='number'; ip.step='0.01'; ip.min='0'; ip.placeholder='Preventivo (€)';
+            if(it.quotePrice!=null) ip.value=it.quotePrice;
+            const sendWA=aBtn('Invia preventivo WA', ()=>{
+              const val=parseFloat((ip.value||'0').replace(',', '.')); if(!(val>=0)) return alert('Importo non valido');
+              it.quotePrice=val; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub();
+              const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(val||0);
+              const txt = `Ciao ${it.name}, sono Alessandro di Re Long (08119578844).\nEcco il preventivo per la tua riparazione.\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.\n\nI nostri servizi: ${HUB_URL}`;
+              window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`,'_blank','noopener');
+            });
+            const acc=btn('Segna preventivo ACCETTATO', ()=>{ it.quoteStatus='accepted'; it.repairStatus='inriparazione'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            const ref=btn('Segna preventivo RIFIUTATO', ()=>{ it.quoteStatus='refused'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            actions.append(ip, sendWA, acc, ref, btnDelete(it));
+          } else {
+            // Preventivo accettato -> "Da consegnare (avvisa cliente)"
+            if(it.quoteStatus==='accepted' && it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
+              actions.append(btnOk('Da consegnare (avvisa cliente)', ()=>{
+                it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+                window.open(waPickup(it.name, it.phone),'_blank','noopener');
+              }));
+            }
+            // Quando PRONTO -> "Ritirato (chiudi pratica)"
+            if(it.repairStatus==='pronto'){
+              actions.append(btn('Ritirato (chiudi pratica)', ()=>{
+                it.repairStatus='consegnato'; it.deliveredAt=new Date().toISOString();
+                // schedule review +3 giorni
+                it.postReviewAt = addDays(new Date(), 3).toISOString();
+                it.postReviewSent = false;
+                it.updatedAt=new Date().toISOString();
+                saveLocal(); saveToGitHub(); render();
+              }));
+            }
+            actions.append(btnDelete(it));
           }
-
-          bSend?.addEventListener('click', (e)=>{
-            e.preventDefault(); e.stopPropagation();
-            const val = parseFloat(ip?.value?.replace(',', '.') || '0');
-            if(!(val>=0)) return alert('Inserisci un importo valido');
-            it.quotePrice = val; it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub();
-            try{ window.open(waForPreventivo(val), '_blank', 'noopener'); }catch{}
-            showToast('Preventivo inviato ✅','ok');
-          });
-
-          bAcc?.addEventListener('click', ()=>{
-            it.quoteStatus = 'accepted';
-            it.repairStatus = 'inriparazione';
-            it.updatedAt=new Date().toISOString(); it.history = [...(it.history||[]), {t:'PREVENTIVO ACCETTATO', d:new Date().toISOString()}];
-            saveLocal(items); saveToGitHub(); render();
-          });
-          bRef?.addEventListener('click', ()=>{
-            it.quoteStatus = 'refused';
-            it.updatedAt=new Date().toISOString(); it.history = [...(it.history||[]), {t:'PREVENTIVO RIFIUTATO', d:new Date().toISOString()}];
-            saveLocal(items); saveToGitHub(); render();
-          });
-        },0);
-      }
-
-      // Azioni base
-      const actions=document.createElement('div'); actions.className='r-line'; actions.style.marginTop='6px';
-      const delivered=document.createElement('button'); delivered.className='btn'; delivered.textContent='Segna CONSEGNATO';
-      delivered.addEventListener('click', ()=>{ it.repairStatus='consegnato'; it.deliveredAt=new Date().toISOString(); scheduleReview(it); it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); });
-      const done=document.createElement('button'); done.className='btn'; done.textContent='Completato';
-      done.addEventListener('click', ()=>{ it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); });
-      const del=document.createElement('button'); del.className='btn'; del.textContent='Elimina';
-      del.addEventListener('click', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(items); saveToGitHub(); render(); buildIndexes(); });
-      actions.append(delivered,done,del); sum.append(actions);
-
-      // Recensione pronta
-      if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt) <= new Date()){
-        const rev=document.createElement('div'); rev.className='r-line';
-        const btn=document.createElement('a'); btn.className='wa-btn ok'; btn.textContent='WhatsApp: ringrazia + recensione';
-        btn.href = waForThankReview(it.name, it.phone); btn.target='_blank'; btn.rel='noopener';
-        btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render(); });
-        rev.append(btn); sum.append(rev);
-      }
-
-      return t;
-    }
-
-    function markChat(it){
-      const until=new Date(Date.now()+45*60*1000); it.activeChatUntil=until.toISOString(); it.muteDate=fmtDate(new Date()); it.updatedAt=new Date().toISOString(); saveLocal(items); saveToGitHub(); render();
-    }
-
-    function isMutedToday(it){ return it.muteDate && it.muteDate===fmtDate(new Date()); }
-    function isActiveChat(it){ return it.activeChatUntil && new Date(it.activeChatUntil) > new Date(); }
-
-    function scheduleReview(it){
-      it.postReviewAt = addHours(new Date(), 3).toISOString();
-      it.postReviewSent = false;
-      it.updatedAt = new Date().toISOString();
-      saveLocal(items); saveToGitHub();
-
-      const ms = new Date(it.postReviewAt) - new Date();
-      if(ms > 0 && ms < 24*60*60*1000){
-        setTimeout(()=>{
-          const hit = items.find(x=>x.id===it.id);
-          if(hit && hit.postReviewAt && !hit.postReviewSent && new Date(hit.postReviewAt) <= new Date()){
-            showToast(`Pronto il messaggio di ringraziamento per ${hit.name}.`, 'ok');
-            render();
-          }
-        }, ms);
-      }
-    }
-
-    // KPIs
-    function kpiRefresh(){
-      const dToday = fmtDate(new Date());
-      const wStart = new Date(); const day=(wStart.getDay()||7)-1; wStart.setDate(wStart.getDate()-day); wStart.setHours(0,0,0,0);
-      const isThisWeek = (d)=> new Date(d)>=wStart;
-
-      const diag = items.filter(i=>i.acceptance && i.repairStatus==='diagnostica').length;
-      const rip  = items.filter(i=>i.acceptance && i.repairStatus==='inriparazione').length;
-      const ready= items.filter(i=>i.acceptance && i.repairStatus==='pronto').length;
-      const pk   = items.filter(i=>i.fromPacchi && !i.done).length;
-      const actD = items.filter(i=> fmtDate(new Date(i.start))===dToday && (i.activated||[]).length).length;
-      const actW = items.filter(i=> isThisWeek(i.start) && (i.activated||[]).length).length;
-      const fup  = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===dToday).length), 0);
-      const rev  = items.filter(i=> i.postReviewAt && !i.postReviewSent && new Date(i.postReviewAt)<=new Date()).length;
-
-      $('#kpiDiag').textContent=diag; $('#kpiRip').textContent=rip; $('#kpiReady').textContent=ready; $('#kpiPacchi').textContent=pk;
-      $('#kpiActDay').textContent=actD; $('#kpiActWeek').textContent=actW; $('#kpiFollow').textContent=fup; $('#kpiReview').textContent=rev;
-
-      $('#kpiDiagSub').textContent='In attesa di preventivo';
-      $('#kpiRipSub').textContent='Lavorazioni in corso';
-      $('#kpiReadySub').textContent='Da avvisare/ritirare';
-      $('#kpiPacchiSub').textContent='Ricevuti/Ritirati';
-      $('#kpiActDaySub').textContent='Oggi';
-      $('#kpiActWeekSub').textContent='Settimana corrente';
-      $('#kpiFollowSub').textContent='Follow-up da fare';
-      $('#kpiReviewSub').textContent='Ringraziamenti pronti';
-    }
-
-    $('#btnDashboard').addEventListener('click', ()=>{
-      const sec = $('#dashboard'); sec.hidden = !sec.hidden; if(!sec.hidden) kpiRefresh();
-    });
-
-    // Notifiche orarie + backup su GitHub
-    (function smartPush(){
-      const httpsOk=(typeof isSecureContext!=='undefined'?isSecureContext:(location.protocol==='https:'||location.hostname==='localhost'));
-      if('Notification' in window && httpsOk && Notification.permission==='default'){ try{ Notification.requestPermission(); }catch{} }
-      function scheduleAt(hour){ const now=new Date(); const when=new Date(); when.setHours(hour,0,0,0); if(when<=now) when.setDate(when.getDate()+1); setTimeout(()=>{ fire(hour); scheduleAt(hour); }, when-now); }
-      function fire(hour){
-        const tStr = fmtDate(new Date());
-        const dueToday = items.reduce((n,it)=> n + (it.done?0: it.tasks.filter(tsk=>fmtDate(new Date(tsk.due))===tStr).length), 0);
-        if(hour===10){ if(dueToday) new Notification(`Alle 10: hai ${dueToday} follow-up da fare oggi`); }
-        if(hour===18){
-          const pending = items.filter(it=>!it.done && !isMutedToday(it) && !isActiveChat(it) && it.tasks.some(tsk=>fmtDate(new Date(tsk.due))===tStr)).length;
-          if(pending) new Notification(`Ore 18: ${pending} clienti ancora da contattare`);
+        } else {
+          // altri elementi (attivazioni, ecc.): opzionale completato + elimina
+          actions.append(btn('Completato', ()=>{ it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); }));
+          actions.append(btnDelete(it));
         }
-      }
-      scheduleAt(10); scheduleAt(18);
 
-      async function nightlyBackup(){
-        try{
-          const cfg = GH.cfg(); if(!cfg) return;
-          const key=backupPrefix+isoDay(new Date()); const payload=JSON.stringify({ when:new Date().toISOString(), items });
-          await GH.put(`backups/${key}.json`, payload, 'Backup notturno scadenzario v31');
-        }catch(e){ console.warn('Backup failed',e); }
-      }
-      function scheduleBackup(){
-        const now=new Date(); const when=new Date(); when.setHours(23,59,0,0); if(when<=now) when.setDate(now.getDate()+1);
-        setTimeout(()=>{ nightlyBackup(); scheduleBackup(); }, when-now);
-      }
-      scheduleBackup();
+        // REVIEW ready
+        review.innerHTML='';
+        if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
+          const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+          review.append(a);
+        }
+
+        list.append(el);
+      });
+    }
+
+    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
+    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
+
+    /* Boot */
+    (async function(){
+      await loadFromGitHubOrLocal();
+      render();
+      showToast('v32 pronta ✅');
     })();
-
-    // Recensioni pronte: scanner
-    function scanOverdueReviews(){
-      let due = items.filter(x=> x.postReviewAt && !x.postReviewSent && new Date(x.postReviewAt) <= new Date());
-      if(due.length){ showToast(`Ci sono ${due.length} ringraziamenti pronti all'invio.`, 'ok'); render(); }
-    }
-    setInterval(scanOverdueReviews, 60*1000);
-    setTimeout(scanOverdueReviews, 1500);
-
-    // Boot
-    async function boot(){
-      try{
-        await loadFromGitHubOrLocal();
-        buildIndexes();
-        render(); kpiRefresh();
-        showToast('Scadenzario pronto 🚀','ok');
-      }catch(e){
-        console.error(e); items = loadLocal(); buildIndexes(); render(); kpiRefresh();
-      }
-    }
-    boot();
   </script>
 </body>
 </html>
