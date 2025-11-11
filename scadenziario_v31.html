@@ -54,6 +54,7 @@
     .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
     .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
+    .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
   </style>
 </head>
 <body>
@@ -226,15 +227,14 @@
     const REM_TYPES=['sim','energia','fissomobile','rate'];
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate' };
 
-    // Mappa: per ogni categoria selezionata, quali tipologie inviare
     const complementByKey={
-      sim:       ['energia','fissomobile','rate'],
-      energia:   ['sim','fissomobile','rate'],
-      fisso:     ['sim','energia','rate'],
-      rate:      ['energia','sim','fissomobile'],
-      pacchi:    ['sim','energia','fissomobile','rate'],
+      sim:        ['energia','fissomobile','rate'],
+      energia:    ['sim','fissomobile','rate'],
+      fisso:      ['sim','energia','rate'],
+      rate:       ['energia','sim','fissomobile'],
+      pacchi:     ['sim','energia','fissomobile','rate'],
       riparazione:['sim','energia','fissomobile','rate'],
-      preventivi: [] // non influenza, lasciamo vuoto
+      preventivi: []
     };
 
     function shuffle(arr){
@@ -242,20 +242,12 @@
     }
 
     function getReminderTypesForItem(it){
-      // Pacchi o Riparazioni: tutte
       if(it.acceptance || it.fromPacchi) return [...REM_TYPES];
-      // Da "activated" ricaviamo l'unione dei set complementari
       const act = Array.isArray(it.activated)? it.activated : [];
       let set = new Set();
-      if(act.length===0){
-        // Default: se non c'è nulla, inviamo tutto
-        REM_TYPES.forEach(t=>set.add(t));
-      }else{
-        act.forEach(k=>{
-          const comp = complementByKey[k] || [];
-          comp.forEach(t=>set.add(t));
-        });
-        // se l'unione fosse vuota (es. solo 'preventivi'), fallback a tutto
+      if(act.length===0){ REM_TYPES.forEach(t=>set.add(t)); }
+      else{
+        act.forEach(k=> (complementByKey[k]||[]).forEach(t=>set.add(t)) );
         if(set.size===0){ REM_TYPES.forEach(t=>set.add(t)); }
       }
       return [...set];
@@ -265,7 +257,6 @@
       if(it.reminders && Array.isArray(it.reminders) && it.reminders.length) return;
       const created = new Date(it.createdAt||Date.now());
       const types = shuffle(getReminderTypesForItem(it));
-      // usa gli offset in ordine con le prime N tipologie
       it.reminders = types.map((type, idx)=>{
         const off = REMINDER_OFFSETS[idx] ?? REMINDER_OFFSETS[REMINDER_OFFSETS.length-1];
         const due = addDays(created, off);
@@ -311,7 +302,6 @@
 
       if(activeSet.has('pacchi')) newItem.fromPacchi=true;
 
-      // merge by phone
       const prev=items.find(x=>normalizePhone(x.phone)===phone);
       if(prev){
         Object.assign(prev, newItem, { updatedAt:new Date().toISOString(), activated:[...(new Set([...(prev.activated||[]), ...act]))] });
@@ -325,7 +315,6 @@
       $('#c_name').value=''; $('#c_phone').value=''; activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active')); $('#acceptWrap').style.display='none';
       render(); showToast('Cliente inserito ✅');
 
-      // invii cortesia
       try{
         if(isRepair){ window.open(waRepairIntake(name, phone),'_blank','noopener'); }
         else if(newItem.fromPacchi){ window.open(waPacchiReceived(name, phone),'_blank','noopener'); }
@@ -340,6 +329,16 @@
       render();
     });
 
+    /* Quick WA (mostrati ora per tutti i NON riparazione, non solo Pacchi) */
+    function appendQuickWA(actions, it){
+      const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+      const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
+      actions.append(a1,a2,a3,a4,a5);
+    }
+
     /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
@@ -348,7 +347,6 @@
       const source = items.slice().filter(it=>{
         ensureReminders(it);
         if(!filterToday) return true;
-        // almento un promemoria dovuto oggi e non inviato
         return (it.reminders||[]).some(r=>{
           const due0=startOfDay(r.dueAt);
           return (due0.getTime()===today0.getTime()) && !r.sent;
@@ -363,16 +361,9 @@
               remWrap=el.querySelector('.reminders');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
 
-        /* ACTIONS (invariato) */
+        /* ACTIONS */
         actions.innerHTML='';
-        if(it.fromPacchi && !it.acceptance){
-          const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-          const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-          const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
-          const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
-          const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
-          actions.append(a1,a2,a3,a4,a5, btnDelete(it));
-        } else if(it.acceptance){
+        if(it.acceptance){
           if(it.repairStatus==='diagnostica'){
             const ip=document.createElement('input'); ip.type='number'; ip.step='0.01'; ip.min='0'; ip.placeholder='Preventivo (€)';
             if(it.quotePrice!=null) ip.value=it.quotePrice;
@@ -403,9 +394,18 @@
                 try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
               }));
             }
+            // Pulsante Elimina + Etichetta "Ritirato • data"
             actions.append(btnDelete(it));
+            if(it.repairStatus==='consegnato' && it.deliveredAt){
+              const lab=document.createElement('span');
+              lab.className='label';
+              lab.textContent='Ritirato • '+fmt(it.deliveredAt);
+              actions.append(lab);
+            }
           }
         } else {
+          // NON riparazione: mostra Quick WA per tutti
+          appendQuickWA(actions, it);
           actions.append(btn('Completato', ()=>{
             try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
             it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
@@ -413,7 +413,7 @@
           actions.append(btnDelete(it));
         }
 
-        /* REMINDERS UI */
+        /* REMINDERS (per TUTTI i clienti) */
         remWrap.innerHTML='';
         if(it.reminders && it.reminders.length){
           const now0=startOfDay(new Date());
