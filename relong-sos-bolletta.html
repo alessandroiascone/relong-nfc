@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long • SOS Bolletta</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="SOS Bolletta Re Long: inserisci i dati luce/gas, calcoliamo la spesa annua stimata e il possibile risparmio. Invia tutto su WhatsApp 08119578844." />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0a0a0a; --bg2:#000;
+      --card:rgba(20,20,20,.94); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(255,255,255,.72);
+      --tileStroke:rgba(0,140,255,.35);
+      --glow:rgba(0,140,255,.15);
+      --ok:#25D366; --accent:#008CFF; --warn:#ffb020;
+    }
+    html,body{height:100%;background:radial-gradient(circle at 20% 20%,var(--bg1),var(--bg2));color:#fff;font-family:system-ui,-apple-system,"Inter",Roboto,Segoe UI,Arial,sans-serif}
+    .wrap{max-width:980px;margin-inline:auto;padding:24px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#00b4ff,#006de1);display:grid;place-items:center;box-shadow:0 0 24px rgba(0,140,255,.35)}
+    .logo::after{content:"⚡";font-size:22px}
+    h1{font-weight:800;font-size:clamp(22px,3.5vw,34px);letter-spacing:.3px}
+    .muted{color:var(--muted);font-size:14px}
+    .card{border:1px solid var(--stroke);background:var(--card);border-radius:18px;padding:14px;margin-top:12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr}}
+    label{font-size:13px;color:#eaeaea;margin-bottom:6px;display:block}
+    input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);color:#fff}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .cta button,.cta a{flex:1;min-width:220px;text-align:center;text-decoration:none;padding:12px 14px;border-radius:14px;border:1px solid var(--tileStroke);background:rgba(0,140,255,.1);color:#fff;cursor:pointer}
+    .ok{background:rgba(37,211,102,.12);border-color:rgba(37,211,102,.4)}
+    .warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.4)}
+    .sum{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:rgba(255,255,255,.05);padding:10px;border-radius:12px;border:1px dashed var(--stroke);white-space:pre-wrap}
+    footer{opacity:.7;margin-top:18px;font-size:12px}
+    .whats{position:fixed;right:16px;bottom:16px;background:var(--ok);color:#000;border-radius:999px;padding:12px 16px;font-weight:700;box-shadow:0 12px 32px rgba(0,0,0,.4);text-decoration:none}
+    .consent{display:flex;align-items:center;gap:10px;margin-top:10px}
+    .consent input{width:auto}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Re Long • SOS Bolletta</h1>
+        <div class="muted">Inserisci i dati principali della bolletta. Calcolo istantaneo e invio su WhatsApp <b>08119578844</b>.</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="row">
+        <div>
+          <label>Tipo fornitura</label>
+          <select id="tipo">
+            <option value="Luce">Luce</option>
+            <option value="Gas">Gas</option>
+            <option value="Dual">Luce + Gas</option>
+          </select>
+        </div>
+        <div>
+          <label>Cliente residente?</label>
+          <select id="res">
+            <option>Sì</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:10px">
+        <div>
+          <label>kWh annui (se luce)</label>
+          <input id="kwh" type="number" inputmode="decimal" placeholder="es. 2700" />
+        </div>
+        <div>
+          <label>Smc annui (se gas)</label>
+          <input id="mc" type="number" inputmode="decimal" placeholder="es. 900" />
+        </div>
+        <div>
+          <label>Spesa mensile attuale €</label>
+          <input id="spesa" type="number" inputmode="decimal" placeholder="es. 120" />
+        </div>
+        <div>
+          <label>Prezzo energia attuale €/kWh (facoltativo)</label>
+          <input id="prezzo" type="number" inputmode="decimal" step="0.0001" placeholder="es. 0.25" />
+        </div>
+      </div>
+
+      <div class="cta">
+        <button id="calcola" class="warn">Calcola risparmio</button>
+        <a id="reset" href="#">Reset</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="font-size:18px;margin-bottom:8px">Risultato</h2>
+      <div id="out" class="sum">Inserisci i dati e premi “Calcola risparmio”.</div>
+      <div class="consent">
+        <input id="consenso" type="checkbox" />
+        <label for="consenso">Acconsento a inviare questi dati su WhatsApp per essere ricontattato.</label>
+      </div>
+      <div class="cta">
+        <a id="toWA" class="ok" href="#" rel="noopener">Invia su WhatsApp</a>
+      </div>
+      <p class="muted" style="margin-top:6px">Nota: non possiamo allegare foto della bolletta automaticamente. Dopo l'invio, allegala nella chat WhatsApp.</p>
+    </section>
+
+    <footer class="muted">© Re Long Informatica — Marano di Napoli • WhatsApp 08119578844</footer>
+  </div>
+
+  <a class="whats" id="waFloating" href="#" rel="noopener">Chatta su WhatsApp</a>
+
+<script>
+const PHONE = "3908119578844";
+
+function euro(n){return isFinite(n) ? n.toLocaleString('it-IT',{style:'currency',currency:'EUR'}) : "-"}
+
+// Modello molto semplice di stima: se non c'è prezzo unitario, stimiamo da spesa mensile × 12
+function stima(){
+  const tipo = document.getElementById("tipo").value;
+  const residente = document.getElementById("res").value === "Sì";
+  const kwh = parseFloat(document.getElementById("kwh").value) || 0;
+  const mc = parseFloat(document.getElementById("mc").value) || 0;
+  const spesa = parseFloat(document.getElementById("spesa").value) || 0;
+  const prezzo = parseFloat(document.getElementById("prezzo").value) || 0;
+  const usoLuce = (tipo==="Luce"||tipo==="Dual");
+  const usoGas = (tipo==="Gas"||tipo==="Dual");
+
+  // Stima costo annuo attuale
+  let annuoAttuale = spesa>0 ? spesa*12 : 0;
+
+  // Stima alternativa se viene indicato il prezzo unitario
+  if(prezzo>0 && usoLuce && kwh>0){
+    // componenti semplificati: energia + 20% oneri/iva forfettario
+    annuoAttuale = (kwh*prezzo)*1.2;
+  }
+
+  // Tariffa ipotetica "Re Long" (placeholder): 0.19 €/kWh luce; gas 0.85 €/Smc
+  // Sono valori esemplificativi per la simulazione lato cliente.
+  let ipotLuce = usoLuce && kwh>0 ? (kwh*0.19)*1.2 : 0;
+  let ipotGas  = usoGas  && mc>0  ? (mc*0.85)*1.2  : 0;
+  let annuoIpotetico = ipotLuce + ipotGas;
+
+  // Se non abbiamo kWh/Smc ma abbiamo spesa mensile, applichiamo -12% come stima media di miglioramento
+  if(annuoIpotetico===0 && annuoAttuale>0){
+    annuoIpotetico = annuoAttuale*0.88;
+  }
+
+  const risparmio = Math.max(0, annuoAttuale - annuoIpotetico);
+
+  const righe = [
+    `Tipo: ${tipo} • Residente: ${residente ? "Sì" : "No"}`,
+    usoLuce ? `Consumo annuo stimato luce: ${kwh} kWh` : null,
+    usoGas  ? `Consumo annuo stimato gas: ${mc} Smc` : null,
+    spesa>0 ? `Spesa mensile attuale: ${euro(spesa)}` : null,
+    prezzo>0 ? `Prezzo attuale energia: € ${prezzo.toFixed(4)}/kWh` : null,
+    `Costo annuo stimato attuale: ${euro(annuoAttuale)}`,
+    `Offerta ipotetica Re Long: ${euro(annuoIpotetico)} / anno`,
+    `Risparmio potenziale: ${euro(risparmio)} / anno`,
+    `— Stima indicativa. Analisi reale su bolletta completa —`
+  ].filter(Boolean).join("\n");
+
+  document.getElementById("out").textContent = righe;
+  return righe;
+}
+
+document.getElementById("calcola").addEventListener("click", stima);
+document.getElementById("reset").addEventListener("click", (e)=>{
+  e.preventDefault();
+  ["kwh","mc","spesa","prezzo"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("out").textContent = "Inserisci i dati e premi “Calcola risparmio”.";
+});
+
+function openWA(text){
+  const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`;
+  window.open(url, "_blank");
+}
+
+document.getElementById("toWA").addEventListener("click",(e)=>{
+  e.preventDefault();
+  const ok = document.getElementById("consenso").checked;
+  if(!ok){ alert("Per proseguire devi acconsentire all'invio dei dati su WhatsApp."); return; }
+  const txt = "SOS Bolletta — Vorrei essere ricontattato:\\n" + stima();
+  openWA(txt);
+});
+
+document.getElementById("waFloating").addEventListener("click",(e)=>{
+  e.preventDefault();
+  openWA("Ciao Re Long, ho bisogno di aiuto per la mia bolletta.");
+});
+</script>
+</body>
+</html>
