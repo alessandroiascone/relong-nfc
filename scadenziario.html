@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>ReLong • Scadenzario + Accettazione + Pacchi (UI+Kanban+Sync)</title>
+<title>ReLong • Scadenzario + Accettazione + Pacchi (UI+Kanban+Sync+PIN fix)</title>
 <meta name="theme-color" content="#0a0a0a" />
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -127,14 +127,17 @@
   <div id="errBar"></div>
   <div id="toast" aria-live="polite"></div>
 
-  <!-- PIN -->
-  <div id="pinGate" hidden>
+  <!-- PIN (visibile finché non sblocchi) -->
+  <div id="pinGate">
     <div id="pinCard">
       <h3>Accesso protetto</h3>
       <p class="subtitle">Inserisci il PIN a 4 cifre per aprire lo scadenzario.</p>
       <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
-      <div class="r-line"><button id="pinOk" class="btn primary" style="flex:1">Sblocca</button></div>
-      <p class="subtitle" style="font-size:11px">Nota: blocco base lato client.</p>
+      <div class="r-line">
+        <!-- Fallback inline: chiama window.__unlock se gli handler non partono -->
+        <button id="pinOk" class="btn primary" type="button" style="flex:1" onclick="window.__unlock && window.__unlock()">Sblocca</button>
+      </div>
+      <p class="subtitle" style="font-size:11px">Nota: blocco base lato client. PIN: 1990</p>
     </div>
   </div>
 
@@ -262,7 +265,7 @@
     </div>
   </section>
 
-  <!-- STATISTICHE (collassabile) -->
+  <!-- STATISTICHE -->
   <section class="card" id="statsSection" hidden aria-hidden="true" style="max-width:1200px;margin:0 auto">
     <h2 style="padding:16px 16px 0">Statistiche mensili</h2>
     <div class="content">
@@ -305,11 +308,10 @@
   </dialog>
 
 <script>
-/* ===== Base */
-const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
-const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
-const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
+/* ===== Error bar */
 (function(){const bar=document.getElementById('errBar');window.addEventListener('error',e=>{bar.textContent='Errore JavaScript: '+(e.message||'sconosciuto');bar.style.display='block';});})();
+
+/* ===== Shortcuts */
 const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const STORE_KEY='relong-scadenzario-v31';
 const backupPrefix='relong-backup-';
@@ -325,7 +327,35 @@ const normalizePhone=(p)=>{let ph=String(p||'').trim().replace(/\D/g,'');if(ph.s
 function showToast(text,type='ok'){const wrap=$('#toast');if(!wrap)return;const el=document.createElement('div');el.className=`toast ${type==='ok'?'ok':type==='err'?'err':''}`;el.textContent=text;wrap.appendChild(el);setTimeout(()=>{el.remove();},3600);}
 const startI=$('#start');function setStartToToday(){const d=new Date();const pad=n=>String(n).padStart(2,'0');if(startI){if('valueAsDate'in startI)startI.valueAsDate=d;else startI.value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}}setStartToToday();
 
-/* ===== Upsell tasks */
+/* ===== PIN (fix robusto con fallback inline) */
+(function pinGateInit(){
+  const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput');
+  const KEY='relong-pin-date';
+  function todayKey(){const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${da}`;}
+  function setAppHidden(h){document.querySelectorAll('[aria-hidden]').forEach(n=>n.setAttribute('aria-hidden',h?'true':'false'));}
+
+  function showGate(){gate.hidden=false;setAppHidden(true);setTimeout(()=>input&&input.focus(),80);}
+  function hideGate(){gate.hidden=true;gate.remove();setAppHidden(false);}
+
+  function unlock(){
+    const val=(input.value||'').trim();
+    if(val==='1990'){localStorage.setItem(KEY,todayKey());hideGate();}
+    else{input.value='';input.focus();}
+  }
+  // Espongo il fallback per l'attributo onclick inline del bottone
+  window.__unlock = unlock;
+
+  const saved=localStorage.getItem(KEY);
+  if(saved===todayKey()){ hideGate(); } else { showGate(); }
+
+  ok?.addEventListener('click', unlock);
+  input?.addEventListener('keydown', e=>{ if(e.key==='Enter') unlock(); });
+})();
+
+/* ===== Upsell / tasks */
+const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
+const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
 const BASE_RANGES={ energia:[9,16], fisso:[12,20], sim:[6,12], smartphone:[10,18], preventivi:[3,7] };
 function hashStr(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function rngInt(seedStr,min,max){const h=hashStr(seedStr);const span=Math.max(0,(max-min));return min+(h%(span+1));}
@@ -335,7 +365,7 @@ if(ctx.prior.has('smartphone')&&type==='energia'){lo+=2;}if(ctx.prior.has('energ
 lo=Math.max(3,Math.min(lo,28));hi=Math.max(lo,Math.min(hi,35));const seed=`${ctx.phone}|${type}`;return rngInt(seed,lo,hi);}
 function computeMixedTasks({startDate,phone,priorActivated,includePreventivi=false,contextKind=null,activatedNow=[]}){const upsellTargets=['energia','fisso','sim','smartphone'];const exclude=new Set((activatedNow||[]).map(x=>String(x).toLowerCase()).filter(x=>upsellTargets.includes(x)));const ctx={phone:normalizePhone(phone||''),prior:new Set(priorActivated||[]),kind:contextKind};const base=upsellTargets.filter(t=>!exclude.has(t)).map(type=>{let due=addDays(startDate,offsetDaysFor(type,ctx));due=avoidWeekend(due);return{type,due:due.toISOString()};});if(includePreventivi){let due=addDays(startDate,offsetDaysFor('preventivi',ctx));due=avoidWeekend(due);base.push({type:'preventivi',due:due.toISOString()});}return base;}
 
-/* ===== Storage */
+/* ===== Storage & indexes */
 let items=load();function load(){try{const raw=localStorage.getItem(STORE_KEY);return raw?JSON.parse(raw):[]}catch(e){console.warn('Storage danneggiato:',e);localStorage.removeItem(STORE_KEY);return[];}}
 function save(arr){localStorage.setItem(STORE_KEY,JSON.stringify(arr));try{if(sync.enabled())debouncedPush();}catch{}return arr;}
 function ensureTimeline(it){it.timeline=Array.isArray(it.timeline)?it.timeline:[]}
@@ -420,7 +450,7 @@ function handlePacchi(kind){
   try{const base=`Ciao ${name}, sono Alessandro di Re Long (08119578844).`;const msg=`${base}\nAggiornamento pacco: ${kind.toUpperCase()}.\n\nHub: ${HUB_URL}`;window.open(`https://wa.me/39${phone}?text=${encodeURIComponent(msg)}`,'_blank','noopener');const it=idxByPhone.get(phone);if(it){addTimeline(it,'wa','Messaggio pacchi inviato');save(items);}}catch{}
 }
 
-/* ===== Filters & list render */
+/* ===== Filters & render */
 let filter='all';const qI=$('#q');$$('.pill').forEach(p=>p.addEventListener('click',()=>{$$('.pill').forEach(x=>x.classList.remove('active'));p.classList.add('active');filter=p.dataset.filter;render();}));qI?.addEventListener('input',render);
 function iconName(type){return({energia:'Energia',fisso:'Internet Casa',sim:'SIM',smartphone:'Smartphone a rate',preventivi:'Preventivi acquisti',riparazione:'Riparazione'})[type]||type;}
 function tag(txt,cls=''){const s=document.createElement('span');s.className='tag';if(cls)s.classList.add(cls);s.textContent=txt;return s}
@@ -432,7 +462,7 @@ function setKanbanOpen(open){const s=$('#kanbanSection');s.hidden=!open;s.setAtt
 function setStatsOpen(open){const s=$('#statsSection');s.hidden=!open;s.setAttribute('aria-hidden',open?'false':'true');if(open)renderStats();}
 
 /* ===== Step helper + progress */
-function stepInfo(it){const st=(it.repairStatus||'diagnostica');if(st==='diagnostica')return{n:1,label:'Step 1/4',desc:'Diagnostica → invio preventivo WA',pct:25};if(st==='inriparazione')return{n:2,label:'Step 2/4',desc:'Riparazione in corso',pct:50};if(st==='pronto')return{n:3,label:'Step 3/4',desc:'Pronto al ritiro → invio WA',pct:75};if(st==='consegnato')return{n:4,label:'Step 4/4',desc:`Consegnato${it.deliveredAt?' • '+fmtDate(new Date(it.deliveredAt)):''}`,pct:100};return{n:1,label:'Step',desc:'',pct:0};}
+function stepInfo(it){const st=(it.repairStatus||'diagnostica');if(st==='diagnostica')return{n:1,label:'Step 1/4',desc:'Diagnostica → invio preventivo WA',pct:25};if(st==='inriparazione')return{n:2,label:'Step 2/4',desc:'Riparazione in corso',pct:50};if(st==='pronto')return{n:3,label:'Step 3/4',desc:`Pronto al ritiro → invio WA`,pct:75};if(st==='consegnato')return{n:4,label:'Step 4/4',desc:`Consegnato${it.deliveredAt?' • '+fmtDate(new Date(it.deliveredAt)):''}`,pct:100};return{n:1,label:'Step',desc:'',pct:0};}
 
 /* ===== Render list items */
 function render(){if($('#listSection').hidden)return;const listStd=$('#listStandard');listStd.innerHTML='';const listPac=$('#listPacchi');listPac.innerHTML='';const q=(qI?.value||$('#q_top')?.value||'').trim().toLowerCase();
@@ -469,7 +499,7 @@ function renderItem(it,counts){
 
     const locked=(it.repairStatus==='consegnato');
 
-    // STEP 1: Diagnostica → invio preventivo (WA) → poi segna accettato
+    // STEP 1
     if((it.repairStatus||'diagnostica')==='diagnostica'){
       const pv=document.createElement('div');pv.className='r-line';pv.style.marginTop='8px';
       pv.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -493,7 +523,7 @@ function renderItem(it,counts){
       },0);
     }
 
-    // STEP 2: In riparazione → Dispositivo PRONTO (WA)
+    // STEP 2
     if((it.repairStatus||'')==='inriparazione'){
       const actions=document.createElement('div');actions.className='r-line';actions.style.marginTop='6px';
       const ready=document.createElement('button');ready.className='btn ok';ready.textContent='Dispositivo PRONTO → invia WA';
@@ -501,7 +531,7 @@ function renderItem(it,counts){
       actions.append(ready);div.append(actions);
     }
 
-    // STEP 3: Pronto → Consegnato (chiusura e lock)
+    // STEP 3
     if((it.repairStatus||'')==='pronto'){
       const actions=document.createElement('div');actions.className='r-line';actions.style.marginTop='6px';
       const deliver=document.createElement('button');deliver.className='btn ok';deliver.textContent='Consegnato al cliente (chiudi pratica)';
@@ -509,7 +539,7 @@ function renderItem(it,counts){
       actions.append(deliver);div.append(actions);
     }
 
-    // STEP 4: Consegnato (LOCK)
+    // STEP 4
     if((it.repairStatus||'')==='consegnato'){
       const lock=document.createElement('div');lock.className='subtitle';lock.style.marginTop='8px';lock.textContent='Pratica chiusa. Modifiche disabilitate.';div.append(lock);
     }
@@ -547,13 +577,6 @@ function scheduleBackup(){const now=new Date();const when=new Date();when.setHou
 function scheduleReviewAfterDays(it,days){it.postReviewAt=addDays(new Date(),days).toISOString();it.postReviewSent=false;it.updatedAt=new Date().toISOString();save(items);const ms=new Date(it.postReviewAt)-new Date();if(ms>0&&ms<7*24*60*60*1000){setTimeout(()=>{const hit=items.find(x=>x.id===it.id);if(hit&&hit.postReviewAt&&!hit.postReviewSent&&new Date(hit.postReviewAt)<=new Date()){showToast(`Pronto il messaggio di ringraziamento per ${hit.name}.`,'ok');setListOpen(true);render();}},ms);}}
 function scanOverdueReviews(){let due=items.filter(x=>x.postReviewAt&&!x.postReviewSent&&new Date(x.postReviewAt)<=new Date());if(due.length){showToast(`Ci sono ${due.length} ringraziamenti pronti all'invio.`,'ok');if($('#listSection').hidden)setListOpen(true);render();}}
 setInterval(scanOverdueReviews,60*1000);setTimeout(scanOverdueReviews,1500);
-
-/* ===== PIN (1 volta al giorno) */
-(function pinGateInit(){const gate=$('#pinGate'), ok=$('#pinOk'), input=$('#pinInput');const KEY='relong-pin-date';const pad=n=>String(n).padStart(2,'0');function localDayKey(){const d=new Date();return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
-const todayStr=localDayKey();const last=localStorage.getItem(KEY);function show(el){el&&el.removeAttribute('hidden');}function hide(el){el&&el.setAttribute('hidden','');}
-function setAppHidden(h){document.querySelectorAll('[aria-hidden]').forEach(n=>n.setAttribute('aria-hidden',h?'true':'false'));}if(last===todayStr){hide(gate);setAppHidden(false);}else{show(gate);setAppHidden(true);setTimeout(()=>input?.focus(),50);}
-function tryUnlock(){const val=(input.value||'').trim();if(val==='1990'){localStorage.setItem(KEY,todayStr);setAppHidden(false);hide(gate);gate.parentNode&&gate.parentNode.removeChild(gate);}else{input.value='';input.focus();}}
-ok.addEventListener('click',tryUnlock);input.addEventListener('keydown',(e)=>{if(e.key==='Enter'){tryUnlock();}});})();
 
 /* ===== Statistiche (canvas base) */
 function renderStats(){const cvs=$('#statsChart');if(!cvs)return;const ctx=cvs.getContext('2d');const W=cvs.width,H=cvs.height;ctx.clearRect(0,0,W,H);
@@ -594,9 +617,6 @@ $('#btnSyncCfg').onclick=sync.openDialog;
 /* ===== Boot */
 function boot(){setListOpen(false);setKanbanOpen(false);$('#acceptWrap').style.display='none';$('#pacchiWrap').style.display='none';if(sync.enabled())sync.startPolling();}
 boot();renderKanban();
-
-/* ===== Helpers for list */
-let countsCache=null;
 </script>
 </body>
 </html>
