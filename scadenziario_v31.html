@@ -225,7 +225,7 @@
     /* Reminders plan */
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
-    const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate' };
+    const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
 
     const complementByKey={
       sim:        ['energia','fissomobile','rate'],
@@ -253,16 +253,39 @@
       return [...set];
     }
 
+    function buildReminders(startDate, types){
+      const base = new Date(startDate);
+      return types.map((type, idx)=>{
+        const off = REMINDER_OFFSETS[idx] ?? REMINDER_OFFSETS[REMINDER_OFFSETS.length-1];
+        const due = addDays(base, off);
+        return { type, dueAt: due.toISOString(), sent:false, sentAt:null };
+      });
+    }
+
     function ensureReminders(it){
       if(it.reminders && Array.isArray(it.reminders) && it.reminders.length) return;
       const created = new Date(it.createdAt||Date.now());
       const types = shuffle(getReminderTypesForItem(it));
-      it.reminders = types.map((type, idx)=>{
-        const off = REMINDER_OFFSETS[idx] ?? REMINDER_OFFSETS[REMINDER_OFFSETS.length-1];
-        const due = addDays(created, off);
-        return { type, dueAt: due.toISOString(), sent:false, sentAt:null };
-      });
+      it.reminders = buildReminders(created, types);
+      it.remindersCycle = 1; // primo ciclo
+      it.responded = !!it.responded; // default false
       it.updatedAt=new Date().toISOString();
+    }
+
+    function maybeScheduleNextCycle(it){
+      if(it.responded) return;
+      if(!it.reminders || !it.reminders.length) return;
+      const onlyMain = it.reminders.filter(r=> r.type!=='followup');
+      if(onlyMain.length===0) return;
+      const allSent = onlyMain.every(r=>r.sent);
+      if(!allSent) return;
+      const start = addDays(new Date(), 45);
+      const types = shuffle(getReminderTypesForItem(it));
+      it.reminders = buildReminders(start, types);
+      it.remindersCycle = (it.remindersCycle||1) + 1;
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub();
+      showToast(`Nuovo ciclo reminder pianificato (Ciclo ${it.remindersCycle})`);
     }
 
     function reminderLink(it, rem){
@@ -271,8 +294,34 @@
         case 'energia':     return waPacchiEnergia(it.name,it.phone);
         case 'fissomobile': return waPacchiFisso(it.name,it.phone);
         case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
         default:            return waPacchiMemo(it.name,it.phone);
       }
+    }
+
+    function addFollowup90(it){
+      if(!it.reminders) it.reminders=[];
+      const due = addDays(new Date(), 90).toISOString();
+      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub(); render();
+      showToast('Promemoria unico (+90g) aggiunto ✅');
+    }
+
+    function addFollowupCustom(it){
+      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
+      if(val===null) return;
+      const days = parseInt(String(val).trim(),10);
+      if(!Number.isFinite(days) || days<=0 || days>365){
+        alert('Inserisci un numero di giorni valido (1–365).');
+        return;
+      }
+      if(!it.reminders) it.reminders=[];
+      const due = addDays(new Date(), days).toISOString();
+      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub(); render();
+      showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
     }
 
     /* Insert logic */
@@ -329,7 +378,7 @@
       render();
     });
 
-    /* Quick WA (mostrati ora per tutti i NON riparazione, non solo Pacchi) */
+    /* Quick WA per tutti i NON riparazione */
     function appendQuickWA(actions, it){
       const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
       const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
@@ -354,6 +403,9 @@
       });
 
       source.forEach(it=>{
+        // nuova tranche a +45g se ciclo completato e nessuna risposta
+        maybeScheduleNextCycle(it);
+
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
         el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
@@ -394,7 +446,6 @@
                 try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
               }));
             }
-            // Pulsante Elimina + Etichetta "Ritirato • data"
             actions.append(btnDelete(it));
             if(it.repairStatus==='consegnato' && it.deliveredAt){
               const lab=document.createElement('span');
@@ -404,7 +455,6 @@
             }
           }
         } else {
-          // NON riparazione: mostra Quick WA per tutti
           appendQuickWA(actions, it);
           actions.append(btn('Completato', ()=>{
             try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
@@ -413,8 +463,34 @@
           actions.append(btnDelete(it));
         }
 
-        /* REMINDERS (per TUTTI i clienti) */
+        /* REMINDERS UI */
         remWrap.innerHTML='';
+
+        // badge ciclo
+        const cycleBadge=document.createElement('span');
+        cycleBadge.className='label';
+        cycleBadge.textContent='Ciclo '+(it.remindersCycle||1);
+        remWrap.append(cycleBadge);
+
+        // tasto stop promo / risposta
+        if(!it.responded){
+          const stop=aBtn('Stop promo (ha risposto)', ()=>{
+            it.responded=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+          });
+          remWrap.append(stop);
+        } else {
+          const stopped=document.createElement('span');
+          stopped.className='label';
+          stopped.textContent='Promo stoppata';
+          remWrap.append(stopped);
+        }
+
+        // pulsanti promemoria unico
+        const addFU=aBtn('+ Promemoria unico (+90g)', ()=> addFollowup90(it));
+        const addFUc=aBtn('+ Promemoria unico (personalizzato)', ()=> addFollowupCustom(it));
+        remWrap.append(addFU, addFUc);
+
+        // bottoni reminder
         if(it.reminders && it.reminders.length){
           const now0=startOfDay(new Date());
           const copy = it.reminders.slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
