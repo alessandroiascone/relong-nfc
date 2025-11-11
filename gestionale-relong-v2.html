@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ReLong • Gestionale v2 (Acquisizione + Rotazioni WhatsApp + Riparazioni)</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0b0d12; --bg2:#06070b;
+      --card:rgba(14,16,22,.92); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(210,220,255,.70);
+      --elec:#0aa2ff; --elec2:#58c3ff; --elec3:#0079ff;
+      --ok:#25D366; --danger:#ff4d4f; --warn:#ffcc00;
+    }
+    html,body{height:100%}
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;background:radial-gradient(circle at 20% 20%,var(--bg1),var(--bg2));color:#fff;line-height:1.35}
+    .wrap{max-width:1280px;margin:32px auto;padding:20px}
+    .shell{border:1px solid var(--stroke);border-radius:20px;background:var(--card);box-shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04)}
+    header{padding:18px 22px;border-bottom:1px solid var(--stroke);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .logo{font-weight:800;font-size:20px}
+    .chip{padding:6px 10px;border:1px solid var(--stroke);border-radius:999px;color:var(--muted);font-size:12px}
+    nav{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--stroke)}
+    .tab{appearance:none;border:1px solid var(--stroke);background:transparent;color:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;transition:.2s}
+    .tab:hover{box-shadow:0 0 0 3px rgba(0,122,255,.15)}
+    .tab.active{border-color:rgba(0,140,255,.6);box-shadow:0 0 0 3px rgba(0,140,255,.25), 0 6px 24px rgba(0,140,255,.15)}
+    main{padding:18px}
+    .panel{display:none}
+    .panel.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+    .card{border:1px solid var(--stroke);border-radius:16px;background:rgba(0,0,0,.18);padding:14px}
+    h2{font-size:16px;font-weight:700;margin-bottom:10px;letter-spacing:.2px}
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{width:100%;margin-top:6px;margin-bottom:10px;background:#0f1320;border:1px solid var(--stroke);color:#fff;padding:10px;border-radius:10px;outline:none}
+    textarea{min-height:88px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid var(--stroke);cursor:pointer;background:linear-gradient(180deg,#0f2a44,#0b1b2d);color:#fff;transition:.2s}
+    .btn:hover{box-shadow:0 0 0 3px rgba(0,140,255,.2)}
+    .btn.ok{background:linear-gradient(180deg,#1a6f3f,#0f4b2a)}
+    .btn.warn{background:linear-gradient(180deg,#5e4f12,#40370c)}
+    .btn.danger{background:linear-gradient(180deg,#6b1f1f,#461414)}
+    .btn.ghost{background:transparent}
+    .seg{display:flex;flex-wrap:wrap;gap:8px}
+    .seg .opt{padding:10px 12px;border:1px solid var(--stroke);border-radius:12px;cursor:pointer}
+    .seg .opt.active{border-color:#0090ff;box-shadow:0 0 0 3px rgba(0,140,255,.22)}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border-bottom:1px solid var(--stroke);padding:10px;text-align:left;font-size:14px}
+    th{color:var(--muted);font-weight:600}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .row>*{flex:1 1 160px}
+    .hint{font-size:12px;color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .badge{font-size:12px;padding:4px 8px;border:1px solid var(--stroke);border-radius:999px;color:var(--muted)}
+    .badge.ok{border-color:rgba(37,211,102,.45);color:#9ef2bd}
+    @media (max-width:980px){.col-8,.col-7,.col-6,.col-5,.col-4,.col-3{grid-column:span 12}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="shell">
+      <header>
+        <div class="logo">👑 ReLong • Gestionale v2</div>
+        <span class="chip">Offline‑first</span>
+        <span class="chip">Sync GitHub</span>
+        <span class="chip">WhatsApp: <strong>08119578844</strong></span>
+        <div style="margin-left:auto" class="row">
+          <input id="quickSearch" placeholder="🔎 Cerca cliente / telefono / note..." />
+          <button class="btn ghost" id="btnExport">Esporta JSON</button>
+          <input type="file" id="fileImport" style="display:none" accept="application/json" />
+          <button class="btn ghost" id="btnImport">Importa JSON</button>
+        </div>
+      </header>
+      <nav>
+        <button class="tab active" data-tab="clienti">Clienti</button>
+        <button class="tab" data-tab="riparazioni">Riparazioni</button>
+        <button class="tab" data-tab="pacchi">Pacchi</button>
+        <button class="tab" data-tab="promemoria">Promemoria</button>
+        <button class="tab" data-tab="preventivi">Preventivi</button>
+        <button class="tab" data-tab="sync">Sincronizzazione</button>
+      </nav>
+      <main>
+        <section class="panel active" id="panel-clienti">
+          <div class="grid">
+            <div class="col-7">
+              <div class="card">
+                <h2>Acquisizione Rapida</h2>
+                <div class="row">
+                  <div><label>Nome</label><input id="inq-nome" placeholder="Mario"/></div>
+                  <div><label>Cognome</label><input id="inq-cognome" placeholder="Rossi"/></div>
+                  <div><label>Telefono</label><input id="inq-telefono" placeholder="3331234567"/></div>
+                </div>
+                <label>Prodotto scelto</label>
+                <div class="seg" id="inq-prodotti">
+                  <div class="opt" data-prod="sim">SIM</div>
+                  <div class="opt" data-prod="linea fissa">Linea fissa</div>
+                  <div class="opt" data-prod="smartphone a rate">Smartphone a rate</div>
+                  <div class="opt" data-prod="energia">Energia</div>
+                  <div class="opt" data-prod="pacchi">Pacchi</div>
+                  <div class="opt" data-prod="riparazione">Riparazione</div>
+                  <div class="opt" data-prod="preventivi">Preventivi</div>
+                </div>
+                <div id="rip-sub" style="display:none;margin-top:12px">
+                  <div class="row">
+                    <div>
+                      <label>Categoria riparazione</label>
+                      <select id="rip-cat">
+                        <option>smartphone</option>
+                        <option>computer</option>
+                        <option>stampante</option>
+                        <option>console & accessori</option>
+                        <option>altro</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Brand (se smartphone)</label>
+                      <select id="rip-brand">
+                        <option>apple</option>
+                        <option>samsung</option>
+                        <option>oppo</option>
+                        <option>xiaomi</option>
+                        <option>honor</option>
+                        <option>altro</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row"><div><label>Modello</label><input id="rip-model" placeholder="iPhone 15, S25, ecc."/></div></div>
+                  <label>Difetto / Descrizione</label><textarea id="rip-difetto" placeholder="Descrizione del problema"></textarea>
+                </div>
+                <div class="row" style="margin-top:6px">
+                  <button class="btn ok" id="inq-accetta">Accetta & Inserisci</button>
+                  <span class="badge" id="inq-banner" style="display:none">Programmate rotazioni WhatsApp ogni 6 giorni</span>
+                </div>
+                <p class="hint">Alla conferma: cliente in anagrafica (no doppioni) + promemoria WA ogni 6 giorni alternando le categorie (esclusa quella scelta).</p>
+              </div>
+              <div class="card" style="margin-top:12px">
+                <h2>Elenco Clienti</h2>
+                <table id="tblClienti"><thead><tr><th>Cliente</th><th>Telefono</th><th>Prodotti</th><th>Note</th><th></th></tr></thead><tbody></tbody></table>
+              </div>
+            </div>
+            <div class="col-5">
+              <div class="card">
+                <h2>Scheda Cliente</h2>
+                <div id="clientCardEmpty" class="hint">Seleziona un cliente per gestire preventivi e stati riparazione.</div>
+                <div id="clientCard" style="display:none">
+                  <div class="row">
+                    <div><label>Nome</label><input id="cc-nome"/></div>
+                    <div><label>Cognome</label><input id="cc-cognome"/></div>
+                    <div><label>Telefono</label><input id="cc-telefono"/></div>
+                  </div>
+                  <label>Note</label><textarea id="cc-note"></textarea>
+                  <div class="row">
+                    <div>
+                      <label>Preventivo riparazione (€)</label>
+                      <input id="cc-preventivo" type="number" step="0.01" />
+                    </div>
+                    <div class="row" style="align-items:flex-end">
+                      <button class="btn" id="cc-sendQuote">Invia preventivo su WhatsApp</button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <button class="btn ok" id="cc-accettaPrev">Preventivo accettato</button>
+                    <button class="btn warn" id="cc-rifiutaPrev">Preventivo rifiutato</button>
+                    <button class="btn" id="cc-pronto">Da consegnare (avvisa cliente)</button>
+                    <button class="btn" id="cc-consegnato">Consegnato</button>
+                  </div>
+                  <div class="row"><span id="cc-statoBadge" class="badge">stato: —</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="panel" id="panel-riparazioni">
+          <div class="card">
+            <h2>Lista Riparazioni</h2>
+            <div class="row">
+              <select id="filterStato">
+                <option value="tutti">Tutti</option>
+                <option value="ritiro">Accettati</option>
+                <option value="diagnosi">In diagnosi</option>
+                <option value="in_lavorazione">In lavorazione</option>
+                <option value="pronto">Pronti al ritiro</option>
+                <option value="consegnato">Consegnati</option>
+                <option value="ritardo">In ritardo</option>
+              </select>
+            </div>
+            <table id="tblRip"></table>
+          </div>
+        </section>
+        <section class="panel" id="panel-pacchi">
+          <div class="grid">
+            <div class="col-4">
+              <div class="card">
+                <h2>Registra Pacco</h2>
+                <div class="row">
+                  <div><label>Nome</label><input id="p-nome"/></div>
+                  <div><label>Cognome</label><input id="p-cognome"/></div>
+                </div>
+                <div class="row">
+                  <div><label>Telefono</label><input id="p-telefono"/></div>
+                  <div><label>Corriere</label><input id="p-corriere" placeholder="GLS, SDA, ecc."/></div>
+                </div>
+                <label>Note</label><textarea id="p-note" placeholder="Contenuto, tracking, ecc."></textarea>
+                <div class="row">
+                  <button class="btn ok" id="btnAddPacco">Ricevuto</button>
+                  <button class="btn warn" id="btnConsegnaPacco">Consegnato</button>
+                </div>
+                <p class="hint">L'aggiunta pacco aggiorna anche l'anagrafica clienti e pianifica rotazioni WA (smartphone a rate, sim, linea fissa, energia).</p>
+              </div>
+            </div>
+            <div class="col-8">
+              <div class="card">
+                <h2>Storico Pacchi</h2>
+                <table id="tblPacchi"></table>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="panel" id="panel-promemoria">
+          <div class="card">
+            <h2>Promemoria & Rotazioni WhatsApp</h2>
+            <table id="tblMemo"></table>
+            <p class="hint">I promemoria WA mostrano un bottone per inviare il messaggio quando la data è oggi/passata.</p>
+          </div>
+        </section>
+        <section class="panel" id="panel-preventivi">
+          <div class="grid">
+            <div class="col-5">
+              <div class="card">
+                <h2>Nuovo Preventivo</h2>
+                <label>Cliente</label><input id="q-cliente" placeholder="Mario Rossi"/>
+                <label>Oggetto</label><input id="q-obj" placeholder="iPhone 17 256GB + attivazione"/>
+                <label>Importo €</label><input id="q-eur" type="number" step="0.01"/>
+                <label>Note</label><textarea id="q-note"></textarea>
+                <div class="row">
+                  <button class="btn ok" id="btnAddQuote">Salva</button>
+                  <button class="btn" id="btnWAQuote">Invia su WhatsApp</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="card">
+                <h2>Preventivi Acquisti</h2>
+                <table id="tblQuote"></table>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="panel" id="panel-sync">
+          <div class="grid">
+            <div class="col-6">
+              <div class="card">
+                <h2>Impostazioni Sync GitHub</h2>
+                <label>Owner / Repo</label>
+                <input id="gh-repo" class="mono" placeholder="alessandroiascone/relong-nfc" />
+                <label>Branch</label>
+                <input id="gh-branch" class="mono" placeholder="main" />
+                <label>Percorso file JSON</label>
+                <input id="gh-path" class="mono" placeholder="gestionale/data.json" />
+                <label>Token Personale (scopes: repo)</label>
+                <input id="gh-token" class="mono" placeholder="ghp_…" />
+                <div class="row">
+                  <button class="btn" id="btnGHLoad">Carica da GitHub</button>
+                  <button class="btn ok" id="btnGHSave">Salva su GitHub</button>
+                </div>
+                <p class="hint">Usiamo GitHub Contents API (merge LWW). Il token resta nel tuo browser.</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <h2>Stato & Log</h2>
+                <pre id="gh-log" style="white-space:pre-wrap;background:#0b0f1a;border:1px solid var(--stroke);padding:12px;border-radius:10px;min-height:180px"></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <div style="padding:14px 16px;border-top:1px solid var(--stroke);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="badge">💾 Salvataggio automatico locale</div>
+        <div class="badge ok">Versione <strong class="mono">v2.0.0</strong></div>
+      </div>
+    </div>
+  </div>
+<script>
+(function(){
+  const $=(q,r=document)=>r.querySelector(q); const $$=(q,r=document)=>Array.from(r.querySelectorAll(q));
+  const STORAGE_KEY='relong_gestionale_v2';
+  const WA_MAIN='3908119578844';
+  const SITE_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+  const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
+  const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
+  const ROTATION=["energia","linea fissa","sim","smartphone a rate"];
+  const state={
+    db:{version:'2',lastWrite:0,clients:[],repairs:[],parcels:[],memos:[],quotes:[]},
+    gh:{repo:'',branch:'main',path:'',token:'',sha:null},
+    filter:'' ,
+    selectedClientId:null
+  };
+  const nowISO=()=>new Date().toISOString();
+  const fmtDate=d=> new Date(d).toLocaleDateString('it-IT');
+  const idgen=()=> Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const slug=s=> (s||'').trim().toLowerCase();
+  const saveLocal=()=>{state.db.lastWrite=Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));};
+  const loadLocal=()=>{ try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw) state.db=JSON.parse(raw);}catch(e){} };
+  const upsertClient=(c)=>{
+    const key=slug(\`\${c.nome} \${c.cognome}\`); const tel=(c.telefono||'').replace(/\s+/g,'');
+    let found=state.db.clients.find(x=> slug(\`\${x.nome} \${x.cognome}\`)===key || (tel&&x.telefono===tel));
+    if(found){ Object.assign(found,{...c,telefono:tel||found.telefono,updatedAt:nowISO()}); return found; }
+    const nu={id:idgen(),prodotti:[], ...c, telefono:tel, createdAt:nowISO(), updatedAt:nowISO()}; state.db.clients.push(nu); return nu;
+  };
+  const renderClienti=()=>{
+    const body=$('#tblClienti tbody'); body.innerHTML='';
+    const rows=state.db.clients.filter(c=> JSON.stringify(c).toLowerCase().includes(state.filter))
+      .sort((a,b)=> slug(a.cognome+a.nome).localeCompare(slug(b.cognome+b.nome)));
+    for(const c of rows){
+      const tr=document.createElement('tr');
+      tr.innerHTML=\`<td><strong>\${(c.cognome||'').toUpperCase()}</strong> \${c.nome||''}</td>
+      <td><a target="_blank" href="https://wa.me/39\${c.telefono}">\${c.telefono||''}</a></td>
+      <td>\${(c.prodotti||[]).join(', ')}</td>
+      <td>\${c.note||''}</td>
+      <td><button class="btn ghost" data-card="\${c.id}">Apri scheda</button></td>\`;
+      body.appendChild(tr);
+    }
+    body.addEventListener('click',(e)=>{const id=e.target?.dataset?.card; if(!id) return; openClientCard(id);},{once:true});
+  };
+  function openClientCard(id){
+    state.selectedClientId=id; const c=state.db.clients.find(x=>x.id===id); if(!c) return;
+    $('#clientCardEmpty').style.display='none'; $('#clientCard').style.display='block';
+    $('#cc-nome').value=c.nome||''; $('#cc-cognome').value=c.cognome||''; $('#cc-telefono').value=c.telefono||''; $('#cc-note').value=c.note||'';
+    $('#cc-preventivo').value=c.preventivo||'';
+    updateBadge(c);
+  }
+  function updateBadge(c){
+    const b=$('#cc-statoBadge');
+    const rep=state.db.repairs.find(r=> r.clientId===c.id && r.stato!=='consegnato');
+    b.textContent='stato: '+(rep? (rep.pronto?'pronto al ritiro':rep.stato):'—');
+  }
+  function scheduleRotation(client, selected){
+    const base=new Date();
+    const order=ROTATION.filter(x=> x!==selected);
+    for(let i=0;i<order.length;i++){
+      const due=new Date(base.getTime()+ (i+1)*6*86400000);
+      const cat=order[i];
+      const text=\`Ciao \${client.nome} \${client.cognome}! Ti segnaliamo la nostra offerta \${cat.toUpperCase()} — scrivici su WhatsApp.\`;
+      state.db.memos.push({id:idgen(),type:'wa',clientId:client.id,phone:client.telefono,when:due.toISOString(),title:\`Proposta \${cat}\`,note:text,done:false});
+    }
+  }
+  function renderMemo(){
+    const tbl=$('#tblMemo');
+    const list=state.db.memos.slice().sort((a,b)=> (a.when||'').localeCompare(b.when||''));
+    tbl.innerHTML=\`<thead><tr><th>Data</th><th>Cliente</th><th>Titolo</th><th>Nota</th><th></th></tr></thead>\`;
+    const tb=document.createElement('tbody');
+    for(const m of list){
+      const c=state.db.clients.find(x=>x.id===m.clientId)||{};
+      const due=new Date(m.when||m.date||Date.now());
+      const canSend = (!m.done && due<=new Date());
+      const tr=document.createElement('tr');
+      tr.innerHTML=\`<td>\${due.toLocaleDateString('it-IT')}</td><td>\${(c.cognome||'').toUpperCase()} \${c.nome||''}</td><td>\${m.title||''}</td><td>\${m.note||''}</td>
+      <td>\${m.type==='wa'? \`<button class="btn \${canSend?'ok':'ghost'}" data-wa="\${m.id}">WA</button>\`:''} <button class="btn danger" data-del="\${m.id}">Del</button></td>\`;
+      tb.appendChild(tr);
+    }
+    tbl.appendChild(tb);
+    tb.addEventListener('click',(e)=>{
+      const wa=e.target?.dataset?.wa; const del=e.target?.dataset?.del; if(!wa && !del) return;
+      if(wa){
+        const m=state.db.memos.find(x=>x.id===wa); if(!m) return;
+        const text=m.note+`\n\n— ReLong Informatica\n${SITE_URL}`;
+        window.open(\`https://wa.me/39\${m.phone}?text=\${encodeURIComponent(text)}\`,'_blank');
+        m.done=true; saveLocal(); renderMemo();
+      } else if(del){ state.db.memos=state.db.memos.filter(x=>x.id!==del); saveLocal(); renderMemo(); }
+    },{once:true});
+  }
+  function addRepairFromIntake(c, form){
+    const rec={id:idgen(),clientId:c.id,nome:c.nome,cognome:c.cognome,telefono:c.telefono, dispositivo:form.model||form.cat, categoria:form.cat, brand:form.brand||null, difetto:form.difetto||'', stato:'ritiro', pronto:false, createdAt:nowISO(), updatedAt:nowISO(), dataConsegna:null};
+    state.db.repairs.push(rec);
+    const text=\`Ciao \${c.nome} \${c.cognome} abbiamo accettato il tuo prodotto in assistenza. Ti aggiorneremo noi per il preventivo dopo la diagnosi. Nel frattempo puoi visitare il nostro sito: ${SITE_URL}\`;
+    if(c.telefono) window.open(\`https://wa.me/39\${c.telefono}?text=\${encodeURIComponent(text)}\`,'_blank');
+  }
+  function renderRip(){
+    const tbl=$('#tblRip');
+    const f=$('#filterStato').value;
+    let list=state.db.repairs.slice();
+    if(f==='ritardo'){
+      const lim=Date.now()-3*86400000; list=list.filter(r=> r.stato!=='consegnato' && new Date(r.createdAt).getTime()<lim);
+    } else if(f!=='tutti'){
+      if(f==='pronto') list=list.filter(r=> r.pronto===true);
+      else list=list.filter(r=> r.stato===f);
+    }
+    list=list.filter(r=> JSON.stringify(r).toLowerCase().includes(state.filter));
+    tbl.innerHTML=\`<thead><tr><th>Data</th><th>Cliente</th><th>Dispositivo</th><th>Difetto</th><th>Stato</th><th></th></tr></thead>\`;
+    const tb=document.createElement('tbody');
+    for(const r of list){
+      const tr=document.createElement('tr');
+      tr.innerHTML=\`<td>\${fmtDate(r.createdAt)}</td>
+        <td>\${r.cognome.toUpperCase()} \${r.nome}<br><span class="hint">\${r.telefono||''}</span></td>
+        <td>\${r.dispositivo||''}</td>
+        <td>\${r.difetto||''}\${r.dataConsegna? \` <span class="hint">• consegnato il \${fmtDate(r.dataConsegna)}</span>\`:''}</td>
+        <td>\${r.pronto?'✅ pronto':''+r.stato.replace('_',' ')}</td>
+        <td class="row">
+          <button class="btn ghost" data-act="wa" data-id="\${r.id}">WA</button>
+          <button class="btn ghost" data-act="pronto" data-id="\${r.id}">Pronto</button>
+          <button class="btn ghost" data-act="consegna" data-id="\${r.id}">Da consegnare</button>
+          <button class="btn danger" data-act="del" data-id="\${r.id}">Del</button>
+        </td>\`;
+      tb.appendChild(tr);
+    }
+    tbl.appendChild(tb);
+    tb.addEventListener('click',(e)=>{
+      const id=e.target?.dataset?.id; if(!id) return; const r=state.db.repairs.find(x=>x.id===id); if(!r) return;
+      const act=e.target?.dataset?.act;
+      if(act==='wa'){
+        const text=\`Aggiornamento assistenza: \${r.dispositivo} — stato: \${r.pronto?'PRONTO al ritiro':r.stato.replace('_',' ')}.\`;
+        window.open(\`https://wa.me/39\${r.telefono}?text=\${encodeURIComponent(text)}\`,'_blank');
+      }
+      if(act==='pronto'){ r.pronto=true; r.stato='in_lavorazione'; r.updatedAt=nowISO(); saveLocal(); renderRip(); }
+      if(act==='consegna'){
+        const text=\`Ciao \${r.nome}, il tuo \${r.dispositivo} è pronto per il ritiro. Qui trovi la nostra posizione: ${MAPS_URL}\`;
+        window.open(\`https://wa.me/39\${r.telefono}?text=\${encodeURIComponent(text)}\`,'_blank');
+      }
+      if(act==='del'){ state.db.repairs=state.db.repairs.filter(x=>x.id!==id); saveLocal(); renderRip(); }
+    },{once:true});
+  }
+  const intakeSel=$('#inq-prodotti');
+  intakeSel.addEventListener('click',(e)=>{
+    const opt=e.target.closest('.opt'); if(!opt) return; $$('.opt', intakeSel).forEach(x=>x.classList.remove('active')); opt.classList.add('active');
+    const p=opt.dataset.prod; $('#rip-sub').style.display = (p==='riparazione')? 'block':'none';
+  });
+  $('#inq-accetta').addEventListener('click',()=>{
+    const nome=$('#inq-nome').value.trim(); const cognome=$('#inq-cognome').value.trim(); const telefono=$('#inq-telefono').value.trim();
+    const active=$('.opt.active', intakeSel); if(!active){ alert('Seleziona un prodotto.'); return; }
+    const prodotto=active.dataset.prod;
+    const c=upsertClient({nome,cognome,telefono});
+    if(!c.prodotti.includes(prodotto)) c.prodotti.push(prodotto);
+    if(['sim','linea fissa','smartphone a rate','energia','pacchi','preventivi'].includes(prodotto)){
+      scheduleRotation(c, prodotto==='pacchi'? 'pacchi': (prodotto));
+    }
+    if(prodotto==='riparazione'){
+      const form={cat:$('#rip-cat').value, brand:$('#rip-brand').value, model:$('#rip-model').value, difetto:$('#rip-difetto').value};
+      addRepairFromIntake(c, form);
+    }
+    saveLocal(); renderClienti(); renderMemo(); renderRip();
+    $('#inq-banner').style.display='inline-block'; setTimeout(()=> $('#inq-banner').style.display='none', 3000);
+  });
+  $('#cc-sendQuote').addEventListener('click',()=>{
+    const id=state.selectedClientId; if(!id) return; const c=state.db.clients.find(x=>x.id===id); if(!c) return;
+    const eur=(+($('#cc-preventivo').value||0)).toFixed(2);
+    const text=\`Ciao \${c.nome} \${c.cognome}, il preventivo per la tua riparazione è di € \${eur}. Rispondi ACCETTO o RIFIUTO.\`;
+    window.open(\`https://wa.me/39\${c.telefono}?text=\${encodeURIComponent(text)}\`,'_blank');
+    c.preventivo=+eur; saveLocal();
+  });
+  $('#cc-accettaPrev').addEventListener('click',()=>{
+    const id=state.selectedClientId; if(!id) return; const rep=state.db.repairs.find(r=>r.clientId===id && r.stato!=='consegnato'); if(rep){rep.stato='in_lavorazione'; rep.updatedAt=nowISO();}
+    saveLocal(); renderRip();
+  });
+  $('#cc-rifiutaPrev').addEventListener('click',()=>{
+    const id=state.selectedClientId; if(!id) return; const rep=state.db.repairs.find(r=>r.clientId===id && r.stato!=='consegnato'); if(rep){rep.stato='diagnosi'; rep.updatedAt=nowISO();}
+    saveLocal(); renderRip();
+  });
+  $('#cc-pronto').addEventListener('click',()=>{
+    const id=state.selectedClientId; if(!id) return; const c=state.db.clients.find(x=>x.id===id); const rep=state.db.repairs.find(r=>r.clientId===id && r.stato!=='consegnato'); if(!c||!rep) return;
+    rep.pronto=true; rep.stato='in_lavorazione'; rep.updatedAt=nowISO();
+    const text=\`Ciao \${c.nome}, il tuo prodotto è pronto per il ritiro. Ecco il percorso: ${MAPS_URL}\`;
+    window.open(\`https://wa.me/39\${c.telefono}?text=\${encodeURIComponent(text)}\`,'_blank');
+    saveLocal(); renderRip();
+  });
+  $('#cc-consegnato').addEventListener('click',()=>{
+    const id=state.selectedClientId; if(!id) return; const c=state.db.clients.find(x=>x.id===id); const rep=state.db.repairs.find(r=>r.clientId===id && r.stato!=='consegnato'); if(!c||!rep) return;
+    rep.stato='consegnato'; rep.pronto=false; rep.dataConsegna=nowISO(); rep.updatedAt=nowISO();
+    const due= new Date(Date.now()+3*86400000);
+    const text=\`Grazie per averci scelto! Se ti va, lasciaci una recensione su Google: ${REVIEW_URL}\`;
+    state.db.memos.push({id:idgen(),type:'wa',clientId:c.id,phone:c.telefono,when:due.toISOString(),title:'Ringraziamento & Recensione',note:text,done:false});
+    saveLocal(); renderRip(); renderMemo();
+  });
+  function renderPacchi(){
+    const tbl=$('#tblPacchi');
+    const list=state.db.parcels.filter(p=> JSON.stringify(p).toLowerCase().includes(state.filter));
+    tbl.innerHTML=\`<thead><tr><th>Data</th><th>Cliente</th><th>Corriere</th><th>Note</th><th>Stato</th></tr></thead>\`;
+    const tb=document.createElement('tbody');
+    for(const p of list){
+      const tr=document.createElement('tr');
+      tr.innerHTML=\`<td>\${fmtDate(p.createdAt)}</td><td>\${p.cognome.toUpperCase()} \${p.nome} <span class="hint">\${p.telefono||''}</span></td><td>\${p.corriere||''}</td><td>\${p.note||''}</td><td>\${p.consegnato?'Consegnato':'Ricevuto'}</td>\`; tb.appendChild(tr);
+    }
+    tbl.appendChild(tb);
+  }
+  $('#btnAddPacco').addEventListener('click',()=>{
+    const c=upsertClient({nome:$('#p-nome').value.trim(),cognome:$('#p-cognome').value.trim(),telefono:$('#p-telefono').value.trim()});
+    state.db.parcels.push({id:idgen(),nome:c.nome,cognome:c.cognome,telefono:c.telefono,corriere:$('#p-corriere').value.trim(),note:$('#p-note').value.trim(),createdAt:nowISO(),consegnato:false});
+    scheduleRotation(c,'pacchi'); saveLocal(); renderPacchi(); renderMemo(); renderClienti();
+  });
+  $('#btnConsegnaPacco').addEventListener('click',()=>{
+    const key=slug(\`\${$('#p-nome').value} \${$('#p-cognome').value}\`);
+    const last=[...state.db.parcels].reverse().find(p=> slug(\`\${p.nome} \${p.cognome}\`)===key && !p.consegnato);
+    if(last){ last.consegnato=true; saveLocal(); renderPacchi(); }
+  });
+  function renderQuote(){
+    const tbl=$('#tblQuote');
+    const list=state.db.quotes.slice().reverse();
+    tbl.innerHTML=\`<thead><tr><th>Data</th><th>Cliente</th><th>Oggetto</th><th>Importo</th><th>Note</th><th></th></tr></thead>\`;
+    const tb=document.createElement('tbody');
+    for(const q of list){
+      const tr=document.createElement('tr');
+      tr.innerHTML=\`<td>\${fmtDate(q.createdAt)}</td><td>\${q.cliente}</td><td>\${q.obj}</td><td>\${(+q.eur||0).toFixed(2)}</td><td>\${q.note||''}</td>
+      <td><button class="btn ghost" data-wa="\${q.id}">WA</button> <button class="btn danger" data-del="\${q.id}">Del</button></td>\`;
+      tb.appendChild(tr);
+    }
+    tbl.appendChild(tb);
+    tb.addEventListener('click',(e)=>{
+      const id=e.target?.dataset?.wa || e.target?.dataset?.del; if(!id) return; const q=state.db.quotes.find(x=>x.id===id);
+      if(e.target?.dataset?.wa){ const text=\`Ciao! Ecco il preventivo ReLong: \${q.obj} — \${(+q.eur||0).toFixed(2)}€.\`; window.open(\`https://wa.me/\${WA_MAIN}?text=\${encodeURIComponent(text)}\`,'_blank'); }
+      else { state.db.quotes=state.db.quotes.filter(x=>x.id!==id); saveLocal(); renderQuote(); }
+    },{once:true});
+  }
+  $('#btnAddQuote').addEventListener('click',()=>{ state.db.quotes.push({id:idgen(),cliente:$('#q-cliente').value.trim(),obj:$('#q-obj').value.trim(),eur:+($('#q-eur').value||0),note:$('#q-note').value.trim(),createdAt:nowISO()}); saveLocal(); renderQuote(); });
+  $('#btnWAQuote').addEventListener('click',()=>{ const text=\`Ciao! Ecco il preventivo ReLong: \${$('#q-obj').value.trim()} — \${(+($('#q-eur').value||0)).toFixed(2)}€.\`; window.open(\`https://wa.me/\${WA_MAIN}?text=\${encodeURIComponent(text)}\`,'_blank'); });
+  $('#quickSearch').addEventListener('input',e=>{ state.filter=(e.target.value||'').toLowerCase(); renderClienti(); renderRip(); renderPacchi(); renderMemo(); });
+  $$('.tab').forEach(b=> b.addEventListener('click',()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active'); const key=b.dataset.tab; $$('.panel').forEach(p=>p.classList.remove('active')); $('#panel-'+key).classList.add('active'); }));
+  $('#btnExport').addEventListener('click',()=>{ const blob=new Blob([JSON.stringify(state.db,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=\`relong-gestionale-\${new Date().toISOString().slice(0,10)}.json\`; a.click(); });
+  $('#btnImport').addEventListener('click',()=> $('#fileImport').click());
+  $('#fileImport').addEventListener('change',async(e)=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); try{ const incoming=JSON.parse(text); const merge=(key,id='id')=>{const cur=new Map((state.db[key]||[]).map(x=>[x[id],x])); for(const it of incoming[key]||[]){ cur.set(it[id],it);} state.db[key]=[...cur.values()];}; ['clients','repairs','parcels','memos','quotes'].forEach(k=>merge(k)); state.db.lastWrite=Math.max(state.db.lastWrite||0,incoming.lastWrite||0); saveLocal(); renderAll(); }catch{ alert('JSON non valido'); } });
+  const log=(m)=>{ const el=$('#gh-log'); el.textContent += `\n${new Date().toLocaleTimeString('it-IT')} • ${m}`.trim(); el.scrollTop=el.scrollHeight; };
+  const ghHeaders=()=>({'Authorization':`token ${state.gh.token}`,'Accept':'application/vnd.github+json'});
+  async function ghLoad(){ try{ log('Carico da GitHub…'); const url=`https://api.github.com/repos/${'alessandroiascone/relong-nfc'}/contents/${'gestionale/data.json'}?ref=${'main'}`; const r=await fetch(url,{headers:ghHeaders()}); if(r.status===404){ log('File non trovato: verrà creato al salvataggio.'); state.gh.sha=null; return; } if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); state.gh.sha=j.sha; const decoded=JSON.parse(atob(j.content.replace(/\n/g,''))); const merge=(key,id='id')=>{const map=new Map(state.db[key].map(x=>[x[id],x])); for(const it of decoded[key]||[]){ map.set(it[id],it);} state.db[key]=[...map.values()];}; ['clients','repairs','parcels','memos','quotes'].forEach(k=>merge(k)); saveLocal(); renderAll(); log('Unione completata.'); }catch(e){ log('Errore load: '+e.message);} }
+  async function ghSave(){ try{ log('Salvo su GitHub…'); const url=`https://api.github.com/repos/${'alessandroiascone/relong-nfc'}/contents/${'gestionale/data.json'}`; const body={message:`Gestionale sync ${nowISO()}`, content:btoa(unescape(encodeURIComponent(JSON.stringify(state.db)))), branch:${JSON.stringify('main')}}; if(state.gh.sha) body.sha=state.gh.sha; const r=await fetch(url,{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)}); if(!r.ok) throw new Error('HTTP '+r.status); const j=await r.json(); state.gh.sha=j.content.sha; log('Salvato.'); }catch(e){ log('Errore save: '+e.message);} }
+  $('#btnGHLoad').addEventListener('click',ghLoad); $('#btnGHSave').addEventListener('click',ghSave);
+  ;['gh-repo','gh-branch','gh-path','gh-token'].forEach(id=>{ $('#'+id).addEventListener('input',()=>{ state.gh.repo=$('#gh-repo').value.trim(); state.gh.branch=$('#gh-branch').value.trim()||'main'; state.gh.path=$('#gh-path').value.trim(); state.gh.token=$('#gh-token').value.trim(); localStorage.setItem(STORAGE_KEY+':gh', JSON.stringify(state.gh)); });});
+  loadLocal();
+  function renderAll(){ renderClienti(); renderRip(); renderPacchi(); renderMemo(); renderQuote(); }
+  $('#gh-repo').value='alessandroiascone/relong-nfc'; $('#gh-branch').value='main'; $('#gh-path').value='gestionale/data.json'; $('#gh-token').value=state.gh.token||'';
+  renderAll();
+})();
+</script>
+</body>
+</html>
