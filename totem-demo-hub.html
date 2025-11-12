@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Re Long • Totem Demo (Hub Ufficiale) + Animazioni</title>
+  <title>Re Long • Totem Demo (Hub Ufficiale) – Simulazioni</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -12,6 +12,7 @@
       --tile:rgba(10,200,255,.28);
       --ok:#25D366;
       --fx:rgba(10,200,255,.35);
+      --txt:#e5f2ff;
     }
     html,body{height:100%;background:#000}
     body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;color:#fff;overflow:hidden}
@@ -24,7 +25,7 @@
     .wa{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--ok);padding:.3rem .6rem;border-radius:999px}
 
     .frame{position:relative;height:100%;}
-    iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-top:1px solid var(--stroke)}
+    iframe#hub{position:absolute;inset:0;width:100%;height:100%;border:0;border-top:1px solid var(--stroke);z-index:1}
 
     .footer{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;border-top:1px solid var(--stroke);background:linear-gradient(180deg,rgba(6,7,12,.6),rgba(6,7,12,.95));backdrop-filter:blur(8px)}
     .hint{font-size:.9rem;color:#cbd5e1}
@@ -33,7 +34,7 @@
     .btn{background:transparent;border:1px solid var(--stroke);color:#fff;border-radius:12px;padding:.45rem .7rem;cursor:pointer}
     .btn:hover{box-shadow:0 0 0 1px var(--tile) inset}
 
-    /* --- FX Overlay transizioni --- */
+    /* ---------- Overlay transizioni ---------- */
     .fx{
       position:absolute;inset:0;pointer-events:none;z-index:3;
       display:grid;grid-template-rows:1fr auto auto 1fr;justify-items:center;align-items:center;
@@ -43,7 +44,7 @@
     }
     .fx.show{opacity:1;transform:scale(1.0)}
     .fxTitle{
-      font-size:1.25rem;letter-spacing:.06em;
+      font-size:1.2rem;letter-spacing:.06em;color:var(--txt);
       padding:.5rem .9rem;border:1px solid var(--tile);border-radius:14px;
       background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
       box-shadow:0 0 24px rgba(10,200,255,.22), inset 0 0 0 1px rgba(10,200,255,.2)
@@ -52,14 +53,31 @@
     .progress{width:min(560px,80%);height:8px;border-radius:999px;border:1px solid var(--tile);background:rgba(255,255,255,.06);overflow:hidden}
     .bar{width:0%;height:100%;background:linear-gradient(90deg, rgba(10,200,255,.8), rgba(124,200,255,.8));animation:load 1.8s ease-in-out infinite}
     @keyframes load{0%{width:0%}50%{width:75%}100%{width:100%}}
-    .fxLogo{
-      width:72px;height:72px;border-radius:18px;border:1px solid var(--tile);
-      display:grid;place-items:center;
-      background:linear-gradient(180deg, rgba(10,200,255,.16), rgba(10,200,255,.06));
-      box-shadow:0 10px 30px rgba(0,0,0,.45), 0 0 0 2px rgba(10,200,255,.12) inset;
-      transform:scale(1);animation:kb 3s ease-in-out infinite alternate
+
+    /* ---------- Overlay “simulazioni” (puntatore, label) ---------- */
+    .sim{
+      position:absolute;inset:0;pointer-events:none;z-index:2;
+      opacity:0;transition:opacity .5s ease;
     }
-    @keyframes kb{from{transform:scale(1)}to{transform:scale(1.05)}}
+    .sim.show{opacity:1}
+    .cursor{
+      position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 4px rgba(10,200,255,.25),0 0 18px rgba(10,200,255,.35);
+      transform:translate(-50%,-50%);
+    }
+    .click{
+      position:absolute;width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.8);
+      transform:translate(-50%,-50%) scale(0.8);opacity:0;animation:ping .8s ease-out 1;
+    }
+    @keyframes ping{0%{opacity:1;transform:translate(-50%,-50%) scale(0.7)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+    .label{
+      position:absolute;transform:translate(-50%,-120%);background:rgba(6,10,18,.85);
+      border:1px solid var(--tile);padding:.45rem .65rem;border-radius:10px;color:#e6f2ff;font-size:.95rem;white-space:nowrap;
+      box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(10,200,255,.12)
+    }
+    .hl{
+      position:absolute;border:2px dashed rgba(10,200,255,.85);border-radius:12px;box-shadow:0 0 0 4px rgba(10,200,255,.15);opacity:.95
+    }
   </style>
 </head>
 <body>
@@ -76,22 +94,26 @@
     </header>
 
     <main class="frame">
+      <!-- HUB UFFICIALE -->
       <iframe id="hub" title="Re Long Hub" allow="autoplay; clipboard-write"
               src="https://alessandroiascone.github.io/relong-nfc/index.html"></iframe>
 
+      <!-- OVERLAY TRANSIZIONE -->
       <div class="fx" id="fx">
         <div></div>
-        <div class="fxLogo">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="url(#g2)" stroke-width="2"/>
-            <defs><linearGradient id="g2" x1="0" x2="24" y1="0" y2="24"><stop stop-color="#0ac8ff"/><stop offset="1" stop-color="#7cf"/></linearGradient></defs>
-          </svg>
-        </div>
         <div>
           <div class="fxTitle" id="fxTitle">Caricamento…</div>
           <div class="fxSub" id="fxSub">Re Long • Caricamento sezione…</div>
         </div>
         <div class="progress"><div class="bar" id="bar"></div></div>
+        <div></div>
+      </div>
+
+      <!-- OVERLAY SIMULAZIONI -->
+      <div class="sim" id="sim">
+        <div class="cursor" id="cursor"></div>
+        <div class="label" id="labelSim" style="left:50%;top:50%;display:none">azione</div>
+        <div class="hl" id="hl" style="display:none"></div>
       </div>
     </main>
 
@@ -99,75 +121,201 @@
       <div class="hint" id="hint">Demo automatica attiva • muovi mouse/clicca per interrompere</div>
       <div class="controls">
         <button class="btn" id="prev">◀︎</button>
-        <span class="pill" id="label">index</span>
+        <span class="pill" id="labelPage">index</span>
         <button class="btn" id="next">▶︎</button>
       </div>
     </footer>
   </div>
 
 <script>
-  // ========= CONFIG =========
+  // ========= CONFIG PRINCIPALE =========
   const BASE = 'https://alessandroiascone.github.io/relong-nfc/';
 
-  // RIMOSSA la pagina 404; demo più lenta; include tutte le sezioni che mi hai dato.
-  const SECTIONS = [
-    'index.html',
-    'catalogo-smartphone-reale-v3.html',
-    'Business+Energy2.html',
-    'assistenza.html',
-    'contattaci'
+  // Playlist completa: ogni step apre una tua pagina reale + (opzionale) sequenza di azioni simulate
+  // Le posizioni sono in percentuale dello schermo (x%, y%) così va bene su qualsiasi monitor verticale.
+  // Puoi aggiungere/rimuovere liberamente step o azioni.
+  const PLAYLIST = [
+    {
+      page: 'index.html',
+      title: 'Home',
+      actions: [
+        {t:1200, type:'move', x:50, y:78, label:'Scorri le promo del giorno'},
+        {t:2500, type:'highlight', x:50, y:78, w:64, h:10},
+        {t:3200, type:'click', x:50, y:78},
+        {t:5200, type:'move', x:50, y:20, label:'Black Friday • Novità'},
+      ],
+      dwell: 20000
+    },
+    {
+      page: 'catalogo-smartphone-reale-v3.html',
+      title: 'Catalogo smartphone',
+      actions: [
+        {t:800, type:'move', x:50, y:18, label:'Filtra o cerca modelli'},
+        {t:2000, type:'highlight', x:50, y:18, w:70, h:10},
+        {t:3000, type:'move', x:30, y:55, label:'Visualizza • iPhone 17'},
+        {t:4200, type:'click', x:30, y:55},
+        {t:5200, type:'highlight', x:30, y:55, w:35, h:23},
+        {t:7000, type:'move', x:72, y:58, label:'Richiedi info su WhatsApp'},
+        {t:8300, type:'click', x:72, y:58},
+      ],
+      dwell: 22000
+    },
+    {
+      page: 'Business+Energy2.html',
+      title: 'Energia • Simulatore',
+      actions: [
+        {t:1200, type:'move', x:52, y:28, label:'Apri simulatore energia'},
+        {t:2600, type:'click', x:52, y:28},
+        {t:3800, type:'highlight', x:52, y:60, w:70, h:28, label:'Inserisci dati bolletta'},
+        {t:7200, type:'move', x:52, y:88, label:'Contatta su WhatsApp'},
+        {t:8600, type:'click', x:52, y:88},
+      ],
+      dwell: 22000
+    },
+    {
+      page: 'assistenza.html',
+      title: 'Assistenza & Riparazioni',
+      actions: [
+        {t:1200, type:'move', x:30, y:42, label:'Smartphone in riparazione'},
+        {t:2600, type:'click', x:30, y:42},
+        {t:3800, type:'highlight', x:30, y:66, w:60, h:22, label:'Diagnosi e preventivo'},
+        {t:7200, type:'move', x:70, y:74, label:'Chiedi preventivo'},
+        {t:8600, type:'click', x:70, y:74},
+      ],
+      dwell: 20000
+    },
+    {
+      page: 'contattaci',
+      title: 'Contatti & Recensioni',
+      actions: [
+        {t:1200, type:'move', x:30, y:22, label:'WhatsApp 08119578844'},
+        {t:2600, type:'click', x:30, y:22},
+        {t:4200, type:'move', x:70, y:22, label:'Lascia una recensione Google'},
+        {t:5600, type:'click', x:70, y:22},
+      ],
+      dwell: 16000
+    }
   ];
 
-  // ========= STATO =========
+  // ========= STATO & RIFERIMENTI =========
   const iframe = document.getElementById('hub');
-  const label = document.getElementById('label');
   const fx = document.getElementById('fx');
   const fxTitle = document.getElementById('fxTitle');
-  let idx = 0, demo = true, rotTimer = null, idleTimer = null, hideTimer = null;
+  const labelPage = document.getElementById('labelPage');
+  const sim = document.getElementById('sim');
+  const cursor = document.getElementById('cursor');
+  const labelSim = document.getElementById('labelSim');
+  const hl = document.getElementById('hl');
 
-  function humanize(path){
-    return path.replace('.html','').replace('.htm','').replace(/-/g,' ').replace(/\+/g,' ')
-               .replace(/\b\\w/g, m => m.toUpperCase());
-  }
+  let step = 0, demo = true, rotTimer = null, idleTimer = null, hideTimer = null, actionTimers = [];
 
+  // ========= UTIL =========
+  function humanize(s){return s.replace('.html','').replace('.htm','').replace(/-/g,' ').replace(/\+/g,' ').replace(/\b\w/g,m=>m.toUpperCase());}
+  function vw(x){return (x/100)*window.innerWidth}
+  function vh(y){return (y/100)*window.innerHeight}
   function showOverlay(name){
     fxTitle.textContent = name;
     fx.classList.add('show');
     clearTimeout(hideTimer);
   }
-  function hideOverlay(){ fx.classList.remove('show') }
-
-  function go(i){
-    idx = (i + SECTIONS.length) % SECTIONS.length;
-    const path = SECTIONS[idx];
-    const title = humanize(path);
-    label.textContent = title;
-
-    showOverlay(title);
-    iframe.src = BASE + path;
-    // Fallback chiusura overlay se load non arriva
-    hideTimer = setTimeout(hideOverlay, 4000);
+  function hideOverlay(){ fx.classList.remove('show'); }
+  function clearActions(){
+    actionTimers.forEach(t=>clearTimeout(t));
+    actionTimers=[];
+    sim.classList.remove('show');
+    labelSim.style.display='none';
+    hl.style.display='none';
+  }
+  function runActions(list){
+    sim.classList.add('show');
+    list.forEach(a=>{
+      actionTimers.push(setTimeout(()=>{
+        if(a.type==='move'){
+          cursor.style.left = vw(a.x)+'px';
+          cursor.style.top  = vh(a.y)+'px';
+          if(a.label){
+            labelSim.textContent = a.label;
+            labelSim.style.left = vw(a.x)+'px';
+            labelSim.style.top  = vh(a.y)+'px';
+            labelSim.style.display='block';
+          }
+        }
+        if(a.type==='click'){
+          const c=document.createElement('div');
+          c.className='click';
+          c.style.left = vw(a.x)+'px';
+          c.style.top  = vh(a.y)+'px';
+          sim.appendChild(c);
+          setTimeout(()=>c.remove(),800);
+        }
+        if(a.type==='highlight'){
+          const w=a.w||30,h=a.h||14;
+          hl.style.left = (vw(a.x)-(vw(w)/2))+'px';
+          hl.style.top  = (vh(a.y)-(vh(h)/2))+'px';
+          hl.style.width = vw(w)+'px';
+          hl.style.height = vh(h)+'px';
+          hl.style.display='block';
+          if(a.label){
+            labelSim.textContent = a.label;
+            labelSim.style.left = (vw(a.x))+'px';
+            labelSim.style.top  = (vh(a.y)-vh(h)/2-12)+'px';
+            labelSim.style.display='block';
+          }
+        }
+      }, a.t));
+    });
   }
 
-  // Chiudi overlay al load reale
-  iframe.addEventListener('load', hideOverlay);
+  // ========= NAVIGAZIONE =========
+  function go(i){
+    step = (i + PLAYLIST.length) % PLAYLIST.length;
+    const s = PLAYLIST[step];
 
-  function next(){ go(idx+1) }
-  function prev(){ go(idx-1) }
+    // transizione
+    showOverlay(humanize(s.title || s.page));
+    clearActions();
+    iframe.src = BASE + s.page;
+    labelPage.textContent = humanize(s.title || s.page);
 
-  document.getElementById('next').addEventListener('click', ()=>{ stopDemo(); next() });
-  document.getElementById('prev').addEventListener('click', ()=>{ stopDemo(); prev() });
+    // chiusura overlay al load reale o fallback
+    hideTimer = setTimeout(hideOverlay, 3500);
+  }
+
+  iframe.addEventListener('load', ()=>{
+    hideOverlay();
+    clearActions();
+    const s = PLAYLIST[step];
+    if(s.actions && s.actions.length){
+      // avvia azioni simulate dopo un attimo
+      setTimeout(()=>runActions(s.actions), 600);
+    }
+    // programma avanzamento automatico
+    if(demo){
+      clearTimeout(rotTimer);
+      rotTimer = setTimeout(()=>{ next() }, s.dwell || 20000);
+    }
+  });
+
+  function next(){ go(step+1) }
+  function prev(){ go(step-1) }
+
+  document.getElementById('next').addEventListener('click',()=>{ stopDemo(); next() });
+  document.getElementById('prev').addEventListener('click',()=>{ stopDemo(); prev() });
 
   // ========= DEMO MODE =========
   function startDemo(){
-    clearInterval(rotTimer);
-    rotTimer = setInterval(next, 20000); // 20s per sezione (più lento)
+    demo = true;
+    const s = PLAYLIST[step] || {};
+    clearTimeout(rotTimer);
+    rotTimer = setTimeout(()=>{ next() }, s.dwell || 20000);
   }
   function stopDemo(){
     if (!demo) return;
     demo = false;
     document.getElementById('hint').textContent = 'Demo disattivata';
-    clearInterval(rotTimer);
+    clearTimeout(rotTimer);
+    clearTimeout(idleTimer);
+    clearActions();
   }
   function resetIdle(){
     if(!demo) return;
