@@ -89,8 +89,33 @@
       </div>
       <div style="grid-column:1/-1;display:none" id="acceptWrap">
         <div class="grid2">
-          <div><label>Tipo</label><select id="a_type"><option>Smartphone</option><option>Computer</option><option>Stampante</option><option>Console</option></select></div>
-          <div><label>Marca</label><input id="a_brand" placeholder="Apple/Samsung…"></div>
+          <div>
+            <label>Tipo</label>
+            <select id="a_type">
+              <option>Smartphone</option>
+              <option>Computer</option>
+              <option>Stampante</option>
+              <option>Console</option>
+            </select>
+          </div>
+
+          <!-- Marca: input libero + select per Smartphone + "Altro" con campo dedicato -->
+          <div>
+            <label>Marca</label>
+            <input id="a_brand" placeholder="Apple/Samsung…" />
+            <div id="brandSmartWrap" style="display:none">
+              <select id="a_brand_sel">
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Oppo">Oppo</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="Honor">Honor</option>
+                <option value="Altro">Altro</option>
+              </select>
+              <input id="a_brand_other" placeholder="Inserisci marca…" style="display:none;margin-top:6px" />
+            </div>
+          </div>
+
           <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max…"></div>
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
@@ -137,6 +162,7 @@
       const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
     }
     const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
+    const normalizeName = n => String(n||'').trim().replace(/\s+/g,' ').toLowerCase();
     const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
@@ -272,6 +298,15 @@
       it.updatedAt=new Date().toISOString();
     }
 
+    // Proroga dei promemoria a partire da oggi, senza duplicare il cliente
+    function prorogaPromemoria(it){
+      if(it.responded) return; // se stoppato, non toccare
+      const types = shuffle(getReminderTypesForItem(it));
+      it.reminders = buildReminders(new Date(), types);
+      it.remindersCycle = (it.remindersCycle||1) + 1;
+      it.updatedAt = new Date().toISOString();
+    }
+
     function maybeScheduleNextCycle(it){
       if(it.responded) return;
       if(!it.reminders || !it.reminders.length) return;
@@ -334,8 +369,54 @@
       if(on) activeSet.add(k); else activeSet.delete(k);
     });
 
+    // UI Marca per Smartphone + "Altro"
+    const typeSel = document.getElementById('a_type');
+    const brandInput = document.getElementById('a_brand');            // per non-smartphone
+    const brandSmartWrap = document.getElementById('brandSmartWrap'); // contiene select + other
+    const brandSelect = document.getElementById('a_brand_sel');
+    const brandOther = document.getElementById('a_brand_other');
+
+    function refreshBrandUI(){
+      const isPhone = (typeSel.value === 'Smartphone');
+      brandInput.style.display = isPhone ? 'none' : '';
+      brandSmartWrap.style.display = isPhone ? '' : 'none';
+      // gestione "Altro"
+      if(isPhone){
+        const isOther = brandSelect.value === 'Altro';
+        brandOther.style.display = isOther ? '' : 'none';
+      } else {
+        brandOther.style.display = 'none';
+      }
+    }
+    refreshBrandUI();
+    typeSel.addEventListener('change', refreshBrandUI);
+    brandSelect.addEventListener('change', refreshBrandUI);
+
+    // Auto-compilazione campi: se esiste nome o telefono, precompila l'altro
+    const nameInput = document.getElementById('c_name');
+    const phoneInput = document.getElementById('c_phone');
+
+    function findByPhone(p){ const np=normalizePhone(p); return items.find(x=>normalizePhone(x.phone)===np); }
+    function findByName(n){ const nn=normalizeName(n); return items.find(x=>normalizeName(x.name)===nn); }
+
+    nameInput.addEventListener('blur', ()=>{
+      const n = nameInput.value;
+      if(!n) return;
+      if((phoneInput.value||'').trim()) return; // già compilato
+      const hit = findByName(n);
+      if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); showToast('Telefono precompilato dalla lista clienti'); }
+    });
+
+    phoneInput.addEventListener('blur', ()=>{
+      const p = normalizePhone(phoneInput.value);
+      if(!p) return;
+      if((nameInput.value||'').trim()) return; // già compilato
+      const hit = findByPhone(p);
+      if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
+    });
+
     $('#insertBtn').addEventListener('click', async ()=>{
-      const name=($('#c_name').value||'').trim(); let phone=normalizePhone($('#c_phone').value||'');
+      const name=(nameInput.value||'').trim(); let phone=normalizePhone(phoneInput.value||'');
       if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
       if(!phone || phone.length<7) return alert('Telefono non valido');
       const act=[...activeSet];
@@ -345,15 +426,40 @@
 
       if(isRepair){
         const model=($('#a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
-        newItem.acceptance=true; newItem.device={ type:$('#a_type').value, brand:$('#a_brand').value, model, issue:($('#a_issue').value||'').trim() };
+        const brand = (typeSel.value==='Smartphone')
+          ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value)
+          : (brandInput.value||'');
+        newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:($('#a_issue').value||'').trim() };
         newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
       }
 
       if(activeSet.has('pacchi')) newItem.fromPacchi=true;
 
-      const prev=items.find(x=>normalizePhone(x.phone)===phone);
+      // RICERCA ESISTENTE: per telefono o per nome
+      const byPhone = findByPhone(phone);
+      const byName  = findByName(name);
+      const prev = byPhone || byName;
+
       if(prev){
-        Object.assign(prev, newItem, { updatedAt:new Date().toISOString(), activated:[...(new Set([...(prev.activated||[]), ...act]))] });
+        // aggiorna dati e unisci attivazioni
+        prev.name = prev.name || name;
+        prev.phone = prev.phone || phone;
+        prev.activated = [...new Set([...(prev.activated||[]), ...act])];
+        if(newItem.acceptance){ // se oggi è un intake riparazione, aggiorna i dettagli
+          prev.acceptance = true;
+          prev.device = newItem.device;
+          prev.repairStatus = prev.repairStatus || 'diagnostica';
+        }
+        if(newItem.fromPacchi) prev.fromPacchi = true;
+
+        // Se è esattamente lo stesso cliente (match sia nome sia telefono) => PROROGA
+        if(normalizeName(prev.name)===normalizeName(name) && normalizePhone(prev.phone)===normalizePhone(phone)){
+          prorogaPromemoria(prev);
+          showToast('Cliente già presente: promemoria prorogati ✅');
+        } else {
+          prev.updatedAt = new Date().toISOString();
+        }
+
         ensureReminders(prev);
       } else {
         ensureReminders(newItem);
@@ -361,8 +467,10 @@
       }
 
       saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
-      $('#c_name').value=''; $('#c_phone').value=''; activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active')); $('#acceptWrap').style.display='none';
-      render(); showToast('Cliente inserito ✅');
+      nameInput.value=''; phoneInput.value='';
+      activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
+      $('#acceptWrap').style.display='none';
+      render(); showToast('Operazione registrata ✅');
 
       try{
         if(isRepair){ window.open(waRepairIntake(name, phone),'_blank','noopener'); }
@@ -539,7 +647,7 @@
       showToast('v32b pronta ✅');
     })();
 
-    /* ====== Toggle Elenco (Mostra/Nascondi) — aggiunta minima ====== */
+    /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
     (function(){
       const KEY='relong-elenco-hidden';
       const h2s=[...document.querySelectorAll('section.card > h2')];
@@ -559,10 +667,9 @@
       let startHidden=false; try{ startHidden = localStorage.getItem(KEY)==='1'; }catch{}
       apply(startHidden);
       btn.addEventListener('click',()=> apply(!(content.style.display==='none')));
-      // Inserisco subito dopo l'h2
       elencoH2.insertAdjacentElement('afterend', btn);
     })();
-    /* =============================================================== */
+    /* ============================================ */
   </script>
 </body>
 </html>
