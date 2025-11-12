@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32e (Pacchi + Reminder)</title>
+  <title>ReLong • Scadenzario v32f (Pacchi + Reminder)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -46,7 +46,7 @@
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;text-decoration:none;display:inline-flex;gap:6px;align-items:center;font-weight:800;letter-spacing:.2px}
     .wa-btn.ok{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.18)}
     .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
-    /* Nuove pill per azioni rapide (Energia/SIM/Fisso/Rate) */
+    /* Pill moderne per azioni rapide */
     .pillbtn{font-size:12px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
       background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
       color:#e6f1ff;display:inline-flex;gap:8px;align-items:center;font-weight:800;letter-spacing:.2px}
@@ -62,10 +62,12 @@
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
-    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;justify-content:space-between;flex-wrap:wrap}
+    .toolbar-left{display:flex;gap:8px;align-items:center}
+    .toolbar-right{display:flex;gap:8px;align-items:center}
     .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
-    .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
+    .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
     /* Remind dropdown */
     .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
     .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
@@ -150,7 +152,12 @@
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
       <div class="toolbar">
-        <button id="toggleToday" class="toggle">Remind oggi</button>
+        <div class="toolbar-left">
+          <button id="toggleToday" class="toggle">Remind oggi</button>
+        </div>
+        <div class="toolbar-right">
+          <span id="clientCounter" class="label">Clienti: 0</span>
+        </div>
       </div>
       <div id="list"></div>
     </div>
@@ -546,6 +553,10 @@
       const list=$('#list'); list.innerHTML='';
       const now=new Date(); const today0=startOfDay(now);
 
+      // aggiorna counter totale clienti
+      const counter=$('#clientCounter');
+      if(counter) counter.textContent = `Clienti: ${items.length}`;
+
       const source = items.slice().filter(it=>{
         ensureReminders(it);
         if(!filterToday) return true;
@@ -683,7 +694,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32e pronta ✅');
+      showToast('v32f pronta ✅');
     })();
 
     /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
