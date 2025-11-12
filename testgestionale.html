@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ReLong • Scadenzario v32b (Pacchi + Reminder)</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#0b0d12; --bg2:#06070b;
+      --card:rgba(14,16,22,.92); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(210,220,255,.70);
+      --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
+      --ok:#25D366; --danger:#ff4d4f;
+    }
+    body{min-height:100svh;font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;color:#eef3ff;
+      background:radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
+      padding:24px;display:flex;flex-direction:column;gap:16px}
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:22px;box-shadow:0 10px 40px rgba(0,140,255,.18)}
+    .card h2{font-size:18px;font-weight:800;padding:18px 18px 0;letter-spacing:.3px}
+    .card .content{padding:18px}
+    header.title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    header .subtitle{color:var(--muted);font-size:14px}
+    .status{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill{border:1px solid rgba(0,140,255,.22);color:#dbeaff;padding:8px 12px;border-radius:999px;font-size:12px;background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02))}
+    .pill.good{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .pill.bad{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#2b0a0a;border-color:transparent}
+    .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
+    .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
+    .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{margin-top:6px;background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;border-radius:14px;padding:12px 14px;font-size:15px}
+    textarea{min-height:84px;resize:vertical}
+    .toggle-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:8px}
+    @media (max-width:980px){.toggle-grid{grid-template-columns:repeat(2,1fr)}}
+    .tbtn{display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease}
+    .tbtn.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 10px 30px rgba(0,140,255,.35)}
+    .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
+    .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
+    .details{padding:12px 14px; border-top:1px solid var(--stroke)}
+    .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+    .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
+    .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
+    .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
+    .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
+    @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
+    .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
+  </style>
+</head>
+<body>
+  <div id="toast"></div>
+  <header class="title">
+    <div>
+      <h1>ReLong • Gestionale</h1>
+      <div class="subtitle">Ogni cliente che entra è un’occasione: trasformala in valore, supera le aspettative, domina la giornata</div>
+    </div>
+    <div class="status">
+      <span id="syncState" class="pill bad">Sync: Disconnesso</span>
+      <button id="cfgSync" class="btn">Imposta Sync GitHub</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>Dati Cliente</h2>
+    <div class="content grid2">
+      <div><label>Nome e Cognome</label><input id="c_name" placeholder="Mario Rossi"></div>
+      <div><label>Telefono</label><input id="c_phone" placeholder="3331234567" inputmode="numeric"></div>
+      <div style="grid-column:1/-1">
+        <label>Seleziona operazione</label>
+        <div class="toggle-grid" id="toggles">
+          <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
+          <button type="button" class="tbtn" data-key="preventivi">Preventivo</button>
+          <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
+          <button type="button" class="tbtn" data-key="sim">SIM</button>
+          <button type="button" class="tbtn" data-key="fisso">Fisso</button>
+          <button type="button" class="tbtn" data-key="energia">Energia</button>
+          <button type="button" class="tbtn" data-key="rate">Smartphone a rate</button>
+        </div>
+      </div>
+      <div style="grid-column:1/-1;display:none" id="acceptWrap">
+        <div class="grid2">
+          <div><label>Tipo</label><select id="a_type"><option>Smartphone</option><option>Computer</option><option>Stampante</option><option>Console</option></select></div>
+          <div><label>Marca</label><input id="a_brand" placeholder="Apple/Samsung…"></div>
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max…"></div>
+          <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
+        </div>
+      </div>
+      <div><button id="insertBtn" class="btn primary">Inserisci</button></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Elenco</h2>
+    <div class="content" id="elencoContent">
+      <div class="toolbar">
+        <button id="toggleToday" class="toggle">Remind oggi</button>
+      </div>
+      <div id="list"></div>
+    </div>
+  </section>
+
+  <template id="tpl">
+    <div class="item">
+      <button class="head" type="button">
+        <div class="title"></div>
+        <div>▶</div>
+      </button>
+      <div class="details" hidden>
+        <div class="r-line actions"></div>
+        <div class="r-line reminders"></div>
+        <div class="r-line review"></div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    /* Utils & UI */
+    const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+    const STORE_KEY='relong-scadenzario-v32b';
+    const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
+    const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+    const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
+    const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
+    const RELONG_PHONE='08119578844';
+
+    function showToast(t, type='ok'){
+      const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
+    }
+    const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
+    const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
+    const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
+
+    /* GitHub Sync */
+    const syncState=$('#syncState'), cfgBtn=$('#cfgSync');
+    const GH={
+      cfg(){ try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||'null'); }catch{return null} },
+      token(){ return localStorage.getItem(GH_TOKEN_KEY)||'' },
+      headers(){ return { 'Accept':'application/vnd.github+json', 'Authorization':'Bearer '+this.token() } },
+      async get(path){
+        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
+        const res=await fetch(url,{headers:this.headers()}); if(!res.ok) throw new Error('GET '+res.status); return res.json();
+      },
+      async put(path, text, msg){
+        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
+        let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
+        const body={ message:msg||'Update v32b', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        if(sha) body.sha=sha;
+        const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+        if(!res.ok){
+          if(res.status===409){
+            const meta=await this.get(path); const body2={...body,sha:meta.sha};
+            const r2=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body2)});
+            if(!r2.ok) throw new Error('PUT '+r2.status);
+            return r2.json();
+          }
+          throw new Error('PUT '+res.status);
+        }
+        return res.json();
+      }
+    };
+    function syncBadge(ok){ syncState.textContent= ok?'Sync: Connesso':'Sync: Disconnesso'; syncState.classList.toggle('good',ok); syncState.classList.toggle('bad',!ok); }
+    cfgBtn.addEventListener('click', async ()=>{
+      const owner=prompt('Owner GitHub','alessandroiascone')||'';
+      const repo=prompt('Repository','relong-nfc')||'';
+      const branch=prompt('Branch','main')||'main';
+      const path=prompt('Percorso file dati','data/items.json')||'data/items.json';
+      const token=prompt('Token (classic, scope repo)','')||'';
+      if(!owner||!repo||!token) return alert('Compila owner/repo/token');
+      localStorage.setItem(GH_CFG_KEY, JSON.stringify({owner,repo,branch,path,tokenStored:true}));
+      localStorage.setItem(GH_TOKEN_KEY, token);
+      syncBadge(true); showToast('Sync configurato ✅');
+      await saveToGitHub(); // prova un primo push
+    });
+
+    let items=[];
+    function loadLocal(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]') }catch{return []} }
+    function saveLocal(){ localStorage.setItem(STORE_KEY, JSON.stringify(items||[])); }
+
+    async function loadFromGitHubOrLocal(){
+      const cfg=GH.cfg(); const tk=GH.token();
+      if(cfg && tk){
+        try{
+          const meta=await GH.get(cfg.path||'data/items.json');
+          const json=JSON.parse(decodeURIComponent(escape(atob(meta.content))));
+          items=Array.isArray(json)? json:[]; saveLocal(); syncBadge(true); return;
+        }catch(e){ syncBadge(false); showToast('Lettura GitHub KO, uso locale','err'); }
+      }
+      items=loadLocal();
+    }
+    async function saveToGitHub(){
+      const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
+      if(cfg && tk){
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32b sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+      }
+      return false;
+    }
+
+    /* WA templates */
+    function walink(phone, text){ return `https://wa.me/39${phone}?text=${encodeURIComponent(text)}`; }
+    function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nTi va una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
+    function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con minuti e Giga top. 📶`; return walink(phone,t); }
+    function waPacchiFisso(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo a te dedicata. 🏠📡`; return walink(phone,t); }
+    function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate senza busta paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
+    function waPacchiMemo(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`; return walink(phone,t); }
+
+    function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
+    function waReview(name, phone){ const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return walink(phone,t); }
+
+    /* Messaggi automatici conferma/avanzamento */
+    function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧`; return walink(phone,t); }
+    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato.Grazie 📦`; return walink(phone,t); }
+    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, Grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
+
+    /* Reminders plan */
+    const REMINDER_OFFSETS=[6,13,21,30];
+    const REM_TYPES=['sim','energia','fissomobile','rate'];
+    const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
+
+    const complementByKey={
+      sim:        ['energia','fissomobile','rate'],
+      energia:    ['sim','fissomobile','rate'],
+      fisso:      ['sim','energia','rate'],
+      rate:       ['energia','sim','fissomobile'],
+      pacchi:     ['sim','energia','fissomobile','rate'],
+      riparazione:['sim','energia','fissomobile','rate'],
+      preventivi: []
+    };
+
+    function shuffle(arr){
+      const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a;
+    }
+
+    function getReminderTypesForItem(it){
+      if(it.acceptance || it.fromPacchi) return [...REM_TYPES];
+      const act = Array.isArray(it.activated)? it.activated : [];
+      let set = new Set();
+      if(act.length===0){ REM_TYPES.forEach(t=>set.add(t)); }
+      else{
+        act.forEach(k=> (complementByKey[k]||[]).forEach(t=>set.add(t)) );
+        if(set.size===0){ REM_TYPES.forEach(t=>set.add(t)); }
+      }
+      return [...set];
+    }
+
+    function buildReminders(startDate, types){
+      const base = new Date(startDate);
+      return types.map((type, idx)=>{
+        const off = REMINDER_OFFSETS[idx] ?? REMINDER_OFFSETS[REMINDER_OFFSETS.length-1];
+        const due = addDays(base, off);
+        return { type, dueAt: due.toISOString(), sent:false, sentAt:null };
+      });
+    }
+
+    function ensureReminders(it){
+      if(it.reminders && Array.isArray(it.reminders) && it.reminders.length) return;
+      const created = new Date(it.createdAt||Date.now());
+      const types = shuffle(getReminderTypesForItem(it));
+      it.reminders = buildReminders(created, types);
+      it.remindersCycle = 1; // primo ciclo
+      it.responded = !!it.responded; // default false
+      it.updatedAt=new Date().toISOString();
+    }
+
+    function maybeScheduleNextCycle(it){
+      if(it.responded) return;
+      if(!it.reminders || !it.reminders.length) return;
+      const onlyMain = it.reminders.filter(r=> r.type!=='followup');
+      if(onlyMain.length===0) return;
+      const allSent = onlyMain.every(r=>r.sent);
+      if(!allSent) return;
+      const start = addDays(new Date(), 45);
+      const types = shuffle(getReminderTypesForItem(it));
+      it.reminders = buildReminders(start, types);
+      it.remindersCycle = (it.remindersCycle||1) + 1;
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub();
+      showToast(`Nuovo ciclo reminder pianificato (Ciclo ${it.remindersCycle})`);
+    }
+
+    function reminderLink(it, rem){
+      switch(rem.type){
+        case 'sim':         return waPacchiSIM(it.name,it.phone);
+        case 'energia':     return waPacchiEnergia(it.name,it.phone);
+        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
+        case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
+        default:            return waPacchiMemo(it.name,it.phone);
+      }
+    }
+
+    function addFollowup90(it){
+      if(!it.reminders) it.reminders=[];
+      const due = addDays(new Date(), 90).toISOString();
+      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub(); render();
+      showToast('Promemoria unico (+90g) aggiunto ✅');
+    }
+
+    function addFollowupCustom(it){
+      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
+      if(val===null) return;
+      const days = parseInt(String(val).trim(),10);
+      if(!Number.isFinite(days) || days<=0 || days>365){
+        alert('Inserisci un numero di giorni valido (1–365).');
+        return;
+      }
+      if(!it.reminders) it.reminders=[];
+      const due = addDays(new Date(), days).toISOString();
+      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
+      it.updatedAt=new Date().toISOString();
+      saveLocal(); saveToGitHub(); render();
+      showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
+    }
+
+    /* Insert logic */
+    const activeSet=new Set(); const toggles=$('#toggles');
+    toggles.addEventListener('click', e=>{
+      const b=e.target.closest('.tbtn'); if(!b) return;
+      const k=b.dataset.key; const on=!b.classList.contains('active');
+      if(k==='riparazione') $('#acceptWrap').style.display = on? 'block':'none';
+      b.classList.toggle('active',on);
+      if(on) activeSet.add(k); else activeSet.delete(k);
+    });
+
+    $('#insertBtn').addEventListener('click', async ()=>{
+      const name=($('#c_name').value||'').trim(); let phone=normalizePhone($('#c_phone').value||'');
+      if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
+      if(!phone || phone.length<7) return alert('Telefono non valido');
+      const act=[...activeSet];
+
+      const isRepair=activeSet.has('riparazione');
+      let newItem={ id:Date.now()+Math.random().toString(16).slice(2), name, phone, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), activated:act, acceptance:false, fromPacchi:false, done:false };
+
+      if(isRepair){
+        const model=($('#a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
+        newItem.acceptance=true; newItem.device={ type:$('#a_type').value, brand:$('#a_brand').value, model, issue:($('#a_issue').value||'').trim() };
+        newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
+      }
+
+      if(activeSet.has('pacchi')) newItem.fromPacchi=true;
+
+      const prev=items.find(x=>normalizePhone(x.phone)===phone);
+      if(prev){
+        Object.assign(prev, newItem, { updatedAt:new Date().toISOString(), activated:[...(new Set([...(prev.activated||[]), ...act]))] });
+        ensureReminders(prev);
+      } else {
+        ensureReminders(newItem);
+        items.unshift(newItem);
+      }
+
+      saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
+      $('#c_name').value=''; $('#c_phone').value=''; activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active')); $('#acceptWrap').style.display='none';
+      render(); showToast('Cliente inserito ✅');
+
+      try{
+        if(isRepair){ window.open(waRepairIntake(name, phone),'_blank','noopener'); }
+        else if(newItem.fromPacchi){ window.open(waPacchiReceived(name, phone),'_blank','noopener'); }
+      }catch{}
+    });
+
+    /* Filtro "Remind oggi" */
+    let filterToday=false;
+    $('#toggleToday').addEventListener('click', ()=>{
+      filterToday=!filterToday;
+      $('#toggleToday').classList.toggle('active', filterToday);
+      render();
+    });
+
+    /* Quick WA per tutti i NON riparazione */
+    function appendQuickWA(actions, it){
+      const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+      const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
+      actions.append(a1,a2,a3,a4,a5);
+    }
+
+    /* Render */
+    function render(){
+      const list=$('#list'); list.innerHTML='';
+      const now=new Date(); const today0=startOfDay(now);
+
+      const source = items.slice().filter(it=>{
+        ensureReminders(it);
+        if(!filterToday) return true;
+        return (it.reminders||[]).some(r=>{
+          const due0=startOfDay(r.dueAt);
+          return (due0.getTime()===today0.getTime()) && !r.sent;
+        });
+      });
+
+      source.forEach(it=>{
+        // nuova tranche a +45g se ciclo completato e nessuna risposta
+        maybeScheduleNextCycle(it);
+
+        const el=$('#tpl').content.firstElementChild.cloneNode(true);
+        el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
+        const head=el.querySelector('.head'), details=el.querySelector('.details'),
+              actions=el.querySelector('.actions'), review=el.querySelector('.review'),
+              remWrap=el.querySelector('.reminders');
+        head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
+
+        /* ACTIONS */
+        actions.innerHTML='';
+        if(it.acceptance){
+          if(it.repairStatus==='diagnostica'){
+            const ip=document.createElement('input'); ip.type='number'; ip.step='0.01'; ip.min='0'; ip.placeholder='Preventivo (€)';
+            if(it.quotePrice!=null) ip.value=it.quotePrice;
+            const sendWA=aBtn('Invia preventivo WA', ()=>{
+              const val=parseFloat((ip.value||'0').replace(',', '.')); if(!(val>=0)) return alert('Importo non valido');
+              it.quotePrice=val; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub();
+              const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(val||0);
+              const txt = `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nEcco il preventivo per la tua riparazione.\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.\n\nI nostri servizi: ${HUB_URL}`;
+              window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`,'_blank','noopener');
+            });
+            const acc=btn('Segna preventivo ACCETTATO', ()=>{ it.quoteStatus='accepted'; it.repairStatus='inriparazione'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            const ref=btn('Segna preventivo RIFIUTATO', ()=>{ it.quoteStatus='refused'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            actions.append(ip, sendWA, acc, ref, btnDelete(it));
+          } else {
+            if(it.quoteStatus==='accepted' && it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
+              actions.append(btnOk('Da consegnare (avvisa cliente)', ()=>{
+                it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+                window.open(waPickup(it.name, it.phone),'_blank','noopener');
+              }));
+            }
+            if(it.repairStatus==='pronto'){
+              actions.append(btn('Ritirato (chiudi pratica)', ()=>{
+                it.repairStatus='consegnato'; it.deliveredAt=new Date().toISOString();
+                it.postReviewAt = addDays(new Date(), 3).toISOString();
+                it.postReviewSent = false;
+                it.updatedAt=new Date().toISOString();
+                saveLocal(); saveToGitHub(); render();
+                try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+              }));
+            }
+            actions.append(btnDelete(it));
+            if(it.repairStatus==='consegnato' && it.deliveredAt){
+              const lab=document.createElement('span');
+              lab.className='label';
+              lab.textContent='Ritirato • '+fmt(it.deliveredAt);
+              actions.append(lab);
+            }
+          }
+        } else {
+          appendQuickWA(actions, it);
+          actions.append(btn('Completato', ()=>{
+            try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+            it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+          }));
+          actions.append(btnDelete(it));
+        }
+
+        /* REMINDERS UI */
+        remWrap.innerHTML='';
+
+        // badge ciclo
+        const cycleBadge=document.createElement('span');
+        cycleBadge.className='label';
+        cycleBadge.textContent='Ciclo '+(it.remindersCycle||1);
+        remWrap.append(cycleBadge);
+
+        // tasto stop promo / risposta
+        if(!it.responded){
+          const stop=aBtn('Stop promo (ha risposto)', ()=>{
+            it.responded=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+          });
+          remWrap.append(stop);
+        } else {
+          const stopped=document.createElement('span');
+          stopped.className='label';
+          stopped.textContent='Promo stoppata';
+          remWrap.append(stopped);
+        }
+
+        // pulsanti promemoria unico
+        const addFU=aBtn('+ Promemoria unico (+90g)', ()=> addFollowup90(it));
+        const addFUc=aBtn('+ Promemoria unico (personalizzato)', ()=> addFollowupCustom(it));
+        remWrap.append(addFU, addFUc);
+
+        // bottoni reminder
+        if(it.reminders && it.reminders.length){
+          const now0=startOfDay(new Date());
+          const copy = it.reminders.slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
+          copy.forEach(rem=>{
+            const due = new Date(rem.dueAt);
+            const dueStr = fmt(due);
+            const dueNow = startOfDay(due).getTime()===now0.getTime() && !rem.sent;
+            const lbl = `${typeLabel[rem.type]||rem.type} • ${dueStr}`;
+            const a = document.createElement('a');
+            a.href='#';
+            a.className = 'wa-btn' + (rem.sent ? ' sent' : (dueNow ? ' ok':''));
+            a.textContent = rem.sent ? `${lbl} • Inviato` : (dueNow ? `${lbl} • Invia ora` : `${lbl} • In programma`);
+            a.addEventListener('click',(e)=>{
+              e.preventDefault(); e.stopPropagation();
+              if(rem.sent) return;
+              if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
+              try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
+              rem.sent=true; rem.sentAt=new Date().toISOString();
+              it.updatedAt=new Date().toISOString();
+              saveLocal(); saveToGitHub(); render();
+            });
+            remWrap.append(a);
+          });
+        }
+
+        /* REVIEW ready */
+        review.innerHTML='';
+        if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
+          const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+          review.append(a);
+        }
+
+        list.append(el);
+      });
+    }
+
+    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
+    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
+
+    /* Boot */
+    (async function(){
+      await loadFromGitHubOrLocal();
+      render();
+      showToast('v32b pronta ✅');
+    })();
+
+    /* ====== Toggle Elenco (Mostra/Nascondi) — aggiunta minima ====== */
+    (function(){
+      const KEY='relong-elenco-hidden';
+      const h2s=[...document.querySelectorAll('section.card > h2')];
+      const elencoH2=h2s.find(h=> (h.textContent||'').trim().toLowerCase()==='elenco');
+      const content=document.getElementById('elencoContent');
+      if(!elencoH2 || !content) return;
+      const btn=document.createElement('button');
+      btn.id='toggleElenco';
+      btn.type='button';
+      btn.className='toggle';
+      btn.style.margin='10px 18px 0';
+      const apply=(hide)=>{
+        content.style.display = hide ? 'none' : '';
+        btn.textContent = hide ? 'Mostra elenco' : 'Nascondi elenco';
+        try{ localStorage.setItem(KEY, hide ? '1' : '0'); }catch{}
+      };
+      let startHidden=false; try{ startHidden = localStorage.getItem(KEY)==='1'; }catch{}
+      apply(startHidden);
+      btn.addEventListener('click',()=> apply(!(content.style.display==='none')));
+      // Inserisco subito dopo l'h2
+      elencoH2.insertAdjacentElement('afterend', btn);
+    })();
+    /* =============================================================== */
+  </script>
+</body>
+</html>
