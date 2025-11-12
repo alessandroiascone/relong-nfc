@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32d (Pacchi + Reminder)</title>
+  <title>ReLong • Scadenzario v32e (Pacchi + Reminder)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -29,7 +29,7 @@
     .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
-    .btn.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#2b0a0a;border:0}
+    .btn.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
     label{font-size:12px;color:var(--muted)}
@@ -43,9 +43,19 @@
     .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
-    .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;text-decoration:none;display:inline-flex;gap:6px;align-items:center;font-weight:800;letter-spacing:.2px}
+    .wa-btn.ok{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.18)}
     .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    /* Nuove pill per azioni rapide (Energia/SIM/Fisso/Rate) */
+    .pillbtn{font-size:12px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+      color:#e6f1ff;display:inline-flex;gap:8px;align-items:center;font-weight:800;letter-spacing:.2px}
+    .pillbtn:active{transform:translateY(1px)}
+    .pillbtn.energy{border-color:rgba(255,221,87,.35);box-shadow:0 6px 18px rgba(255,221,87,.12)}
+    .pillbtn.sim{border-color:rgba(0,200,255,.35);box-shadow:0 6px 18px rgba(0,200,255,.12)}
+    .pillbtn.fisso{border-color:rgba(120,180,255,.35);box-shadow:0 6px 18px rgba(120,180,255,.12)}
+    .pillbtn.rate{border-color:rgba(255,140,0,.35);box-shadow:0 6px 18px rgba(255,140,0,.12)}
+    /* Toast */
     #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
     .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
@@ -57,16 +67,17 @@
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
     /* Remind dropdown */
-    .remind-menu{display:none; border:1px dashed rgba(255,255,255,.15); border-radius:12px; padding:10px; margin-top:8px}
-    .remind-toggle{border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:800; letter-spacing:.2px; cursor:pointer; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); color:#e6f1ff}
-    .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger)); color:#2b0a0a; border:0; box-shadow:0 8px 24px rgba(255,77,79,.35)}
-    .r-chip{font-size:11px; border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:6px 8px; display:inline-flex; gap:6px; align-items:center; margin:4px 6px 0 0}
-    .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger)); color:#2b0a0a; border:0}
-    .r-chip.sent{opacity:.6; filter:grayscale(1); pointer-events:none}
-    /* Extra submenu (compare solo post invio ciclo) */
-    .extra-wrap{display:none; margin-top:8px}
-    .extra-toggle{border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 10px; font-weight:800; cursor:pointer; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); color:#e6f1ff; font-size:12px}
-    .extra-menu{display:none; border:1px dashed rgba(255,255,255,.15); border-radius:12px; padding:8px; margin-top:6px}
+    .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
+    .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
+    .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0;box-shadow:0 8px 24px rgba(255,77,79,.35)}
+    .r-chip{font-size:11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 8px;display:inline-flex;gap:6px;align-items:center;margin:4px 6px 0 0;color:#e6f1ff;text-decoration:none}
+    .r-chip:link,.r-chip:visited{color:#e6f1ff}
+    .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
+    .r-chip.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    /* Extra submenu (post invio ciclo) */
+    .extra-wrap{display:none;margin-top:8px}
+    .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
+    .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
   </style>
 </head>
 <body>
@@ -321,12 +332,11 @@
       const created = new Date(it.createdAt||Date.now());
       const types = shuffle(getReminderTypesForItem(it));
       it.reminders = buildReminders(created, types);
-      it.remindersCycle = 1; // primo ciclo
-      it.responded = !!it.responded; // default false
+      it.remindersCycle = 1;
+      it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
     }
 
-    // Proroga a partire da oggi, senza duplicare il cliente
     function prorogaPromemoria(it){
       if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
@@ -511,13 +521,19 @@
       render();
     });
 
-    /* Quick WA per NON riparazione */
+    /* Quick WA pill modern */
+    function pill(lbl, cls, fn){
+      const a=document.createElement('a');
+      a.href='#'; a.className='pillbtn '+cls; a.textContent=lbl;
+      a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn();});
+      return a;
+    }
     function appendQuickWA(actions, it){
-      const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-      const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-      const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
-      const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
-      actions.append(a1,a2,a3,a4);
+      const p1=pill('⚡ Energia','energy',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      const p2=pill('📶 SIM','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      const p3=pill('🏠📡 Fisso','fisso',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      const p4=pill('📱 Rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+      actions.append(p1,p2,p3,p4);
     }
 
     function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
@@ -600,7 +616,7 @@
           actions.append(btnDelete(it));
         }
 
-        /* REMINDERS — toggle + dropdown */
+        /* REMINDERS */
         const now0=startOfDay(new Date());
         const copy = (it.reminders||[]).slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
         const main = copy.filter(r=>r.type!=='followup');
@@ -608,14 +624,13 @@
         const dueToday = copy.filter(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
         remindToggle.textContent = `Remind (${copy.length})`;
         remindToggle.classList.toggle('due', dueToday.length>0);
-
         remindToggle.addEventListener('click', (e)=>{
           e.stopPropagation();
           const vis = remindMenu.style.display!=='none';
           remindMenu.style.display = vis ? 'none' : 'block';
         });
 
-        // Popola menu reminder
+        // chip reminder
         remindMenu.innerHTML='';
         copy.forEach(rem=>{
           const due = new Date(rem.dueAt);
@@ -629,21 +644,15 @@
           chip.addEventListener('click', (e)=>{
             e.preventDefault(); e.stopPropagation();
             if(rem.sent) return;
-            if(!dueNow){
-              showToast('Non è ancora il giorno previsto per questo remind','err');
-              return;
-            }
+            if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
             try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
             rem.sent=true; rem.sentAt=new Date().toISOString();
             it.updatedAt=new Date().toISOString();
             saveLocal(); saveToGitHub();
-
             chip.classList.remove('due'); chip.classList.add('sent');
             chip.textContent = `${typeLabel[rem.type]||rem.type} • ${dueStr} • Inviato`;
-
             const stillDue = (it.reminders||[]).some(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
             remindToggle.classList.toggle('due', stillDue);
-
             render();
           });
           remindMenu.appendChild(chip);
@@ -674,7 +683,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32d pronta ✅');
+      showToast('v32e pronta ✅');
     })();
 
     /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
