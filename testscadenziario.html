@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32m (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32n (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -55,7 +55,7 @@
     .pillbtn.fisso{border-color:rgba(120,180,255,.35);box-shadow:0 6px 18px rgba(120,180,255,.12)}
     .pillbtn.rate{border-color:rgba(255,140,0,.35);box-shadow:0 6px 18px rgba(255,140,0,.12)}
     #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
-    .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
+    .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s.ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -271,6 +271,7 @@
           <div class="kpi rip">
             <div class="k">🔧 Riparazioni</div>
             <div class="v" id="k_rip">0</div>
+            <div class="e" id="e_rip">€ 0</div>
           </div>
           <div class="kpi prev">
             <div class="k">🧾 Preventivi</div>
@@ -323,7 +324,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32m', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32n', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -370,7 +371,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32m sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32n sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -734,6 +735,8 @@
       const subset = items.filter(itemInPeriod);
 
       let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
+      let ripGain = 0;
+
       subset.forEach(it=>{
         if(it.fromPacchi) pacchi++;
         const act = Array.isArray(it.activated)? it.activated : [];
@@ -743,6 +746,12 @@
         if(act.includes('rate')) rate++;
         if(it.acceptance) rip++;
         if(act.includes('preventivi')) prev++;
+
+        // Guadagno riparazioni: SOLO preventivi accettati + consegnati
+        if(it.acceptance && it.quoteStatus==='accepted' && it.repairStatus==='consegnato' && it.quotePrice!=null){
+          const qp = parseFloat(it.quotePrice);
+          if(!isNaN(qp) && qp>0) ripGain += qp;
+        }
       });
 
       const gPacchi = pacchi * GAIN_PACCHI;
@@ -750,7 +759,7 @@
       const gFisso  = fisso  * GAIN_FISSO;
       const gEn     = energia* GAIN_ENERGIA;
       const gRate   = rate   * GAIN_RATE;
-      const totalGain = gPacchi + gSim + gFisso + gEn + gRate;
+      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + ripGain;
 
       $('#k_pacchi').textContent = pacchi;
       $('#k_sim').textContent = sim;
@@ -765,6 +774,7 @@
       $('#e_fisso').textContent  = formatEuro(gFisso);
       $('#e_energia').textContent= formatEuro(gEn);
       $('#e_rate').textContent   = formatEuro(gRate);
+      $('#e_rip').textContent    = formatEuro(ripGain);
 
       let labelPeriodo = 'Tutto';
       if(dashPeriod==='today') labelPeriodo = 'Oggi';
@@ -931,7 +941,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32m pronta ✅');
+      showToast('v32n pronta ✅');
     })();
 
     (function(){
