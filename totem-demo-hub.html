@@ -75,7 +75,7 @@
     <main class="frame">
       <!-- SOLO HOME & CATALOGO -->
       <iframe id="hub" title="Re Long Hub" allow="autoplay; clipboard-write"
-              src="https://alessandroiascone.github.io/relong-nfc/index.html"></iframe>
+              src="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html"></iframe>
 
       <!-- Transizione -->
       <div class="fx" id="fx">
@@ -103,7 +103,7 @@
       <div class="hint" id="hint">Demo automatica attiva • muovi mouse/clicca per interrompere</div>
       <div class="controls">
         <button class="btn" id="prev">◀︎</button>
-        <span class="pill" id="labelPage">index</span>
+        <span class="pill" id="labelPage">home</span>
         <button class="btn" id="next">▶︎</button>
       </div>
     </footer>
@@ -113,9 +113,9 @@
   // ========= CONFIG =========
   const BASE = 'https://alessandroiascone.github.io/relong-nfc/';
 
-  // SOLO Home e Catalogo con simulazioni su rate/offerte
+  // SOLO Home (relong-hub-v2.html) e Catalogo con simulazioni su rate/offerte
   const PLAYLIST = [
-    { page:'index.html', title:'Home',
+    { page:'relong-hub-v2.html', title:'Home',
       actions:[
         {t:1200,type:'move',x:50,y:78,label:'Scorri promo del giorno'},
         {t:2800,type:'click',x:50,y:78},
@@ -223,7 +223,7 @@
     showOverlay(humanize(s.title || s.page));
     clearActions();
     iframe.src = BASE + s.page;
-    labelPage.textContent = humanize(s.title || s.page);
+    labelPage.textContent = s.title || humanize(s.page);
     hideTimer = setTimeout(hideOverlay, 3500);
   }
 
