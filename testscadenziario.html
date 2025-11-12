@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32f (Pacchi + Reminder)</title>
+  <title>ReLong • Scadenzario v32g (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -80,6 +80,25 @@
     .extra-wrap{display:none;margin-top:8px}
     .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
     .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
+
+    /* ===== Dashboard Modal ===== */
+    .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
+    .modal.on{display:grid}
+    .dash{width:min(960px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
+    .dash header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--stroke)}
+    .dash header h3{font-size:16px;font-weight:800;letter-spacing:.3px}
+    .dash header .x{border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;cursor:pointer;background:#0a0d14;color:#eaf2ff}
+    .dash .wrap{padding:16px}
+    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    @media (max-width:980px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+    .kpi{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:#0a0d14}
+    .kpi .k{font-size:12px;color:var(--muted);letter-spacing:.2px}
+    .kpi .v{margin-top:6px;font-size:28px;font-weight:900;letter-spacing:.3px}
+    .kpi.pacchi{box-shadow:0 10px 28px rgba(255,221,87,.10)}
+    .kpi.sim{box-shadow:0 10px 28px rgba(0,200,255,.10)}
+    .kpi.fisso{box-shadow:0 10px 28px rgba(120,180,255,.10)}
+    .kpi.energia{box-shadow:0 10px 28px rgba(0,255,180,.10)}
+    .kpi.rate{box-shadow:0 10px 28px rgba(255,140,0,.10)}
   </style>
 </head>
 <body>
@@ -91,6 +110,7 @@
     </div>
     <div class="status">
       <span id="syncState" class="pill bad">Sync: Disconnesso</span>
+      <button id="openDash" class="btn ok">Dashboard</button>
       <button id="cfgSync" class="btn">Imposta Sync GitHub</button>
     </div>
   </header>
@@ -193,6 +213,44 @@
       </div>
     </div>
   </template>
+
+  <!-- ===== DASHBOARD MODAL ===== -->
+  <div id="dashModal" class="modal" aria-hidden="true">
+    <div class="dash" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
+      <header>
+        <h3 id="dashTitle">Dashboard • Panoramica</h3>
+        <button class="x" id="closeDash" type="button">Chiudi</button>
+      </header>
+      <div class="wrap">
+        <div class="kpis">
+          <div class="kpi pacchi">
+            <div class="k">📦 Pacchi</div>
+            <div class="v" id="k_pacchi">0</div>
+          </div>
+          <div class="kpi sim">
+            <div class="k">📶 SIM</div>
+            <div class="v" id="k_sim">0</div>
+          </div>
+          <div class="kpi fisso">
+            <div class="k">🏠📡 Fisso</div>
+            <div class="v" id="k_fisso">0</div>
+          </div>
+          <div class="kpi energia">
+            <div class="k">⚡ Energia</div>
+            <div class="v" id="k_energia">0</div>
+          </div>
+          <div class="kpi rate">
+            <div class="k">📱 Smartphone a rate</div>
+            <div class="v" id="k_rate">0</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+          <span class="label" id="k_total">Totale clienti: 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- =========================== -->
 
   <script>
     /* Utils & UI */
@@ -548,6 +606,34 @@
     function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
     function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
 
+    /* ===== Dashboard logic ===== */
+    const dashModal = $('#dashModal');
+    const openDashBtn = $('#openDash');
+    const closeDashBtn = $('#closeDash');
+
+    openDashBtn.addEventListener('click', ()=>{ updateDashboard(); dashModal.classList.add('on'); dashModal.setAttribute('aria-hidden','false'); });
+    closeDashBtn.addEventListener('click', ()=>{ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); });
+    dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
+
+    function updateDashboard(){
+      // Conteggi: presenza del flag corrispondente
+      let pacchi=0, sim=0, fisso=0, energia=0, rate=0;
+      items.forEach(it=>{
+        if(it.fromPacchi) pacchi++;
+        const act = Array.isArray(it.activated)? it.activated : [];
+        if(act.includes('sim')) sim++;
+        if(act.includes('fisso')) fisso++;
+        if(act.includes('energia')) energia++;
+        if(act.includes('rate')) rate++;
+      });
+      $('#k_pacchi').textContent = pacchi;
+      $('#k_sim').textContent = sim;
+      $('#k_fisso').textContent = fisso;
+      $('#k_energia').textContent = energia;
+      $('#k_rate').textContent = rate;
+      $('#k_total').textContent = `Totale clienti: ${items.length}`;
+    }
+
     /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
@@ -670,14 +756,19 @@
         });
 
         /* EXTRA SUBMENU — visibile solo post invio ciclo automatico */
+        const extraWrap = el.querySelector('.extra-wrap');
+        const extraToggle = el.querySelector('.extra-toggle');
+        const extraMenu = el.querySelector('.extra-menu');
         extraWrap.style.display = allMainSent ? '' : 'none';
-        extraMenu.style.display = 'none';
-        extraToggle.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          extraMenu.style.display = (extraMenu.style.display!=='none') ? 'none' : 'block';
-        });
-        extraMenu.querySelector('.extra-90').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowup90(it); });
-        extraMenu.querySelector('.extra-pers').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowupCustom(it); });
+        if(extraToggle){
+          extraMenu.style.display = 'none';
+          extraToggle.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            extraMenu.style.display = (extraMenu.style.display!=='none') ? 'none' : 'block';
+          });
+          extraMenu.querySelector('.extra-90').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowup90(it); });
+          extraMenu.querySelector('.extra-pers').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowupCustom(it); });
+        }
 
         /* REVIEW ready */
         review.innerHTML='';
@@ -688,13 +779,16 @@
 
         list.append(el);
       });
+
+      // aggiorna dashboard se è aperta
+      if(dashModal.classList.contains('on')) updateDashboard();
     }
 
     /* Boot */
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32f pronta ✅');
+      showToast('v32g pronta ✅');
     })();
 
     /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
