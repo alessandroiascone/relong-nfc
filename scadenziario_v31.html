@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32b (Pacchi + Reminder)</title>
+  <title>ReLong • Scadenzario v32f (Pacchi + Reminder)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -29,6 +29,7 @@
     .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
+    .btn.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
     label{font-size:12px;color:var(--muted)}
@@ -42,19 +43,43 @@
     .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
     .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
-    .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
+    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;text-decoration:none;display:inline-flex;gap:6px;align-items:center;font-weight:800;letter-spacing:.2px}
+    .wa-btn.ok{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.18)}
     .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    /* Pill moderne per azioni rapide */
+    .pillbtn{font-size:12px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+      color:#e6f1ff;display:inline-flex;gap:8px;align-items:center;font-weight:800;letter-spacing:.2px}
+    .pillbtn:active{transform:translateY(1px)}
+    .pillbtn.energy{border-color:rgba(255,221,87,.35);box-shadow:0 6px 18px rgba(255,221,87,.12)}
+    .pillbtn.sim{border-color:rgba(0,200,255,.35);box-shadow:0 6px 18px rgba(0,200,255,.12)}
+    .pillbtn.fisso{border-color:rgba(120,180,255,.35);box-shadow:0 6px 18px rgba(120,180,255,.12)}
+    .pillbtn.rate{border-color:rgba(255,140,0,.35);box-shadow:0 6px 18px rgba(255,140,0,.12)}
+    /* Toast */
     #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
     .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
-    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;justify-content:space-between;flex-wrap:wrap}
+    .toolbar-left{display:flex;gap:8px;align-items:center}
+    .toolbar-right{display:flex;gap:8px;align-items:center}
     .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
-    .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
+    .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
+    /* Remind dropdown */
+    .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
+    .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
+    .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0;box-shadow:0 8px 24px rgba(255,77,79,.35)}
+    .r-chip{font-size:11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 8px;display:inline-flex;gap:6px;align-items:center;margin:4px 6px 0 0;color:#e6f1ff;text-decoration:none}
+    .r-chip:link,.r-chip:visited{color:#e6f1ff}
+    .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
+    .r-chip.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    /* Extra submenu (post invio ciclo) */
+    .extra-wrap{display:none;margin-top:8px}
+    .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
+    .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
   </style>
 </head>
 <body>
@@ -99,7 +124,6 @@
             </select>
           </div>
 
-          <!-- Marca: input libero + select per Smartphone + "Altro" con campo dedicato -->
           <div>
             <label>Marca</label>
             <input id="a_brand" placeholder="Apple/Samsung…" />
@@ -116,7 +140,7 @@
             </div>
           </div>
 
-          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax,S25 Ultra…"></div>
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax, S25 Ultra…"></div>
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
@@ -128,7 +152,12 @@
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
       <div class="toolbar">
-        <button id="toggleToday" class="toggle">Remind oggi</button>
+        <div class="toolbar-left">
+          <button id="toggleToday" class="toggle">Remind oggi</button>
+        </div>
+        <div class="toolbar-right">
+          <span id="clientCounter" class="label">Clienti: 0</span>
+        </div>
       </div>
       <div id="list"></div>
     </div>
@@ -142,7 +171,24 @@
       </button>
       <div class="details" hidden>
         <div class="r-line actions"></div>
-        <div class="r-line reminders"></div>
+
+        <!-- Toggle Remind -->
+        <div class="r-line">
+          <button class="remind-toggle" type="button">Remind (0)</button>
+        </div>
+
+        <!-- Menu a tendina dei remind -->
+        <div class="remind-menu"></div>
+
+        <!-- Extra submenu: visibile solo quando tutti i reminder principali sono inviati -->
+        <div class="extra-wrap">
+          <button class="extra-toggle" type="button">Extra ▾</button>
+          <div class="extra-menu">
+            <a href="#" class="wa-btn ok extra-90">+90GG</a>
+            <a href="#" class="wa-btn ok extra-pers">+PERS.</a>
+          </div>
+        </div>
+
         <div class="r-line review"></div>
       </div>
     </div>
@@ -206,7 +252,7 @@
       localStorage.setItem(GH_CFG_KEY, JSON.stringify({owner,repo,branch,path,tokenStored:true}));
       localStorage.setItem(GH_TOKEN_KEY, token);
       syncBadge(true); showToast('Sync configurato ✅');
-      await saveToGitHub(); // prova un primo push
+      await saveToGitHub();
     });
 
     let items=[];
@@ -245,8 +291,8 @@
 
     /* Messaggi automatici conferma/avanzamento */
     function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧`; return walink(phone,t); }
-    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato.Grazie 📦`; return walink(phone,t); }
-    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, Grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
+    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato. Grazie 📦`; return walink(phone,t); }
+    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
 
     /* Reminders plan */
     const REMINDER_OFFSETS=[6,13,21,30];
@@ -293,14 +339,13 @@
       const created = new Date(it.createdAt||Date.now());
       const types = shuffle(getReminderTypesForItem(it));
       it.reminders = buildReminders(created, types);
-      it.remindersCycle = 1; // primo ciclo
-      it.responded = !!it.responded; // default false
+      it.remindersCycle = 1;
+      it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
     }
 
-    // Proroga dei promemoria a partire da oggi, senza duplicare il cliente
     function prorogaPromemoria(it){
-      if(it.responded) return; // se stoppato, non toccare
+      if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
       it.reminders = buildReminders(new Date(), types);
       it.remindersCycle = (it.remindersCycle||1) + 1;
@@ -334,17 +379,17 @@
       }
     }
 
+    /* === Promemoria unico (+90GG / +PERS.) === */
     function addFollowup90(it){
       if(!it.reminders) it.reminders=[];
       const due = addDays(new Date(), 90).toISOString();
       it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
       it.updatedAt=new Date().toISOString();
       saveLocal(); saveToGitHub(); render();
-      showToast('Promemoria unico (+90g) aggiunto ✅');
+      showToast('Promemoria unico (+90GG) aggiunto ✅');
     }
-
     function addFollowupCustom(it){
-      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
+      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (1–365)');
       if(val===null) return;
       const days = parseInt(String(val).trim(),10);
       if(!Number.isFinite(days) || days<=0 || days>365){
@@ -371,8 +416,8 @@
 
     // UI Marca per Smartphone + "Altro"
     const typeSel = document.getElementById('a_type');
-    const brandInput = document.getElementById('a_brand');            // per non-smartphone
-    const brandSmartWrap = document.getElementById('brandSmartWrap'); // contiene select + other
+    const brandInput = document.getElementById('a_brand');
+    const brandSmartWrap = document.getElementById('brandSmartWrap');
     const brandSelect = document.getElementById('a_brand_sel');
     const brandOther = document.getElementById('a_brand_other');
 
@@ -380,7 +425,6 @@
       const isPhone = (typeSel.value === 'Smartphone');
       brandInput.style.display = isPhone ? 'none' : '';
       brandSmartWrap.style.display = isPhone ? '' : 'none';
-      // gestione "Altro"
       if(isPhone){
         const isOther = brandSelect.value === 'Altro';
         brandOther.style.display = isOther ? '' : 'none';
@@ -392,7 +436,7 @@
     typeSel.addEventListener('change', refreshBrandUI);
     brandSelect.addEventListener('change', refreshBrandUI);
 
-    // Auto-compilazione campi: se esiste nome o telefono, precompila l'altro
+    // Auto-compilazione campi
     const nameInput = document.getElementById('c_name');
     const phoneInput = document.getElementById('c_phone');
 
@@ -402,7 +446,7 @@
     nameInput.addEventListener('blur', ()=>{
       const n = nameInput.value;
       if(!n) return;
-      if((phoneInput.value||'').trim()) return; // già compilato
+      if((phoneInput.value||'').trim()) return;
       const hit = findByName(n);
       if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); showToast('Telefono precompilato dalla lista clienti'); }
     });
@@ -410,7 +454,7 @@
     phoneInput.addEventListener('blur', ()=>{
       const p = normalizePhone(phoneInput.value);
       if(!p) return;
-      if((nameInput.value||'').trim()) return; // già compilato
+      if((nameInput.value||'').trim()) return;
       const hit = findByPhone(p);
       if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
     });
@@ -435,24 +479,22 @@
 
       if(activeSet.has('pacchi')) newItem.fromPacchi=true;
 
-      // RICERCA ESISTENTE: per telefono o per nome
+      // RICERCA ESISTENTE
       const byPhone = findByPhone(phone);
       const byName  = findByName(name);
       const prev = byPhone || byName;
 
       if(prev){
-        // aggiorna dati e unisci attivazioni
         prev.name = prev.name || name;
         prev.phone = prev.phone || phone;
         prev.activated = [...new Set([...(prev.activated||[]), ...act])];
-        if(newItem.acceptance){ // se oggi è un intake riparazione, aggiorna i dettagli
+        if(newItem.acceptance){
           prev.acceptance = true;
           prev.device = newItem.device;
           prev.repairStatus = prev.repairStatus || 'diagnostica';
         }
         if(newItem.fromPacchi) prev.fromPacchi = true;
 
-        // Se è esattamente lo stesso cliente (match sia nome sia telefono) => PROROGA
         if(normalizeName(prev.name)===normalizeName(name) && normalizePhone(prev.phone)===normalizePhone(phone)){
           prorogaPromemoria(prev);
           showToast('Cliente già presente: promemoria prorogati ✅');
@@ -486,20 +528,34 @@
       render();
     });
 
-    /* Quick WA per tutti i NON riparazione */
-    function appendQuickWA(actions, it){
-      const a1=aBtn('WA Energia', ()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-      const a2=aBtn('WA SIM',    ()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-      const a3=aBtn('WA Fisso',  ()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
-      const a4=aBtn('WA Smartphone a rate', ()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
-      const a5=aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
-      actions.append(a1,a2,a3,a4,a5);
+    /* Quick WA pill modern */
+    function pill(lbl, cls, fn){
+      const a=document.createElement('a');
+      a.href='#'; a.className='pillbtn '+cls; a.textContent=lbl;
+      a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn();});
+      return a;
     }
+    function appendQuickWA(actions, it){
+      const p1=pill('⚡ Energia','energy',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      const p2=pill('📶 SIM','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      const p3=pill('🏠📡 Fisso','fisso',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      const p4=pill('📱 Rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+      actions.append(p1,p2,p3,p4);
+    }
+
+    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
+    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
 
     /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
       const now=new Date(); const today0=startOfDay(now);
+
+      // aggiorna counter totale clienti
+      const counter=$('#clientCounter');
+      if(counter) counter.textContent = `Clienti: ${items.length}`;
 
       const source = items.slice().filter(it=>{
         ensureReminders(it);
@@ -511,14 +567,14 @@
       });
 
       source.forEach(it=>{
-        // nuova tranche a +45g se ciclo completato e nessuna risposta
         maybeScheduleNextCycle(it);
 
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
         el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
               actions=el.querySelector('.actions'), review=el.querySelector('.review'),
-              remWrap=el.querySelector('.reminders');
+              remindToggle=el.querySelector('.remind-toggle'), remindMenu=el.querySelector('.remind-menu'),
+              extraWrap=el.querySelector('.extra-wrap'), extraToggle=el.querySelector('.extra-toggle'), extraMenu=el.querySelector('.extra-menu');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
 
         /* ACTIONS */
@@ -571,58 +627,57 @@
           actions.append(btnDelete(it));
         }
 
-        /* REMINDERS UI */
-        remWrap.innerHTML='';
+        /* REMINDERS */
+        const now0=startOfDay(new Date());
+        const copy = (it.reminders||[]).slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
+        const main = copy.filter(r=>r.type!=='followup');
+        const allMainSent = main.length>0 && main.every(r=>r.sent);
+        const dueToday = copy.filter(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
+        remindToggle.textContent = `Remind (${copy.length})`;
+        remindToggle.classList.toggle('due', dueToday.length>0);
+        remindToggle.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const vis = remindMenu.style.display!=='none';
+          remindMenu.style.display = vis ? 'none' : 'block';
+        });
 
-        // badge ciclo
-        const cycleBadge=document.createElement('span');
-        cycleBadge.className='label';
-        cycleBadge.textContent='Ciclo '+(it.remindersCycle||1);
-        remWrap.append(cycleBadge);
-
-        // tasto stop promo / risposta
-        if(!it.responded){
-          const stop=aBtn('Stop promo (ha risposto)', ()=>{
-            it.responded=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+        // chip reminder
+        remindMenu.innerHTML='';
+        copy.forEach(rem=>{
+          const due = new Date(rem.dueAt);
+          const dueStr = fmt(due);
+          const dueNow = startOfDay(due).getTime()===now0.getTime() && !rem.sent;
+          const chip = document.createElement('a');
+          chip.href='#';
+          chip.className='r-chip'+(rem.sent?' sent':(dueNow?' due':''));
+          const label = `${typeLabel[rem.type]||rem.type} • ${dueStr} ` + (rem.sent ? '• Inviato' : (dueNow ? '• Invia ora' : '• In programma'));
+          chip.textContent=label;
+          chip.addEventListener('click', (e)=>{
+            e.preventDefault(); e.stopPropagation();
+            if(rem.sent) return;
+            if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
+            try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
+            rem.sent=true; rem.sentAt=new Date().toISOString();
+            it.updatedAt=new Date().toISOString();
+            saveLocal(); saveToGitHub();
+            chip.classList.remove('due'); chip.classList.add('sent');
+            chip.textContent = `${typeLabel[rem.type]||rem.type} • ${dueStr} • Inviato`;
+            const stillDue = (it.reminders||[]).some(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
+            remindToggle.classList.toggle('due', stillDue);
+            render();
           });
-          remWrap.append(stop);
-        } else {
-          const stopped=document.createElement('span');
-          stopped.className='label';
-          stopped.textContent='Promo stoppata';
-          remWrap.append(stopped);
-        }
+          remindMenu.appendChild(chip);
+        });
 
-        // pulsanti promemoria unico
-        const addFU=aBtn('+ Promemoria unico (+90g)', ()=> addFollowup90(it));
-        const addFUc=aBtn('+ Promemoria unico (personalizzato)', ()=> addFollowupCustom(it));
-        remWrap.append(addFU, addFUc);
-
-        // bottoni reminder
-        if(it.reminders && it.reminders.length){
-          const now0=startOfDay(new Date());
-          const copy = it.reminders.slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
-          copy.forEach(rem=>{
-            const due = new Date(rem.dueAt);
-            const dueStr = fmt(due);
-            const dueNow = startOfDay(due).getTime()===now0.getTime() && !rem.sent;
-            const lbl = `${typeLabel[rem.type]||rem.type} • ${dueStr}`;
-            const a = document.createElement('a');
-            a.href='#';
-            a.className = 'wa-btn' + (rem.sent ? ' sent' : (dueNow ? ' ok':''));
-            a.textContent = rem.sent ? `${lbl} • Inviato` : (dueNow ? `${lbl} • Invia ora` : `${lbl} • In programma`);
-            a.addEventListener('click',(e)=>{
-              e.preventDefault(); e.stopPropagation();
-              if(rem.sent) return;
-              if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
-              try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
-              rem.sent=true; rem.sentAt=new Date().toISOString();
-              it.updatedAt=new Date().toISOString();
-              saveLocal(); saveToGitHub(); render();
-            });
-            remWrap.append(a);
-          });
-        }
+        /* EXTRA SUBMENU — visibile solo post invio ciclo automatico */
+        extraWrap.style.display = allMainSent ? '' : 'none';
+        extraMenu.style.display = 'none';
+        extraToggle.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          extraMenu.style.display = (extraMenu.style.display!=='none') ? 'none' : 'block';
+        });
+        extraMenu.querySelector('.extra-90').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowup90(it); });
+        extraMenu.querySelector('.extra-pers').addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowupCustom(it); });
 
         /* REVIEW ready */
         review.innerHTML='';
@@ -635,16 +690,11 @@
       });
     }
 
-    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
-    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
-
     /* Boot */
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32b pronta ✅');
+      showToast('v32f pronta ✅');
     })();
 
     /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
@@ -669,7 +719,6 @@
       btn.addEventListener('click',()=> apply(!(content.style.display==='none')));
       elencoH2.insertAdjacentElement('afterend', btn);
     })();
-    /* ============================================ */
   </script>
 </body>
 </html>
