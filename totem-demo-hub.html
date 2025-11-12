@@ -14,10 +14,7 @@
       --fx:rgba(10,200,255,.35);
     }
     html,body{height:100%;background:#000}
-    body{
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
-      color:#fff;overflow:hidden
-    }
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;color:#fff;overflow:hidden}
     .wrap{height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
 
     header{position:sticky;top:0;z-index:5;background:linear-gradient(0deg,transparent,rgba(10,10,15,.7));backdrop-filter:blur(8px);border-bottom:1px solid var(--stroke)}
@@ -36,7 +33,7 @@
     .btn{background:transparent;border:1px solid var(--stroke);color:#fff;border-radius:12px;padding:.45rem .7rem;cursor:pointer}
     .btn:hover{box-shadow:0 0 0 1px var(--tile) inset}
 
-    /* ---------------- FX Overlay ---------------- */
+    /* --- FX Overlay transizioni --- */
     .fx{
       position:absolute;inset:0;pointer-events:none;z-index:3;
       display:grid;grid-template-rows:1fr auto auto 1fr;justify-items:center;align-items:center;
@@ -52,19 +49,9 @@
       box-shadow:0 0 24px rgba(10,200,255,.22), inset 0 0 0 1px rgba(10,200,255,.2)
     }
     .fxSub{color:#bfe9ff;font-size:.95rem;margin-top:.4rem}
-
-    .progress{
-      width:min(560px,80%);height:8px;border-radius:999px;border:1px solid var(--tile);
-      background:rgba(255,255,255,.06);overflow:hidden
-    }
-    .bar{
-      width:0%;height:100%;
-      background:linear-gradient(90deg, rgba(10,200,255,.8), rgba(124,200,255,.8));
-      animation:load 1.8s ease-in-out infinite
-    }
+    .progress{width:min(560px,80%);height:8px;border-radius:999px;border:1px solid var(--tile);background:rgba(255,255,255,.06);overflow:hidden}
+    .bar{width:0%;height:100%;background:linear-gradient(90deg, rgba(10,200,255,.8), rgba(124,200,255,.8));animation:load 1.8s ease-in-out infinite}
     @keyframes load{0%{width:0%}50%{width:75%}100%{width:100%}}
-
-    /* Ken Burns (leggero) sul logo in overlay */
     .fxLogo{
       width:72px;height:72px;border-radius:18px;border:1px solid var(--tile);
       display:grid;place-items:center;
@@ -89,11 +76,9 @@
     </header>
 
     <main class="frame">
-      <!-- HUB UFFICIALE INTEGRATO -->
       <iframe id="hub" title="Re Long Hub" allow="autoplay; clipboard-write"
               src="https://alessandroiascone.github.io/relong-nfc/index.html"></iframe>
 
-      <!-- OVERLAY DI TRANSIZIONE -->
       <div class="fx" id="fx">
         <div></div>
         <div class="fxLogo">
@@ -104,7 +89,7 @@
         </div>
         <div>
           <div class="fxTitle" id="fxTitle">Caricamento…</div>
-          <div class="fxSub" id="fxSub">Attendi mentre apriamo la sezione</div>
+          <div class="fxSub" id="fxSub">Re Long • Caricamento sezione…</div>
         </div>
         <div class="progress"><div class="bar" id="bar"></div></div>
       </div>
@@ -121,16 +106,15 @@
   </div>
 
 <script>
-  // ========= CONFIGURAZIONE =========
+  // ========= CONFIG =========
   const BASE = 'https://alessandroiascone.github.io/relong-nfc/';
 
-  // Sezioni reali del tuo hub
+  // RIMOSSA la pagina 404; demo più lenta; include tutte le sezioni che mi hai dato.
   const SECTIONS = [
     'index.html',
     'catalogo-smartphone-reale-v3.html',
     'Business+Energy2.html',
     'assistenza.html',
-    'black-friday.htm',
     'contattaci'
   ];
 
@@ -139,30 +123,19 @@
   const label = document.getElementById('label');
   const fx = document.getElementById('fx');
   const fxTitle = document.getElementById('fxTitle');
-  const fxSub = document.getElementById('fxSub');
-  let idx = 0;
-  let demo = true;
-  let rotTimer = null;
-  let idleTimer = null;
-  let hideTimer = null;
+  let idx = 0, demo = true, rotTimer = null, idleTimer = null, hideTimer = null;
 
   function humanize(path){
-    return path
-      .replace('.html','').replace('.htm','')
-      .replace(/-/g,' ').replace(/\+/g,' ')
-      .replace(/\b\w/g, m => m.toUpperCase());
+    return path.replace('.html','').replace('.htm','').replace(/-/g,' ').replace(/\+/g,' ')
+               .replace(/\b\\w/g, m => m.toUpperCase());
   }
 
   function showOverlay(name){
     fxTitle.textContent = name;
-    fxSub.textContent = 'Re Long • Caricamento sezione…';
     fx.classList.add('show');
     clearTimeout(hideTimer);
   }
-
-  function hideOverlay(){
-    fx.classList.remove('show');
-  }
+  function hideOverlay(){ fx.classList.remove('show') }
 
   function go(i){
     idx = (i + SECTIONS.length) % SECTIONS.length;
@@ -170,29 +143,25 @@
     const title = humanize(path);
     label.textContent = title;
 
-    // Mostra overlay e imposta nuova pagina
     showOverlay(title);
     iframe.src = BASE + path;
-
-    // Fallback: se l'evento load non arriva, chiudi overlay dopo 3.5s
-    hideTimer = setTimeout(()=>{ hideOverlay() }, 3500);
+    // Fallback chiusura overlay se load non arriva
+    hideTimer = setTimeout(hideOverlay, 4000);
   }
 
-  // Chiudi overlay al load reale della pagina
-  iframe.addEventListener('load', ()=>{
-    hideOverlay();
-  });
+  // Chiudi overlay al load reale
+  iframe.addEventListener('load', hideOverlay);
 
   function next(){ go(idx+1) }
   function prev(){ go(idx-1) }
 
-  document.getElementById('next').addEventListener('click',()=>{ stopDemo(); next() });
-  document.getElementById('prev').addEventListener('click',()=>{ stopDemo(); prev() });
+  document.getElementById('next').addEventListener('click', ()=>{ stopDemo(); next() });
+  document.getElementById('prev').addEventListener('click', ()=>{ stopDemo(); prev() });
 
   // ========= DEMO MODE =========
   function startDemo(){
     clearInterval(rotTimer);
-    rotTimer = setInterval(()=>{ next() }, 8000); // 8s per sezione
+    rotTimer = setInterval(next, 20000); // 20s per sezione (più lento)
   }
   function stopDemo(){
     if (!demo) return;
@@ -203,10 +172,10 @@
   function resetIdle(){
     if(!demo) return;
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(()=>{ startDemo() }, 30000); // 30s inattività → parte demo
+    idleTimer = setTimeout(startDemo, 45000); // parte dopo 45s
   }
 
-  ['click','mousemove','keydown','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{ stopDemo() }));
+  ['click','mousemove','keydown','touchstart'].forEach(ev=>window.addEventListener(ev, stopDemo));
 
   // Avvio
   go(0);
