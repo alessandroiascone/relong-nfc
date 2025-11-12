@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32h (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32i (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -66,6 +66,8 @@
     .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
+
+    /* Remind */
     .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
     .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
     .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0;box-shadow:0 8px 24px rgba(255,77,79,.35)}
@@ -73,18 +75,21 @@
     .r-chip:link,.r-chip:visited{color:#e6f1ff}
     .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
     .r-chip.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+
+    /* Extra submenu */
     .extra-wrap{display:none;margin-top:8px}
     .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
     .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
+
+    /* Modal + Dashboard */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
-    .dash{width:min(960px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
+    .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
     .dash header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--stroke)}
     .dash header h3{font-size:16px;font-weight:800;letter-spacing:.3px}
     .dash header .x{border:1px solid var(--stroke);border-radius:12px;padding:8px 12px;cursor:pointer;background:#0a0d14;color:#eaf2ff}
     .dash .wrap{padding:16px}
-    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-    @media (max-width:980px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
     .kpi{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:#0a0d14}
     .kpi .k{font-size:12px;color:var(--muted);letter-spacing:.2px}
     .kpi .v{margin-top:6px;font-size:28px;font-weight:900;letter-spacing:.3px}
@@ -93,6 +98,8 @@
     .kpi.fisso{box-shadow:0 10px 28px rgba(120,180,255,.10)}
     .kpi.energia{box-shadow:0 10px 28px rgba(0,255,180,.10)}
     .kpi.rate{box-shadow:0 10px 28px rgba(255,140,0,.10)}
+    .kpi.rip{box-shadow:0 10px 28px rgba(255,120,180,.10)}
+    .kpi.prev{box-shadow:0 10px 28px rgba(180,160,255,.10)}
   </style>
 </head>
 <body>
@@ -213,6 +220,8 @@
           <div class="kpi fisso"><div class="k">🏠📡 Fisso</div><div class="v" id="k_fisso">0</div></div>
           <div class="kpi energia"><div class="k">⚡ Energia</div><div class="v" id="k_energia">0</div></div>
           <div class="kpi rate"><div class="k">📱 Rate</div><div class="v" id="k_rate">0</div></div>
+          <div class="kpi rip"><div class="k">🔧 Riparazioni</div><div class="v" id="k_rip">0</div></div>
+          <div class="kpi prev"><div class="k">🧾 Preventivi</div><div class="v" id="k_prev">0</div></div>
         </div>
         <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
           <span class="label" id="k_total">Totale clienti: 0</span>
@@ -253,7 +262,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32h', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32i', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -300,7 +309,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32h sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32i sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -561,7 +570,7 @@
     dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
 
     function updateDashboard(){
-      let pacchi=0, sim=0, fisso=0, energia=0, rate=0;
+      let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
       items.forEach(it=>{
         if(it.fromPacchi) pacchi++;
         const act = Array.isArray(it.activated)? it.activated : [];
@@ -569,12 +578,16 @@
         if(act.includes('fisso')) fisso++;
         if(act.includes('energia')) energia++;
         if(act.includes('rate')) rate++;
+        if(it.acceptance) rip++;                      // prese in carico riparazioni
+        if(act.includes('preventivi')) prev++;       // clienti con preventivo
       });
       $('#k_pacchi').textContent = pacchi;
       $('#k_sim').textContent = sim;
       $('#k_fisso').textContent = fisso;
       $('#k_energia').textContent = energia;
       $('#k_rate').textContent = rate;
+      $('#k_rip').textContent = rip;
+      $('#k_prev').textContent = prev;
       $('#k_total').textContent = `Totale clienti: ${items.length}`;
     }
 
@@ -696,7 +709,6 @@
           remindMenu.appendChild(chip);
         });
 
-        // Extra submenu (solo dopo aver inviato tutti i main)
         if(extraWrapEl){
           extraWrapEl.style.display = allMainSent ? '' : 'none';
           if(extraToggleEl && extraMenuEl){
@@ -727,7 +739,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32h pronta ✅');
+      showToast('v32i pronta ✅');
     })();
 
     (function(){
