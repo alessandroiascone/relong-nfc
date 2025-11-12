@@ -8,472 +8,686 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#05060a; --bg2:#050913;
-      --card:rgba(10,12,20,.96); --stroke:rgba(255,255,255,.10);
-      --muted:rgba(210,220,255,.72);
-      --gold:#f6c453; --plat:#c77dff; --silver:#b0bec5;
-      --accent:#0aa2ff;
+      --bg1:#05060a; --bg2:#050712;
+      --card:rgba(10,12,20,.96); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(210,220,255,.70);
+      --elec:#0aa2ff; --elec2:#66d1ff; --elec3:#008cff;
+      --gold1:#f7d774; --gold2:#f1b84a; --danger:#ff4d4f;
     }
     body{
       min-height:100svh;
       font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
       color:#eef3ff;
-      background:
-        radial-gradient(circle at 10% 0%, #182848 0, transparent 55%),
-        radial-gradient(circle at 100% 100%, #4b6cb7 0, transparent 60%),
-        radial-gradient(65% 65% at 25% 15%, var(--bg1), var(--bg2));
-      padding:20px 16px 28px;
+      background:radial-gradient(80% 80% at 20% 0%,#101523,#05060a);
+      padding:18px 16px 28px;
       display:flex;
       justify-content:center;
-      align-items:center;
     }
     .shell{
-      width:min(480px,100%);
-      margin:0 auto;
+      width:100%;
+      max-width:900px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
     }
     .card{
       background:var(--card);
       border:1px solid var(--stroke);
-      border-radius:26px;
-      box-shadow:0 18px 55px rgba(0,0,0,.65);
-      padding:20px 18px 20px;
-      backdrop-filter:blur(14px);
+      border-radius:22px;
+      box-shadow:0 12px 40px rgba(0,0,0,.65);
+      padding:18px 18px 20px;
     }
-    .logo-row{
+    .card-header{
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      gap:12px;
+      justify-content:space-between;
+      gap:10px;
       margin-bottom:12px;
     }
-    .logo-row h1{
+    .brand-lockup{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo-badge{
+      width:42px; height:42px;
+      border-radius:15px;
+      background:conic-gradient(from 210deg,var(--gold1),var(--gold2),#fff3b0,var(--gold2),var(--gold1));
+      padding:2px;
+      position:relative;
+      overflow:hidden;
+      animation:spinBadge 9s linear infinite;
+    }
+    .logo-inner{
+      width:100%; height:100%;
+      border-radius:13px;
+      background:radial-gradient(circle at 20% 0%,#ffffff44,rgba(0,0,0,.9));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;
+      font-size:15px;
+      letter-spacing:.5px;
+    }
+    .logo-inner span{
+      background:-webkit-linear-gradient(120deg,var(--gold1),var(--gold2));
+      -webkit-background-clip:text;
+      color:transparent;
+    }
+    @keyframes spinBadge{
+      0%{transform:rotate(0deg)}
+      100%{transform:rotate(360deg)}
+    }
+    .title-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .title-main h1{
       font-size:18px;
       font-weight:800;
-      letter-spacing:.26px;
+      letter-spacing:.4px;
     }
-    .logo-sub{font-size:12px;color:var(--muted)}
-    .badge-store{
-      font-size:11px;
+    .title-main .sub{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .status-chip{
       border-radius:999px;
       padding:6px 10px;
-      border:1px solid rgba(255,255,255,.16);
-      background:radial-gradient(circle at 0 0,rgba(255,255,255,.18),rgba(255,255,255,.03));
-      color:#e1e8ff;
+      font-size:11px;
+      font-weight:700;
+      border:1px solid rgba(247,215,116,.6);
+      background:linear-gradient(135deg,rgba(247,215,116,.06),rgba(247,215,116,.16));
+      display:flex;
+      align-items:center;
+      gap:6px;
       white-space:nowrap;
     }
-    .hero{
-      margin-top:8px;
+    .pulse-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--gold1);
+      box-shadow:0 0 0 0 rgba(247,215,116,.7);
+      animation:pulse 1.6s infinite;
+    }
+    @keyframes pulse{
+      0%{transform:scale(.7);box-shadow:0 0 0 0 rgba(247,215,116,.7);}
+      70%{transform:scale(1);box-shadow:0 0 0 8px rgba(247,215,116,0);}
+      100%{transform:scale(.7);box-shadow:0 0 0 0 rgba(247,215,116,0);}
+    }
+
+    .points-row{
       display:flex;
-      gap:14px;
+      flex-wrap:wrap;
+      gap:10px 18px;
+      align-items:flex-end;
+      margin-bottom:14px;
+    }
+    .points-main{
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+    }
+    #pointsValue{
+      font-size:28px;
+      font-weight:900;
+    }
+    .points-main span{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.18px;
+      color:var(--muted);
+    }
+    .mini-counter{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .progress-wrap{
+      margin-top:6px;
+    }
+    .progress-bar{
+      width:100%;height:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      overflow:hidden;
+      position:relative;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--elec3),var(--elec),var(--elec2));
+      box-shadow:0 0 12px rgba(0,140,255,.8);
+      transition:width .5s ease;
+    }
+    .progress-label{
+      margin-top:4px;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+    }
+
+    .id-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
       align-items:center;
     }
-    .avatar{
-      width:68px;height:68px;border-radius:24px;
-      background:conic-gradient(from 210deg, #0aa2ff, #f6c453, #c77dff, #0aa2ff);
-      padding:2px;
-      flex-shrink:0;
+    .code-pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(102,209,255,.65);
+      background:linear-gradient(135deg,rgba(0,140,255,.08),rgba(0,140,255,.15));
+      font-weight:700;
+      letter-spacing:.2px;
+      font-size:12px;
     }
-    .avatar-inner{
-      width:100%;height:100%;border-radius:22px;
-      background:radial-gradient(circle at 30% 0%, #20263a, #05060a);
-      display:flex;align-items:center;justify-content:center;
-      font-size:26px;font-weight:900;
-    }
-    .hero-main{flex:1;min-width:0}
-    .hello{
+
+    .section-title{
       font-size:14px;
-      color:var(--muted);
-      margin-bottom:2px;
-    }
-    .name{
-      font-size:18px;
       font-weight:800;
+      letter-spacing:.25px;
+      margin-bottom:8px;
     }
-    .level-pill{
-      margin-top:6px;
+    .section-sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .btn, .chip-btn{
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      padding:9px 13px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.2px;
+      background:transparent;
+      color:#eef3ff;
+      cursor:pointer;
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:11px;
-      letter-spacing:.2px;
-      border:1px solid rgba(255,255,255,.16);
-      background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04));
+      text-decoration:none;
     }
-    .level-pill span{font-weight:800}
-    .level-pill.gold{border-color:rgba(246,196,83,.7);color:var(--gold);}
-    .level-pill.platinum{border-color:rgba(199,125,255,.7);color:var(--plat);}
-    .level-pill.silver{border-color:rgba(176,190,197,.7);color:var(--silver);}
+    .btn.primary{
+      border:0;
+      background:linear-gradient(135deg,var(--elec3),var(--elec2));
+      box-shadow:0 8px 26px rgba(0,140,255,.4);
+      color:#04121f;
+    }
+    .chip-btn{
+      padding:7px 11px;
+      font-size:11px;
+      border-color:rgba(255,255,255,.16);
+      background:rgba(255,255,255,.03);
+    }
 
-    .points-card{
-      margin-top:18px;
-      border-radius:22px;
-      padding:14px 14px 16px;
-      border:1px solid rgba(0,0,0,.6);
-      background:
-        radial-gradient(circle at 0 0,rgba(246,196,83,.28),transparent 55%),
-        radial-gradient(circle at 100% 100%,rgba(10,162,255,.26),transparent 55%),
-        linear-gradient(145deg,#05060a,#101321);
+    .chips-row{
       display:flex;
-      align-items:center;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:2.1fr 1.4fr;
       gap:14px;
     }
-    .points-circle{
-      width:80px;height:80px;border-radius:999px;
-      background:radial-gradient(circle at 30% 0%,rgba(255,255,255,.35),rgba(255,255,255,.05));
-      border:1px solid rgba(255,255,255,.4);
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 10px 30px rgba(0,0,0,.65);
-      flex-shrink:0;
-    }
-    .points-circle span{
-      font-size:26px;
-      font-weight:900;
-      letter-spacing:.4px;
-    }
-    .points-info{
-      flex:1;min-width:0;
-    }
-    .points-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.18px}
-    .points-main{font-size:18px;font-weight:800;margin-top:2px}
-    .next-level{
-      margin-top:6px;
-      font-size:12px;
-      color:#f1f5ff;
+    @media(max-width:780px){
+      .two-col{grid-template-columns:1fr}
     }
 
-    .section{
-      margin-top:18px;
-      padding-top:10px;
-      border-top:1px solid rgba(255,255,255,.08);
+    .friend-box{
+      border-radius:18px;
+      border:1px dashed rgba(247,215,116,.5);
+      padding:12px 12px 12px;
+      background:linear-gradient(135deg,rgba(247,215,116,.09),rgba(10,12,20,.4));
     }
-    .sec-title{
-      font-size:13px;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.16px;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
-
-    .rewards{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:8px;
-    }
-    @media(max-width:420px){
-      .rewards{grid-template-columns:1fr}
-    }
-    .reward{
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      padding:10px 10px 9px;
-      background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-      font-size:12px;
-    }
-    .reward-title{font-weight:800;margin-bottom:2px}
-    .reward-points{font-size:11px;color:var(--muted)}
-    .reward-available{
-      margin-top:4px;font-size:11px;
-    }
-    .reward-available.ok{color:#a5ffb5}
-    .reward-available.no{color:#ffb3b3}
-
-    .progress{
-      margin-top:10px;
-      border-radius:999px;
-      height:7px;
-      background:rgba(255,255,255,.08);
-      overflow:hidden;
-    }
-    .progress-inner{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg,#0aa2ff,#f6c453,#c77dff);
-      transition:width .35s ease;
-    }
-
-    .history-list{
-      display:grid;
-      gap:6px;
-      font-size:12px;
-    }
-    .mov{
+    .friend-main{
       display:flex;
       justify-content:space-between;
-      gap:6px;
       align-items:flex-start;
+      gap:12px;
+      margin-bottom:8px;
     }
-    .mov-main{flex:1;min-width:0}
-    .mov-reason{font-weight:600}
-    .mov-date{font-size:11px;color:var(--muted)}
-    .mov-points{
-      font-weight:800;
-      font-size:12px;
-      white-space:nowrap;
+    .friend-main strong{font-size:13px}
+    .friend-tag{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.25px;
+      color:var(--gold1);
     }
-    .mov-points.plus{color:#a5ffb5}
-    .mov-points.minus{color:#ffb3b3}
 
-    .cta{
-      margin-top:16px;
+    .promo-grid{
       display:grid;
-      gap:8px;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:10px;
     }
-    .btn{
-      appearance:none;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:800;
-      font-size:13px;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.14);
-      background:linear-gradient(135deg,#0aa2ff,#66d1ff);
-      color:#04111a;
-      text-align:center;
-      text-decoration:none;
+    .promo-card{
+      border-radius:18px;
+      border:1px solid rgba(0,140,255,.25);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.35),rgba(10,12,18,.95));
+      padding:10px 11px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      position:relative;
+      overflow:hidden;
+    }
+    .promo-tag{
+      font-size:10px;
+      text-transform:uppercase;
       letter-spacing:.2px;
+      color:rgba(223,239,255,.9);
     }
-    .btn.ghost{
-      background:transparent;
-      color:#eaf2ff;
-      border-color:rgba(255,255,255,.24);
+    .promo-title{
+      font-size:13px;
+      font-weight:800;
     }
-
-    .hint{
-      margin-top:10px;
+    .promo-sub{
       font-size:11px;
       color:var(--muted);
-      text-align:center;
     }
+    .promo-cta{
+      margin-top:6px;
+      align-self:flex-start;
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.0);
+      background:rgba(0,0,0,.25);
+      text-decoration:none;
+      color:#eef3ff;
+    }
+    .promo-glow{
+      position:absolute;
+      width:140px;height:140px;
+      border-radius:999px;
+      background:radial-gradient(circle,rgba(255,255,255,.38),rgba(255,255,255,0));
+      opacity:.09;
+      right:-40px;top:-60px;
+      pointer-events:none;
+    }
+
+    details{
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      padding:10px 12px;
+      background:#05070d;
+    }
+    summary{
+      list-style:none;
+      cursor:pointer;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    summary::marker, summary::-webkit-details-marker{display:none}
+    .caret{
+      font-size:11px;
+      opacity:.7;
+    }
+    details[open] .caret{
+      transform:rotate(90deg);
+    }
+    .how-body{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+      display:grid;
+      gap:6px;
+    }
+    .how-body strong{color:#fff}
 
     .error{
       text-align:center;
-      padding:24px 12px;
-      font-size:14px;
-      color:#ffb3b3;
+      font-size:13px;
+      color:var(--muted);
+      padding:30px 10px;
+    }
+
+    .skeleton{
+      background:linear-gradient(90deg,#1b2030,#262c40,#1b2030);
+      background-size:200% 100%;
+      border-radius:999px;
+      height:12px;
+      animation:shimmer 1.2s infinite;
+    }
+    @keyframes shimmer{
+      0%{background-position:0% 0}
+      100%{background-position:-200% 0}
+    }
+    .skeleton-line{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+    .skeleton-line div{height:100%;width:35%;background:linear-gradient(90deg,#1b2030,#2b3250,#1b2030);animation:shimmer 1.3s infinite;}
+
+    .small-hint{
+      font-size:10px;
+      color:var(--muted);
+      margin-top:4px;
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <div class="card" id="card">
-      <div id="loading" class="error">Caricamento Fidelity…</div>
+    <!-- CARD PRINCIPALE -->
+    <section class="card" id="cardRoot">
+      <div class="card-header">
+        <div class="brand-lockup">
+          <div class="logo-badge">
+            <div class="logo-inner">
+              <span>RL</span>
+            </div>
+          </div>
+          <div class="title-main">
+            <h1>Re Long • Fidelity Premium</h1>
+            <div class="sub" id="userNameSub">
+              Caricamento profilo…
+            </div>
+          </div>
+        </div>
+        <div class="status-chip">
+          <div class="pulse-dot"></div>
+          <span>Cliente attivo</span>
+        </div>
+      </div>
+
+      <!-- PUNTI + MINI COUNTER -->
+      <div class="points-row">
+        <div>
+          <div class="points-main">
+            <span>Punti</span>
+            <div id="pointsValue">—</div>
+          </div>
+          <div class="mini-counter" id="miniCounter">
+            Rilevo il tuo saldo punti…
+          </div>
+        </div>
+        <div>
+          <button id="howBtn" class="chip-btn" type="button">Come funziona</button>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label">
+          <span id="progressLabelLeft">0 pt</span>
+          <span id="progressLabelRight">Prossimo premio a 500 pt</span>
+        </div>
+      </div>
+
+      <!-- CODICE + LINK HUB -->
+      <div class="id-row">
+        <span>Codice Fidelity (inviti & promo):</span>
+        <span class="code-pill" id="codePill">••••••</span>
+      </div>
+      <div class="small-hint">
+        Usa questo codice quando porti un amico o lo inviti a registrarsi.
+      </div>
+    </section>
+
+    <!-- PORTA UN AMICO + PROMO DEL GIORNO -->
+    <section class="card">
+      <div class="two-col">
+        <!-- Porta un amico -->
+        <div>
+          <div class="section-title">Porta un amico</div>
+          <div class="section-sub">
+            Condividi il tuo codice personale:  
+            <strong>tu guadagni +100 punti</strong> per ogni amico registrato,  
+            il tuo amico riceve <strong>+50 punti di benvenuto</strong>.
+          </div>
+
+          <div class="friend-box">
+            <div class="friend-main">
+              <div>
+                <div class="friend-tag">programma inviti</div>
+                <strong>Invita da WhatsApp in un tap</strong>
+                <div class="small-hint">
+                  Il tuo codice sarà inserito nella registrazione del tuo amico.
+                </div>
+              </div>
+            </div>
+            <div class="chips-row">
+              <button id="shareInviteBtn" class="btn primary" type="button">
+                Invita ora su WhatsApp
+              </button>
+              <button id="copyCodeBtn" class="chip-btn" type="button">
+                Copia il mio codice
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Promo del giorno -->
+        <div>
+          <div class="section-title">Promo del giorno</div>
+          <div class="section-sub">
+            Offerte smart scelte per te.  
+            I banner cambiano in modo dinamico ogni volta che apri la card.
+          </div>
+          <div id="promoArea" class="promo-grid">
+            <!-- riempito da JS -->
+            <div class="promo-card">
+              <div class="promo-glow"></div>
+              <div class="promo-tag">Attendi…</div>
+              <div class="promo-title">Carico le promo Re Long</div>
+              <div class="promo-sub">Smartphone, energia, console e tanto altro.</div>
+              <span class="promo-cta">Caricamento…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COME FUNZIONA -->
+    <section class="card">
+      <div class="section-title">Come funziona la Fidelity Re Long</div>
+      <details id="howDetails">
+        <summary>
+          <span>Apri la guida rapida in 4 punti</span>
+          <span class="caret">▶</span>
+        </summary>
+        <div class="how-body">
+          <p><strong>1. Registrazione</strong><br/>
+            Ti registriamo in negozio o tramite il link che ricevi su WhatsApp. Al primo accesso puoi ricevere punti di benvenuto.</p>
+          <p><strong>2. Come accumuli punti</strong><br/>
+            Ogni attivazione (SIM, fibra, energia, smartphone a rate, ecc.) genera punti. Anche alcune promo speciali possono aggiungere punti extra.</p>
+          <p><strong>3. Porta un amico</strong><br/>
+            Condividi il tuo <strong>codice Fidelity</strong> con amici e familiari.  
+            Quando si registrano usando il tuo codice: tu prendi <strong>+100 punti</strong>, loro <strong>+50 punti</strong>.</p>
+          <p><strong>4. Premi & vantaggi</strong><br/>
+            Raggiunte determinate soglie (es. 500, 1000 punti…) potrai accedere a sconti esclusivi, gadget o promo dedicate in negozio.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ERRORE / INFO -->
+    <div id="errorBox" class="error" style="display:none">
+      Non riesco a trovare la tua Fidelity Card.<br/>
+      Contatta Re Long per verificare il link o la registrazione.
     </div>
   </div>
 
   <script>
-    const DATA_URL = "https://raw.githubusercontent.com/alessandroiascone/relong-nfc/main/data/items.json";
-    const RELONG_PHONE = "08119578844";
+    const DATA_URL   = 'data/items.json'; // stesso percorso usato dal gestionale
+    const HUB_URL    = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+    const CATALOG_URL= 'https://alessandroiascone.github.io/relong-nfc/catalogo-smartphone-reale-v3.html';
+    const RELONG_PHONE = '08119578844';
+    const DEFAULT_STEP = 500; // soglia “prossimo premio”
 
-    function getParam(name){
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
-    function fmtDate(d){
-      const dt = new Date(d);
-      if(isNaN(dt)) return "";
-      return dt.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric"});
-    }
-    function ensurePoints(it){
-      if(typeof it.points !== "number") it.points = 0;
-      if(!Array.isArray(it.pointsHistory)) it.pointsHistory = [];
-    }
+    const $ = s => document.querySelector(s);
 
-    const LEVELS = [
-      { name:"Silver",  min:0,    max:499,  key:"silver"   },
-      { name:"Gold",    min:500,  max:1499, key:"gold"     },
-      { name:"Platinum",min:1500, max:9999999, key:"platinum" }
-    ];
+    function normalizePhone(p){return String(p||'').trim().replace(/\D/g,'');}
 
-    const REWARDS = [
-      { name:"Pellicola display GRATIS", cost:200 },
-      { name:"Cover 50% di sconto", cost:300 },
-      { name:"Sconto 15€ su riparazione", cost:600 },
-      { name:"Sconto 25€ su riparazione/smartphone", cost:1000 },
-      { name:"Premio speciale Re Long", cost:1500 }
-    ];
-
-    function computeLevel(points){
-      return LEVELS.find(l => points >= l.min && points <= l.max) || LEVELS[LEVELS.length-1];
-    }
-    function computeNextLevel(points){
-      if(points < 500)  return {name:"Gold", at:500};
-      if(points < 1500) return {name:"Platinum", at:1500};
-      return null;
-    }
-    function computeNextReward(points){
-      const avail = REWARDS.filter(r=>r.cost>points).sort((a,b)=>a.cost-b.cost);
-      return avail[0] || null;
-    }
-
-    function renderCard(client){
-      const card = document.getElementById("card");
-      card.innerHTML = "";
-
-      ensurePoints(client);
-
-      const level = computeLevel(client.points);
-      const nextLevel = computeNextLevel(client.points);
-      const nextReward = computeNextReward(client.points);
-
-      const initial = (client.name || "?").trim().charAt(0).toUpperCase();
-      const phone = (client.phone || "").replace(/\D/g,"");
-      const waUrl = phone ? `https://wa.me/39${phone}` : `https://wa.me/39${RELONG_PHONE}`;
-
-      const wrap = document.createElement("div");
-      wrap.innerHTML = `
-        <div class="logo-row">
-          <div>
-            <h1>Re Long Fidelity</h1>
-            <div class="logo-sub">Card punti digitale personale</div>
-          </div>
-          <div class="badge-store">Re Long • Marano</div>
-        </div>
-
-        <div class="hero">
-          <div class="avatar">
-            <div class="avatar-inner">${initial}</div>
-          </div>
-          <div class="hero-main">
-            <div class="hello">Ciao,</div>
-            <div class="name">${client.name || "Cliente Re Long"}</div>
-            <div class="level-pill ${level.key}">
-              <span>${level.name.toUpperCase()}</span>
-              <span>• ${client.points} pt</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="points-card">
-          <div class="points-circle">
-            <span>${client.points}</span>
-          </div>
-          <div class="points-info">
-            <div class="points-label">Saldo punti</div>
-            <div class="points-main">${client.points} punti accumulati</div>
-            <div class="next-level" id="nextLevelText"></div>
-          </div>
-        </div>
-
-        <div class="section">
-          <div class="sec-title">Premi disponibili</div>
-          <div class="rewards" id="rewards"></div>
-        </div>
-
-        <div class="section">
-          <div class="sec-title">Il tuo percorso</div>
-          <div class="progress"><div class="progress-inner" id="bar"></div></div>
-        </div>
-
-        <div class="section">
-          <div class="sec-title">Ultimi movimenti</div>
-          <div class="history-list" id="history"></div>
-        </div>
-
-        <div class="section">
-          <div class="sec-title">Contatta Re Long</div>
-          <div class="cta">
-            <a class="btn" href="${waUrl}" target="_blank" rel="noopener noreferrer">
-              Scrivi su WhatsApp
-            </a>
-            <button class="btn ghost" type="button" id="howBtn">
-              Come utilizzare i tuoi punti
-            </button>
-          </div>
-          <div class="hint" id="hint"></div>
-        </div>
-      `;
-      card.appendChild(wrap);
-
-      const nextTxtEl = document.getElementById("nextLevelText");
-      if(nextLevel){
-        const diff = nextLevel.at - client.points;
-        nextTxtEl.textContent = `Ti mancano ${diff} punti per il livello ${nextLevel.name.toUpperCase()}.`;
-      }else{
-        nextTxtEl.textContent = `Hai raggiunto il livello massimo. Chiedi in negozio i vantaggi esclusivi.`;
+    function genCodeFromId(id){
+      if(!id) return '000000';
+      let h=0;
+      for(let i=0;i<id.length;i++){
+        h = (h*31 + id.charCodeAt(i)) >>> 0;
       }
+      const code = 100000 + (h % 900000); // 6 cifre
+      return String(code);
+    }
 
-      const maxForBar = 1500;
-      const bar = document.getElementById("bar");
-      const pct = Math.max(0, Math.min(100, (client.points / maxForBar) * 100));
-      bar.style.width = pct + "%";
+    function computeProgress(points){
+      const p = Math.max(0, points||0);
+      const step = DEFAULT_STEP;
+      const currentStep = Math.floor(p/step);
+      const nextThreshold = (currentStep+1)*step;
+      const prevThreshold = currentStep*step;
+      const inStep = Math.min(1, (p - prevThreshold) / (step||1));
+      return {prevThreshold,nextThreshold,ratio:inStep};
+    }
 
-      const rewEl = document.getElementById("rewards");
-      REWARDS.forEach(r=>{
-        const box = document.createElement("div");
-        box.className = "reward";
-        const has = client.points >= r.cost;
-        const diff = r.cost - client.points;
-        box.innerHTML = `
-          <div class="reward-title">${r.name}</div>
-          <div class="reward-points">${r.cost} punti</div>
-          <div class="reward-available ${has?"ok":"no"}">
-            ${has ? "Premio disponibile: chiedi in negozio di riscattarlo." : `Ti mancano ${diff} punti.`}
-          </div>
+    const PROMOS = [
+      {
+        tag:'Smartphone a rate',
+        title:'Top di gamma senza busta paga',
+        sub:'iPhone, Samsung, Honor e altri modelli disponibili con rate leggere.',
+        link:CATALOG_URL
+      },
+      {
+        tag:'Luce & Gas',
+        title:'Simulazione energia super conveniente',
+        sub:'Porta una bolletta e verifichiamo subito se puoi risparmiare.',
+        link:HUB_URL
+      },
+      {
+        tag:'Console & TV',
+        title:'Offerte su console, TV e accessori',
+        sub:'Chiedi in negozio le promo attive su gaming e intrattenimento.',
+        link:HUB_URL
+      },
+      {
+        tag:'Fibra & Fisso',
+        title:'Fibra veloce per casa e ufficio',
+        sub:'Copertura, modem e promozioni dedicate per linee fisse.',
+        link:HUB_URL
+      }
+    ];
+
+    function shuffle(arr){
+      const a=[...arr];
+      for(let i=a.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    function renderPromos(){
+      const area = $('#promoArea');
+      area.innerHTML='';
+      const chosen = shuffle(PROMOS).slice(0,2);
+      chosen.forEach(p=>{
+        const card = document.createElement('article');
+        card.className='promo-card';
+        card.innerHTML = `
+          <div class="promo-glow"></div>
+          <div class="promo-tag">${p.tag}</div>
+          <div class="promo-title">${p.title}</div>
+          <div class="promo-sub">${p.sub}</div>
+          <a class="promo-cta" href="${p.link}" target="_blank" rel="noopener">Scopri subito</a>
         `;
-        rewEl.appendChild(box);
+        area.appendChild(card);
       });
+    }
 
-      const histEl = document.getElementById("history");
-      const hist = (client.pointsHistory || []).slice().sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,8);
-      if(hist.length===0){
-        histEl.innerHTML = `<div class="mov-date">Ancora nessun movimento. I punti si accumulano ad ogni attivazione o servizio Re Long.</div>`;
-      }else{
-        hist.forEach(m=>{
-          const row = document.createElement("div");
-          row.className = "mov";
-          const sign = m.delta >= 0 ? "+" : "";
-          const cls = m.delta >= 0 ? "plus" : "minus";
-          row.innerHTML = `
-            <div class="mov-main">
-              <div class="mov-reason">${m.reason || "Operazione Re Long"}</div>
-              <div class="mov-date">${fmtDate(m.at)}</div>
-            </div>
-            <div class="mov-points ${cls}">${sign}${m.delta} pt</div>
-          `;
-          histEl.appendChild(row);
-        });
+    function buildInviteText(name, code){
+      const safeName = name || 'Ciao';
+      return (
+        safeName + ` ti invita alla Fidelity Card Re Long!\n\n` +
+        `Usa il suo codice invito: ${code}\n` +
+        `✔ Tu ricevi subito +50 punti di benvenuto\n` +
+        `✔ Lui guadagna +100 punti\n\n` +
+        `Scrivi a Re Long su WhatsApp per registrarti oppure passa in negozio.`
+      );
+    }
+
+    async function loadClient(){
+      const params = new URLSearchParams(location.search);
+      const idParam = params.get('id') || '';
+      if(!idParam){
+        $('#errorBox').style.display='block';
+        return null;
       }
-
-      const hint = document.getElementById("hint");
-      if(nextReward){
-        const diff = nextReward.cost - client.points;
-        hint.textContent = `Ti mancano ${diff} punti per: “${nextReward.name}”.`;
-      }else{
-        hint.textContent = `Hai punti sufficienti per almeno un premio. Chiedi ad Alessandro come usarli.`;
+      try{
+        const res = await fetch(DATA_URL + '?t=' + Date.now());
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const all = await res.json();
+        const byId = all.find(x=> String(x.id||'')===idParam);
+        const byPhone = all.find(x=> normalizePhone(x.phone)===normalizePhone(idParam));
+        const client = byId || byPhone || null;
+        if(!client){
+          $('#errorBox').style.display='block';
+          return null;
+        }
+        return client;
+      }catch(e){
+        console.error(e);
+        $('#errorBox').style.display='block';
+        return null;
       }
-
-      const howBtn = document.getElementById("howBtn");
-      howBtn.addEventListener("click", ()=>{
-        alert("I punti si accumulano con attivazioni, acquisti e riparazioni presso Re Long.\n\nPuoi usarli per sconti, pellicole, cover o premi dedicati.\nChiedi in negozio come riscattare i tuoi punti.");
-      });
     }
 
     (async function init(){
-      const card = document.getElementById("card");
-      const loading = document.getElementById("loading");
-      const id = getParam("id");
-      if(!id){
-        loading.textContent = "Nessun cliente associato a questa card. Contatta Re Long per attivare la Fidelity.";
-        return;
-      }
-      try{
-        const res = await fetch(DATA_URL,{cache:"no-store"});
-        if(!res.ok) throw new Error("HTTP "+res.status);
-        const json = await res.json();
-        const items = Array.isArray(json)? json : [];
-        let client = items.find(x=> String(x.id)===String(id));
-        if(!client){
-          loading.textContent = "Cliente non trovato. Potrebbe essere stata aggiornata la card. Contatta Re Long.";
-          return;
+      renderPromos();
+
+      const client = await loadClient();
+      if(!client) return;
+
+      const name = client.name || 'Cliente Re Long';
+      const points = Number(client.points||0);
+      const code = genCodeFromId(String(client.id||normalizePhone(client.phone)||name));
+
+      $('#userNameSub').textContent = name;
+      $('#pointsValue').textContent = isNaN(points)? '0' : String(points);
+
+      const prog = computeProgress(points);
+      $('#progressFill').style.width = (prog.ratio*100).toFixed(1)+'%';
+      $('#progressLabelLeft').textContent  = `${prog.prevThreshold} pt`;
+      $('#progressLabelRight').textContent = `Prossimo premio a ${prog.nextThreshold} pt`;
+      const missing = Math.max(0, prog.nextThreshold - points);
+      $('#miniCounter').textContent = missing>0
+        ? `Ti mancano ${missing} punti al prossimo premio.`
+        : `Hai superato una soglia di premio, passa in negozio per scoprire cosa puoi riscattare.`;
+
+      $('#codePill').textContent = code;
+
+      // bottone "Come funziona"
+      $('#howBtn').addEventListener('click', ()=>{
+        const det = $('#howDetails');
+        if(det){
+          det.open = true;
+          det.scrollIntoView({behavior:'smooth',block:'start'});
         }
-        renderCard(client);
-      }catch(e){
-        console.error(e);
-        loading.textContent = "Errore nel caricamento dati Fidelity. Riprova più tardi o contatta Re Long.";
-      }
+      });
+
+      // copia codice
+      $('#copyCodeBtn').addEventListener('click', async ()=>{
+        try{
+          await navigator.clipboard.writeText(code);
+          alert('Codice copiato: ' + code);
+        }catch{
+          alert('Codice: ' + code);
+        }
+      });
+
+      // invito WhatsApp
+      $('#shareInviteBtn').addEventListener('click', ()=>{
+        const text = buildInviteText(name, code);
+        const url  = `https://wa.me/39${normalizePhone(RELONG_PHONE)}?text=${encodeURIComponent(text)}`;
+        window.open(url,'_blank','noopener');
+      });
     })();
   </script>
 </body>
