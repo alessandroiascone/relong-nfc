@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32k (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32l (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -61,9 +61,10 @@
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
     .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;justify-content:space-between;flex-wrap:wrap}
-    .toolbar-left{display:flex;gap:8px;align-items:center}
+    .toolbar-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .toolbar-right{display:flex;gap:8px;align-items:center}
-    .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .toolbar-filters{display:flex;gap:6px;flex-wrap:wrap}
+    .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
 
@@ -98,6 +99,8 @@
     .kpi.rate{box-shadow:0 10px 28px rgba(255,140,0,.10)}
     .kpi.rip{box-shadow:0 10px 28px rgba(255,120,180,.10)}
     .kpi.prev{box-shadow:0 10px 28px rgba(180,160,255,.10)}
+
+    .dash-period-bar{margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   </style>
 </head>
 <body>
@@ -171,6 +174,15 @@
       <div class="toolbar">
         <div class="toolbar-left">
           <button id="toggleToday" class="toggle">Remind oggi</button>
+          <div id="filterCats" class="toolbar-filters">
+            <button type="button" class="toggle filter-toggle" data-cat="pacchi">Pacchi</button>
+            <button type="button" class="toggle filter-toggle" data-cat="sim">SIM</button>
+            <button type="button" class="toggle filter-toggle" data-cat="fisso">Fisso</button>
+            <button type="button" class="toggle filter-toggle" data-cat="energia">Energia</button>
+            <button type="button" class="toggle filter-toggle" data-cat="rate">Rate</button>
+            <button type="button" class="toggle filter-toggle" data-cat="riparazione">Riparazioni</button>
+            <button type="button" class="toggle filter-toggle" data-cat="preventivi">Preventivi</button>
+          </div>
         </div>
         <div class="toolbar-right">
           <span id="clientCounter" class="label">Clienti: 0</span>
@@ -211,6 +223,12 @@
         <button class="x" id="closeDash" type="button">Chiudi</button>
       </header>
       <div class="wrap">
+        <div class="dash-period-bar">
+          <span class="label">Periodo</span>
+          <button type="button" class="toggle dash-period active" data-period="all">Tutto</button>
+          <button type="button" class="toggle dash-period" data-period="today">Oggi</button>
+          <button type="button" class="toggle dash-period" data-period="month">Mese</button>
+        </div>
         <div class="kpis">
           <div class="kpi pacchi">
             <div class="k">📦 Pacchi</div>
@@ -263,13 +281,12 @@
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
-    /* CONFIG GUADAGNO PER CATEGORIA (solo quelle richieste) */
-    const GAIN_PACCHI  = 0.5;   // € a pacco
-    const GAIN_SIM     = 30;    // € a SIM
-    const GAIN_FISSO   = 110;   // € a Fisso
-    const GAIN_ENERGIA = 150;   // € a contratto Energia
-    const GAIN_RATE    = 45;    // € a Smartphone a rate
-    // Riparazioni e Preventivi: nessun guadagno in dashboard
+    /* Guadagni per categoria */
+    const GAIN_PACCHI  = 0.5;
+    const GAIN_SIM     = 30;
+    const GAIN_FISSO   = 110;
+    const GAIN_ENERGIA = 150;
+    const GAIN_RATE    = 45;
 
     function showToast(t, type='ok'){
       const w=$('#toast'); const el=document.createElement('div');
@@ -294,7 +311,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32k', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32l', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -341,7 +358,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32k sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32l sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -575,6 +592,39 @@
       render();
     });
 
+    /* Filtri intelligenti per categoria */
+    const filterCats = new Set();
+    const filterBox = $('#filterCats');
+    function matchFilters(it){
+      if(filterCats.size===0) return true;
+      const act = Array.isArray(it.activated)? it.activated : [];
+      const hasPacchi = !!it.fromPacchi;
+      const hasSim = act.includes('sim');
+      const hasFisso = act.includes('fisso');
+      const hasEnergia = act.includes('energia');
+      const hasRate = act.includes('rate');
+      const hasRip = !!it.acceptance;
+      const hasPrev = act.includes('preventivi');
+
+      if(filterCats.has('pacchi') && hasPacchi) return true;
+      if(filterCats.has('sim') && hasSim) return true;
+      if(filterCats.has('fisso') && hasFisso) return true;
+      if(filterCats.has('energia') && hasEnergia) return true;
+      if(filterCats.has('rate') && hasRate) return true;
+      if(filterCats.has('riparazione') && hasRip) return true;
+      if(filterCats.has('preventivi') && hasPrev) return true;
+
+      return false;
+    }
+    filterBox.addEventListener('click', (e)=>{
+      const b=e.target.closest('.filter-toggle'); if(!b) return;
+      const cat=b.dataset.cat;
+      const on=!b.classList.contains('active');
+      b.classList.toggle('active', on);
+      if(on) filterCats.add(cat); else filterCats.delete(cat);
+      render();
+    });
+
     function pill(lbl, cls, fn){
       const a=document.createElement('a');
       a.href='#'; a.className='pillbtn '+cls; a.textContent=lbl;
@@ -594,18 +644,42 @@
     function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
     function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
 
+    /* Dashboard */
     const dashModal = $('#dashModal');
     const openDashBtn = $('#openDash');
     const closeDashBtn = $('#closeDash');
+    let dashPeriod = 'all';
+
+    const dashPeriodBtns = $$('.dash-period');
+    dashPeriodBtns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        dashPeriod = btn.dataset.period || 'all';
+        dashPeriodBtns.forEach(b=>b.classList.toggle('active', b===btn));
+        updateDashboard();
+      });
+    });
+
     openDashBtn.addEventListener('click', ()=>{ updateDashboard(); dashModal.classList.add('on'); dashModal.setAttribute('aria-hidden','false'); });
     closeDashBtn.addEventListener('click', ()=>{ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); });
     dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
 
     function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
 
+    function itemInPeriod(it){
+      const d = new Date(it.createdAt || it.updatedAt || Date.now());
+      const now = new Date();
+      const today0 = startOfDay(now);
+      const item0 = startOfDay(d);
+      if(dashPeriod==='today') return item0.getTime()===today0.getTime();
+      if(dashPeriod==='month') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+      return true;
+    }
+
     function updateDashboard(){
+      const subset = items.filter(itemInPeriod);
+
       let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
-      items.forEach(it=>{
+      subset.forEach(it=>{
         if(it.fromPacchi) pacchi++;
         const act = Array.isArray(it.activated)? it.activated : [];
         if(act.includes('sim')) sim++;
@@ -638,8 +712,12 @@
       $('#e_energia').textContent= formatEuro(gEn);
       $('#e_rate').textContent   = formatEuro(gRate);
 
-      $('#k_total').textContent = `Totale clienti: ${items.length}`;
-      $('#k_total_gain').textContent = `Guadagno totale: ${formatEuro(totalGain)}`;
+      let labelPeriodo = 'Tutto';
+      if(dashPeriod==='today') labelPeriodo = 'Oggi';
+      else if(dashPeriod==='month') labelPeriodo = 'Mese corrente';
+
+      $('#k_total').textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
+      $('#k_total_gain').textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
     function render(){
@@ -651,11 +729,15 @@
 
       const source = items.slice().filter(it=>{
         ensureReminders(it);
-        if(!filterToday) return true;
-        return (it.reminders||[]).some(r=>{
-          const due0=startOfDay(r.dueAt);
-          return (due0.getTime()===today0.getTime()) && !r.sent;
-        });
+        if(filterToday){
+          const anyToday = (it.reminders||[]).some(r=>{
+            const due0=startOfDay(r.dueAt);
+            return (due0.getTime()===today0.getTime()) && !r.sent;
+          });
+          if(!anyToday) return false;
+        }
+        if(!matchFilters(it)) return false;
+        return true;
       });
 
       source.forEach(it=>{
@@ -790,7 +872,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32k pronta ✅');
+      showToast('v32l pronta ✅');
     })();
 
     (function(){
