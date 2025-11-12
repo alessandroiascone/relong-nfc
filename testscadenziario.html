@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32j (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32k (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -240,12 +240,10 @@
           <div class="kpi rip">
             <div class="k">🔧 Riparazioni</div>
             <div class="v" id="k_rip">0</div>
-            <div class="e" id="e_rip">€ 0</div>
           </div>
           <div class="kpi prev">
             <div class="k">🧾 Preventivi</div>
             <div class="v" id="k_prev">0</div>
-            <div class="e" id="e_prev">€ 0</div>
           </div>
         </div>
         <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -265,14 +263,13 @@
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
-    /* CONFIG GUADAGNO PER CATEGORIA */
-    const GAIN_PACCHI     = 0.5;   // € a pacco
-    const GAIN_SIM        = 30;    // € a SIM
-    const GAIN_FISSO      = 110;   // € a Fisso
-    const GAIN_ENERGIA    = 150;   // € a contratto Energia
-    const GAIN_RATE       = 45;    // € a Smartphone a rate
-    const GAIN_RIP        = 0;     // € a Riparazione (modifica se vuoi)
-    const GAIN_PREVENTIVI = 0;     // € a Preventivo (modifica se vuoi)
+    /* CONFIG GUADAGNO PER CATEGORIA (solo quelle richieste) */
+    const GAIN_PACCHI  = 0.5;   // € a pacco
+    const GAIN_SIM     = 30;    // € a SIM
+    const GAIN_FISSO   = 110;   // € a Fisso
+    const GAIN_ENERGIA = 150;   // € a contratto Energia
+    const GAIN_RATE    = 45;    // € a Smartphone a rate
+    // Riparazioni e Preventivi: nessun guadagno in dashboard
 
     function showToast(t, type='ok'){
       const w=$('#toast'); const el=document.createElement('div');
@@ -297,7 +294,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32j', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32k', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -344,7 +341,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32j sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32k sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -624,10 +621,8 @@
       const gFisso  = fisso  * GAIN_FISSO;
       const gEn     = energia* GAIN_ENERGIA;
       const gRate   = rate   * GAIN_RATE;
-      const gRip    = rip    * GAIN_RIP;
-      const gPrev   = prev   * GAIN_PREVENTIVI;
 
-      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + gRip + gPrev;
+      const totalGain = gPacchi + gSim + gFisso + gEn + gRate;
 
       $('#k_pacchi').textContent = pacchi;
       $('#k_sim').textContent = sim;
@@ -642,8 +637,6 @@
       $('#e_fisso').textContent  = formatEuro(gFisso);
       $('#e_energia').textContent= formatEuro(gEn);
       $('#e_rate').textContent   = formatEuro(gRate);
-      $('#e_rip').textContent    = formatEuro(gRip);
-      $('#e_prev').textContent   = formatEuro(gPrev);
 
       $('#k_total').textContent = `Totale clienti: ${items.length}`;
       $('#k_total_gain').textContent = `Guadagno totale: ${formatEuro(totalGain)}`;
@@ -797,7 +790,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32j pronta ✅');
+      showToast('v32k pronta ✅');
     })();
 
     (function(){
