@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32l (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32m (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -101,6 +101,12 @@
     .kpi.prev{box-shadow:0 10px 28px rgba(180,160,255,.10)}
 
     .dash-period-bar{margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .range-wrap{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .range-wrap label{font-size:11px;color:var(--muted)}
+    .range-wrap input[type="date"]{
+      background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;
+      border-radius:999px;padding:6px 10px;font-size:11px;min-width:130px
+    }
   </style>
 </head>
 <body>
@@ -228,6 +234,13 @@
           <button type="button" class="toggle dash-period active" data-period="all">Tutto</button>
           <button type="button" class="toggle dash-period" data-period="today">Oggi</button>
           <button type="button" class="toggle dash-period" data-period="month">Mese</button>
+          <button type="button" class="toggle dash-period" data-period="range">Intervallo</button>
+          <div class="range-wrap" id="rangeWrap" style="display:none">
+            <label for="rangeFrom">Dal</label>
+            <input type="date" id="rangeFrom">
+            <label for="rangeTo">Al</label>
+            <input type="date" id="rangeTo">
+          </div>
         </div>
         <div class="kpis">
           <div class="kpi pacchi">
@@ -281,7 +294,6 @@
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
-    /* Guadagni per categoria */
     const GAIN_PACCHI  = 0.5;
     const GAIN_SIM     = 30;
     const GAIN_FISSO   = 110;
@@ -311,7 +323,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32l', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32m', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -358,7 +370,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32l sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32m sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -592,7 +604,6 @@
       render();
     });
 
-    /* Filtri intelligenti per categoria */
     const filterCats = new Set();
     const filterBox = $('#filterCats');
     function matchFilters(it){
@@ -644,23 +655,54 @@
     function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
     function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
 
-    /* Dashboard */
     const dashModal = $('#dashModal');
     const openDashBtn = $('#openDash');
     const closeDashBtn = $('#closeDash');
     let dashPeriod = 'all';
+    let rangeFrom = null;
+    let rangeTo = null;
 
     const dashPeriodBtns = $$('.dash-period');
-    dashPeriodBtns.forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        dashPeriod = btn.dataset.period || 'all';
-        dashPeriodBtns.forEach(b=>b.classList.toggle('active', b===btn));
+    const rangeWrap = $('#rangeWrap');
+    const rangeFromInput = $('#rangeFrom');
+    const rangeToInput = $('#rangeTo');
+
+    function parseDateInput(val){
+      if(!val) return null;
+      const [y,m,d] = val.split('-').map(x=>parseInt(x,10));
+      if(!y || !m || !d) return null;
+      const dt = new Date(y, m-1, d);
+      if(isNaN(dt.getTime())) return null;
+      return dt;
+    }
+
+    function syncRangeFromInputs(){
+      rangeFrom = parseDateInput(rangeFromInput.value);
+      rangeTo = parseDateInput(rangeToInput.value);
+      if(dashPeriod==='range') updateDashboard();
+    }
+
+    rangeFromInput.addEventListener('change', syncRangeFromInputs);
+    rangeToInput.addEventListener('change', syncRangeFromInputs);
+
+    dashPeriodBtns.forEach(btnEl=>{
+      btnEl.addEventListener('click', ()=>{
+        dashPeriod = btnEl.dataset.period || 'all';
+        dashPeriodBtns.forEach(b=>b.classList.toggle('active', b===btnEl));
+        rangeWrap.style.display = (dashPeriod==='range') ? 'flex' : 'none';
         updateDashboard();
       });
     });
 
-    openDashBtn.addEventListener('click', ()=>{ updateDashboard(); dashModal.classList.add('on'); dashModal.setAttribute('aria-hidden','false'); });
-    closeDashBtn.addEventListener('click', ()=>{ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); });
+    openDashBtn.addEventListener('click', ()=>{
+      updateDashboard();
+      dashModal.classList.add('on');
+      dashModal.setAttribute('aria-hidden','false');
+    });
+    closeDashBtn.addEventListener('click', ()=>{
+      dashModal.classList.remove('on');
+      dashModal.setAttribute('aria-hidden','true');
+    });
     dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
 
     function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
@@ -672,6 +714,19 @@
       const item0 = startOfDay(d);
       if(dashPeriod==='today') return item0.getTime()===today0.getTime();
       if(dashPeriod==='month') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+      if(dashPeriod==='range'){
+        if(!rangeFrom && !rangeTo) return true;
+        const day = startOfDay(d).getTime();
+        if(rangeFrom){
+          const fromDay = startOfDay(rangeFrom).getTime();
+          if(day < fromDay) return false;
+        }
+        if(rangeTo){
+          const toDay = startOfDay(rangeTo).getTime();
+          if(day > toDay) return false;
+        }
+        return true;
+      }
       return true;
     }
 
@@ -695,7 +750,6 @@
       const gFisso  = fisso  * GAIN_FISSO;
       const gEn     = energia* GAIN_ENERGIA;
       const gRate   = rate   * GAIN_RATE;
-
       const totalGain = gPacchi + gSim + gFisso + gEn + gRate;
 
       $('#k_pacchi').textContent = pacchi;
@@ -715,6 +769,11 @@
       let labelPeriodo = 'Tutto';
       if(dashPeriod==='today') labelPeriodo = 'Oggi';
       else if(dashPeriod==='month') labelPeriodo = 'Mese corrente';
+      else if(dashPeriod==='range'){
+        const fromTxt = rangeFrom ? fmt(rangeFrom) : 'inizio';
+        const toTxt   = rangeTo   ? fmt(rangeTo)   : 'oggi';
+        labelPeriodo = `Dal ${fromTxt} al ${toTxt}`;
+      }
 
       $('#k_total').textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
       $('#k_total_gain').textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
@@ -872,7 +931,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32l pronta ✅');
+      showToast('v32m pronta ✅');
     })();
 
     (function(){
