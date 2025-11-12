@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32i (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32j (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -67,7 +67,6 @@
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
 
-    /* Remind */
     .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
     .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
     .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0;box-shadow:0 8px 24px rgba(255,77,79,.35)}
@@ -76,12 +75,10 @@
     .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
     .r-chip.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
 
-    /* Extra submenu */
     .extra-wrap{display:none;margin-top:8px}
     .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
     .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
 
-    /* Modal + Dashboard */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
     .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -93,6 +90,7 @@
     .kpi{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:#0a0d14}
     .kpi .k{font-size:12px;color:var(--muted);letter-spacing:.2px}
     .kpi .v{margin-top:6px;font-size:28px;font-weight:900;letter-spacing:.3px}
+    .kpi .e{margin-top:4px;font-size:13px;color:var(--muted);letter-spacing:.2px}
     .kpi.pacchi{box-shadow:0 10px 28px rgba(255,221,87,.10)}
     .kpi.sim{box-shadow:0 10px 28px rgba(0,200,255,.10)}
     .kpi.fisso{box-shadow:0 10px 28px rgba(120,180,255,.10)}
@@ -206,7 +204,6 @@
     </div>
   </template>
 
-  <!-- DASHBOARD -->
   <div id="dashModal" class="modal" aria-hidden="true">
     <div class="dash" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
       <header>
@@ -215,16 +212,45 @@
       </header>
       <div class="wrap">
         <div class="kpis">
-          <div class="kpi pacchi"><div class="k">📦 Pacchi</div><div class="v" id="k_pacchi">0</div></div>
-          <div class="kpi sim"><div class="k">📶 SIM</div><div class="v" id="k_sim">0</div></div>
-          <div class="kpi fisso"><div class="k">🏠📡 Fisso</div><div class="v" id="k_fisso">0</div></div>
-          <div class="kpi energia"><div class="k">⚡ Energia</div><div class="v" id="k_energia">0</div></div>
-          <div class="kpi rate"><div class="k">📱 Rate</div><div class="v" id="k_rate">0</div></div>
-          <div class="kpi rip"><div class="k">🔧 Riparazioni</div><div class="v" id="k_rip">0</div></div>
-          <div class="kpi prev"><div class="k">🧾 Preventivi</div><div class="v" id="k_prev">0</div></div>
+          <div class="kpi pacchi">
+            <div class="k">📦 Pacchi</div>
+            <div class="v" id="k_pacchi">0</div>
+            <div class="e" id="e_pacchi">€ 0</div>
+          </div>
+          <div class="kpi sim">
+            <div class="k">📶 SIM</div>
+            <div class="v" id="k_sim">0</div>
+            <div class="e" id="e_sim">€ 0</div>
+          </div>
+          <div class="kpi fisso">
+            <div class="k">🏠📡 Fisso</div>
+            <div class="v" id="k_fisso">0</div>
+            <div class="e" id="e_fisso">€ 0</div>
+          </div>
+          <div class="kpi energia">
+            <div class="k">⚡ Energia</div>
+            <div class="v" id="k_energia">0</div>
+            <div class="e" id="e_energia">€ 0</div>
+          </div>
+          <div class="kpi rate">
+            <div class="k">📱 Rate</div>
+            <div class="v" id="k_rate">0</div>
+            <div class="e" id="e_rate">€ 0</div>
+          </div>
+          <div class="kpi rip">
+            <div class="k">🔧 Riparazioni</div>
+            <div class="v" id="k_rip">0</div>
+            <div class="e" id="e_rip">€ 0</div>
+          </div>
+          <div class="kpi prev">
+            <div class="k">🧾 Preventivi</div>
+            <div class="v" id="k_prev">0</div>
+            <div class="e" id="e_prev">€ 0</div>
+          </div>
         </div>
-        <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+        <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="label" id="k_total">Totale clienti: 0</span>
+          <span class="label" id="k_total_gain">Guadagno totale: € 0</span>
         </div>
       </div>
     </div>
@@ -238,6 +264,15 @@
     const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
+
+    /* CONFIG GUADAGNO PER CATEGORIA */
+    const GAIN_PACCHI     = 0.5;   // € a pacco
+    const GAIN_SIM        = 30;    // € a SIM
+    const GAIN_FISSO      = 110;   // € a Fisso
+    const GAIN_ENERGIA    = 150;   // € a contratto Energia
+    const GAIN_RATE       = 45;    // € a Smartphone a rate
+    const GAIN_RIP        = 0;     // € a Riparazione (modifica se vuoi)
+    const GAIN_PREVENTIVI = 0;     // € a Preventivo (modifica se vuoi)
 
     function showToast(t, type='ok'){
       const w=$('#toast'); const el=document.createElement('div');
@@ -262,7 +297,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32i', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32j', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -309,7 +344,7 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32i sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32j sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
@@ -569,6 +604,8 @@
     closeDashBtn.addEventListener('click', ()=>{ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); });
     dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
 
+    function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
+
     function updateDashboard(){
       let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
       items.forEach(it=>{
@@ -578,9 +615,20 @@
         if(act.includes('fisso')) fisso++;
         if(act.includes('energia')) energia++;
         if(act.includes('rate')) rate++;
-        if(it.acceptance) rip++;                      // prese in carico riparazioni
-        if(act.includes('preventivi')) prev++;       // clienti con preventivo
+        if(it.acceptance) rip++;
+        if(act.includes('preventivi')) prev++;
       });
+
+      const gPacchi = pacchi * GAIN_PACCHI;
+      const gSim    = sim    * GAIN_SIM;
+      const gFisso  = fisso  * GAIN_FISSO;
+      const gEn     = energia* GAIN_ENERGIA;
+      const gRate   = rate   * GAIN_RATE;
+      const gRip    = rip    * GAIN_RIP;
+      const gPrev   = prev   * GAIN_PREVENTIVI;
+
+      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + gRip + gPrev;
+
       $('#k_pacchi').textContent = pacchi;
       $('#k_sim').textContent = sim;
       $('#k_fisso').textContent = fisso;
@@ -588,7 +636,17 @@
       $('#k_rate').textContent = rate;
       $('#k_rip').textContent = rip;
       $('#k_prev').textContent = prev;
+
+      $('#e_pacchi').textContent = formatEuro(gPacchi);
+      $('#e_sim').textContent    = formatEuro(gSim);
+      $('#e_fisso').textContent  = formatEuro(gFisso);
+      $('#e_energia').textContent= formatEuro(gEn);
+      $('#e_rate').textContent   = formatEuro(gRate);
+      $('#e_rip').textContent    = formatEuro(gRip);
+      $('#e_prev').textContent   = formatEuro(gPrev);
+
       $('#k_total').textContent = `Totale clienti: ${items.length}`;
+      $('#k_total_gain').textContent = `Guadagno totale: ${formatEuro(totalGain)}`;
     }
 
     function render(){
@@ -739,7 +797,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32i pronta ✅');
+      showToast('v32j pronta ✅');
     })();
 
     (function(){
