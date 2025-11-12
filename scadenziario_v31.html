@@ -116,7 +116,7 @@
             </div>
           </div>
 
-          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max…"></div>
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax,S25 Ultra…"></div>
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
@@ -234,10 +234,10 @@
 
     /* WA templates */
     function walink(phone, text){ return `https://wa.me/39${phone}?text=${encodeURIComponent(text)}`; }
-    function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nTi va una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
-    function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con minuti e Giga top. 📶`; return walink(phone,t); }
+    function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPosso proporti una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
+    function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`; return walink(phone,t); }
     function waPacchiFisso(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo a te dedicata. 🏠📡`; return walink(phone,t); }
-    function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate senza busta paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
+    function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate Senza Busta Paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
     function waPacchiMemo(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`; return walink(phone,t); }
 
     function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
@@ -534,8 +534,8 @@
               const txt = `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nEcco il preventivo per la tua riparazione.\nDispositivo: ${it?.device?.type||'-'}\nMarca: ${it?.device?.brand||'-'}\nModello: ${it?.device?.model||'-'}\nDifetto dichiarato: ${it?.device?.issue||'-'}\n\nTotale preventivato: ${price}\n\nSe ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.\n\nI nostri servizi: ${HUB_URL}`;
               window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`,'_blank','noopener');
             });
-            const acc=btn('Segna preventivo ACCETTATO', ()=>{ it.quoteStatus='accepted'; it.repairStatus='inriparazione'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
-            const ref=btn('Segna preventivo RIFIUTATO', ()=>{ it.quoteStatus='refused'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            const acc=btn('Preventivo ACCETTATO', ()=>{ it.quoteStatus='accepted'; it.repairStatus='inriparazione'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
+            const ref=btn('Preventivo RIFIUTATO', ()=>{ it.quoteStatus='refused'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
             actions.append(ip, sendWA, acc, ref, btnDelete(it));
           } else {
             if(it.quoteStatus==='accepted' && it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
