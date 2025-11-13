@@ -41,7 +41,7 @@
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
     .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
-    .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
     .wa-btn{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
     .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
     .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
@@ -55,6 +55,19 @@
     .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
     .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
+    /* Mini badge Fidelity nella lista */
+    .badge-mini{
+      margin-left:8px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,0,.7);
+      background:linear-gradient(135deg,rgba(255,215,0,.22),rgba(255,215,0,.05));
+      font-size:11px;
+      color:#fff9d6;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
   </style>
 </head>
 <body>
@@ -125,29 +138,6 @@
     </div>
   </section>
 
-  <!-- CARD FIDELITY CARD -->
-  <section class="card">
-    <h2>Fidelity Card</h2>
-    <div class="content grid2">
-      <div>
-        <label>Codice Fidelity (6 cifre)</label>
-        <input id="f_code" placeholder="123456" inputmode="numeric" maxlength="6">
-      </div>
-      <div>
-        <label>Punti da aggiungere</label>
-        <input id="f_points" placeholder="es. 50" inputmode="numeric">
-      </div>
-      <div style="grid-column:1/-1">
-        <button id="f_apply" class="btn primary" type="button">
-          Applica punti su Fidelity
-        </button>
-      </div>
-      <div style="grid-column:1/-1">
-        <span id="f_result" class="label" style="display:none"></span>
-      </div>
-    </div>
-  </section>
-
   <!-- CARD ELENCO -->
   <section class="card">
     <h2>Elenco</h2>
@@ -167,6 +157,7 @@
       </button>
       <div class="details" hidden>
         <div class="r-line actions"></div>
+        <div class="r-line points"></div>
         <div class="r-line reminders"></div>
         <div class="r-line review"></div>
       </div>
@@ -179,6 +170,7 @@
     const STORE_KEY='relong-scadenzario-v32b';
     const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
     const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+    const FIDELITY_URL='https://alessandroiascone.github.io/relong-nfc/fidelity.html';
     const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
@@ -188,15 +180,6 @@
     }
     const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
     const normalizeName  = n => String(n||'').trim().replace(/\s+/g,' ').toLowerCase();
-    function genCodeFromId(id){
-      if(!id) return '000000';
-      let h = 0;
-      for(let i = 0; i < id.length; i++){
-        h = (h * 31 + id.charCodeAt(i)) >>> 0;
-      }
-      const code = 100000 + (h % 900000); // 6 cifre
-      return String(code);
-    }
     const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
@@ -549,9 +532,22 @@
         maybeScheduleNextCycle(it);
 
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
-        el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
+        const titleEl = el.querySelector('.title');
+        titleEl.innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
+
+        // MINI BADGE FIDELITY se il cliente ha punti
+        const currentPoints = Number(it.points || 0);
+        if(!isNaN(currentPoints) && currentPoints>0){
+          const badge = document.createElement('span');
+          badge.className = 'badge-mini';
+          badge.innerHTML = '★ Fidelity <strong>'+currentPoints+' pt</strong>';
+          titleEl.appendChild(badge);
+        }
+
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
-              actions=el.querySelector('.actions'), review=el.querySelector('.review'),
+              actions=el.querySelector('.actions'),
+              pointsLine=el.querySelector('.points'),
+              review=el.querySelector('.review'),
               remWrap=el.querySelector('.reminders');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
 
@@ -605,6 +601,38 @@
           actions.append(btnDelete(it));
         }
 
+        /* FIDELITY: saldo + aggiungi punti + apri card */
+        if(pointsLine){
+          pointsLine.innerHTML='';
+          const currentPoints = Number(it.points || 0);
+          const lbl = document.createElement('span');
+          lbl.className='label';
+          lbl.textContent = `Saldo punti Fidelity: ${isNaN(currentPoints)?0:currentPoints}`;
+
+          const add = aBtn('Aggiungi punti', ()=>{
+            const val = prompt('Quanti punti vuoi aggiungere o togliere? (es. 50 oppure -50)','50');
+            if(val===null) return;
+            const delta = parseInt(String(val).replace(',','.'),10);
+            if(!Number.isFinite(delta) || delta===0){
+              alert('Inserisci un numero valido di punti.');
+              return;
+            }
+            let np = Number(it.points || 0) + delta;
+            if(np < 0) np = 0;
+            it.points = np;
+            it.updatedAt = new Date().toISOString();
+            saveLocal(); saveToGitHub(); render();
+            showToast('Saldo Fidelity aggiornato ✅');
+          });
+
+          const openCard = aBtn('Apri Fidelity Card', ()=>{
+            const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+            window.open(url,'_blank','noopener');
+          });
+
+          pointsLine.append(lbl, add, openCard);
+        }
+
         /* REMINDERS UI */
         remWrap.innerHTML='';
 
@@ -628,8 +656,8 @@
         }
 
         // pulsanti promemoria unico
-        const addFU=aBtn('+ Promemoria unico (+90g)', ()=> addFollowup90(it));
-        const addFUc=aBtn('+ Promemoria unico (personalizzato)', ()=> addFollowupCustom(it));
+        const addFU=aBtn('+90GG', ()=> addFollowup90(it));
+        const addFUc=aBtn('+PERS.', ()=> addFollowupCustom(it));
         remWrap.append(addFU, addFUc);
 
         // bottoni reminder
@@ -679,63 +707,6 @@
       await loadFromGitHubOrLocal();
       render();
       showToast('v32b pronta ✅');
-    })();
-
-    /* ====== Fidelity Card: aggiunta punti da codice univoco ====== */
-    (function(){
-      const fCode   = document.getElementById('f_code');
-      const fPoints = document.getElementById('f_points');
-      const fBtn    = document.getElementById('f_apply');
-      const fRes    = document.getElementById('f_result');
-
-      if(!fBtn) return;
-
-      fBtn.addEventListener('click', async ()=>{
-        const codeRaw = (fCode.value || '').trim();
-        const code = codeRaw.replace(/\D/g,''); // solo cifre
-        let delta = parseInt((fPoints.value || '0').replace(',', '.'), 10);
-
-        if(!code || code.length < 4){
-          alert('Inserisci un codice Fidelity valido (almeno 4–6 cifre).');
-          return;
-        }
-        if(!Number.isFinite(delta) || delta === 0){
-          alert('Inserisci un numero di punti valido (positivo o negativo).');
-          return;
-        }
-
-        // Trova cliente con quel codice Fidelity
-        const target = items.find(it => {
-          const baseId = String(it.id || normalizePhone(it.phone) || it.name || '');
-          return genCodeFromId(baseId) === code;
-        });
-
-        if(!target){
-          fRes.style.display = 'block';
-          fRes.className = 'label';
-          fRes.textContent = 'Nessun cliente trovato per questo codice Fidelity.';
-          showToast('Codice Fidelity non trovato','err');
-          return;
-        }
-
-        const oldPoints = Number(target.points || 0);
-        let newPoints = oldPoints + delta;
-        if(newPoints < 0) newPoints = 0; // niente negativo
-
-        target.points = newPoints;
-        target.updatedAt = new Date().toISOString();
-
-        saveLocal();
-        const ok = await saveToGitHub();
-        if(!ok) showToast('Punti aggiornati solo in locale (sync KO)','err');
-        else    showToast('Punti Fidelity aggiornati ✅');
-
-        fRes.style.display = 'block';
-        fRes.className = 'label';
-        fRes.textContent = `${target.name} ora ha ${newPoints} punti Fidelity`;
-
-        fPoints.value = '';
-      });
     })();
 
     /* ====== Toggle Elenco (Mostra/Nascondi) ====== */
