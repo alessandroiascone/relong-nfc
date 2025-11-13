@@ -86,7 +86,6 @@
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
-    /* spotlight extra soft */
     .hero::after{
       content:""; position:absolute; top:-40px; width:60%; height:120px; max-width:560px;
       background:radial-gradient(ellipse at center, rgba(255,120,0,.16) 0%, rgba(0,0,0,0) 70%);
@@ -129,11 +128,19 @@
       border:1px solid rgba(0,0,0,.08);
     }
 
+    /* Badge oro Fidelity Card */
+    #fidelity-card .badge{
+      background:linear-gradient(90deg,#facc15,#f97316);
+      color:#3b2500;
+      box-shadow:0 10px 22px rgba(250,204,21,.65);
+      border:1px solid rgba(0,0,0,.08);
+    }
+
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
     .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
 
-    /* CTA principale – 3D + sheen */
+    /* CTA principale */
     .btn{
       display:flex; align-items:center; justify-content:center;
       text-decoration:none; text-align:center; width:100%;
@@ -211,121 +218,6 @@
     @keyframes fall{ to{ transform:translateY(105vh); opacity:.92; } }
 
     .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
-
-    /* --- SEZIONE FIDELITY SOTTO LA GRIGLIA --- */
-    .fidelity-section{
-      margin-top:4px;
-      border-radius:20px;
-      border:1px solid rgba(250,204,21,.45);
-      background:
-        radial-gradient(circle at 0 0,rgba(250,204,21,.18),transparent 60%),
-        radial-gradient(circle at 100% 0,rgba(248,113,113,.18),transparent 60%),
-        linear-gradient(145deg,#020617,#020617 60%,#020617 100%);
-      box-shadow:0 24px 56px rgba(0,0,0,.9),0 0 40px rgba(250,204,21,.32);
-      padding:16px 18px 14px;
-    }
-    .fidelity-header{
-      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;
-    }
-    .fidelity-title{
-      display:flex;flex-direction:column;gap:2px;
-    }
-    .fidelity-title h2{
-      font-size:16px;font-weight:900;letter-spacing:-.02em;
-      display:flex;align-items:center;gap:6px;
-    }
-    .fidelity-title h2 span.ico{font-size:16px}
-    .fidelity-title p{
-      font-size:12px;color:var(--muted);max-width:460px;
-    }
-    .fidelity-chip{
-      font-size:11px;text-transform:uppercase;letter-spacing:.08em;
-      padding:5px 10px;border-radius:999px;
-      border:1px solid rgba(250,204,21,.8);
-      background:linear-gradient(90deg,#facc15,#f97316);
-      color:#111827;font-weight:800;
-      box-shadow:0 10px 24px rgba(250,204,21,.6);
-      display:inline-flex;align-items:center;gap:6px;
-    }
-    .fidelity-body{
-      margin-top:10px;
-      display:grid;gap:10px;
-    }
-    @media(min-width:720px){
-      .fidelity-body{
-        grid-template-columns: minmax(0,1.2fr) minmax(0,1.1fr);
-        align-items:flex-start;
-      }
-    }
-    .fid-nav{
-      display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;
-    }
-    .fid-pill{
-      border-radius:999px;
-      padding:8px 12px;
-      border:1px solid rgba(248,250,252,.5);
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;font-size:12px;font-weight:600;
-      display:inline-flex;align-items:center;gap:6px;
-      cursor:pointer;
-      transition:background .18s,border-color .18s,transform .12s,box-shadow .18s;
-    }
-    .fid-pill span.ico{font-size:13px}
-    .fid-pill.active{
-      background:linear-gradient(90deg,#facc15,#f97316);
-      color:#111827;
-      border-color:rgba(15,23,42,.85);
-      box-shadow:0 10px 24px rgba(250,204,21,.6);
-      transform:translateY(-1px);
-    }
-    .fid-forms{
-      display:grid;gap:8px;
-    }
-    .fid-form{
-      display:none;
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.6);
-      background:rgba(15,23,42,.9);
-      padding:10px 12px;
-      font-size:12px;
-    }
-    .fid-form.active{display:block}
-    .fid-fields{display:grid;gap:6px;margin-top:4px}
-    .fid-field{display:flex;flex-direction:column;gap:3px}
-    .fid-field label{
-      font-size:11px;color:var(--muted2);
-      text-transform:uppercase;letter-spacing:.08em;
-    }
-    .fid-field input{
-      border-radius:10px;
-      border:1px solid rgba(55,65,81,.9);
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;font-size:13px;
-      padding:7px 9px;
-    }
-    .fid-helper{
-      font-size:11px;color:var(--muted2);margin-top:4px;
-    }
-    .fid-submit{
-      margin-top:8px;
-      display:inline-flex;align-items:center;justify-content:center;
-      gap:6px;padding:9px 12px;
-      border-radius:999px;
-      border:none;
-      background:linear-gradient(90deg,#22c55e,#16a34a);
-      color:#022c22;font-size:12px;font-weight:800;
-      cursor:pointer;
-      box-shadow:0 14px 32px rgba(22,163,74,.7);
-      transition:background .18s,transform .12s,box-shadow .18s;
-    }
-    .fid-submit:hover{
-      background:linear-gradient(90deg,#4ade80,#22c55e);
-      transform:translateY(-1px);
-      box-shadow:0 18px 40px rgba(22,163,74,.85);
-    }
-    .fid-summary{
-      font-size:12px;color:var(--muted2);
-    }
   </style>
 </head>
 <body>
@@ -396,7 +288,15 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
-      <!-- 5 — SEASON CARD -->
+      <!-- 5 — FIDELITY CARD -->
+      <article class="card" data-anim id="fidelity-card">
+        <div class="badge">FIDELITY CARD</div>
+        <div class="title"><span class="ico">💳</span><span>Fidelity Card Re Long</span></div>
+        <p class="desc">Accumula punti ad ogni acquisto e sfrutta i vantaggi esclusivi per te e i tuoi amici.</p>
+        <a class="btn" href="./fidelity.html">Scopri di più</a>
+      </article>
+
+      <!-- 6 — SEASON CARD -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
@@ -406,107 +306,13 @@
         <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
       </article>
 
-      <!-- 6 — CONTATTO RAPIDO -->
+      <!-- 7 — CONTATTO RAPIDO -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">CONTATTO RAPIDO</div>
         <div class="title"><span class="ico">💬</span><span>Contattaci per altre info</span></div>
         <p class="desc">Hai una domanda? Ti rispondiamo subito su WhatsApp.</p>
         <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20posso%20chiedere%20delle%20informazioni?%20Grazie">💬 Chatta con noi</a>
       </article>
-    </section>
-
-    <!-- SEZIONE FIDELITY SOTTO LA GRIGLIA -->
-    <section class="fidelity-section" id="fidelity">
-      <div class="fidelity-header">
-        <div class="fidelity-title">
-          <h2><span class="ico">🎁</span> Fidelity Card Re Long</h2>
-          <p>
-            Iscriviti gratis, accumula punti con ogni servizio (telefonia, energia, assistenza) e ricevi premi reali.
-            Se porti un amico, guadagnate punti entrambi.
-          </p>
-        </div>
-        <div class="fidelity-chip">
-          ✨ Fidelity Premium • Punti & Premi
-        </div>
-      </div>
-
-      <div class="fidelity-body">
-        <div>
-          <div class="fid-nav">
-            <button type="button" class="fid-pill active" id="fid-nav-register">
-              <span class="ico">📝</span> Registrati
-            </button>
-            <button type="button" class="fid-pill" id="fid-nav-friend">
-              <span class="ico">🤝</span> Porta un amico
-            </button>
-          </div>
-
-          <div class="fid-forms">
-            <!-- FORM REGISTRAZIONE DIRETTA -->
-            <form class="fid-form active" id="fid-form-register">
-              <div class="fid-summary">
-                Compila i tuoi dati, ti contattiamo su WhatsApp e ti riconosciamo
-                <strong>40 punti di benvenuto</strong> sulla Fidelity Card.
-              </div>
-              <div class="fid-fields">
-                <div class="fid-field">
-                  <label for="reg-name">Nome e Cognome</label>
-                  <input id="reg-name" required placeholder="Mario Rossi">
-                </div>
-                <div class="fid-field">
-                  <label for="reg-phone">Telefono</label>
-                  <input id="reg-phone" required placeholder="3331234567" inputmode="numeric">
-                </div>
-              </div>
-              <div class="fid-helper">
-                Riceverai il link della tua card digitale Re Long direttamente su WhatsApp.
-              </div>
-              <button type="submit" class="fid-submit">
-                <span>📲 Iscriviti</span>
-              </button>
-            </form>
-
-            <!-- FORM PORTA UN AMICO -->
-            <form class="fid-form" id="fid-form-friend">
-              <div class="fid-summary">
-                Usa il tuo <strong>codice Fidelity personale</strong> per far registrare un amico:
-                <br>• <b>80 punti</b> a chi presenta
-                <br>• <b>40 punti</b> al nuovo iscritto.
-              </div>
-              <div class="fid-fields">
-                <div class="fid-field">
-                  <label for="friend-code">Codice amico</label>
-                  <input id="friend-code" required placeholder="Es: A1B2C3">
-                </div>
-                <div class="fid-field">
-                  <label for="friend-name">Nome e Cognome del tuo amico</label>
-                  <input id="friend-name" required placeholder="Giulia Bianchi">
-                </div>
-                <div class="fid-field">
-                  <label for="friend-phone">Telefono del tuo amico</label>
-                  <input id="friend-phone" required placeholder="3331234567" inputmode="numeric">
-                </div>
-              </div>
-              <div class="fid-helper">
-                Invieremo la richiesta a Re Long per assegnare i punti e creare la nuova Fidelity.
-              </div>
-              <button type="submit" class="fid-submit">
-                <span>📲 Invia richiesta Porta un amico</span>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div class="fid-summary">
-          <strong>Come funziona il punteggio?</strong><br>
-          • Riparazioni, attivazioni SIM/Fisso, Energia, consumabili (cartucce/toner) e
-          <strong>Porta un amico</strong> ti fanno salire di livello.<br>
-          • I punti vengono caricati dal negozio sul tuo profilo Fidelity associato al tuo
-          <strong>numero di telefono</strong>.<br><br>
-          Per consultare saldo punti e premi raggiungibili, ti basterà aprire il link della tua
-          <strong>Fidelity Card Re Long</strong> che riceverai su WhatsApp.
-        </div>
-      </div>
     </section>
 
     <p class="footer">
@@ -537,7 +343,6 @@
   <!-- Script UX -->
   <script>
     const HOME_PAGE = './relong-hub-v2.html';
-    const STORE_WHATSAPP = '3908119578844';
 
     /* Click sicuri + fallback */
     document.addEventListener('click', async (e)=>{
@@ -569,7 +374,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* “Tilt” 3D al mouse (disabilitato con reduced-motion) */
+    /* “Tilt” 3D al mouse */
     (function(){
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(prefersReduced) return;
@@ -632,73 +437,6 @@
       window.addEventListener('resize', setH);
       window.addEventListener('orientationchange', setH);
       new ResizeObserver(setH).observe(bar);
-    })();
-
-    /* --- LOGICA FIDELITY HUB: REGISTRAZIONE & PORTA UN AMICO --- */
-    (function(){
-      const navReg = document.getElementById('fid-nav-register');
-      const navFri = document.getElementById('fid-nav-friend');
-      const formReg= document.getElementById('fid-form-register');
-      const formFri= document.getElementById('fid-form-friend');
-      if(!navReg || !navFri || !formReg || !formFri) return;
-
-      function setMode(mode){
-        if(mode==='friend'){
-          navReg.classList.remove('active');
-          navFri.classList.add('active');
-          formReg.classList.remove('active');
-          formFri.classList.add('active');
-        }else{
-          navReg.classList.add('active');
-          navFri.classList.remove('active');
-          formReg.classList.add('active');
-          formFri.classList.remove('active');
-        }
-      }
-
-      navReg.addEventListener('click',()=>setMode('register'));
-      navFri.addEventListener('click',()=>setMode('friend'));
-
-      formReg.addEventListener('submit',e=>{
-        e.preventDefault();
-        const name = (document.getElementById('reg-name').value||'').trim();
-        const phone= (document.getElementById('reg-phone').value||'').trim();
-        if(!name || !phone) return;
-        const msg =
-`Nuova richiesta Fidelity Card Re Long 🧾
-
-Nome: ${name}
-Telefono: ${phone}
-
-Provenienza: HUB online (Registrati).
-Richiesta: Creare Fidelity Card e assegnare 40 punti di benvenuto.`;
-        const url = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`;
-        window.location.href = url;
-      });
-
-      formFri.addEventListener('submit',e=>{
-        e.preventDefault();
-        const code  = (document.getElementById('friend-code').value||'').trim();
-        const name  = (document.getElementById('friend-name').value||'').trim();
-        const phone = (document.getElementById('friend-phone').value||'').trim();
-        if(!code || !name || !phone) return;
-        const msg =
-`Nuova iscrizione Fidelity - Porta un amico 🤝
-
-Nuovo cliente:
-• Nome: ${name}
-• Telefono: ${phone}
-
-Codice amico utilizzato: ${code}
-
-Punti da assegnare:
-• 80 pt al cliente con codice: ${code}
-• 40 pt al nuovo iscritto.
-
-Provenienza: HUB online (Porta un amico).`;
-        const url = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`;
-        window.location.href = url;
-      });
     })();
   </script>
 
