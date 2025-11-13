@@ -126,7 +126,7 @@
       margin:10px 0 6px;
     }
 
-    /* CODICE INVITO MOLTO PIÙ VISIBILE */
+    /* CODICE INVITO MOLTO VISIBILE */
     .code-chip{
       border-radius:999px;
       border:1px solid rgba(255,215,0,1);
@@ -441,8 +441,8 @@
       </p>
     </div>
 
-    <!-- SEZIONE COME ACCUMULARE PUNTI -->
-    <div class="section" id="howPoints">
+    <!-- SEZIONE COME ACCUMULARE PUNTI (COLLASSABILE) -->
+    <div class="section" id="howPoints" style="display:none">
       <h2>Come accumulare punti</h2>
       <p>
         Usa la tua Fidelity Card ogni volta che attivi un servizio o fai un acquisto da Re Long:
@@ -524,6 +524,7 @@
     const elRewardsList = document.getElementById("rewardsList");
     const errorBox = document.getElementById("errorBox");
     const cardInner = document.getElementById("cardInner");
+    const howSection = document.getElementById("howPoints");
 
     function fallbackCodeFromId(id){
       const digits = String(id||"").replace(/\D/g,"") || String(Date.now());
@@ -631,9 +632,13 @@
       if(code) copyToClipboard(code);
     });
 
+    // Toggle "Come accumulare punti"
     document.getElementById("btnHow").addEventListener("click",()=>{
-      const sec = document.getElementById("howPoints");
-      sec.scrollIntoView({behavior:"smooth", block:"start"});
+      const isHidden = (howSection.style.display === "none" || howSection.style.display === "");
+      howSection.style.display = isHidden ? "block" : "none";
+      if(isHidden){
+        howSection.scrollIntoView({behavior:"smooth", block:"start"});
+      }
     });
 
     document.getElementById("btnInvite").addEventListener("click",()=>{
