@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Re Long Telefonia, Energia & Assistenza PC</title>
+  <meta name="theme-color" content="#05060a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#05060a; --bg2:#020308;
+      --card:rgba(10,12,20,.96); --stroke:rgba(255,255,255,.09);
+      --muted:rgba(210,220,255,.72);
+      --accent:#0aa2ff; --accent2:#66d1ff;
+      --gold:#ffd700; --gold2:#ffb347;
+      --ok:#25D366; --danger:#ff4d4f;
+    }
+    body{
+      min-height:100svh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
+      color:#eef3ff;
+      background:
+        radial-gradient(90% 90% at 10% 0%,rgba(0,140,255,.22),transparent),
+        radial-gradient(90% 90% at 100% 0%,rgba(255,215,0,.17),transparent),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      padding:24px 16px 32px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+    .app{
+      width:100%;
+      max-width:980px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .logo-main{
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      font-size:14px;
+    }
+    .logo-main span{
+      padding:4px 9px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#ff3b3b,#ff9f1a);
+      margin-right:6px;
+      box-shadow:0 0 14px rgba(255,120,60,.7);
+    }
+    .brand-sub{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .top-contact{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:4px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .top-contact a{
+      color:#fff;
+      text-decoration:none;
+    }
+    .top-contact a:hover{text-decoration:underline}
+    .wh-btn-small{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(37,211,102,.8);
+      background:linear-gradient(135deg,rgba(37,211,102,.22),rgba(0,0,0,.85));
+      font-size:12px;
+      color:#eafff3;
+      text-decoration:none;
+      box-shadow:0 0 12px rgba(37,211,102,.5);
+    }
+
+    .hero{
+      margin-top:4px;
+      padding:16px 18px 18px;
+      border-radius:22px;
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 0 0,rgba(0,140,255,.28),transparent 60%),
+        radial-gradient(circle at 100% 0,rgba(255,215,0,.22),transparent 60%),
+        linear-gradient(135deg,rgba(7,10,20,.98),rgba(3,4,10,.96));
+      box-shadow:0 20px 60px rgba(0,0,0,.8);
+    }
+    .hero-title{
+      font-size:22px;
+      margin-bottom:4px;
+    }
+    .hero-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .hero-tags{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      font-size:11px;
+    }
+    .tag{
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.68);
+      color:var(--muted);
+    }
+    .tag strong{color:#fff;}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width:900px){
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .tile{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      border:1px solid var(--stroke);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.12),rgba(5,6,12,.98));
+      padding:13px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-height:120px;
+    }
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:radial-gradient(circle at 100% 0,rgba(255,215,0,.18),transparent 60%);
+      opacity:.6;
+      pointer-events:none;
+    }
+    .tile-inner{position:relative;z-index:1}
+    .tile-kicker{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:var(--muted);
+    }
+    .tile-title{
+      font-size:15px;
+      font-weight:700;
+      margin-top:4px;
+    }
+    .tile-text{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .tile-cta{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .btn{
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      padding:7px 11px;
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+      background:rgba(0,0,0,.7);
+      color:#f5f6ff;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn-primary{
+      border-color:rgba(0,140,255,.9);
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#03101b;
+      box-shadow:0 12px 28px rgba(0,0,0,.8),0 0 18px rgba(0,140,255,.7);
+    }
+    .btn-gold{
+      border-color:rgba(255,215,0,.9);
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#2b1900;
+      box-shadow:0 10px 26px rgba(0,0,0,.85),0 0 18px rgba(255,215,0,.8);
+    }
+    .btn-outline{
+      border-style:dashed;
+      border-color:rgba(255,255,255,.26);
+    }
+    .btn span.icon{font-size:15px}
+
+    .section-title{
+      margin-top:10px;
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    /* Contatti + Fidelity blocchi verticali */
+    .stack{
+      display:grid;
+      grid-template-columns:minmax(0,1fr);
+      gap:12px;
+      margin-top:6px;
+    }
+    .card{
+      border-radius:20px;
+      border:1px solid var(--stroke);
+      background:rgba(7,9,16,.98);
+      padding:15px 14px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.13),transparent 60%);
+      opacity:.8;
+      pointer-events:none;
+    }
+    .card-inner{position:relative;z-index:1}
+    .card h2{
+      font-size:16px;
+      margin-bottom:4px;
+    }
+    .card p{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .contact-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+      font-size:12px;
+    }
+
+    /* Fidelity Card speciale */
+    .card-gold{
+      border-color:rgba(255,215,0,.75);
+      background:
+        radial-gradient(circle at 0 0,rgba(255,215,0,.18),transparent 60%),
+        radial-gradient(circle at 100% 0,rgba(0,140,255,.18),transparent 60%),
+        linear-gradient(145deg,rgba(7,8,14,.98),rgba(3,3,8,.98));
+      box-shadow:0 22px 60px rgba(0,0,0,.9),0 0 30px rgba(255,215,0,.3);
+    }
+    .fid-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,0,.8);
+      background:linear-gradient(135deg,rgba(255,215,0,.23),rgba(10,12,20,1));
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#fff7d0;
+      margin-bottom:6px;
+      position:relative;
+      overflow:hidden;
+    }
+    .fid-badge::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:conic-gradient(from 0deg,rgba(255,255,255,.3),transparent 40%,transparent 60%,rgba(255,255,255,.6));
+      mix-blend-mode:screen;
+      animation:spin 6s linear infinite;
+      opacity:.7;
+      pointer-events:none;
+    }
+    .fid-badge span{position:relative;z-index:1}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .fid-tabs{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .fid-tab-btn{
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      padding:6px 11px;
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+      background:rgba(0,0,0,.7);
+      color:#f5f6ff;
+    }
+    .fid-tab-btn.active{
+      border-color:rgba(255,215,0,.9);
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#2b1900;
+      box-shadow:0 0 18px rgba(255,215,0,.8);
+    }
+
+    .fid-forms{
+      margin-top:10px;
+    }
+    .fid-form{
+      display:none;
+    }
+    .fid-form.active{display:block;}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      margin-bottom:8px;
+    }
+    .field label{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .field input{
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.7);
+      padding:8px 10px;
+      font-size:13px;
+      color:#f5f6ff;
+    }
+    .field input::placeholder{color:rgba(210,220,255,.5)}
+    .micro{
+      font-size:10px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.9);
+      border:1px solid rgba(255,255,255,.25);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:12px;
+      z-index:9999;
+    }
+
+    footer{
+      margin-top:14px;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      justify-content:space-between;
+      align-items:center;
+    }
+    footer a{color:#fff;text-decoration:none}
+    footer a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo-main"><span>Re</span>LONG</div>
+        <div class="brand-sub">
+          Telefonia • Luce & Gas • Assistenza PC<br/>
+          Smartphone a rate senza busta paga.
+        </div>
+      </div>
+      <div class="top-contact">
+        <a href="https://maps.app.goo.gl/s4ytGUBeGDAEaFG59" target="_blank" rel="noopener">
+          📍 Via Casalanno 31, Marano di Napoli
+        </a>
+        <a href="tel:08119578844">☎️ 08119578844</a>
+        <a class="wh-btn-small" href="https://wa.me/3908119578844" target="_blank" rel="noopener">
+          <span>💬 WhatsApp rapido</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-title">Clicca sulla sezione di interesse</div>
+      <div class="hero-sub">Tu scegli, noi ci prendiamo cura di ogni dettaglio: smartphone, energia, aziende, assistenza e Fidelity Card.</div>
+      <div class="hero-tags">
+        <div class="tag"><strong>Smartphone a rate</strong> senza busta paga</div>
+        <div class="tag">Vodafone • Wind3 • Sky • Luce & Gas ⚡</div>
+        <div class="tag">Assistenza informatica completa</div>
+      </div>
+    </section>
+
+    <!-- GRID PRINCIPALE -->
+    <section>
+      <div class="section-title">Benvenuto</div>
+      <div class="grid">
+        <!-- Smartphone a rate -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Smartphone a rate</div>
+            <div class="tile-title">Scegli il tuo Smartphone</div>
+            <div class="tile-text">
+              Finanziamento Vodafone & Compass senza busta paga con rate flessibili e smartphone top di gamma.
+            </div>
+            <div class="tile-cta">
+              <a class="btn btn-primary" href="catalogo-smartphone-reale-v3.html" target="_blank" rel="noopener">
+                <span class="icon">📱</span><span>Catalogo Digitale</span>
+              </a>
+              <a class="btn btn-outline" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20informazioni%20su%20uno%20smartphone%20a%20rate." target="_blank" rel="noopener">
+                <span class="icon">💬</span><span>Chiedi ora</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Aziende & P.IVA -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Aziende & P.IVA Full Pack</div>
+            <div class="tile-title">Fisso + Mobile con Energia</div>
+            <div class="tile-text">
+              Soluzioni uniche per Partite IVA e Aziende: fisso, mobile e Luce & Gas con un solo referente.
+            </div>
+            <div class="tile-cta">
+              <a class="btn btn-primary" href="aziende-piva.html" target="_blank" rel="noopener">
+                <span class="icon">🏢</span><span>Scopri l'offerta</span>
+              </a>
+              <a class="btn btn-outline" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20info%20per%20una%20soluzione%20Aziende%20%2F%20P.IVA." target="_blank" rel="noopener">
+                <span class="icon">💬</span><span>Parla con noi</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Energia Casa -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Energia Casa</div>
+            <div class="tile-title">⚡ Accendi la tua Energia</div>
+            <div class="tile-text">
+              Invia la foto della tua bolletta e ti prepariamo una simulazione reale per Luce & Gas, senza impegno.
+            </div>
+            <div class="tile-cta">
+              <a class="btn btn-primary" href="simulatore-energia.html" target="_blank" rel="noopener">
+                <span class="icon">⚡</span><span>Vai all’Area Energia</span>
+              </a>
+              <a class="btn btn-outline" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20mando%20la%20foto%20della%20bolletta%20per%20una%20simulazione%20Luce%20%26%20Gas." target="_blank" rel="noopener">
+                <span class="icon">📷</span><span>Invia bolletta</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Assistenza PC -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Assistenza PC</div>
+            <div class="tile-title">Riparazioni & Upgrade</div>
+            <div class="tile-text">
+              Diagnosi veloce e soluzioni su misura per PC, notebook, console e periferiche da lavoro o gaming.
+            </div>
+            <div class="tile-cta">
+              <a class="btn btn-primary" href="assistenza-pc.html" target="_blank" rel="noopener">
+                <span class="icon">🖥️</span><span>Vai all’assistenza PC</span>
+              </a>
+              <a class="btn btn-outline" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ho%20bisogno%20di%20assistenza%20per%20il%20mio%20PC%20%2F%20notebook." target="_blank" rel="noopener">
+                <span class="icon">🔧</span><span>Richiedi diagnosi</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Black Friday / Promo -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Black Friday / Promo</div>
+            <div class="tile-title">⚡ Black Friday Re Long</div>
+            <div class="tile-text">
+              Promo vere su TV, Console, Smartphone ed Energia. Risparmi subito, non solo “scritto sul volantino”.
+            </div>
+            <div class="tile-cta">
+              <a class="btn btn-primary" href="black-friday-relong.html" target="_blank" rel="noopener">
+                <span class="icon">🔥</span><span>Vai alle Offerte</span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Pulsante torna su -->
+        <article class="tile">
+          <div class="tile-inner">
+            <div class="tile-kicker">Navigazione</div>
+            <div class="tile-title">⬆️ Torna su</div>
+            <div class="tile-text">
+              Ritorna subito all’inizio della pagina e scegli un’altra sezione da esplorare.
+            </div>
+            <div class="tile-cta">
+              <button class="btn btn-outline" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+                ⬆️ Portami all’inizio
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTATTO RAPIDO + FIDELITY -->
+    <section>
+      <div class="section-title">Contatto rapido</div>
+      <div class="stack">
+        <!-- Contattaci -->
+        <div class="card">
+          <div class="card-inner">
+            <h2>Contattaci per altre info</h2>
+            <p>
+              Vuoi un consiglio veloce su offerte, attivazioni o assistenza? Scrivici su WhatsApp:
+              risponde direttamente Re Long, senza bot.
+            </p>
+            <div class="contact-row">
+              <a class="btn btn-primary" href="https://wa.me/3908119578844" target="_blank" rel="noopener">
+                <span class="icon">💬</span><span>Chatta con noi</span>
+              </a>
+              <a class="btn btn-outline" href="tel:08119578844">
+                📞 Chiama ora
+              </a>
+              <a class="btn btn-outline" href="https://maps.app.goo.gl/s4ytGUBeGDAEaFG59" target="_blank" rel="noopener">
+                📍 Portami allo Store
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fidelity Card -->
+        <div class="card card-gold" id="fidelity">
+          <div class="card-inner">
+            <div class="fid-badge"><span>Fidelity Card Re Long</span></div>
+            <h2>Fidelity Card Re Long</h2>
+            <p>
+              Iscriviti gratis, accumula punti su ogni servizio e trasforma la tua fedeltà in premi:
+              pellicole, powerbank, cuffie Bluetooth, smartwatch e occhiali smart.
+            </p>
+
+            <div class="fid-tabs">
+              <button class="fid-tab-btn active" type="button" data-tab="reg">Registrati</button>
+              <button class="fid-tab-btn" type="button" data-tab="friend">Porta un amico</button>
+            </div>
+
+            <div class="fid-forms">
+              <!-- Registrazione -->
+              <form class="fid-form active" id="formReg">
+                <div class="field">
+                  <label>Nome e Cognome</label>
+                  <input type="text" id="regName" placeholder="Mario Rossi" autocomplete="name" />
+                </div>
+                <div class="field">
+                  <label>Telefono</label>
+                  <input type="tel" id="regPhone" placeholder="3331234567" inputmode="numeric" />
+                </div>
+                <div class="micro">
+                  Con la registrazione alla Fidelity Card accetti di essere ricontattato da Re Long per premi,
+                  promozioni dedicate e gestione punti.
+                </div>
+                <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                  <button type="button" class="btn btn-gold" onclick="submitFidRegister()">
+                    ✨ Iscriviti alla Fidelity (+40 punti)
+                  </button>
+                </div>
+              </form>
+
+              <!-- Porta un amico -->
+              <form class="fid-form" id="formFriend">
+                <div class="field">
+                  <label>Codice invito Fidelity (6 cifre)</label>
+                  <input type="text" id="friendCode" maxlength="6" placeholder="Es. 123456" />
+                </div>
+                <div class="field">
+                  <label>Nome e Cognome del tuo amico</label>
+                  <input type="text" id="friendName" placeholder="Luigi Bianchi" />
+                </div>
+                <div class="field">
+                  <label>Telefono del tuo amico</label>
+                  <input type="tel" id="friendPhone" placeholder="3337654321" inputmode="numeric" />
+                </div>
+                <div class="micro">
+                  Il tuo amico riceve 40 punti di benvenuto. Tu, come presentatore, ottieni 80 punti extra
+                  sulla tua Fidelity Card Re Long.
+                </div>
+                <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                  <button type="button" class="btn btn-gold" onclick="submitFidFriend()">
+                    ⭐ Conferma invito (+80 punti a te, +40 al tuo amico)
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© Re Long Informatica – Telefonia, Energia & Assistenza PC</div>
+      <div>Via Casalanno 31 • Marano di Napoli • ☎️ 08119578844</div>
+    </footer>
+  </div>
+
+  <script>
+    const RELONG_PHONE = "08119578844";
+    const HUB_URL = window.location.href.split("#")[0].split("?")[0];
+    const GH_CFG_KEY = "relong-gh-config-v31";
+    const GH_TOKEN_KEY = "relong-gh-token-v31";
+
+    function toast(msg){
+      const t=document.createElement("div");
+      t.className="toast";
+      t.textContent=msg;
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),2400);
+    }
+
+    // Tabs Fidelity
+    document.querySelectorAll(".fid-tab-btn").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".fid-tab-btn").forEach(b=>b.classList.toggle("active", b===btn));
+        document.querySelectorAll(".fid-form").forEach(f=>f.classList.remove("active"));
+        const form = document.getElementById(tab==="reg" ? "formReg" : "formFriend");
+        if(form) form.classList.add("active");
+      });
+    });
+
+    const normalizePhone = p => String(p||"").trim().replace(/\D/g,"");
+    const nowISO = () => new Date().toISOString();
+
+    const GH = {
+      cfg(){
+        try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||"null"); }catch{return null}
+      },
+      token(){
+        return localStorage.getItem(GH_TOKEN_KEY)||"";
+      },
+      headers(){
+        return {
+          "Accept":"application/vnd.github+json",
+          "Authorization":"Bearer "+this.token()
+        };
+      },
+      async get(path){
+        const c=this.cfg();
+        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||"main")}`;
+        const res=await fetch(url,{headers:this.headers()});
+        if(!res.ok) throw new Error("GET "+res.status);
+        return res.json();
+      },
+      async put(path, text, msg){
+        const c=this.cfg();
+        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
+        let sha=null;
+        try{
+          const meta=await this.get(path);
+          sha=meta.sha;
+        }catch(e){}
+        const body={
+          message:msg||"Update Fidelity dal Re Long Hub",
+          content:btoa(unescape(encodeURIComponent(text))),
+          branch:c.branch||"main"
+        };
+        if(sha) body.sha=sha;
+        const res=await fetch(url,{
+          method:"PUT",
+          headers:{...this.headers(),"Content-Type":"application/json"},
+          body:JSON.stringify(body)
+        });
+        if(!res.ok){
+          if(res.status===409){
+            const meta=await this.get(path);
+            const body2={...body,sha:meta.sha};
+            const r2=await fetch(url,{
+              method:"PUT",
+              headers:{...this.headers(),"Content-Type":"application/json"},
+              body:JSON.stringify(body2)
+            });
+            if(!r2.ok) throw new Error("PUT "+r2.status);
+            return r2.json();
+          }
+          throw new Error("PUT "+res.status);
+        }
+        return res.json();
+      }
+    };
+
+    function hasGitHubConfig(){
+      const cfg = GH.cfg();
+      const tk = GH.token();
+      return !!(cfg && tk && cfg.owner && cfg.repo);
+    }
+
+    async function loadItems(){
+      const cfg = GH.cfg();
+      const path = cfg?.path || "data/items.json";
+      const meta = await GH.get(path);
+      const text = decodeURIComponent(escape(atob(meta.content)));
+      let json;
+      try{ json = JSON.parse(text); }catch{ json=[]; }
+      if(!Array.isArray(json)) json=[];
+      return {items:json, path};
+    }
+
+    async function saveItems(items, path){
+      await GH.put(path, JSON.stringify(items||[]), "Update items Fidelity (Hub)");
+    }
+
+    function fallbackCodeFromId(id){
+      const digits = String(id||"").replace(/\D/g,"") || String(Date.now());
+      const last6 = digits.slice(-6);
+      return last6.padStart(6,"0");
+    }
+
+    function findClientByPhone(items, phone){
+      const np = normalizePhone(phone);
+      return items.find(x=> normalizePhone(x.phone)===np );
+    }
+
+    function findClientByInviteCode(items, code){
+      const c = String(code||"").trim();
+      if(!c) return null;
+      for(const it of items){
+        const effective = it.fidCode || fallbackCodeFromId(it.id);
+        if(String(effective)===c) return it;
+      }
+      return null;
+    }
+
+    function ensureFidCode(it){
+      if(!it.fidCode){
+        it.fidCode = fallbackCodeFromId(it.id);
+      }
+    }
+
+    function walinkToReLong(text){
+      return `https://wa.me/39${RELONG_PHONE}?text=${encodeURIComponent(text)}`;
+    }
+
+    async function submitFidRegister(){
+      const name = (document.getElementById("regName").value||"").trim();
+      const phone = normalizePhone(document.getElementById("regPhone").value||"");
+      if(!name || !/\s/.test(name)){
+        alert("Inserisci Nome e Cognome completi");
+        return;
+      }
+      if(!phone || phone.length<7){
+        alert("Inserisci un numero di telefono valido");
+        return;
+      }
+
+      // Se c'è configurazione GitHub, aggiorna items.json
+      if(hasGitHubConfig()){
+        try{
+          const {items,path} = await loadItems();
+          let it = findClientByPhone(items, phone);
+          const now = nowISO();
+          if(it){
+            it.name = it.name || name;
+            it.updatedAt = now;
+            it.fromFidelity = true;
+            it.fidelityTag = "registrazione";
+            it.points = (Number(it.points)||0) + 40;
+            ensureFidCode(it);
+          }else{
+            const id = Date.now()+Math.random().toString(16).slice(2);
+            it = {
+              id,
+              name,
+              phone,
+              createdAt:now,
+              updatedAt:now,
+              activated:[],
+              acceptance:false,
+              fromPacchi:false,
+              fromFidelity:true,
+              fidelityTag:"registrazione",
+              points:40,
+              fidCode:String(Math.floor(100000+Math.random()*900000)),
+              done:false
+            };
+            items.unshift(it);
+          }
+          await saveItems(items,path);
+          toast("Registrazione Fidelity salvata (+40 punti) ✅");
+
+          // Messaggio che il cliente invia a Re Long (stile uniforme)
+          const msg =
+            `Ciao Re Long, sono ${name}.\n`+
+            `Mi sono appena iscritto alla Fidelity Card dal sito e ho attivato i miei primi 40 punti.\n`+
+            `Tienimi aggiornato su premi e promozioni.`;
+          window.open(walinkToReLong(msg), "_blank", "noopener");
+
+          (document.getElementById("formReg")).reset();
+          return;
+        }catch(e){
+          console.error(e);
+          toast("Sync Fidelity non disponibile, invio dati via WhatsApp…");
+        }
+      }
+
+      // Fallback WhatsApp (nessun token o errore)
+      const message =
+        `Fidelity – Nuova registrazione dal sito:\n\n`+
+        `Nome: ${name}\n`+
+        `Telefono: ${phone}\n\n`+
+        `Da inserire nel gestionale con +40 punti Fidelity.`;
+      window.open(walinkToReLong(message), "_blank", "noopener");
+      toast("Apertura WhatsApp per registrazione Fidelity");
+      (document.getElementById("formReg")).reset();
+    }
+
+    async function submitFidFriend(){
+      const code = (document.getElementById("friendCode").value||"").trim();
+      const name = (document.getElementById("friendName").value||"").trim();
+      const phone = normalizePhone(document.getElementById("friendPhone").value||"");
+      if(!code || code.length<3){
+        alert("Inserisci un codice invito Fidelity valido");
+        return;
+      }
+      if(!name || !/\s/.test(name)){
+        alert("Inserisci Nome e Cognome dell'amico");
+        return;
+      }
+      if(!phone || phone.length<7){
+        alert("Inserisci un numero di telefono valido");
+        return;
+      }
+
+      if(hasGitHubConfig()){
+        try{
+          const {items,path} = await loadItems();
+          const inviter = findClientByInviteCode(items, code);
+          const now = nowISO();
+          if(!inviter){
+            alert("Codice invito non trovato nei dati Fidelity. Verrà inviata una richiesta via WhatsApp a Re Long.");
+            throw new Error("Inviter not found");
+          }
+          ensureFidCode(inviter);
+          inviter.points = (Number(inviter.points)||0) + 80;
+          inviter.updatedAt = now;
+
+          let friend = findClientByPhone(items, phone);
+          if(friend){
+            friend.name = friend.name || name;
+            friend.updatedAt = now;
+            friend.fromFidelity = true;
+            friend.fidelityTag = "porta-amico";
+            friend.points = (Number(friend.points)||0) + 40;
+            friend.invitedByCode = inviter.fidCode;
+            ensureFidCode(friend);
+          }else{
+            const id = Date.now()+Math.random().toString(16).slice(2);
+            friend = {
+              id,
+              name,
+              phone,
+              createdAt:now,
+              updatedAt:now,
+              activated:[],
+              acceptance:false,
+              fromPacchi:false,
+              fromFidelity:true,
+              fidelityTag:"porta-amico",
+              points:40,
+              fidCode:String(Math.floor(100000+Math.random()*900000)),
+              invitedByCode:inviter.fidCode,
+              done:false
+            };
+            items.unshift(friend);
+          }
+
+          await saveItems(items,path);
+          toast("Invito registrato: +80 punti al presentatore, +40 punti al nuovo cliente ✅");
+
+          // Messaggio da far inviare all'amico verso Re Long
+          const msgFriend =
+            `Ciao Re Long, sono ${name}.\n`+
+            `Mi sono registrato alla Fidelity Card usando il codice invito ${code}.\n`+
+            `Attendo conferma dei miei 40 punti di benvenuto.`;
+          window.open(walinkToReLong(msgFriend), "_blank", "noopener");
+
+          (document.getElementById("formFriend")).reset();
+          return;
+        }catch(e){
+          console.error(e);
+          toast("Sync Fidelity non disponibile, invio dati via WhatsApp…");
+        }
+      }
+
+      // Fallback WhatsApp
+      const msg =
+        `Fidelity – PORTA UN AMICO dal sito:\n\n`+
+        `Codice invito presentatore: ${code}\n\n`+
+        `Nuovo cliente:\n`+
+        `Nome: ${name}\n`+
+        `Telefono: ${phone}\n\n`+
+        `Da inserire nel gestionale con: +80 punti al presentatore, +40 punti al nuovo cliente.`;
+      window.open(walinkToReLong(msg), "_blank", "noopener");
+      toast("Apertura WhatsApp per invito Fidelity");
+      (document.getElementById("formFriend")).reset();
+    }
+  </script>
+</body>
+</html>
