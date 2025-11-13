@@ -128,7 +128,7 @@
       border-radius:999px;padding:6px 10px;font-size:11px;min-width:130px
     }
 
-    /* Search input in filtri */
+    /* Search input sempre visibile */
     #searchInput{
       background:#0a0d14;
       border:1px solid var(--stroke);
@@ -214,8 +214,11 @@
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
+
+      <!-- Toolbar: Filtri + Ricerca sempre visibile -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
+        <input id="searchInput" placeholder="Cerca nome o telefono" />
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -227,11 +230,10 @@
         <button class="toggle" data-filter="rate">Rate</button>
         <button class="toggle" data-filter="riparazioni">Riparazioni</button>
         <button class="toggle" data-filter="preventivi">Preventivi</button>
-        <button class="toggle" data-filter="search">Ricerca</button>
-        <input id="searchInput" placeholder="Cerca nome o telefono" style="display:none" />
       </div>
 
-      <div id="counter" class="label" style="margin-bottom:10px">Clienti: 0</div>
+      <div id="counter" class="label" style="margin-bottom:6px">Clienti: 0</div>
+      <div id="filterSummary" class="label" style="margin-bottom:10px;display:none"></div>
       <div id="list"></div>
     </div>
   </section>
@@ -644,19 +646,19 @@
       }catch{}
     });
 
-    /* FILTRI */
+    /* FILTRI + RICERCA */
     let filterToday=false;
     let filterState={
       remindtoday:false,
       pacchi:false, sim:false, fisso:false, energia:false,
-      rate:false, riparazioni:false, preventivi:false,
-      search:false
+      rate:false, riparazioni:false, preventivi:false
     };
     let searchTerm='';
 
     const toggleFiltersBtn = $('#toggleFilters');
     const filtersRow = $('#filtersRow');
     const searchInput = document.getElementById('searchInput');
+    const filterSummary = document.getElementById('filterSummary');
 
     toggleFiltersBtn.addEventListener('click', ()=>{
       const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
@@ -664,28 +666,22 @@
       toggleFiltersBtn.classList.toggle('active', isHidden);
     });
 
+    // click sugli altri filtri
     filtersRow.addEventListener('click', e=>{
       const b=e.target.closest('.toggle'); if(!b) return;
       const key=b.dataset.filter;
       const on=!b.classList.contains('active');
       b.classList.toggle('active',on);
       filterState[key]=on;
-      if(key==='remindtoday') filterToday = on;
-      if(key==='search'){
-        if(on){
-          searchInput.style.display='block';
-          searchInput.focus();
-        } else {
-          searchInput.value='';
-          searchInput.style.display='none';
-          searchTerm='';
-          render();
-        }
-      } else {
-        render();
+
+      if(key === 'remindtoday'){
+        filterToday = on;
       }
+
+      render();
     });
 
+    // Ricerca sempre attiva
     if(searchInput){
       searchInput.addEventListener('input', ()=>{
         searchTerm = searchInput.value.trim().toLowerCase();
@@ -694,7 +690,7 @@
     }
 
     function matchesCategoryFilters(it){
-      const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && k!=='search' && v);
+      const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && v);
       if(!anyOn) return true;
 
       const acts = new Set(it.activated||[]);
@@ -910,6 +906,45 @@
       if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
+    /* Badge riassunto filtri */
+    function updateFilterSummary(visibleCount){
+      if(!filterSummary) return;
+
+      const parts = [];
+
+      if(searchTerm){
+        parts.push(`Ricerca: "${searchTerm}"`);
+      }
+
+      if(filterToday){
+        parts.push('Remind oggi');
+      }
+
+      const mapLabel = {
+        pacchi:'Pacchi',
+        sim:'SIM',
+        fisso:'Fisso',
+        energia:'Energia',
+        rate:'Rate',
+        riparazioni:'Riparazioni',
+        preventivi:'Preventivi'
+      };
+
+      Object.entries(filterState).forEach(([k,v])=>{
+        if(k==='remindtoday') return;
+        if(v) parts.push(mapLabel[k] || k);
+      });
+
+      if(!parts.length){
+        filterSummary.style.display='none';
+        filterSummary.textContent='';
+        return;
+      }
+
+      filterSummary.style.display='';
+      filterSummary.textContent = `Filtri attivi: ${parts.join(' • ')} | Risultati: ${visibleCount}`;
+    }
+
     /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
@@ -929,9 +964,16 @@
 
         if(!matchesCategoryFilters(it)) return false;
 
+        // ricerca: nome o telefono
         if(searchTerm){
-          const nMatch = normalizeName(it.name||'').includes(searchTerm);
-          const pMatch = normalizePhone(it.phone||'').includes(searchTerm.replace(/\D/g,''));
+          const nameText = (it.name || '').toLowerCase();
+          const phoneText = normalizePhone(it.phone || '');
+          const q = searchTerm.toLowerCase();
+          const qDigits = q.replace(/\D/g,'');
+
+          const nMatch = nameText.includes(q);
+          const pMatch = qDigits ? phoneText.includes(qDigits) : false;
+
           if(!nMatch && !pMatch) return false;
         }
 
@@ -939,6 +981,7 @@
       });
 
       counter.textContent = 'Clienti: ' + source.length;
+      updateFilterSummary(source.length);
 
       source.forEach(it=>{
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
