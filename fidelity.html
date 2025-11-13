@@ -225,6 +225,11 @@
       border-color:rgba(255,255,255,.16);
       background:rgba(255,255,255,.03);
     }
+    .chip-btn.active{
+      background:linear-gradient(135deg,var(--elec3),var(--elec2));
+      color:#04121f;
+      border-color:transparent;
+    }
 
     .chips-row{
       display:flex;
@@ -365,12 +370,78 @@
       padding-left:0;
       margin:4px 0 0;
       display:grid;
-      gap:6px;
+      gap:8px;
       font-size:12px;
       color:var(--muted);
     }
-    .rewards-list li strong{
+    .rewards-list li{
+      padding:6px 8px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.04);
+      background:rgba(0,0,0,.15);
+      transition:.25s ease;
+    }
+    .rewards-list li.reachable{
+      border-color:rgba(247,215,116,.65);
+      background:linear-gradient(135deg,rgba(247,215,116,.14),rgba(10,12,20,.9));
+    }
+    .rewards-list li.locked{
+      opacity:.8;
+    }
+    .reward-line{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .reward-badge{
+      min-width:64px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.25px;
+      text-transform:uppercase;
+      text-align:center;
+      border:1px solid rgba(255,255,255,.18);
+      background:radial-gradient(circle at 0 0,rgba(247,215,116,.4),rgba(10,10,10,1));
+      color:#110b00;
+      box-shadow:0 0 14px rgba(247,215,116,.55);
+      animation:rewardPulse 2.4s ease-in-out infinite alternate;
+    }
+    .rewards-list li.locked .reward-badge{
+      background:rgba(20,20,26,1);
+      color:var(--muted);
+      border-color:rgba(255,255,255,.18);
+      box-shadow:none;
+      animation:none;
+    }
+    .reward-body{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .reward-title{
+      font-size:12px;
       color:#fff;
+      font-weight:700;
+    }
+    .reward-desc{
+      font-size:11px;
+      color:var(--muted);
+    }
+    @keyframes rewardPulse{
+      0%{transform:translateY(0px);box-shadow:0 0 6px rgba(247,215,116,.6);}
+      100%{transform:translateY(-1px);box-shadow:0 0 14px rgba(247,215,116,1);}
+    }
+    .reward-label{
+      margin-top:4px;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.22px;
+      color:var(--muted);
+    }
+    .rewards-list li.reachable .reward-label{
+      color:var(--gold1);
     }
   </style>
 </head>
@@ -420,7 +491,7 @@
         </div>
         <div class="progress-label">
           <span id="progressLabelLeft">0 pt</span>
-          <span id="progressLabelRight">Prossimo premio a 500 pt</span>
+          <span id="progressLabelRight">Prossimo premio a 150 pt</span>
         </div>
       </div>
 
@@ -505,22 +576,76 @@
             Condividi il tuo <strong>codice Fidelity</strong> con amici e familiari.  
             Quando si registrano usando il tuo codice: tu prendi <strong>+100 punti</strong>, loro <strong>+50 punti</strong>.</p>
           <p><strong>4. Premi & vantaggi</strong><br/>
-            Raggiunte determinate soglie (es. 500, 1000 punti…) potrai accedere a sconti esclusivi, gadget o promo dedicate in negozio.</p>
+            Raggiunte determinate soglie potrai accedere a sconti esclusivi, gadget o promo dedicate in negozio.</p>
         </div>
       </details>
     </section>
 
     <!-- ELENCO PREMI -->
     <section class="card">
-      <div class="section-title">Elenco premi indicativo</div>
+      <div class="section-title">Elenco premi Fidelity Re Long</div>
       <div class="section-sub">
-        Esempio di soglie punti. I premi possono variare nel tempo:  
-        verifica sempre in negozio le promo attive.
+        Riscatta i tuoi premi esclusivi quando raggiungi le soglie punti indicate.
+        I premi possono variare in base alle disponibilità in negozio.
       </div>
-      <ul class="rewards-list">
-        <li><strong>500 punti</strong> – Sconto dedicato su accessori o servizio base.</li>
-        <li><strong>1000 punti</strong> – Bonus su acquisto smartphone o gadget selezionati.</li>
-        <li><strong>1500 punti</strong> – Vantaggi premium, bundle o promo speciali Re Long.</li>
+
+      <div class="chips-row" style="margin-bottom:8px">
+        <button id="filterReachableBtn" class="chip-btn" type="button">
+          Mostra solo premi raggiungibili
+        </button>
+      </div>
+
+      <ul class="rewards-list" id="rewardsList">
+        <li data-points="150">
+          <div class="reward-line">
+            <span class="reward-badge">150 pt</span>
+            <div class="reward-body">
+              <div class="reward-title">Pellicola di Gel Ultra Crystal Premium Quality</div>
+              <div class="reward-desc">Protezione schermo con installazione inclusa.</div>
+              <div class="reward-label">Primo premio, ideale come start del percorso Fidelity.</div>
+            </div>
+          </div>
+        </li>
+        <li data-points="300">
+          <div class="reward-line">
+            <span class="reward-badge">300 pt</span>
+            <div class="reward-body">
+              <div class="reward-title">Powerbank 5000 mAh First Rapid Charge</div>
+              <div class="reward-desc">Ricarica rapida per il tuo smartphone, compatto e da portare sempre con te.</div>
+              <div class="reward-label">Perfetto per chi viaggia o usa molto il telefono.</div>
+            </div>
+          </div>
+        </li>
+        <li data-points="600">
+          <div class="reward-line">
+            <span class="reward-badge">600 pt</span>
+            <div class="reward-body">
+              <div class="reward-title">Cuffie Bluetooth SGS Pods</div>
+              <div class="reward-desc">Ascolta musica e chiamate in comodità, senza fili.</div>
+              <div class="reward-label">Premio intermedio, pensato per chi è già fedele a Re Long.</div>
+            </div>
+          </div>
+        </li>
+        <li data-points="1000">
+          <div class="reward-line">
+            <span class="reward-badge">1000 pt</span>
+            <div class="reward-body">
+              <div class="reward-title">Smartwatch SGS Square Bluetooth con funzione chiamata</div>
+              <div class="reward-desc">Gestisci notifiche e chiamate direttamente dal polso.</div>
+              <div class="reward-label">Premio importante, dedicato ai clienti super attivi.</div>
+            </div>
+          </div>
+        </li>
+        <li data-points="1500">
+          <div class="reward-line">
+            <span class="reward-badge">1500 pt</span>
+            <div class="reward-body">
+              <div class="reward-title">Occhiali SGS Smart</div>
+              <div class="reward-desc">Ascolta la musica e rispondi al cellulare direttamente dai tuoi occhiali.</div>
+              <div class="reward-label">Top reward: il massimo della Fidelity Re Long.</div>
+            </div>
+          </div>
+        </li>
       </ul>
     </section>
 
@@ -536,7 +661,9 @@
     const HUB_URL    = 'https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
     const CATALOG_URL= 'https://alessandroiascone.github.io/relong-nfc/catalogo-smartphone-reale-v3.html';
     const RELONG_PHONE = '08119578844';
-    const DEFAULT_STEP = 500; // soglia “prossimo premio”
+
+    // soglie dei premi
+    const REWARD_STEPS = [150,300,600,1000,1500];
 
     const $ = s => document.querySelector(s);
 
@@ -552,14 +679,22 @@
       return String(code);
     }
 
+    // progress in base alle soglie dei premi
     function computeProgress(points){
       const p = Math.max(0, points||0);
-      const step = DEFAULT_STEP;
-      const currentStep = Math.floor(p/step);
-      const nextThreshold = (currentStep+1)*step;
-      const prevThreshold = currentStep*step;
-      const inStep = Math.min(1, (p - prevThreshold) / (step||1));
-      return {prevThreshold,nextThreshold,ratio:inStep};
+      const steps = REWARD_STEPS;
+      let next = steps.find(s => p < s);
+      if(!next) next = steps[steps.length-1];
+      let prev = 0;
+      for(let i=0;i<steps.length;i++){
+        if(steps[i] >= next){
+          prev = i===0 ? 0 : steps[i-1];
+          break;
+        }
+      }
+      const span = (next - prev) || next || 1;
+      const ratio = Math.max(0, Math.min(1, (p - prev) / span));
+      return {prevThreshold:prev,nextThreshold:next,ratio};
     }
 
     const PROMOS = [
@@ -654,6 +789,17 @@
       }
     }
 
+    function updateRewardsUI(points){
+      const list = document.getElementById('rewardsList');
+      if(!list) return;
+      [...list.querySelectorAll('li')].forEach(li=>{
+        const need = parseInt(li.dataset.points,10) || 0;
+        const reachable = points >= need;
+        li.classList.toggle('reachable', reachable);
+        li.classList.toggle('locked', !reachable);
+      });
+    }
+
     (async function init(){
       renderPromos();
 
@@ -674,9 +820,12 @@
       const missing = Math.max(0, prog.nextThreshold - points);
       document.getElementById('miniCounter').textContent = missing>0
         ? `Ti mancano ${missing} punti al prossimo premio.`
-        : `Hai superato una soglia di premio, passa in negozio per scoprire cosa puoi riscattare.`;
+        : `Hai superato una soglia premio, passa in negozio per scoprire cosa puoi riscattare.`;
 
       document.getElementById('codePill').textContent = code;
+
+      // aggiorna stato premi (badge animati / raggiungibili)
+      updateRewardsUI(points);
 
       // bottone "Come funziona"
       document.getElementById('howBtn').addEventListener('click', ()=>{
@@ -686,6 +835,26 @@
           det.scrollIntoView({behavior:'smooth',block:'start'});
         }
       });
+
+      // filtro "Mostra solo premi raggiungibili"
+      const filterBtn = document.getElementById('filterReachableBtn');
+      if(filterBtn){
+        let filterOn = false;
+        filterBtn.addEventListener('click', ()=>{
+          filterOn = !filterOn;
+          filterBtn.classList.toggle('active', filterOn);
+          const list = document.getElementById('rewardsList');
+          if(!list) return;
+          [...list.querySelectorAll('li')].forEach(li=>{
+            const need = parseInt(li.dataset.points,10) || 0;
+            if(!filterOn){
+              li.style.display = '';
+            }else{
+              li.style.display = (points >= need) ? '' : 'none';
+            }
+          });
+        });
+      }
 
       // copia solo codice
       document.getElementById('copyCodeBtn').addEventListener('click', async ()=>{
