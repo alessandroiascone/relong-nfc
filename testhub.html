@@ -3,879 +3,717 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Re Long Informatica, Telefonia, Energia & Assistenza PC</title>
-  <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
-  <meta name="theme-color" content="#0a0a0a">
-
-  <!-- Open Graph / Twitter -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Re Long Informatica – Telefonia, Energia & Assistenza PC">
-  <meta property="og:description" content="Smartphone a rate, Offerte Business, Energia Casa e Assistenza PC. Tel: 08119578844.">
-  <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
-  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Re Long Informatica">
-  <meta name="twitter:description" content="Smartphone a rate, Energia, Business, Assistenza PC.">
-  <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
-
-  <!-- SEO extras -->
-  <link rel="canonical" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
-
-  <!-- Favicon inline -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://wa.me">
-  <link rel="preconnect" href="https://maps.app.goo.gl">
-  <link rel="preconnect" href="https://www.google.com">
-  <link rel="dns-prefetch" href="https://alessandroiascone.github.io">
-  <link rel="prefetch" href="./catalogo-smartphone-reale-v3.html" as="document" crossorigin>
-
+  <title>Re Long • Fidelity Card</title>
+  <meta name="theme-color" content="#05060a">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;
-      --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
-      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
-      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
-      --seasonbar-h:96px;
-      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --bg1:#04050a;--bg2:#050712;
+      --accent1:#facc15;--accent2:#f97316;
+      --accent3:#22c55e;--stroke:rgba(255,255,255,.08);
+      --muted:rgba(226,232,255,.72);--muted2:rgba(148,163,184,.9);
+      --danger:#ef4444;
     }
-    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
-    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-    :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
-
-    /* Loader */
-    #rl-loader{
-      position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
-      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
-      transition:opacity .45s ease, visibility .45s ease;
-      animation: loaderAutoHide 0s linear 3.2s forwards;
-    }
-    #rl-loader.hidden{opacity:0;visibility:hidden}
-    .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
-    .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.6s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
-    .rl-cube .face{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand1),var(--brand2));border:1px solid rgba(255,255,255,.12);border-radius:10px;opacity:.96}
-    .rl-cube .f1{transform:translateZ(42px)} .rl-cube .f2{transform:rotateY(180deg) translateZ(42px)}
-    .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
-    .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
-    @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
-    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
-
     body{
+      min-height:100vh;
       font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
-      background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
-      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow-x:hidden
+      background:radial-gradient(circle at 0% 0%,#111827 0%,#020617 56%,#000 100%);
+      color:#e5e7eb;
+      display:flex;align-items:center;justify-content:center;
+      padding:20px;
     }
     body::before{
-      content:"";position:fixed;inset:auto;left:50%;top:40%;
-      transform:translateX(-50%);width:1200px;height:1200px;border-radius:50%;
-      background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
-      filter:blur(6px);pointer-events:none;z-index:0
+      content:"";position:fixed;inset:auto;top:-200px;left:50%;
+      transform:translateX(-50%);
+      width:900px;height:900px;border-radius:50%;
+      background:radial-gradient(circle,#f97316 0%,transparent 60%);
+      opacity:.15;filter:blur(10px);pointer-events:none;z-index:-1;
     }
-    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
-    @media(max-width:480px){.wrap{padding-bottom:130px}}
-
-    .head{text-align:center;padding:8px 8px 0 8px}
-    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
-    .brand .logo{width:24px;height:24px;display:inline-block}
-    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
-
-    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;position:relative}
-    .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
-    .hero p{font-size:13px;color:var(--muted)}
-    .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
-    /* spotlight extra soft */
-    .hero::after{
-      content:""; position:absolute; top:-40px; width:60%; height:120px; max-width:560px;
-      background:radial-gradient(ellipse at center, rgba(255,120,0,.16) 0%, rgba(0,0,0,0) 70%);
-      filter:blur(10px); pointer-events:none;
+    .shell{
+      width:100%;max-width:900px;margin:auto;
+      display:grid;gap:18px;
+    }
+    header.head{text-align:center}
+    header.head h1{
+      font-size:22px;font-weight:900;letter-spacing:-.03em;
+      display:flex;justify-content:center;align-items:center;gap:8px;
+    }
+    header.head span.logo{
+      width:22px;height:22px;border-radius:7px;
+      background:linear-gradient(135deg,#ef4444,#f97316);
+      display:inline-flex;align-items:center;justify-content:center;
+      box-shadow:0 0 0 1px rgba(15,23,42,.8),0 10px 24px rgba(248,113,113,.45);
+    }
+    header.head p{
+      margin-top:6px;font-size:13px;color:var(--muted);
     }
 
-    /* Griglia */
-    .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
-    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+    .layout{
+      display:grid;gap:18px;margin-top:10px;
+    }
+    @media(min-width:880px){
+      .layout{
+        grid-template-columns: minmax(0,2.2fr) minmax(0,1.4fr);
+        align-items:flex-start;
+      }
+    }
 
-    /* Card */
+    .card-wrap{
+      position:relative;
+    }
     .card{
-      position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
-      border:1px solid var(--stroke);border-radius:18px;padding:18px;
-      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
-      display:flex;flex-direction:column;gap:10px;
-      transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
-      transform-style:preserve-3d;
-      will-change:transform;
+      position:relative;
+      border-radius:24px;
+      padding:18px 18px 16px;
+      overflow:hidden;
+      border:1px solid rgba(248,250,252,.1);
+      background:
+        radial-gradient(circle at 0% 0%,rgba(250,204,21,.2),transparent 55%),
+        radial-gradient(circle at 100% 0%,rgba(248,113,113,.22),transparent 55%),
+        linear-gradient(145deg,#020617,#020617 55%,#020617 100%);
+      box-shadow:0 26px 60px rgba(15,23,42,.95);
     }
-    .card[data-anim]{opacity:0;transform:translateY(18px)}
-    .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
-    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
-
-    .badge{
-      position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;
-      padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);
-      animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06);z-index:2
+    .card::after{
+      content:"";
+      position:absolute;inset:-40%;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(250,204,21,.16),transparent 55%),
+        radial-gradient(circle at 100% 0%,rgba(248,113,113,.16),transparent 55%);
+      opacity:.6;mix-blend-mode:soft-light;pointer-events:none;
     }
-    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
-    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
-    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
-    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+    .card-inner{position:relative;z-index:1;display:grid;gap:16px}
 
-    #biz-mobile .badge{
-      background:linear-gradient(90deg,#10B981,#84CC16);
-      box-shadow:0 10px 22px rgba(16,185,129,.55);
-      color:#042;
-      border:1px solid rgba(0,0,0,.08);
+    .badge-premium{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 10px;border-radius:999px;
+      background:linear-gradient(90deg,#facc15,#f97316);
+      color:#111827;font-size:11px;font-weight:900;letter-spacing:.08em;
+      text-transform:uppercase;
+      box-shadow:0 12px 30px rgba(248,113,113,.55);
+      animation:pulse 2.6s ease-in-out infinite;
+    }
+    .badge-premium span.ico{font-size:13px}
+    @keyframes pulse{
+      0%,100%{transform:translateY(0) scale(1)}
+      50%{transform:translateY(-1px) scale(1.04)}
     }
 
-    .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
-    .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
-    .desc{font-size:13px;color:var(--muted);line-height:1.45}
+    .card-header{
+      display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+    }
+    .holder{
+      display:flex;flex-direction:column;gap:1px;font-size:12px;
+    }
+    .holder strong{font-size:14px;letter-spacing:.03em}
+    .holder span.sub{color:var(--muted2);font-size:11px}
 
-    /* CTA principale – 3D + sheen */
+    .code-block{
+      text-align:right;font-size:11px;
+    }
+    .code-label{color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
+    .code-value{
+      font-family:monospace;
+      font-size:16px;font-weight:800;letter-spacing:.25em;
+      padding-top:3px;
+    }
+
+    .points-row{
+      display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;font-size:13px;
+    }
+    .points-main span.big{
+      font-size:32px;font-weight:900;
+      background:linear-gradient(90deg,#facc15,#22c55e);
+      -webkit-background-clip:text;color:transparent;
+    }
+    .points-main small{
+      display:block;font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;
+    }
+    .points-next{
+      text-align:right;font-size:11px;color:var(--muted2);
+    }
+
+    .bar-wrap{
+      margin-top:8px;
+      background:rgba(15,23,42,.9);
+      border-radius:999px;
+      padding:4px;
+      border:1px solid rgba(148,163,184,.5);
+      overflow:hidden;
+      position:relative;
+    }
+    .bar-track{
+      height:10px;border-radius:999px;
+      background:radial-gradient(circle at 0% 0%,rgba(55,65,81,.9),rgba(15,23,42,1));
+      overflow:hidden;
+    }
+    .bar-fill{
+      height:100%;border-radius:999px;
+      background:linear-gradient(90deg,#f97316,#facc15,#22c55e);
+      width:0%;
+      position:relative;
+      box-shadow:0 0 20px rgba(250,204,21,.65);
+      transition:width .6s ease-out;
+    }
+    .bar-dot{
+      position:absolute;right:-6px;top:50%;
+      width:14px;height:14px;border-radius:999px;
+      background:#facc15;box-shadow:0 0 0 2px rgba(15,23,42,.9),0 0 24px rgba(250,204,21,.85);
+      transform:translateY(-50%);
+    }
+    .bar-text{
+      margin-top:6px;font-size:11px;color:var(--muted2);display:flex;justify-content:space-between;
+    }
+
+    .actions{
+      display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;
+    }
     .btn{
-      display:flex; align-items:center; justify-content:center;
-      text-decoration:none; text-align:center; width:100%;
-      padding:14px 18px; border-radius:16px;
-      font-size:15.5px; font-weight:900; letter-spacing:.2px; color:#000;
-      background:linear-gradient(90deg,var(--brand1),var(--brand2));
-      box-shadow:0 18px 36px rgba(255,90,0,.38), 0 0 0 1px rgba(0,0,0,.2) inset;
-      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-      transform-style:preserve-3d; position:relative; overflow:hidden;
+      flex:1 1 auto;
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:9px 12px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:radial-gradient(circle at 0 0,rgba(15,23,42,1),rgba(15,23,42,.7));
+      color:#e5e7eb;font-size:12px;font-weight:600;
+      text-decoration:none;cursor:pointer;gap:6px;
+      transition:background .2s,border-color .2s,transform .15s,box-shadow .2s;
     }
-    .btn::after{
-      content:""; position:absolute; inset:0; pointer-events:none;
-      background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.45) 45%, rgba(255,255,255,0) 70%);
-      transform:translateX(-120%);
+    .btn span.ico{font-size:13px}
+    .btn:hover{
+      background:radial-gradient(circle at 0 0,rgba(30,64,175,1),rgba(15,23,42,1));
+      border-color:rgba(248,250,252,.8);
+      transform:translateY(-1px);
+      box-shadow:0 14px 26px rgba(15,23,42,.85);
     }
-    .btn:hover{ transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg); box-shadow:0 28px 54px rgba(255,90,0,.55), 0 0 0 1px rgba(0,0,0,.26) inset; filter:brightness(1.05) }
-    .btn:hover::after{ animation:sheenMove .9s ease forwards }
-    @keyframes sheenMove { to{ transform:translateX(120%); } }
 
-    .footer{text-align:center;color:var(--muted2);font-size:11px;margin-top:10px}
-    .footer a{color:var(--muted2);text-decoration:none}
-
-    /* Barra stagionale */
-    .seasonbar{
-      position:fixed;left:0;right:0;bottom:0;z-index:2100;
-      display:flex;align-items:center;gap:.75rem;justify-content:center;
-      padding:.95rem 1rem;background:linear-gradient(90deg, rgba(255,59,26,.92), rgba(255,123,0,.92));
-      color:#fff;text-decoration:none;font-weight:700;border-top:1px solid rgba(255,255,255,.18);
-      backdrop-filter:saturate(1.2) blur(6px)
+    .btn-primary{
+      border:none;
+      background:linear-gradient(90deg,#22c55e,#16a34a);
+      color:#022c22;font-weight:800;
+      box-shadow:0 16px 32px rgba(22,163,74,.65);
     }
-    .seasonbar__icon{ animation:pulse 1.2s infinite }
-    .seasonbar__cta{ margin-left:.5rem; padding:.35rem .6rem; border-radius:.6rem; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.28); font-weight:800 }
-
-    /* FAB (fianco a fianco) “appoggiati” alla barra */
-    .fab-nav{
-      position:fixed; right:16px;
-      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom));
-      display:flex; flex-direction:row; gap:12px; z-index:2101;
+    .btn-primary:hover{
+      background:linear-gradient(90deg,#4ade80,#22c55e);
+      box-shadow:0 18px 40px rgba(22,163,74,.8);
     }
-    .fab-btn{
-      display:flex;align-items:center;gap:10px;background:radial-gradient(circle at 0% 0%,var(--wa1),var(--wa2));
-      color:#000;text-decoration:none;font-weight:900;border-radius:50px;padding:12px 16px;
-      box-shadow:0 20px 34px rgba(18,140,126,.45);transition:all .22s ease;transform-style:preserve-3d;animation:pulse 2.8s ease-in-out infinite
+
+    .rewards{
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:radial-gradient(circle at 0 0,rgba(15,23,42,.9),#020617);
+      padding:14px 14px 12px;
+      box-shadow:0 18px 40px rgba(15,23,42,.9);
+      font-size:13px;
     }
-    .fab-btn:hover{transform:perspective(700px) translateZ(10px) scale(1.06);filter:brightness(1.05);box-shadow:0 28px 44px rgba(18,140,126,.65)}
-    .fab-btn svg{width:18px;height:18px}
-    @media(max-width:420px){.fab-btn span{display:none}}
-
-    .to-top{
-      position:fixed; left:16px;
-      bottom:calc(var(--seasonbar-h) + 8px + var(--safe-bottom));
-      opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:2101
+    .rewards h2{
+      font-size:14px;font-weight:800;margin-bottom:6px;
+      display:flex;justify-content:space-between;align-items:center;
     }
-    .to-top.show{opacity:1;pointer-events:auto}
-    .to-top a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#000;font-weight:900;box-shadow:0 16px 28px rgba(255,90,0,.35);text-decoration:none}
-
-    .toast{position:fixed;left:50%;bottom:calc(var(--seasonbar-h) + 64px + var(--safe-bottom));transform:translateX(-50%);background:#161616;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:2101}
-
-    #season-card .badge{background:linear-gradient(90deg,#ff0000,#ff7b00)}
-    #season-card .highlight{
-      position:absolute; top:-11px; right:14px;
-      background:linear-gradient(90deg,#ff5a1a,#ffbe0b);
-      color:#000; font-size:11px; font-weight:900; letter-spacing:.02em;
-      padding:6px 10px; border-radius:999px; border:1px solid rgba(0,0,0,.06);
-      box-shadow:0 10px 18px rgba(255,90,0,.45); animation:pulse 2.4s ease-in-out infinite; white-space:nowrap; z-index:2;
+    .rewards h2 span.sub{font-size:11px;color:var(--muted2);font-weight:500}
+    .reward-list{
+      margin-top:8px;display:grid;gap:6px;
     }
-    #season-card .santa{position:absolute; top:-22px; right:-6px; font-size:22px; filter:drop-shadow(0 4px 12px rgba(0,0,0,.45)); transform-origin:bottom right; transform:rotate(10deg); opacity:0; pointer-events:none}
-    body.theme-xmas #season-card .santa{opacity:1; animation:santaPop .9s ease .2s both, santaBob 2.8s ease-in-out .9s infinite}
-    @keyframes santaPop{0%{transform:translateY(-12px) rotate(18deg);opacity:0}100%{transform:translateY(0) rotate(10deg);opacity:1}}
-    @keyframes santaBob{0%,100%{transform:translateY(0) rotate(10deg)}50%{transform:translateY(3px) rotate(8deg)}}
-
-    .snow{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5;display:none}
-    body.theme-xmas .snow{display:block}
-    .snow i{position:absolute; top:-10px; width:6px; height:6px; background:radial-gradient(#fff,rgba(255,255,255,.6)); border-radius:50%; opacity:.9; filter:blur(.2px); animation:fall linear infinite}
-    @keyframes fall{ to{ transform:translateY(105vh); opacity:.92; } }
-
-    .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
-
-    /* --- SEZIONE FIDELITY HUB (aggiunta) --- */
-    #fidelity-section{margin-top:4px}
-    .card-fid{
-      border-color:rgba(255,215,0,.78);
-      background:linear-gradient(145deg,rgba(24,20,10,.98),rgba(5,5,8,.98));
-      box-shadow:0 22px 60px rgba(0,0,0,.9),0 0 30px rgba(255,215,0,.35);
-    }
-    .card-fid h2{font-size:16px;margin-bottom:4px}
-    .card-fid p{font-size:13px;color:var(--muted);margin-bottom:8px}
-
-    .fid-badge{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:4px 10px;border-radius:999px;
-      border:1px solid rgba(255,215,0,.9);
-      background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(0,0,0,.85));
-      font-size:10px;text-transform:uppercase;letter-spacing:.14em;
-      color:#fff7d0;margin-bottom:6px;position:relative;overflow:hidden;
-    }
-    .fid-badge::after{
-      content:"";position:absolute;inset:-40%;
-      background:conic-gradient(from 0deg,rgba(255,255,255,.4),transparent 40%,transparent 60%,rgba(255,255,255,.8));
-      mix-blend-mode:screen;animation:spin 6s linear infinite;opacity:.7;pointer-events:none;
-    }
-    .fid-badge span{position:relative;z-index:1}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    .fid-tabs{
-      margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;
-    }
-    .fid-tab-btn{
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.22);
-      padding:6px 11px;
+    .reward-item{
+      display:flex;justify-content:space-between;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:12px;
+      border:1px solid rgba(30,64,175,.6);
+      background:linear-gradient(120deg,rgba(15,23,42,.98),rgba(15,23,42,.7));
       font-size:12px;
-      font-weight:600;
-      cursor:pointer;
-      background:rgba(0,0,0,.7);
-      color:#f5f6ff;
     }
-    .fid-tab-btn.active{
-      border-color:rgba(255,215,0,.95);
-      background:linear-gradient(135deg,#ffd700,#ffb347);
-      color:#2b1900;
-      box-shadow:0 0 18px rgba(255,215,0,.9);
+    .reward-item.reached{
+      border-color:rgba(34,197,94,.9);
+      background:linear-gradient(120deg,rgba(22,163,74,.25),rgba(15,23,42,1));
+    }
+    .reward-item.next{
+      border-color:rgba(250,204,21,.9);
+      background:linear-gradient(120deg,rgba(234,179,8,.25),rgba(15,23,42,1));
+    }
+    .reward-main{display:flex;flex-direction:column;gap:2px}
+    .reward-title{font-weight:700}
+    .reward-meta{font-size:11px;color:var(--muted2)}
+    .reward-threshold{font-size:12px;font-weight:800;white-space:nowrap}
+
+    .badge-tag{
+      font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+      padding:3px 7px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      color:var(--muted2);
     }
 
-    .fid-forms{margin-top:8px}
-    .fid-form{display:none}
-    .fid-form.active{display:block}
-
-    .fid-field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
-    .fid-field label{font-size:11px;color:var(--muted)}
-    .fid-field input{
-      border-radius:12px;border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.78);
-      padding:8px 10px;font-size:13px;color:#f5f6ff;
+    .section{
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:radial-gradient(circle at 0 0,rgba(15,23,42,1),#020617);
+      padding:14px 14px 12px;
+      box-shadow:0 18px 40px rgba(15,23,42,.9);
+      font-size:13px;
     }
-    .fid-field input::placeholder{color:rgba(210,220,255,.5)}
-    .fid-micro{font-size:10px;color:var(--muted);margin-top:2px}
-
-    .fid-actions{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}
-    .btn-gold{
-      border-radius:999px;
-      border:1px solid rgba(255,215,0,.85);
-      padding:8px 13px;
-      font-size:12px;
-      font-weight:700;
-      cursor:pointer;
-      background:linear-gradient(135deg,#ffd700,#ffb347);
-      color:#2b1900;
-      box-shadow:0 14px 30px rgba(0,0,0,.85),0 0 18px rgba(255,215,0,.7);
-      display:inline-flex;align-items:center;gap:6px;
+    .section h2{
+      font-size:14px;font-weight:800;margin-bottom:6px;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
     }
-    .btn-gold span.icon{font-size:14px}
+    .section h2 button.toggle-link{
+      border:none;background:transparent;
+      color:var(--muted2);font-size:11px;cursor:pointer;
+      display:inline-flex;align-items:center;gap:4px;
+    }
+    .section h2 button.toggle-link span.ico{font-size:11px}
+    .section-body{margin-top:8px;font-size:12px;color:var(--muted);}
+    .section-body ul{list-style:none;display:grid;gap:4px;margin-top:4px}
+    .section-body li{display:flex;justify-content:space-between;gap:8px}
+    .section-body li span.points{font-weight:700;color:#facc15}
+
+    .section-body.collapsed{display:none}
+
+    .toast{
+      position:fixed;left:50%;bottom:20px;
+      transform:translateX(-50%);
+      padding:8px 12px;border-radius:999px;
+      background:rgba(15,23,42,.98);
+      border:1px solid rgba(248,250,252,.4);
+      font-size:12px;color:#e5e7eb;
+      box-shadow:0 18px 40px rgba(15,23,42,.9);
+      opacity:0;pointer-events:none;transition:opacity .2s;
+      z-index:50;
+    }
+    .toast.show{opacity:1}
+
+    /* FLOW: registrati / amico */
+    .flow{
+      display:none;
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:radial-gradient(circle at 0 0,rgba(15,23,42,1),#020617);
+      padding:16px 16px 14px;
+      box-shadow:0 20px 46px rgba(15,23,42,.95);
+      font-size:13px;
+    }
+    .flow h2{
+      font-size:16px;font-weight:800;margin-bottom:6px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .flow h2 span.ico{font-size:16px}
+    .flow p.lead{font-size:12px;color:var(--muted);margin-bottom:10px}
+    .field{
+      display:flex;flex-direction:column;gap:4px;margin-bottom:8px;
+    }
+    .field label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
+    .field input{
+      padding:8px 10px;border-radius:10px;
+      border:1px solid rgba(55,65,81,.9);
+      background:rgba(15,23,42,.9);color:#e5e7eb;font-size:13px;
+    }
+    .flow small.helper{font-size:11px;color:var(--muted2);display:block;margin-top:4px}
+    .flow .btn-primary{margin-top:6px}
+
+    @media(max-width:600px){
+      header.head h1{font-size:18px}
+      .card{padding:16px}
+      .points-row span.big{font-size:26px}
+    }
   </style>
 </head>
 <body>
-
-  <!-- Loader -->
-  <div id="rl-loader" aria-label="Caricamento in corso" role="status">
-    <div class="rl-cube">
-      <span class="face f1"></span><span class="face f2"></span><span class="face f3"></span>
-      <span class="face f4"></span><span class="face f5"></span><span class="face f6"></span>
-    </div>
-    <p class="rl-loading-text">Caricamento…</p>
-  </div>
-  <script>
-    (function(){
-      const hideNow=()=>{const ld=document.getElementById('rl-loader');if(ld){ld.classList.add('hidden');setTimeout(()=>{try{ld.remove()}catch(e){}},600)}};
-      if(document.readyState!=='loading'){hideNow()} window.addEventListener('load',hideNow,{once:true}); setTimeout(hideNow,3200);
-    })();
-  </script>
-
-  <main class="wrap">
+  <div class="shell">
     <header class="head">
-      <a class="brand" href="./relong-hub-v2.html" rel="home">
-        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
-          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#ff0000"/><stop offset="100%" stop-color="#ff7b00"/></linearGradient></defs>
-          <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Re Long Telefonia, Energia & Assistenza PC
-      </a>
-      <div class="sub">Clicca sulla sezione di interesse</div>
-
-      <div class="hero" aria-hidden="false">
-        <div class="line" aria-hidden="true"></div>
-        <h1>Benvenuto</h1>
-        <p>Tu Scegli, <strong> Noi ci prendiamo cura di ogni Dettaglio</strong>.</p>
-      </div>
+      <h1>
+        <span class="logo">👑</span>
+        Fidelity Card Re Long
+      </h1>
+      <p>Accumula punti con ogni servizio e sblocca premi reali in negozio.</p>
     </header>
 
-    <section class="grid" aria-label="Collegamenti rapidi Re Long">
-      <!-- 1 -->
-      <article class="card" data-anim>
-        <div class="badge">SMARTPHONE A RATE</div>
-        <div class="title"><span class="ico">📱</span><span>Scegli il tuo Smartphone</span></div>
-        <p class="desc">Finanziamento Vodafone & Compass senza busta paga con rate flessibili.</p>
-        <a class="btn" href="./catalogo-smartphone-reale-v3.html">📱 Catalogo Digitale</a>
-      </article>
-
-      <!-- 2 -->
-      <article class="card" data-anim>
-        <div class="badge">AZIENDE & P.IVA FULL PACK</div>
-        <div class="title"><span class="ico">🧾</span><span>Fisso + Mobile con Energia per P.IVA</span></div>
-        <p class="desc">Soluzioni per Partite IVA e Aziende.</p>
-        <a class="btn" href="./Business+Energy2.html">Scopri l'offerta</a>
-      </article>
-
-      <!-- 3 -->
-      <article class="card" data-anim>
-        <div class="badge">ENERGIA CASA</div>
-        <div class="title"><span class="ico">⚡</span><span>Accendi la tua Energia</span></div>
-        <p class="desc">Invia la foto della tua bolletta per una verifica immediata.</p>
-        <a class="btn" href="./index.html">Vai all’Area Energia</a>
-      </article>
-
-      <!-- 4 -->
-      <article class="card" data-anim>
-        <div class="badge">ASSISTENZA PC</div>
-        <div class="title"><span class="ico">🧰</span><span>Riparazioni & Upgrade</span></div>
-        <p class="desc">Diagnosi immediata e upgrade su misura.</p>
-        <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
-      </article>
-
-      <!-- 5 — SEASON CARD -->
-      <article class="card" data-anim id="season-card">
-        <div class="badge" id="season-badge">BLACK FRIDAY</div>
-        <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
-        <div class="santa" id="santa" aria-hidden="true">🎅</div>
-        <div class="title"><span class="ico" id="season-ico">⚡</span><span id="season-title">Black Friday ReLong</span></div>
-        <p class="desc" id="season-desc">Offerte flash reali su TV, Console, Smartphone ed Energia</p>
-        <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
-      </article>
-
-      <!-- 6 — CONTATTO RAPIDO -->
-      <article class="card" data-anim id="biz-mobile">
-        <div class="badge">CONTATTO RAPIDO</div>
-        <div class="title"><span class="ico">💬</span><span>Contattaci per altre info</span></div>
-        <p class="desc">Hai una domanda? Ti rispondiamo subito su WhatsApp.</p>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20posso%20chiedere%20delle%20informazioni?%20Grazie">💬 Chatta con noi</a>
-      </article>
-    </section>
-
-    <!-- NUOVA SEZIONE FIDELITY, subito sotto il contatto rapido -->
-    <section id="fidelity-section" aria-label="Fidelity Card Re Long">
-      <article class="card card-fid">
-        <div class="fid-badge"><span>Fidelity Card Re Long</span></div>
-        <h2>Fidelity Card Re Long</h2>
-        <p>
-          Iscriviti gratis, accumula punti su ogni servizio Re Long e trasforma la tua fedeltà
-          in premi: pellicole, powerbank, cuffie Bluetooth, smartwatch e occhiali smart.
-        </p>
-
-        <div class="fid-tabs">
-          <button type="button" class="fid-tab-btn active" data-tab="reg">Registrati</button>
-          <button type="button" class="fid-tab-btn" data-tab="friend">Porta un amico</button>
-        </div>
-
-        <div class="fid-forms">
-          <!-- Registrazione Fidelity -->
-          <form class="fid-form active" id="fidFormReg">
-            <div class="fid-field">
-              <label for="fidRegName">Nome e Cognome</label>
-              <input id="fidRegName" type="text" placeholder="Mario Rossi" autocomplete="name">
+    <div class="layout">
+      <!-- VISTA CARD DIGITALE -->
+      <div id="card-view" class="card-wrap">
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-header">
+              <div class="holder">
+                <span class="badge-premium"><span class="ico">✨</span> Fidelity Premium</span>
+                <strong id="holder-name">Cliente Re Long</strong>
+                <span class="sub">Marano di Napoli • Via Casalanno 31</span>
+              </div>
+              <div class="code-block">
+                <div class="code-label">Codice Invito</div>
+                <div class="code-value" id="invite-code">XXXXXX</div>
+              </div>
             </div>
-            <div class="fid-field">
-              <label for="fidRegPhone">Telefono</label>
-              <input id="fidRegPhone" type="tel" placeholder="3331234567" inputmode="numeric">
+
+            <div class="points-row">
+              <div class="points-main">
+                <span class="big" id="points-total">0</span>
+                <small>Punti disponibili</small>
+              </div>
+              <div class="points-next" id="points-next">
+                Prossimo premio a <b>150</b> punti
+              </div>
             </div>
-            <div class="fid-micro">
-              Con la registrazione alla Fidelity Card accetti di essere ricontattato da Re Long
-              per premi, promozioni dedicate e gestione punti.
+
+            <div class="bar-wrap">
+              <div class="bar-track">
+                <div class="bar-fill" id="bar-fill">
+                  <div class="bar-dot"></div>
+                </div>
+              </div>
+              <div class="bar-text">
+                <span id="bar-label-left">Inizio percorso</span>
+                <span id="bar-label-right">0 / 150 punti</span>
+              </div>
             </div>
-            <div class="fid-actions">
-              <button type="button" class="btn-gold" onclick="submitFidRegister()">
-                <span class="icon">✨</span>
-                <span>Iscriviti (+40 punti)</span>
+
+            <div class="actions">
+              <button class="btn btn-primary" id="btn-invita">
+                <span class="ico">📲</span>
+                Porta un amico
+              </button>
+              <button class="btn" id="btn-come">
+                <span class="ico">📈</span>
+                Come accumulo punti?
               </button>
             </div>
-          </form>
-
-          <!-- Porta un amico -->
-          <form class="fid-form" id="fidFormFriend">
-            <div class="fid-field">
-              <label for="fidFriendCode">Codice Fidelity (6 cifre)</label>
-              <input id="fidFriendCode" type="text" maxlength="6" placeholder="Es. 123456">
-            </div>
-            <div class="fid-field">
-              <label for="fidFriendName">Nome e Cognome del tuo amico</label>
-              <input id="fidFriendName" type="text" placeholder="Luigi Bianchi">
-            </div>
-            <div class="fid-field">
-              <label for="fidFriendPhone">Telefono del tuo amico</label>
-              <input id="fidFriendPhone" type="tel" placeholder="3337654321" inputmode="numeric">
-            </div>
-            <div class="fid-micro">
-              Il tuo amico riceve 40 punti di benvenuto. Tu, come presentatore, ottieni 80 punti extra
-              sulla tua Fidelity Card Re Long.
-            </div>
-            <div class="fid-actions">
-              <button type="button" class="btn-gold" onclick="submitFidFriend()">
-                <span class="icon">⭐</span>
-                <span>Conferma invito (+80 / +40 punti)</span>
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </article>
-    </section>
 
-    <p class="footer">
-      <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">📍 Via Casalanno 31, Marano di Napoli</a>
-      •
-      <a href="tel:+3908119578844">☎️ 08119578844</a>
-    </p>
-  </main>
+        <div class="rewards" style="margin-top:12px">
+          <h2>
+            Premi disponibili
+            <span class="sub">Mostriamo cosa hai già sbloccato e cosa ti manca.</span>
+          </h2>
+          <div class="reward-list" id="reward-list"></div>
+        </div>
+      </div>
 
-  <!-- Neve -->
-  <div class="snow" id="snow"></div>
+      <!-- PANNELLO DESTRO: COME ACCUMULO + FLOW -->
+      <div style="display:grid;gap:12px">
+        <!-- COME ACCUMULARE PUNTI -->
+        <section class="section">
+          <h2>
+            Come accumulare punti
+            <button type="button" class="toggle-link" id="toggle-come">
+              <span class="ico">▾</span> Mostra / Nascondi
+            </button>
+          </h2>
+          <div class="section-body collapsed" id="come-body">
+            <p>Per ogni servizio Re Long, ottieni punti sulla tua Fidelity Card:</p>
+            <ul>
+              <li><span>Riparazione Computer</span><span class="points">+50 pt</span></li>
+              <li><span>Riparazione Smartphone</span><span class="points">+25 pt</span></li>
+              <li><span>Kit 4 cartucce compatibili</span><span class="points">+5 pt</span></li>
+              <li><span>Toner compatibili</span><span class="points">+10 pt</span></li>
+              <li><span>Linea Fissa attivata</span><span class="points">+80 pt</span></li>
+              <li><span>SIM attivata</span><span class="points">+30 pt</span></li>
+              <li><span>Offerta Energia attivata</span><span class="points">+100 pt</span></li>
+              <li><span>Porta un amico (chi presenta)</span><span class="points">+80 pt</span></li>
+              <li><span>Porta un amico (chi si iscrive)</span><span class="points">+40 pt</span></li>
+            </ul>
+          </div>
+        </section>
 
-  <!-- TO-TOP + FAB -->
-  <div class="to-top" id="toTop"><a href="#" aria-label="Torna su">⬆️ Torna su</a></div>
-  <div class="fab-nav" aria-label="Azioni rapide">
-    <a class="fab-btn" href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener" aria-label="Portami allo Store">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
-      <span>Portami allo Store</span>
-    </a>
-    <a class="fab-btn" href="tel:+3908119578844" aria-label="Chiama il negozio">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.4 22 2 13.6 2 3a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
-      <span>Chiamaci</span>
-    </a>
+        <!-- FLOW: REGISTRAZIONE / PORTA UN AMICO -->
+        <section class="flow" id="flow-registrati">
+          <h2><span class="ico">📝</span> Registrati alla Fidelity Re Long</h2>
+          <p class="lead">
+            Compila i tuoi dati e invieremo una richiesta diretta a Re Long su WhatsApp per creare la tua Fidelity Card.
+          </p>
+          <form id="form-registrati">
+            <div class="field">
+              <label for="reg-name">Nome e Cognome</label>
+              <input id="reg-name" required placeholder="Mario Rossi">
+            </div>
+            <div class="field">
+              <label for="reg-phone">Telefono</label>
+              <input id="reg-phone" required placeholder="3331234567" inputmode="numeric">
+            </div>
+            <small class="helper">Verrai contattato da Re Long per conferma e rilascio della tua card digitale.</small>
+            <button type="submit" class="btn btn-primary">
+              📲 Invia richiesta su WhatsApp
+            </button>
+          </form>
+        </section>
+
+        <section class="flow" id="flow-amico">
+          <h2><span class="ico">🤝</span> Porta un amico / Iscriviti con un codice</h2>
+          <p class="lead">
+            Hai ricevuto un codice invito Fidelity da un amico? Inseriscilo qui insieme ai tuoi dati.
+          </p>
+          <form id="form-amico">
+            <div class="field">
+              <label for="amico-code">Codice amico</label>
+              <input id="amico-code" required placeholder="ES: A1B2C3" maxlength="10">
+            </div>
+            <div class="field">
+              <label for="amico-name">Il tuo Nome e Cognome</label>
+              <input id="amico-name" required placeholder="Giulia Bianchi">
+            </div>
+            <div class="field">
+              <label for="amico-phone">Il tuo Telefono</label>
+              <input id="amico-phone" required placeholder="3331234567" inputmode="numeric">
+            </div>
+            <small class="helper">
+              Re Long assegnerà automaticamente i punti:
+              <br>• <b>80 punti</b> a chi ti ha invitato
+              <br>• <b>40 punti</b> a te sulla nuova Fidelity Card
+            </small>
+            <button type="submit" class="btn btn-primary">
+              📲 Invia richiesta su WhatsApp
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
   </div>
 
-  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast">Copiato negli appunti</div>
 
-  <!-- Script UX ESISTENTE + Fidelity aggiunta in fondo -->
   <script>
-    const HOME_PAGE = './relong-hub-v2.html';
+    const HUB_URL = "https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html";
+    const STORE_PHONE = "3908119578844"; // per WhatsApp negozio
+    const STORAGE_KEY = "relong-fidelity-points-v1";
 
-    /* Click sicuri + fallback */
-    document.addEventListener('click', async (e)=>{
-      const a = e.target.closest('a'); if(!a) return;
-      const href = a.getAttribute('href')||'';
-      const special=/^(tel:|mailto:|sms:|geo:|maps:|itms:|intent:|whatsapp:)/i.test(href)||href.includes('wa.me')||href==='#';
-      if(special){ if(href==='#'){e.preventDefault()} return; }
-      let url; try{ url=new URL(a.href,location.href);}catch(_){return;}
-      const internal=(url.protocol==='http:'||url.protocol==='https:')&&url.origin===location.origin&&/\.html?$/.test(url.pathname);
-      if(internal){ e.preventDefault(); try{ const res=await fetch(url.href,{method:'GET',cache:'no-store',redirect:'follow'}); if(res.ok){location.href=url.href}else{ toast('Pagina non trovata. Torno alla Home.'); setTimeout(()=>location.href=HOME_PAGE,800)} }catch(_){ toast('Impossibile aprire la pagina. Torno alla Home.'); setTimeout(()=>location.href=HOME_PAGE,1000)} }
-    });
+    const rewards = [
+      { threshold:150, label:"Pellicola di gel Ultra Crystal Premium Quality" },
+      { threshold:300, label:"Powerbank 5000mAh First Rapid Charge" },
+      { threshold:600, label:"Cuffie Bluetooth SGS Pods" },
+      { threshold:1000,label:"Smartwatch SGS Square BT con chiamata" },
+      { threshold:1500,label:"Occhiali SGS Smart con musica & chiamate" }
+    ];
 
-    function toast(msg){
-      let t=document.querySelector('.toast'); if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}
-      t.textContent=msg; t.style.opacity=1; setTimeout(()=>t.style.opacity=0,2200);
+    function showToast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg||"Azioni completata";
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),1800);
     }
 
-    /* To-top visibile dopo scroll */
-    (function(){
-      const tt=document.getElementById('toTop');
-      const onScroll=()=>{ (window.scrollY>250)?tt.classList.add('show'):tt.classList.remove('show'); };
-      window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
-      tt.addEventListener('click',e=>{const a=e.target.closest('a'); if(!a) return; e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});});
-    })();
-
-    /* Animazioni in-view */
-    (function(){
-      const obs=new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){en.target.classList.add('in'); obs.unobserve(en.target);} }); }, {threshold:.18});
-      document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
-    })();
-
-    /* “Tilt” 3D al mouse (disabilitato con reduced-motion) */
-    (function(){
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(prefersReduced) return;
-      const cards=document.querySelectorAll('.card');
-      const maxTilt=6, perspective=900;
-      cards.forEach(card=>{
-        card.addEventListener('mousemove',(e)=>{
-          const r=card.getBoundingClientRect();
-          const cx=e.clientX - r.left, cy=e.clientY - r.top;
-          const dx=(cx/r.width - .5)*2, dy=(cy/r.height - .5)*2;
-          const rx= -dy * maxTilt, ry= dx * maxTilt;
-          card.style.transform=`perspective(${perspective}px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
-        });
-        card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
-      });
-    })();
-
-    /* Neve */
-    function buildSnow(container){
-      if(!container) return;
-      const flakes=18, frag=document.createDocumentFragment();
-      for(let i=0;i<flakes;i++){ const f=document.createElement('i'); const size=(Math.random()*5)+3; f.style.width=f.style.height=size+'px'; f.style.left=Math.floor(Math.random()*100)+'vw'; f.style.animationDuration=(5+Math.random()*7)+'s'; f.style.animationDelay=(Math.random()*3)+'s'; f.style.opacity=(0.65+Math.random()*0.35).toFixed(2); frag.appendChild(f); }
-      container.innerHTML=''; container.appendChild(frag);
-    }
-
-    /* Stagioni + tema */
-    (function(){
-      const now=new Date(); const m=now.getMonth()+1, d=now.getDate();
-      let season="blackfriday"; if(m===12 && d>=8) season="christmas"; if(m===1) season="flash";
-      const copy={
-        blackfriday:{badge:"BLACK FRIDAY",title:"Black Friday ReLong",desc:"Offerte flash su TV, Console, Smartphone ed Energia. Valide per poco!",btn:"Vai alle Offerte Black Friday",href:"./black-friday.html",bar:"<b>Black Friday ReLong</b> — sconti a tempo limitato",barHref:"./black-friday.html",highlight:"🔥 IN EVIDENZA",icon:"⚡",themeClass:"theme-bf",btnGradient:null},
-        christmas:{badge:"NATALE",title:"Christmas Promo 🎄",desc:"Regali tech e risparmio su TV, Console, Smartphone ed Energia. Disponibilità limitata.",btn:"Scopri le Offerte di Natale",href:"./black-friday.html?season=christmas",bar:"<b>Offerte di Natale 🎄</b> — idee regalo & promo",barHref:"./black-friday.html?season=christmas",highlight:"🎄🎅 IN EVIDENZA",icon:"🎄",themeClass:"theme-xmas",btnGradient:"linear-gradient(90deg,#ff2a2a,#1db954)"},
-        flash:{badge:"FLASH",title:"Offerte Flash ⚡",desc:"Promo rapide su smartphone, accessori ed energia. Fino ad esaurimento scorte.",btn:"Vedi le Offerte Flash",href:"./black-friday.html?season=flash",bar:"<b>Offerte Flash ⚡</b> — sconti lampo",barHref:"./black-friday.html?season=flash",highlight:"🔥 IN EVIDENZA",icon:"⚡",themeClass:"theme-flash",btnGradient:null}
+    function getParams(){
+      const p=new URLSearchParams(location.search);
+      return {
+        id: p.get("id"),
+        mode: p.get("mode")
       };
-      const c=copy[season];
-      document.getElementById('season-badge').textContent=c.badge;
-      document.getElementById('season-title').textContent=c.title;
-      document.getElementById('season-desc').textContent=c.desc;
-      const link=document.getElementById('season-link'); link.textContent=c.btn; link.href=c.href; link.setAttribute('aria-label',c.btn);
-      document.getElementById('season-highlight').textContent=c.highlight;
-      const ico=document.getElementById('season-ico'); if(ico) ico.textContent=c.icon;
-
-      const bar=document.getElementById('seasonBar'); const textEl=bar.querySelector('.seasonbar__text'); textEl.innerHTML=c.bar; bar.href=c.barHref;
-
-      document.body.classList.remove('theme-bf','theme-xmas','theme-flash'); document.body.classList.add(c.themeClass);
-      if(c.btnGradient){ link.style.background=c.btnGradient } else { link.style.background='' }
-
-      const snow=document.getElementById('snow'); const santa=document.getElementById('santa');
-      if(c.themeClass==='theme-xmas'){ buildSnow(snow); if(santa) santa.style.display='block'; } else { if(snow) snow.innerHTML=''; if(santa) santa.style.display='none'; }
-    })();
-
-    /* Offset dinamico per FAB/to-top “appoggiati” alla barra */
-    (function(){
-      const bar=document.getElementById('seasonBar');
-      function setH(){
-        const h=Math.max(bar.getBoundingClientRect().height, bar.offsetHeight, 86);
-        document.documentElement.style.setProperty('--seasonbar-h', h + 'px');
-      }
-      setH();
-      window.addEventListener('resize', setH);
-      window.addEventListener('orientationchange', setH);
-      new ResizeObserver(setH).observe(bar);
-    })();
-
-    /* --- LOGICA FIDELITY (aggiunta, non tocca il resto) --- */
-    const RELONG_PHONE = "08119578844";
-    const GH_CFG_KEY = "relong-gh-config-v31";
-    const GH_TOKEN_KEY = "relong-gh-token-v31";
-    const HUB_URL = window.location.href.split("#")[0].split("?")[0];
-
-    const normalizePhoneFid = p => String(p||"").trim().replace(/\D/g,"");
-    const nowISO = () => new Date().toISOString();
-
-    // Switch tab Fidelity
-    document.querySelectorAll('.fid-tab-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const tab = btn.dataset.tab;
-        document.querySelectorAll('.fid-tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
-        document.querySelectorAll('.fid-form').forEach(f=>f.classList.remove('active'));
-        const form = document.getElementById(tab==="reg" ? "fidFormReg" : "fidFormFriend");
-        if(form) form.classList.add('active');
-      });
-    });
-
-    function walinkToReLong(text){
-      return `https://wa.me/39${RELONG_PHONE}?text=${encodeURIComponent(text)}`;
     }
 
-    function hasGitHubConfig(){
+    function normalizeId(id){
+      if(!id) return "demo";
+      return String(id);
+    }
+
+    function loadPoints(){
       try{
-        const cfg = JSON.parse(localStorage.getItem(GH_CFG_KEY)||"null");
-        const tk = localStorage.getItem(GH_TOKEN_KEY)||"";
-        return !!(cfg && tk && cfg.owner && cfg.repo);
-      }catch(_){ return false; }
+        const raw=localStorage.getItem(STORAGE_KEY);
+        if(!raw) return {};
+        const obj=JSON.parse(raw);
+        return obj && typeof obj==="object" ? obj : {};
+      }catch(e){return {}}
+    }
+    function savePoints(map){
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(map));}catch(e){}
     }
 
-    const GH = {
-      cfg(){
-        try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||"null"); }catch{return null}
-      },
-      token(){ return localStorage.getItem(GH_TOKEN_KEY)||""; },
-      headers(){ return { "Accept":"application/vnd.github+json", "Authorization":"Bearer "+this.token() }; },
-      async get(path){
-        const c=this.cfg();
-        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||"main")}`;
-        const res=await fetch(url,{headers:this.headers()});
-        if(!res.ok) throw new Error("GET "+res.status);
-        return res.json();
-      },
-      async put(path, text, msg){
-        const c=this.cfg();
-        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
-        let sha=null;
-        try{ const meta=await this.get(path); sha=meta.sha; }catch(_){}
-        const body={
-          message:msg||"Update Fidelity dal Re Long Hub",
-          content:btoa(unescape(encodeURIComponent(text))),
-          branch:c.branch||"main"
-        };
-        if(sha) body.sha=sha;
-        const res=await fetch(url,{
-          method:"PUT",
-          headers:{...this.headers(),"Content-Type":"application/json"},
-          body:JSON.stringify(body)
+    function initCard(cardId){
+      const id = normalizeId(cardId);
+      const ptsMap = loadPoints();
+      if(typeof ptsMap[id] !== "number") ptsMap[id]=0;
+      const points = ptsMap[id];
+
+      const holderName = document.getElementById("holder-name");
+      const codeEl = document.getElementById("invite-code");
+      const totalEl = document.getElementById("points-total");
+      const nextEl  = document.getElementById("points-next");
+      const barFill = document.getElementById("bar-fill");
+      const barRight= document.getElementById("bar-label-right");
+      const rewardList = document.getElementById("reward-list");
+
+      // Nome: se abbiamo salvato qualcosa in locale lo usiamo, altrimenti generico
+      const storedNameKey = "relong-fidelity-name-" + id;
+      const storedName = localStorage.getItem(storedNameKey);
+      holderName.textContent = storedName || "Cliente Re Long";
+
+      // Codice invito deterministico dalle ultime 6 cifre dell'id
+      let rawCode = id.replace(/\D/g,"");
+      if(rawCode.length < 6){
+        rawCode = (rawCode + "000000").slice(-6);
+      } else {
+        rawCode = rawCode.slice(-6);
+      }
+      const code = rawCode.toUpperCase();
+      codeEl.textContent = code.replace(/(.{3})/g,"$1 ").trim();
+
+      totalEl.textContent = points;
+
+      // Calcolo prossimo reward
+      let nextReward = rewards.find(r=> points < r.threshold);
+      let prevThreshold = 0;
+      if(!nextReward){
+        nextReward = rewards[rewards.length-1];
+        prevThreshold = nextReward.threshold;
+      }else{
+        const idx = rewards.indexOf(nextReward);
+        prevThreshold = idx>0 ? rewards[idx-1].threshold : 0;
+      }
+      nextEl.innerHTML = points >= rewards[rewards.length-1].threshold
+        ? "Hai raggiunto l'ultimo premio disponibile!"
+        : `Prossimo premio a <b>${nextReward.threshold}</b> punti`;
+
+      // Progress %
+      const spanTotal = nextReward.threshold - prevThreshold || 1;
+      const spanDone = Math.min(points - prevThreshold, spanTotal);
+      let perc = Math.max(0, Math.min(100, (spanDone/spanTotal)*100));
+      barFill.style.width = perc + "%";
+      barRight.textContent = `${points} / ${nextReward.threshold} punti`;
+
+      // Lista premi
+      rewardList.innerHTML="";
+      rewards.forEach(r=>{
+        const item=document.createElement("div");
+        item.className="reward-item";
+        if(points >= r.threshold) item.classList.add("reached");
+        else if(!rewardList.querySelector(".next") && points < r.threshold) item.classList.add("next");
+
+        const main=document.createElement("div");
+        main.className="reward-main";
+        const title=document.createElement("div");
+        title.className="reward-title";
+        title.textContent=r.label;
+        const meta=document.createElement("div");
+        meta.className="reward-meta";
+
+        if(points >= r.threshold){
+          meta.textContent="Premio raggiunto • Ritiralo in negozio";
+        }else if(points < r.threshold){
+          const diff = r.threshold - points;
+          if(diff <= 50){
+            meta.textContent=`Ti mancano solo ${diff} punti`;
+          }else{
+            meta.textContent=`Ancora ${diff} punti per sbloccarlo`;
+          }
+        }
+
+        main.appendChild(title);
+        main.appendChild(meta);
+
+        const right=document.createElement("div");
+        right.style.textAlign="right";
+        const th=document.createElement("div");
+        th.className="reward-threshold";
+        th.textContent=r.threshold+" pt";
+
+        const tag=document.createElement("div");
+        tag.className="badge-tag";
+        if(points >= r.threshold){
+          tag.textContent="Sbloccato";
+        }else{
+          tag.textContent = (r.threshold === nextReward.threshold) ? "Prossimo premio" : "Prossimo step";
+        }
+        right.appendChild(th);
+        right.appendChild(tag);
+
+        item.appendChild(main);
+        item.appendChild(right);
+        rewardList.appendChild(item);
+      });
+
+      // Porta un amico (codice + WhatsApp)
+      const btnInvita=document.getElementById("btn-invita");
+      btnInvita.onclick=()=>{
+        const msg = `Ti invito alla Fidelity Card Re Long 🎁\n`+
+          `Usa questo codice per iscriverti: ${code}\n`+
+          `Iscriviti da qui o chiedi info: ${HUB_URL}`;
+        try{ navigator.clipboard.writeText(code); showToast("Codice invito copiato"); }catch(e){ showToast("Codice: "+code); }
+        const url = "https://wa.me/?text="+encodeURIComponent(msg);
+        window.open(url,"_blank","noopener");
+      };
+    }
+
+    function initComeSection(){
+      const btn=document.getElementById("btn-come");
+      const toggle=document.getElementById("toggle-come");
+      const body=document.getElementById("come-body");
+      const toggleFn=()=>{
+        body.classList.toggle("collapsed");
+      };
+      btn.addEventListener("click",toggleFn);
+      toggle.addEventListener("click",toggleFn);
+    }
+
+    function initFlows(mode){
+      const reg=document.getElementById("flow-registrati");
+      const ami=document.getElementById("flow-amico");
+      reg.style.display="none";
+      ami.style.display="none";
+
+      if(mode==="registrati" || mode==="iscriviti"){
+        reg.style.display="block";
+      }else if(mode==="amico"){
+        ami.style.display="block";
+      }
+    }
+
+    function initForms(){
+      const regForm=document.getElementById("form-registrati");
+      const amiForm=document.getElementById("form-amico");
+
+      if(regForm){
+        regForm.addEventListener("submit",e=>{
+          e.preventDefault();
+          const name=document.getElementById("reg-name").value.trim();
+          const phone=document.getElementById("reg-phone").value.trim();
+          if(!name || !phone) return;
+          const text=
+`Nuova richiesta Fidelity Card Re Long 🧾
+Nome: ${name}
+Telefono: ${phone}
+Provenienza: Registrazione dal sito / HUB.
+
+Attribuire 40 punti di benvenuto.`;
+          const url=`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(text)}`;
+          window.location.href=url;
         });
-        if(!res.ok){
-          if(res.status===409){
-            const meta=await this.get(path);
-            const body2={...body,sha:meta.sha};
-            const r2=await fetch(url,{
-              method:"PUT",
-              headers:{...this.headers(),"Content-Type":"application/json"},
-              body:JSON.stringify(body2)
-            });
-            if(!r2.ok) throw new Error("PUT "+r2.status);
-            return r2.json();
-          }
-          throw new Error("PUT "+res.status);
-        }
-        return res.json();
       }
-    };
 
-    async function loadItemsFid(){
-      const cfg = GH.cfg();
-      const path = cfg?.path || "data/items.json";
-      const meta = await GH.get(path);
-      const text = decodeURIComponent(escape(atob(meta.content)));
-      let json;
-      try{ json = JSON.parse(text); }catch{ json=[]; }
-      if(!Array.isArray(json)) json=[];
-      return {items:json, path};
-    }
+      if(amiForm){
+        amiForm.addEventListener("submit",e=>{
+          e.preventDefault();
+          const code=document.getElementById("amico-code").value.trim();
+          const name=document.getElementById("amico-name").value.trim();
+          const phone=document.getElementById("amico-phone").value.trim();
+          if(!code || !name || !phone) return;
+          const text=
+`Nuova iscrizione Fidelity - Porta un amico 🤝
 
-    async function saveItemsFid(items, path){
-      await GH.put(path, JSON.stringify(items||[]), "Update items Fidelity (Hub)");
-    }
+Nuovo cliente:
+• Nome: ${name}
+• Telefono: ${phone}
 
-    function fallbackCodeFromId(id){
-      const digits = String(id||"").replace(/\D/g,"") || String(Date.now());
-      const last6 = digits.slice(-6);
-      return last6.padStart(6,"0");
-    }
+Codice amico utilizzato: ${code}
 
-    function findClientByPhone(items, phone){
-      const np = normalizePhoneFid(phone);
-      return items.find(x=> normalizePhoneFid(x.phone)===np );
-    }
-
-    function findClientByInviteCode(items, code){
-      const c = String(code||"").trim();
-      if(!c) return null;
-      for(const it of items){
-        const effective = it.fidCode || fallbackCodeFromId(it.id);
-        if(String(effective)===c) return it;
-      }
-      return null;
-    }
-
-    function ensureFidCode(it){
-      if(!it.fidCode){
-        it.fidCode = fallbackCodeFromId(it.id);
+Punti da assegnare:
+• 80 pt al cliente con codice: ${code}
+• 40 pt al nuovo iscritto.`;
+          const url=`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(text)}`;
+          window.location.href=url;
+        });
       }
     }
 
-    async function submitFidRegister(){
-      const name = (document.getElementById("fidRegName").value||"").trim();
-      const phone = normalizePhoneFid(document.getElementById("fidRegPhone").value||"");
-      if(!name || !/\s/.test(name)){
-        alert("Inserisci Nome e Cognome completi");
-        return;
-      }
-      if(!phone || phone.length<7){
-        alert("Inserisci un numero di telefono valido");
-        return;
+    (function boot(){
+      const {id,mode} = getParams();
+
+      // Card view sempre visibile (per i link con id)
+      if(id){
+        initCard(id);
+      }else{
+        initCard("demo");
       }
 
-      if(hasGitHubConfig()){
-        try{
-          const {items,path} = await loadItemsFid();
-          let it = findClientByPhone(items, phone);
-          const now = nowISO();
-          if(it){
-            it.name = it.name || name;
-            it.updatedAt = now;
-            it.fromFidelity = true;
-            it.fidelityTag = "registrazione";
-            it.points = (Number(it.points)||0) + 40;
-            ensureFidCode(it);
-          }else{
-            const id = Date.now()+Math.random().toString(16).slice(2);
-            it = {
-              id,
-              name,
-              phone,
-              createdAt:now,
-              updatedAt:now,
-              activated:[],
-              acceptance:false,
-              fromPacchi:false,
-              fromFidelity:true,
-              fidelityTag:"registrazione",
-              points:40,
-              fidCode:String(Math.floor(100000+Math.random()*900000)),
-              done:false
-            };
-            items.unshift(it);
-          }
-          await saveItemsFid(items,path);
-          toast("Registrazione Fidelity salvata (+40 punti) ✅");
+      initComeSection();
+      initForms();
 
-          const msg =
-            `Ciao Re Long, sono ${name}.\n`+
-            `Mi sono appena iscritto alla Fidelity Card dal sito e ho attivato i miei primi 40 punti.\n`+
-            `Tienimi aggiornato su premi e promozioni.`;
-          window.open(walinkToReLong(msg), "_blank", "noopener");
-
-          document.getElementById("fidFormReg").reset();
-          return;
-        }catch(e){
-          console.error(e);
-          toast("Sync Fidelity non disponibile, invio dati via WhatsApp…");
-        }
+      // Flussi dal HUB (registrati / amico)
+      if(mode){
+        initFlows(mode);
       }
-
-      // fallback WhatsApp
-      const message =
-        `Fidelity – Nuova registrazione dal sito:\n\n`+
-        `Nome: ${name}\n`+
-        `Telefono: ${phone}\n\n`+
-        `Da inserire nel gestionale con +40 punti Fidelity.`;
-      window.open(walinkToReLong(message), "_blank", "noopener");
-      toast("Apertura WhatsApp per registrazione Fidelity");
-      document.getElementById("fidFormReg").reset();
-    }
-
-    async function submitFidFriend(){
-      const code = (document.getElementById("fidFriendCode").value||"").trim();
-      const name = (document.getElementById("fidFriendName").value||"").trim();
-      const phone = normalizePhoneFid(document.getElementById("fidFriendPhone").value||"");
-      if(!code || code.length<3){
-        alert("Inserisci un codice Fidelity valido");
-        return;
-      }
-      if(!name || !/\s/.test(name)){
-        alert("Inserisci Nome e Cognome dell'amico");
-        return;
-      }
-      if(!phone || phone.length<7){
-        alert("Inserisci un numero di telefono valido");
-        return;
-      }
-
-      if(hasGitHubConfig()){
-        try{
-          const {items,path} = await loadItemsFid();
-          const inviter = findClientByInviteCode(items, code);
-          const now = nowISO();
-          if(!inviter){
-            alert("Codice Fidelity non trovato nei dati. Verrà inviata una richiesta via WhatsApp a Re Long.");
-            throw new Error("Inviter not found");
-          }
-          ensureFidCode(inviter);
-          inviter.points = (Number(inviter.points)||0) + 80;
-          inviter.updatedAt = now;
-
-          let friend = findClientByPhone(items, phone);
-          if(friend){
-            friend.name = friend.name || name;
-            friend.updatedAt = now;
-            friend.fromFidelity = true;
-            friend.fidelityTag = "porta-amico";
-            friend.points = (Number(friend.points)||0) + 40;
-            friend.invitedByCode = inviter.fidCode;
-            ensureFidCode(friend);
-          }else{
-            const id = Date.now()+Math.random().toString(16).slice(2);
-            friend = {
-              id,
-              name,
-              phone,
-              createdAt:now,
-              updatedAt:now,
-              activated:[],
-              acceptance:false,
-              fromPacchi:false,
-              fromFidelity:true,
-              fidelityTag:"porta-amico",
-              points:40,
-              fidCode:String(Math.floor(100000+Math.random()*900000)),
-              invitedByCode:inviter.fidCode,
-              done:false
-            };
-            items.unshift(friend);
-          }
-
-          await saveItemsFid(items,path);
-          toast("Invito registrato: +80 punti al presentatore, +40 al nuovo cliente ✅");
-
-          const msgFriend =
-            `Ciao Re Long, sono ${name}.\n`+
-            `Mi sono registrato alla Fidelity Card usando il codice invito ${code}.\n`+
-            `Attendo conferma dei miei 40 punti di benvenuto.`;
-          window.open(walinkToReLong(msgFriend), "_blank", "noopener");
-
-          document.getElementById("fidFormFriend").reset();
-          return;
-        }catch(e){
-          console.error(e);
-          toast("Sync Fidelity non disponibile, invio dati via WhatsApp…");
-        }
-      }
-
-      // fallback WhatsApp
-      const msg =
-        `Fidelity – PORTA UN AMICO dal sito:\n\n`+
-        `Codice invito presentatore: ${code}\n\n`+
-        `Nuovo cliente:\n`+
-        `Nome: ${name}\n`+
-        `Telefono: ${phone}\n\n`+
-        `Da inserire nel gestionale con: +80 punti al presentatore, +40 punti al nuovo cliente.`;
-      window.open(walinkToReLong(msg), "_blank", "noopener");
-      toast("Apertura WhatsApp per invito Fidelity");
-      document.getElementById("fidFormFriend").reset();
-    }
+    })();
   </script>
-
-  <!-- Barra in basso stagionale -->
-  <a id="seasonBar" class="seasonbar" href="./black-friday.html" aria-label="Vai alle Offerte Black Friday ReLong">
-    <span class="seasonbar__icon">⚡</span>
-    <span class="seasonbar__text"><b>Black Friday ReLong</b> — Paga in 3 RATE senza FINANZIAMENTO</span>
-    <span class="seasonbar__cta">Clicca QUI</span>
-  </a>
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Re Long Informatica",
-    "image": "https://alessandroiascone.github.io/relong-nfc/og-cover.jpg",
-    "url": "https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html",
-    "telephone": "+39 08119578844",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Via Casalanno 31",
-      "addressLocality": "Marano di Napoli",
-      "postalCode": "80016",
-      "addressCountry": "IT"
-    },
-    "sameAs": ["https://maps.app.goo.gl/dwpNWoUwFQD4NppU6"]
-  }
-  </script>
-
-  <noscript><style>#rl-loader{display:none!important}</style></noscript>
 </body>
 </html>
