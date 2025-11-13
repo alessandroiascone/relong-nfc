@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32b (Pacchi + Reminder)</title>
+  <title>ReLong • Scadenzario v32b (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -99,7 +99,7 @@
       margin-left:4px;
     }
 
-    /* DASHBOARD (copia dal primo file) */
+    /* DASHBOARD (copiata da v32m + incasso riparazioni) */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
     .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -237,7 +237,7 @@
     </div>
   </template>
 
-  <!-- DASHBOARD MODAL (copiata dal primo file) -->
+  <!-- DASHBOARD MODAL -->
   <div id="dashModal" class="modal" aria-hidden="true">
     <div class="dash" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
       <header>
@@ -287,6 +287,7 @@
           <div class="kpi rip">
             <div class="k">🔧 Riparazioni</div>
             <div class="v" id="k_rip">0</div>
+            <div class="e" id="e_rip">€ 0</div>
           </div>
           <div class="kpi prev">
             <div class="k">🧾 Preventivi</div>
@@ -312,7 +313,7 @@
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
-    /* Guadagni stimati per Dashboard (copiati dal primo file) */
+    /* Guadagni stimati per la Dashboard */
     const GAIN_PACCHI  = 0.5;
     const GAIN_SIM     = 30;
     const GAIN_FISSO   = 110;
@@ -717,18 +718,18 @@
       actions.append(row);
     }
 
-    /* DASHBOARD JS (copiato dal primo file e adattato) */
-    const dashModal = $('#dashModal');
-    const openDashBtn = $('#openDash');
-    const closeDashBtn = $('#closeDash');
+    /* DASHBOARD: funzioni */
+    const dashModal = document.getElementById('dashModal');
+    const openDashBtn = document.getElementById('openDash');
+    const closeDashBtn = document.getElementById('closeDash');
     let dashPeriod = 'all';
     let rangeFrom = null;
     let rangeTo = null;
 
     const dashPeriodBtns = $$('.dash-period');
-    const rangeWrap = $('#rangeWrap');
-    const rangeFromInput = $('#rangeFrom');
-    const rangeToInput = $('#rangeTo');
+    const rangeWrap = document.getElementById('rangeWrap');
+    const rangeFromInput = document.getElementById('rangeFrom');
+    const rangeToInput = document.getElementById('rangeTo');
 
     function parseDateInput(val){
       if(!val) return null;
@@ -745,8 +746,10 @@
       if(dashPeriod==='range') updateDashboard();
     }
 
-    if(rangeFromInput) rangeFromInput.addEventListener('change', syncRangeFromInputs);
-    if(rangeToInput) rangeToInput.addEventListener('change', syncRangeFromInputs);
+    if(rangeFromInput && rangeToInput){
+      rangeFromInput.addEventListener('change', syncRangeFromInputs);
+      rangeToInput.addEventListener('change', syncRangeFromInputs);
+    }
 
     dashPeriodBtns.forEach(btnEl=>{
       btnEl.addEventListener('click', ()=>{
@@ -771,12 +774,7 @@
       });
     }
     if(dashModal){
-      dashModal.addEventListener('click', (e)=>{
-        if(e.target===dashModal){
-          dashModal.classList.remove('on');
-          dashModal.setAttribute('aria-hidden','true');
-        }
-      });
+      dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
     }
 
     function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
@@ -805,41 +803,59 @@
     }
 
     function updateDashboard(){
-      if(!dashModal) return;
       const subset = items.filter(itemInPeriod);
 
       let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
+      let gPacchi=0, gSim=0, gFisso=0, gEn=0, gRate=0, gRip=0;
+
       subset.forEach(it=>{
-        if(it.fromPacchi) pacchi++;
+        if(it.fromPacchi){ pacchi++; gPacchi += GAIN_PACCHI; }
         const act = Array.isArray(it.activated)? it.activated : [];
-        if(act.includes('sim')) sim++;
-        if(act.includes('fisso')) fisso++;
-        if(act.includes('energia')) energia++;
-        if(act.includes('rate')) rate++;
+        if(act.includes('sim'))   { sim++;   gSim   += GAIN_SIM; }
+        if(act.includes('fisso')) { fisso++; gFisso += GAIN_FISSO; }
+        if(act.includes('energia')){ energia++; gEn += GAIN_ENERGIA; }
+        if(act.includes('rate'))  { rate++;  gRate  += GAIN_RATE; }
         if(it.acceptance) rip++;
         if(act.includes('preventivi')) prev++;
+
+        // INCASSO RIPARAZIONI: somma dei preventivi accettati e consegnati
+        if(it.acceptance && it.repairStatus === 'consegnato' && it.quoteStatus === 'accepted'){
+          const val = parseFloat(it.quotePrice ?? 0);
+          if(!isNaN(val) && val > 0) gRip += val;
+        }
       });
 
-      const gPacchi = pacchi * GAIN_PACCHI;
-      const gSim    = sim    * GAIN_SIM;
-      const gFisso  = fisso  * GAIN_FISSO;
-      const gEn     = energia* GAIN_ENERGIA;
-      const gRate   = rate   * GAIN_RATE;
-      const totalGain = gPacchi + gSim + gFisso + gEn + gRate;
+      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + gRip;
 
-      $('#k_pacchi').textContent = pacchi;
-      $('#k_sim').textContent = sim;
-      $('#k_fisso').textContent = fisso;
-      $('#k_energia').textContent = energia;
-      $('#k_rate').textContent = rate;
-      $('#k_rip').textContent = rip;
-      $('#k_prev').textContent = prev;
+      const k_pacchi = document.getElementById('k_pacchi');
+      const k_sim = document.getElementById('k_sim');
+      const k_fisso = document.getElementById('k_fisso');
+      const k_energia = document.getElementById('k_energia');
+      const k_rate = document.getElementById('k_rate');
+      const k_rip = document.getElementById('k_rip');
+      const k_prev = document.getElementById('k_prev');
 
-      $('#e_pacchi').textContent = formatEuro(gPacchi);
-      $('#e_sim').textContent    = formatEuro(gSim);
-      $('#e_fisso').textContent  = formatEuro(gFisso);
-      $('#e_energia').textContent= formatEuro(gEn);
-      $('#e_rate').textContent   = formatEuro(gRate);
+      const e_pacchi = document.getElementById('e_pacchi');
+      const e_sim = document.getElementById('e_sim');
+      const e_fisso = document.getElementById('e_fisso');
+      const e_energia = document.getElementById('e_energia');
+      const e_rate = document.getElementById('e_rate');
+      const e_rip = document.getElementById('e_rip');
+
+      if(k_pacchi) k_pacchi.textContent = pacchi;
+      if(k_sim)    k_sim.textContent    = sim;
+      if(k_fisso)  k_fisso.textContent  = fisso;
+      if(k_energia)k_energia.textContent= energia;
+      if(k_rate)   k_rate.textContent   = rate;
+      if(k_rip)    k_rip.textContent    = rip;
+      if(k_prev)   k_prev.textContent   = prev;
+
+      if(e_pacchi) e_pacchi.textContent = formatEuro(gPacchi);
+      if(e_sim)    e_sim.textContent    = formatEuro(gSim);
+      if(e_fisso)  e_fisso.textContent  = formatEuro(gFisso);
+      if(e_energia)e_energia.textContent= formatEuro(gEn);
+      if(e_rate)   e_rate.textContent   = formatEuro(gRate);
+      if(e_rip)    e_rip.textContent    = formatEuro(gRip);
 
       let labelPeriodo = 'Tutto';
       if(dashPeriod==='today') labelPeriodo = 'Oggi';
@@ -850,8 +866,10 @@
         labelPeriodo = `Dal ${fromTxt} al ${toTxt}`;
       }
 
-      $('#k_total').textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
-      $('#k_total_gain').textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
+      const k_total = document.getElementById('k_total');
+      const k_total_gain = document.getElementById('k_total_gain');
+      if(k_total) k_total.textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
+      if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
     /* Render */
@@ -929,6 +947,9 @@
                 it.updatedAt=new Date().toISOString();
                 saveLocal(); saveToGitHub(); render();
                 try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+
+                // la dashboard leggerà ora questo incasso (quotePrice) perché lo stato è "consegnato"
+                if(dashModal && dashModal.classList.contains('on')) updateDashboard();
               }));
             }
             actions.append(btnDelete(it));
@@ -1008,7 +1029,7 @@
         list.append(el);
       });
 
-      // Se la dashboard è aperta, aggiorna i KPI in tempo reale
+      // se la dashboard è aperta, aggiorna numeri live
       if(dashModal && dashModal.classList.contains('on')) updateDashboard();
     }
 
