@@ -2,790 +2,666 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Re Long • Smartphone, Telefonia, Energia & Assistenza Informatica</title>
-  <meta name="description" content="Re Long Informatica: Smartphone a rate senza busta paga, Vodafone, WindTre, Sky, Luce & Gas e Assistenza PC a Marano di Napoli. Tel 08119578844." />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Re Long • Fidelity Card</title>
   <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Fidelity Card Re Long: accumula punti ad ogni acquisto e ottieni vantaggi esclusivi. Porta un amico e guadagnate entrambi.">
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#020617; --bg2:#000;
-      --card:rgba(15,23,42,.96);
-      --stroke:rgba(148,163,184,.28);
-      --muted:rgba(148,163,184,.9);
-      --accent:#0ea5e9;
-      --accent2:#38bdf8;
-      --accent3:#22c55e;
-      --danger:#ef4444;
-      --gold:#facc15;
+      --bg1:#050509; --bg2:#020308;
+      --card:rgba(14,16,22,.96); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(220,225,255,.74); --muted2:rgba(200,205,240,.55);
+      --gold1:#facc15; --gold2:#f97316; --gold3:#fde68a;
+      --wa1:#25D366; --wa2:#128C7E;
+      --danger:#f97373;
+      --focus:#facc15;
     }
-    html,body{min-height:100vh}
+    html,body{min-height:100%}
     body{
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",Roboto,sans-serif;
-      color:#e5f0ff;
-      background:
-        radial-gradient(circle at 0 0,rgba(56,189,248,.18),transparent 60%),
-        radial-gradient(circle at 100% 0,rgba(59,130,246,.22),transparent 55%),
-        radial-gradient(circle at 50% 100%,rgba(16,185,129,.16),transparent 55%),
-        radial-gradient(65% 65% at 25% 10%,#020617,#000);
-      padding:18px;
+      font-family:system-ui,-apple-system,"Inter",Roboto,sans-serif;
+      background:radial-gradient(circle at 15% 0%,rgba(250,204,21,.18) 0%, transparent 45%),
+                 radial-gradient(circle at 85% 100%,rgba(248,113,113,.2) 0%, transparent 55%),
+                 linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#f9fafb;
+      padding:24px 18px 32px;
       display:flex;
-      justify-content:center;
       align-items:flex-start;
+      justify-content:center;
     }
-    main{
-      width:min(1180px,100%);
+    :focus-visible{
+      outline:2px solid var(--focus);
+      outline-offset:2px;
+      border-radius:10px;
+    }
+    .wrap{
+      width:100%;
+      max-width:880px;
+      margin:0 auto;
       display:flex;
       flex-direction:column;
       gap:18px;
+      position:relative;
+      z-index:1;
     }
-    a{color:inherit;text-decoration:none}
 
-    /* Top bar */
-    .top-bar{
+    /* HEADER */
+    .top{
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:flex-start;
       gap:12px;
       flex-wrap:wrap;
     }
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .logo{
-      width:42px;height:42px;
-      border-radius:14px;
-      background:radial-gradient(circle at 30% 20%,#fff,rgba(248,113,113,.8));
-      display:flex;
-      align-items:center;
-      justify-content:center;
       font-weight:900;
-      color:#111827;
-      box-shadow:0 12px 30px rgba(248,113,113,.55);
-      font-size:18px;
-    }
-    .brand-text{
+      letter-spacing:-.04em;
+      font-size:19px;
       display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .brand-text h1{
-      font-size:20px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .brand-text span{
-      font-size:12px;
-      color:var(--muted);
-    }
-    .contact-pill{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.45);
-      padding:8px 14px;
-      display:inline-flex;
       align-items:center;
       gap:8px;
-      font-size:13px;
-      background:radial-gradient(circle at 0 0,rgba(15,118,110,.45),rgba(15,23,42,.95));
-      box-shadow:0 10px 30px rgba(0,0,0,.6);
+      text-decoration:none;
+      color:#f9fafb;
     }
-    .contact-pill strong{font-weight:800}
-    .contact-pill .wa{
+    .brand svg{width:22px;height:22px}
+    .subtitle{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:3px;
+      max-width:360px;
+    }
+    .back-link{
+      font-size:12px;
+      color:var(--muted2);
+      text-decoration:none;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:radial-gradient(circle at 0 0,rgba(250,204,21,.14),transparent 55%);
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      width:22px;height:22px;
-      border-radius:999px;
-      background:#22c55e;
-      color:#022c22;
-      font-size:14px;
-      box-shadow:0 0 0 1px rgba(6,78,59,.6),0 10px 20px rgba(22,163,74,.7);
+      gap:6px;
     }
+    .back-link:hover{border-color:rgba(250,204,21,.7);color:#fefce8}
 
-    /* Hero */
+    /* HERO */
     .hero{
-      border-radius:22px;
-      border:1px solid rgba(148,163,184,.35);
+      margin-top:6px;
+      border-radius:18px;
+      padding:16px 16px 14px;
+      border:1px solid rgba(250,204,21,.45);
       background:
-        radial-gradient(circle at 0 0,rgba(56,189,248,.25),transparent 60%),
-        radial-gradient(circle at 100% 0,rgba(59,130,246,.25),transparent 60%),
-        linear-gradient(135deg,rgba(15,23,42,.96),rgba(15,23,42,.92));
-      padding:18px 18px 18px;
-      display:grid;
-      grid-template-columns:minmax(0,2.2fr) minmax(0,2fr);
-      gap:18px;
+        radial-gradient(circle at 0% 0%,rgba(250,204,21,.26),transparent 60%),
+        radial-gradient(circle at 100% 100%,rgba(248,250,252,.06),transparent 60%),
+        rgba(10,10,15,.96);
+      box-shadow:0 18px 60px rgba(0,0,0,.85), 0 0 80px rgba(250,204,21,.3);
       position:relative;
       overflow:hidden;
     }
-    @media(max-width:900px){
-      .hero{grid-template-columns:1fr}
-    }
-    .hero::before{
+    .hero::after{
       content:"";
       position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 0 100%,rgba(34,197,94,.18),transparent 60%),
-        radial-gradient(circle at 100% 100%,rgba(249,115,22,.25),transparent 60%);
-      opacity:.75;
-      mix-blend-mode:screen;
-      pointer-events:none;
+      inset:auto;
+      right:-40px;
+      top:-40px;
+      width:120px;
+      height:120px;
+      border-radius:32px;
+      border:1px solid rgba(254,243,199,.6);
+      background:radial-gradient(circle at 30% 0%,rgba(254,249,195,.6),rgba(234,179,8,.2));
+      opacity:.7;
+      filter:blur(.2px);
     }
-    .hero-left{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px}
-    .hero-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      font-size:11px;
-      padding:4px 9px;
-      border-radius:999px;
-      border:1px solid rgba(52,211,153,.7);
-      background:radial-gradient(circle at 0 0,rgba(34,197,94,.4),rgba(15,23,42,1));
-      color:#bbf7d0;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      width:max-content;
-    }
-    .hero-kicker span.dot{
-      width:7px;height:7px;border-radius:999px;
-      background:radial-gradient(circle at 30% 20%,#bbf7d0,#22c55e);
-      box-shadow:0 0 0 1px rgba(21,128,61,.8);
-    }
-    .hero-title{
-      font-size:clamp(23px,3vw,28px);
-      line-height:1.1;
-      letter-spacing:.04em;
-    }
-    .hero-title span.red{color:#fb7185}
-    .hero-sub{
-      font-size:13px;
-      color:var(--muted);
-      max-width:460px;
-    }
-    .hero-badges{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin:8px 0 4px;
-    }
-    .hero-badge{
-      font-size:11px;
-      padding:5px 10px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.4);
-      background:radial-gradient(circle at 0 0,rgba(59,130,246,.5),rgba(15,23,42,1));
-      color:#dbeafe;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .hero-badge span.ico{font-size:13px}
-    .hero-cta-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:10px;
-      align-items:center;
-    }
-    .btn{
-      border-radius:999px;
-      padding:9px 16px;
-      font-size:13px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      font-weight:800;
-      border:1px solid rgba(148,163,184,.6);
-      background:radial-gradient(circle at 0 0,rgba(56,189,248,.45),rgba(15,23,42,1));
-      color:#0b1120;
-      box-shadow:0 12px 30px rgba(56,189,248,.65);
-      cursor:pointer;
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      justify-content:center;
-    }
-    .btn span.ico{font-size:15px}
-    .btn.secondary{
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,1),rgba(15,23,42,.4));
-      color:#e5e7eb;
-      box-shadow:none;
-    }
-    .btn.outline{
-      background:transparent;
-      color:#e5e7eb;
-      border-style:dashed;
-    }
-
-    .hero-note{
-      font-size:11px;
-      color:rgba(148,163,184,.9);
-      margin-top:8px;
-    }
-
-    .hero-right{
+    .hero-main{
       position:relative;
       z-index:1;
       display:flex;
+      flex-wrap:wrap;
+      gap:12px 20px;
       align-items:center;
-      justify-content:center;
-    }
-    .phone-stack{
-      position:relative;
-      width:260px;
-      max-width:100%;
-      aspect-ratio:9/19;
-      border-radius:36px;
-      background:radial-gradient(circle at 0 0,#1e293b,#020617);
-      box-shadow:
-        0 20px 60px rgba(15,23,42,.95),
-        0 0 0 1px rgba(15,23,42,.9),
-        0 0 0 2px rgba(148,163,184,.4);
-      overflow:hidden;
-    }
-    .phone-stack::before{
-      content:"";
-      position:absolute;
-      inset:-20%;
-      background:
-        conic-gradient(from 220deg,rgba(56,189,248,.4),rgba(244,63,94,.9),rgba(251,191,36,.9),rgba(56,189,248,.4));
-      opacity:.7;
-      mix-blend-mode:screen;
-    }
-    .phone-inner{
-      position:absolute;
-      inset:8px;
-      border-radius:30px;
-      background:
-        radial-gradient(circle at 0 0,rgba(15,23,42,.7),transparent 55%),
-        radial-gradient(circle at 100% 0,rgba(30,64,175,.55),transparent 55%),
-        linear-gradient(145deg,#020617,#020617);
-      box-shadow:0 0 0 1px rgba(15,23,42,.9);
-      padding:10px 10px 12px;
-      display:flex;
-      flex-direction:column;
       justify-content:space-between;
-      color:#e5e7eb;
     }
-    .phone-pill{
-      align-self:center;
-      width:36%;
-      height:4px;
-      border-radius:999px;
-      background:linear-gradient(90deg,rgba(148,163,184,.7),rgba(30,64,175,.9));
-      margin-bottom:4px;
-    }
-    .phone-header{
+    .hero-text h1{
+      font-size:22px;
+      letter-spacing:-.03em;
+      font-weight:900;
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      font-size:10px;
-      color:#9ca3af;
-      margin-bottom:6px;
+      gap:8px;
     }
-    .phone-clock{font-weight:600;color:#e5e7eb}
-    .phone-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:7px;
-      margin-top:2px;
-    }
-    .phone-tile{
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.55);
-      background:radial-gradient(circle at 0 0,rgba(56,189,248,.6),rgba(15,23,42,1));
-      padding:7px;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      font-size:10px;
-      box-shadow:0 10px 25px rgba(56,189,248,.85);
-    }
-    .phone-tile.alt{
-      background:radial-gradient(circle at 0 0,rgba(251,113,133,.7),rgba(15,23,42,1));
-      box-shadow:0 10px 25px rgba(248,113,113,.9);
-    }
-    .phone-tile h4{font-size:10px}
-    .phone-tile span.big{
+    .hero-text h1 span.emoji{font-size:22px}
+    .hero-text p{
+      margin-top:4px;
       font-size:13px;
-      font-weight:800;
+      color:#fefce8;
     }
-    .phone-footer{
-      margin-top:6px;
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.45);
-      padding:6px 8px;
-      font-size:9px;
-      display:flex;
-      justify-content:space-between;
+    .hero-badge{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(254,243,199,.9);
+      background:rgba(12,10,5,.8);
+      color:#fef9c3;
+      display:inline-flex;
       align-items:center;
-      color:#9ca3af;
-      background:radial-gradient(circle at 0 0,rgba(56,189,248,.35),rgba(15,23,42,1));
+      gap:6px;
+    }
+    .hero-badge span.dot{
+      width:7px;height:7px;border-radius:50%;
+      background:radial-gradient(circle,#22c55e,#15803d);
+      box-shadow:0 0 10px #22c55e;
+    }
+    .hero-extra{
+      margin-top:10px;
+      font-size:11px;
+      color:var(--muted2);
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .hero-extra span{
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(248,250,252,.16);
+      background:rgba(15,23,42,.75);
     }
 
-    /* Card grid */
-    .cards{
+    /* GRID */
+    .grid{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:14px;
+      grid-template-columns:1.1fr 0.9fr;
+      gap:16px;
+      margin-top:4px;
     }
-    @media(max-width:960px){
-      .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media(max-width:768px){
+      .grid{grid-template-columns:1fr}
     }
-    @media(max-width:700px){
-      .cards{grid-template-columns:1fr}
-    }
+
     .card{
-      position:relative;
-      border-radius:20px;
+      background:var(--card);
+      border-radius:18px;
       border:1px solid var(--stroke);
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,.9),rgba(15,23,42,.98));
-      padding:14px 14px 16px;
-      box-shadow:0 10px 32px rgba(15,23,42,.9);
-      overflow:hidden;
+      padding:16px 16px 14px;
+      box-shadow:0 18px 45px rgba(0,0,0,.85);
       display:flex;
       flex-direction:column;
       gap:10px;
+      position:relative;
+      overflow:hidden;
     }
     .card::before{
       content:"";
       position:absolute;
-      inset:-30%;
-      background:
-        radial-gradient(circle at 0 0,rgba(56,189,248,.35),transparent 60%),
-        radial-gradient(circle at 100% 0,rgba(59,130,246,.3),transparent 60%);
-      opacity:.4;
+      inset:0;
+      background:radial-gradient(circle at 0 0,rgba(250,204,21,.14),transparent 60%);
+      opacity:.9;
       pointer-events:none;
-      mix-blend-mode:screen;
     }
-    .card > *{position:relative;z-index:1}
-    .card .badge{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      padding:4px 9px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.7);
-      color:rgba(226,232,240,.96);
-      width:max-content;
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,.95),rgba(15,23,42,.8));
-    }
-    .card .title{
-      display:flex;
-      gap:8px;
-      align-items:flex-start;
-      font-size:15px;
+    .card-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px}
+    .card h2{
+      font-size:16px;
       font-weight:800;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-    .card .title .ico{font-size:17px}
-    .card .desc{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.45;
-    }
-    .card .btn{
-      margin-top:auto;
-      align-self:flex-start;
-      padding:7px 13px;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      border-radius:999px;
-      border:1px solid rgba(56,189,248,.7);
-      background:radial-gradient(circle at 0 0,rgba(56,189,248,.52),rgba(15,23,42,1));
-      color:#0b1120;
-      display:inline-flex;
+      display:flex;
       align-items:center;
       gap:8px;
-      box-shadow:0 10px 26px rgba(56,189,248,.8);
-      cursor:pointer;
     }
-    .card .btn span.ico{font-size:14px}
-    .card .meta{
-      font-size:11px;
-      color:rgba(148,163,184,.9);
-      margin-top:4px;
-    }
-
-    /* Card color variations */
-    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#22c55e,#16a34a)}
-    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#0ea5e9,#38bdf8)}
-    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#f97316,#fb923c)}
-    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
-    .card.fidelity-card{
-      border-color:rgba(255,215,0,.7);
-      box-shadow:0 12px 40px rgba(255,215,0,.25);
-    }
-    .card.fidelity-card .badge{
-      background:linear-gradient(135deg,#ffd700,#ffb400);
-      color:#2b1a00;
-    }
-    .card.fidelity-card .btn{
-      background:linear-gradient(135deg,#ffec8b,#ffd700);
-      color:#2b1a00;
-      border:0;
-      box-shadow:0 8px 24px rgba(255,215,0,.45);
-    }
-
-    #biz-mobile .badge{background:linear-gradient(90deg,#22c55e,#14b8a6)}
-    #energia-card .badge{background:linear-gradient(90deg,#facc15,#f97316)}
-    #support-card .badge{background:linear-gradient(90deg,#60a5fa,#22d3ee)}
-    #season-card .badge{background:linear-gradient(90deg,#fb7185,#f97316)}
-    #contact-card .badge{background:linear-gradient(90deg,#4b5563,#6b7280)}
-
-    /* Energia mini list */
-    .mini-list{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:4px;
-    }
-    .mini-pill{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(249,250,251,.08);
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,.96),rgba(15,23,42,.94));
-      color:rgba(226,232,240,.92);
-    }
-
-    /* Helper sections bottom */
-    .bottom-grid{
-      display:grid;
-      grid-template-columns:2.2fr 1.8fr;
-      gap:14px;
-    }
-    @media(max-width:900px){
-      .bottom-grid{grid-template-columns:1fr}
-    }
-    .helper-card{
-      border-radius:20px;
-      border:1px solid rgba(148,163,184,.4);
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,.9),rgba(15,23,42,.98));
-      padding:14px 14px 15px;
-      box-shadow:0 12px 34px rgba(15,23,42,.9);
-    }
-    .helper-title{
+    .card h2 .ico{font-size:18px}
+    .card p{
       font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color:#e5e7eb;
-      margin-bottom:6px;
+      color:var(--muted);
     }
-    .helper-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
-    .helper-grid{
+
+    .list{
+      list-style:none;
+      font-size:12px;
+      color:var(--muted2);
+      margin-top:4px;
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:8px;
+      gap:4px;
     }
-    @media(max-width:700px){
-      .helper-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .list li{display:flex;align-items:flex-start;gap:6px}
+    .list li span.dot{
+      margin-top:4px;
+      width:4px;height:4px;border-radius:50%;
+      background:rgba(250,250,250,.8);
     }
-    .helper-pill{
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.4);
-      background:radial-gradient(circle at 0 0,rgba(15,23,42,.96),rgba(15,23,42,1));
-      padding:8px 8px;
-      font-size:11px;
-      color:#e5e7eb;
+
+    /* FORM */
+    .field{
       display:flex;
       flex-direction:column;
-      gap:3px;
+      gap:4px;
+      margin-top:6px;
     }
-    .helper-pill span.k{
+    .field label{
+      font-size:12px;
+      color:var(--muted2);
+    }
+    .field input, .field textarea{
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.45);
+      background:rgba(15,23,42,.85);
+      color:#e5e7eb;
+      padding:10px 12px;
+      font-size:14px;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder{color:rgba(148,163,184,.85)}
+    .field small{
       font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.1em;
-      color:rgba(148,163,184,.95);
+      color:var(--muted2);
     }
-    .helper-pill span.v{font-weight:600}
 
-    .helper-actions{
+    .inline{
       display:flex;
-      gap:8px;
       flex-wrap:wrap;
+      gap:10px 12px;
+      align-items:center;
+      margin-top:8px;
+    }
+    .check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      color:var(--muted2);
+    }
+    .check input{width:14px;height:14px}
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.5);
+      color:var(--muted2);
+      background:rgba(15,23,42,.82);
+    }
+
+    /* BUTTONS */
+    .btn-main{
       margin-top:10px;
-    }
-    .helper-actions .btn{
-      font-size:11px;
-      padding:7px 12px;
-    }
-
-    /* Anim hint (border glow) */
-    [data-anim]{transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-    [data-anim]:hover{
-      border-color:rgba(59,130,246,.9);
-      box-shadow:
-        0 0 0 1px rgba(15,23,42,1),
-        0 0 0 1px rgba(59,130,246,.9),
-        0 18px 36px rgba(37,99,235,.7);
-      transform:translateY(-2px);
-    }
-
-    /* Small footer */
-    footer{
-      font-size:10px;
-      color:rgba(148,163,184,.9);
-      display:flex;
-      justify-content:space-between;
+      border:none;
+      outline:none;
+      width:100%;
+      border-radius:999px;
+      padding:12px 16px;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       gap:8px;
-      flex-wrap:wrap;
-      padding-top:4px;
+      cursor:pointer;
+      color:#0f172a;
+      background:linear-gradient(90deg,var(--gold1),var(--gold2));
+      box-shadow:0 18px 36px rgba(250,204,21,.4);
+      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
     }
-    footer a{text-decoration:underline;text-decoration-style:dotted}
+    .btn-main span.icon{font-size:16px}
+    .btn-main:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+      box-shadow:0 24px 46px rgba(250,204,21,.55);
+    }
+    .btn-main:active{
+      transform:translateY(1px);
+      box-shadow:0 12px 26px rgba(250,204,21,.4);
+    }
 
-    /* Mobile tweaks */
-    @media(max-width:480px){
-      body{padding:14px}
-      .hero{padding:14px}
-      .hero-title{font-size:20px}
-      .card{padding:12px 12px 14px}
+    .btn-secondary{
+      margin-top:8px;
+      border:none;
+      outline:none;
+      width:100%;
+      border-radius:12px;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      cursor:pointer;
+      color:#e5e7eb;
+      background:radial-gradient(circle at 0 0,rgba(37,211,102,.22),transparent 65%);
+      border:1px solid rgba(37,211,102,.55);
+    }
+
+    /* SIDE CARD: COME FUNZIONA */
+    .side-card{
+      background:rgba(15,23,42,.94);
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.3);
+      padding:16px 16px 14px;
+      box-shadow:0 14px 40px rgba(0,0,0,.85);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .side-card::after{
+      content:"";
+      position:absolute;
+      inset:auto;
+      left:-40px;
+      bottom:-40px;
+      width:120px;
+      height:120px;
+      border-radius:32px;
+      background:radial-gradient(circle at 30% 0%,rgba(37,211,102,.4),transparent 70%);
+      opacity:.5;
+    }
+    .side-card h3{
+      font-size:14px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .side-card p{font-size:12px;color:var(--muted2)}
+    .steps{margin-top:4px;display:grid;gap:4px;font-size:12px;color:var(--muted2)}
+    .steps span.step-num{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:18px;height:18px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(248,250,252,.2);
+      font-size:11px;
+      margin-right:4px;
+    }
+
+    /* ALERT / TOAST */
+    .toast{
+      position:fixed;
+      left:50%;bottom:16px;
+      transform:translateX(-50%);
+      background:rgba(15,23,42,.98);
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      padding:8px 14px;
+      font-size:12px;
+      color:#e5e7eb;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 14px 34px rgba(0,0,0,.8);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+      z-index:50;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-4px);
+      pointer-events:auto;
+    }
+    .toast span.icon{font-size:14px}
+
+    .toast.error{border-color:rgba(248,113,113,.8);color:#fecaca}
+    .toast.error span.icon{filter:drop-shadow(0 0 8px rgba(248,113,113,.8))}
+    .toast.ok{border-color:rgba(52,211,153,.8);color:#bbf7d0}
+
+    /* FOOTER */
+    .footer{
+      margin-top:10px;
+      font-size:11px;
+      color:var(--muted2);
+      text-align:center;
+    }
+    .footer a{
+      color:var(--muted2);
+      text-decoration:none;
     }
   </style>
 </head>
 <body>
-  <main>
-    <!-- TOP -->
-    <header class="top-bar">
-      <div class="brand">
-        <div class="logo">RL</div>
-        <div class="brand-text">
-          <h1>Re Long Informatica</h1>
-          <span>Smartphone, Telefonia, Energia &amp; Assistenza • Marano di Napoli</span>
-        </div>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <a href="./relong-hub-v2.html" class="brand">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <linearGradient id="g-hub" x1="0%" y1="0%" x2="100%">
+                <stop offset="0%" stop-color="#f97316"/>
+                <stop offset="100%" stop-color="#facc15"/>
+              </linearGradient>
+            </defs>
+            <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g-hub)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Re Long Fidelity Card
+        </a>
+        <p class="subtitle">Punti ad ogni acquisto, vantaggi esclusivi, extra bonus se porti gli amici in Re Long.</p>
       </div>
-      <a href="https://wa.me/3908119578844" target="_blank" rel="noopener" class="contact-pill">
-        <div class="wa">W</div>
-        <div>
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.14em">Contattaci su WhatsApp</div>
-          <strong>081 195 788 44</strong>
-        </div>
+
+      <a href="./relong-hub-v2.html" class="back-link">
+        ← Torna all’HUB
       </a>
     </header>
 
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-left">
-        <div class="hero-kicker">
-          <span class="dot"></span>
-          <span>Hub digitale Re Long</span>
-        </div>
-        <h2 class="hero-title">
-          Smartphone a rate <span class="red">senza busta paga</span>, offerte fibra, SIM, luce &amp; gas:
-          tutto in un unico hub.
-        </h2>
-        <p class="hero-sub">
-          Dal tuo smartphone o direttamente in negozio, questo portale raccoglie il meglio delle nostre soluzioni:
-          telefoni top di gamma, Vodafone•WindTre•Sky, offerte Energia e assistenza informatica.
-        </p>
-        <div class="hero-badges">
-          <div class="hero-badge"><span class="ico">📱</span><span>iPhone, Samsung, Xiaomi, Honor…</span></div>
-          <div class="hero-badge"><span class="ico">📡</span><span>Vodafone • WindTre • Sky • Fisso</span></div>
-          <div class="hero-badge"><span class="ico">⚡</span><span>Luce &amp; Gas con consulenza reale</span></div>
-        </div>
-        <div class="hero-cta-row">
-          <a href="catalogo-smartphone-reale-v3.html" class="btn">
-            <span class="ico">📲</span><span>Catalogo Smartphone</span>
-          </a>
-          <a href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20informazioni%20su%20smartphone%20a%20rate%2C%20fibra%20o%20energia." class="btn secondary" target="_blank" rel="noopener">
-            <span class="ico">💬</span><span>Scrivici ora</span>
-          </a>
-        </div>
-        <p class="hero-note">
-          Nessun call-center, solo consulenza reale in negozio a Marano di Napoli.
-        </p>
-      </div>
-      <div class="hero-right">
-        <div class="phone-stack">
-          <div class="phone-inner">
-            <div class="phone-pill"></div>
-            <div class="phone-header">
-              <span class="phone-clock">10:24</span>
-              <span>Re Long • Hub</span>
-            </div>
-            <div class="phone-grid">
-              <div class="phone-tile">
-                <h4>Smartphone a Rate</h4>
-                <span class="big">0€ anticipo</span>
-                <span>Vodafone • WindTre</span>
-              </div>
-              <div class="phone-tile alt">
-                <h4>Luce &amp; Gas</h4>
-                <span class="big">Risparmia ora</span>
-                <span>Analisi bolletta reale</span>
-              </div>
-              <div class="phone-tile alt">
-                <h4>SIM &amp; Fisso</h4>
-                <span class="big">Giga &amp; Fibra</span>
-                <span>Business &amp; Privati</span>
-              </div>
-              <div class="phone-tile">
-                <h4>Assistenza PC &amp; Console</h4>
-                <span class="big">Diagnosi</span>
-                <span>Riparazioni professionali</span>
-              </div>
-            </div>
-            <div class="phone-footer">
-              <span>Hub Re Long attivo</span>
-              <span>📍 Marano di Napoli</span>
-            </div>
+      <div class="hero-main">
+        <div class="hero-text">
+          <div class="hero-badge">
+            <span class="dot"></span>
+            PROGRAMMA ATTIVO
           </div>
+          <h1><span class="emoji">💳</span> Fidelity Card Re Long</h1>
+          <p>Iscriviti in un tap e inizia a raccogliere punti. Se inserisci un codice “Porta un amico”, guadagnate entrambi.</p>
         </div>
+        <div>
+          <span class="pill">
+            ⭐ Punti su smartphone, accessori, assistenza & energia
+          </span>
+        </div>
+      </div>
+      <div class="hero-extra">
+        <span>📍 Re Long Informatica • Via Casalanno 31, Marano di Napoli</span>
+        <span>📞 08119578844</span>
       </div>
     </section>
 
-    <!-- CARDS GRID -->
-    <section class="cards">
-      <!-- 1 -->
-      <article class="card" id="biz-mobile" data-anim>
-        <div class="badge">Smartphone a rate</div>
-        <div class="title"><span class="ico">📱</span><span>Telefonia &amp; Offerte Mobile</span></div>
-        <p class="desc">
-          iPhone, Samsung, Xiaomi, Honor e altri top di gamma anche <strong>senza busta paga</strong>,
-          con piani Vodafone e WindTre studiati su misura per te o per la tua azienda.
-        </p>
-        <p class="meta">Scopri i modelli disponibili, le promo in corso e chiedi una consulenza dedicata.</p>
-        <a class="btn" href="catalogo-smartphone-reale-v3.html">
-          <span class="ico">🔍</span><span>Vai al catalogo</span>
-        </a>
-      </article>
+    <!-- GRID -->
+    <section class="grid">
+      <!-- REGISTRAZIONE -->
+      <article class="card">
+        <div class="card-inner">
+          <h2><span class="ico">📝</span>Registrati alla Fidelity Card</h2>
+          <p>Compila nome e cognome e invia: riceveremo subito la tua richiesta su WhatsApp e ti attiveremo la Fidelity Card Re Long.</p>
 
-      <!-- 2 -->
-      <article class="card" id="energia-card" data-anim>
-        <div class="badge">Energia • Luce &amp; Gas</div>
-        <div class="title"><span class="ico">⚡</span><span>Simulatore Offerte Energia</span></div>
-        <p class="desc">
-          Porta la tua ultima bolletta in negozio o scansiona il QR dedicato:
-          analizziamo insieme i consumi e valutiamo se conviene davvero cambiare fornitore.
-        </p>
-        <div class="mini-list">
-          <span class="mini-pill">Analisi bolletta reale</span>
-          <span class="mini-pill">Simulazione risparmio</span>
-          <span class="mini-pill">Nessun call center, solo noi</span>
-        </div>
-        <a class="btn" href="simulatore-energia.html">
-          <span class="ico">📊</span><span>Simula la tua offerta</span>
-        </a>
-      </article>
+          <ul class="list">
+            <li><span class="dot"></span><span>Iscrizione gratuita, nessun canone.</span></li>
+            <li><span class="dot"></span><span>Punti su acquisti, riparazioni e contratti attivati in negozio.</span></li>
+            <li><span class="dot"></span><span>Bonus extra in occasioni speciali (Black Friday, Natale, promo lampo).</span></li>
+          </ul>
 
-      <!-- 3 -->
-      <article class="card" id="support-card" data-anim>
-        <div class="badge">Assistenza Informatica</div>
-        <div class="title"><span class="ico">🖥️</span><span>PC, Console &amp; Stampanti</span></div>
-        <p class="desc">
-          Riparazioni notebook, PC fissi, console, stampanti e periferiche. Diagnosi, preventivo
-          e avanzamento lavori tracciato con il nostro gestionale interno.
-        </p>
-        <p class="meta">Porta il dispositivo in negozio: ti avvisiamo noi su WhatsApp per ogni aggiornamento.</p>
-        <a class="btn" href="accettazione-assistenza.html">
-          <span class="ico">🛠️</span><span>Richiedi assistenza</span>
-        </a>
-      </article>
-
-      <!-- FIDELITY CARD -->
-      <article class="card fidelity-card" data-anim>
-        <div class="badge">FIDELITY CARD</div>
-        <div class="title"><span class="ico">💳</span><span>Re Long Fidelity &amp; Porta un Amico</span></div>
-        <p class="desc">
-          Iscriviti alla Fidelity Card Re Long e accumula punti ad ogni attivazione.
-          Se porti un amico, guadagnate entrambi vantaggi e promozioni dedicate.
-        </p>
-        <a class="btn" href="./fidelity.html">
-          <span class="ico">⭐</span><span>Scopri di più</span>
-        </a>
-      </article>
-
-      <!-- 5 — SEASON CARD -->
-      <article class="card" id="season-card" data-anim>
-        <div class="badge">Promo del periodo</div>
-        <div class="title"><span class="ico">🎯</span><span>Offerta del Momento</span></div>
-        <p class="desc">
-          In negozio trovi sempre qualche promo dedicata tra smartphone, SIM, fibra o energia.
-          Passa a trovarci o scrivici su WhatsApp per scoprire cosa è attivo oggi.
-        </p>
-        <p class="meta">Contattaci, ti risponde direttamente Re Long (nessun bot, nessun call center).</p>
-        <a class="btn" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20conoscere%20le%20promo%20attive%20oggi." target="_blank" rel="noopener">
-          <span class="ico">💬</span><span>Chiedi le promo</span>
-        </a>
-      </article>
-
-      <!-- 6 -->
-      <article class="card" id="contact-card" data-anim>
-        <div class="badge">Contatti &amp; Orari</div>
-        <div class="title"><span class="ico">📍</span><span>Vieni a trovarci</span></div>
-        <p class="desc">
-          Siamo a Marano di Napoli. Puoi scriverci su WhatsApp, chiamarci o seguire le indicazioni su Google Maps
-          per raggiungere il negozio e vedere le offerte dal vivo.
-        </p>
-        <p class="meta">
-          WhatsApp / Tel: <strong>081 195 788 44</strong><br/>
-          Clicca sul pulsante per aprire Maps.
-        </p>
-        <a class="btn" href="https://maps.app.goo.gl/s4ytGUBeGDAEaFG59" target="_blank" rel="noopener">
-          <span class="ico">🗺️</span><span>Apri su Google Maps</span>
-        </a>
-      </article>
-    </section>
-
-    <!-- BOTTOM HELPERS -->
-    <section class="bottom-grid">
-      <article class="helper-card">
-        <h3 class="helper-title">Perché scegliere Re Long</h3>
-        <p class="helper-sub">
-          Non siamo un semplice punto vendita: siamo il tuo referente unico per smartphone, linee fisse, mobile,
-          energia e assistenza informatica. Un solo negozio, tanti servizi collegati.
-        </p>
-        <div class="helper-grid">
-          <div class="helper-pill">
-            <span class="k">Consulenza reale</span>
-            <span class="v">Ti spieghiamo pro e contro di ogni offerta, senza giri di parole.</span>
+          <div class="field">
+            <label for="reg_name">Nome e Cognome</label>
+            <input id="reg_name" type="text" placeholder="Mario Rossi" autocomplete="name" />
+            <small>Indica il tuo nome e cognome come vuoi che compaiano sulla Fidelity.</small>
           </div>
-          <div class="helper-pill">
-            <span class="k">Un unico referente</span>
-            <span class="v">Telefono, SIM, fibra, luce &amp; gas e PC sempre seguiti da noi.</span>
+
+          <div class="inline">
+            <label class="check">
+              <input type="checkbox" id="reg_priv" checked />
+              <span>Acconsento al trattamento dei dati per l’attivazione della Fidelity Card.</span>
+            </label>
           </div>
-          <div class="helper-pill">
-            <span class="k">Dopo la vendita</span>
-            <span class="v">Ti assistiamo anche dopo l’attivazione, senza abbandonarti al call center.</span>
-          </div>
-        </div>
-        <div class="helper-actions">
-          <a class="btn outline" href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20vorrei%20una%20consulenza%20completa%20su%20telefonia%20ed%20energia." target="_blank" rel="noopener">
-            <span class="ico">📞</span><span>Prenota una consulenza</span>
-          </a>
+
+          <button class="btn-main" id="btn_reg">
+            <span class="icon">💬</span>
+            Invia richiesta su WhatsApp
+          </button>
+
+          <button class="btn-secondary" id="btn_reg_empty">
+            <span>Oppure scrivici senza compilare i campi</span>
+          </button>
         </div>
       </article>
 
-      <article class="helper-card">
-        <h3 class="helper-title">Gestione clienti &amp; NFC</h3>
-        <p class="helper-sub">
-          In negozio utilizziamo un gestionale dedicato e tag NFC sulle postazioni per velocizzare richieste,
-          attivazioni e reminder. Tu pensi alle tue esigenze, al resto pensiamo noi.
-        </p>
-        <div class="helper-grid">
-          <div class="helper-pill">
-            <span class="k">Tag NFC vetrina</span>
-            <span class="v">Catalogo smartphone e offerte apribili dal tuo telefono.</span>
+      <!-- PORTA UN AMICO -->
+      <article class="card">
+        <div class="card-inner">
+          <h2><span class="ico">🤝</span>Porta un Amico</h2>
+          <p>Hai ricevuto un codice da un amico già iscritto alla Fidelity Card Re Long? Inseriscilo qui e fate punti entrambi.</p>
+
+          <ul class="list">
+            <li><span class="dot"></span><span>Tu ti registri alla Fidelity.</span></li>
+            <li><span class="dot"></span><span>L’amico che ti ha invitato accumula punti bonus.</span></li>
+            <li><span class="dot"></span><span>In negozio vi spieghiamo i vantaggi dedicati.</span></li>
+          </ul>
+
+          <div class="field">
+            <label for="ref_code">Codice “Porta un Amico” del tuo amico</label>
+            <input id="ref_code" type="text" placeholder="Codice invito (es. RL-1234)" />
           </div>
-          <div class="helper-pill">
-            <span class="k">Promemoria post-vendita</span>
-            <span class="v">Reminder WhatsApp per proporre servizi utili, non spam.</span>
+
+          <div class="field">
+            <label for="ref_name">Il tuo Nome e Cognome</label>
+            <input id="ref_name" type="text" placeholder="Mario Rossi" />
           </div>
-          <div class="helper-pill">
-            <span class="k">Fidelity &amp; punti</span>
-            <span class="v">Fidelity Card digitale e sistema punti gestito direttamente da Re Long.</span>
+
+          <div class="inline">
+            <label class="check">
+              <input type="checkbox" id="ref_priv" checked />
+              <span>Autorizzo il trattamento dei dati per l’attivazione Fidelity e il “Porta un amico”.</span>
+            </label>
           </div>
+
+          <button class="btn-main" id="btn_ref">
+            <span class="icon">💬</span>
+            Invia con codice Amico
+          </button>
         </div>
       </article>
     </section>
 
-    <footer>
-      <span>© Re Long Informatica • Marano di Napoli</span>
-      <span>Questo hub è pensato per guidarti tra smartphone, telefonia, energia e assistenza in modo chiaro.</span>
-    </footer>
-  </main>
+    <!-- SIDE CARD INFO -->
+    <aside class="side-card">
+      <div style="position:relative;z-index:1;">
+        <h3>ℹ️ Come funziona la Fidelity Card</h3>
+        <p>Pensa alla Fidelity come alla “carta punti” di Re Long. La gestiamo noi dal gestionale: tu pensa solo a usarla.</p>
+        <div class="steps">
+          <div><span class="step-num">1</span>Iscriviti qui via WhatsApp o direttamente in negozio.</div>
+          <div><span class="step-num">2</span>Ad ogni acquisto o servizio registriamo i tuoi punti.</div>
+          <div><span class="step-num">3</span>Quando raggiungi una soglia, ti proponiamo i vantaggi disponibili.</div>
+          <div><span class="step-num">4</span>Se porti amici con il tuo codice, aumenti più velocemente il saldo punti.</div>
+        </div>
+        <p style="margin-top:6px;font-size:11px;">Per qualsiasi dubbio puoi sempre scriverci su WhatsApp o passare in store: ti spieghiamo tutto al volo.</p>
+      </div>
+    </aside>
+
+    <p class="footer">
+      Re Long Informatica – Via Casalanno 31, Marano di Napoli • Tel <a href="tel:+3908119578844">08119578844</a>
+    </p>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="icon">ℹ️</span><span id="toast-msg">Messaggio</span>
+  </div>
+
+  <script>
+    const WHATSAPP_NUMBER = "3908119578844";
+    const RELONG_PHONE_TEXT = "08119578844";
+
+    function waLink(text){
+      return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
+    }
+
+    function showToast(msg, type="info"){
+      const t=document.getElementById('toast');
+      const icon=t.querySelector('.icon');
+      t.classList.remove('error','ok');
+      if(type==="error"){
+        t.classList.add('error');
+        icon.textContent="⚠️";
+      }else if(type==="ok"){
+        t.classList.add('ok');
+        icon.textContent="✅";
+      }else{
+        icon.textContent="ℹ️";
+      }
+      document.getElementById('toast-msg').textContent=msg;
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+    }
+
+    // REGISTRAZIONE SEMPLICE
+    document.getElementById('btn_reg').addEventListener('click', ()=>{
+      const name = (document.getElementById('reg_name').value || "").trim();
+      const priv = document.getElementById('reg_priv').checked;
+      if(!name || !name.includes(" ")){
+        showToast("Inserisci Nome e Cognome completi per la registrazione.", "error");
+        return;
+      }
+      if(!priv){
+        showToast("Devi acconsentire al trattamento dati per procedere.", "error");
+        return;
+      }
+      const text =
+        "Ciao Re Long, vorrei iscrivermi alla *Fidelity Card*.\n\n" +
+        "👤 Nome e Cognome: " + name + "\n" +
+        "📍 Negozio: Re Long Informatica (Marano di Napoli)\n\n" +
+        "Ti lascio i miei dati per l'attivazione. Grazie!";
+
+      const url = waLink(text);
+      window.open(url, "_blank", "noopener");
+      showToast("Aprendo WhatsApp per inviare la richiesta.", "ok");
+    });
+
+    // REGISTRAZIONE SENZA COMPILARE
+    document.getElementById('btn_reg_empty').addEventListener('click', ()=>{
+      const text =
+        "Ciao Re Long, vorrei avere info e iscrivermi alla *Fidelity Card*.\n\n" +
+        "Ti lascio qui i miei dati per l'attivazione. Grazie!";
+
+      const url = waLink(text);
+      window.open(url, "_blank", "noopener");
+      showToast("Aprendo WhatsApp per scriverci direttamente.", "ok");
+    });
+
+    // PORTA UN AMICO
+    document.getElementById('btn_ref').addEventListener('click', ()=>{
+      const code = (document.getElementById('ref_code').value || "").trim();
+      const name = (document.getElementById('ref_name').value || "").trim();
+      const priv = document.getElementById('ref_priv').checked;
+
+      if(!code){
+        showToast("Inserisci il codice invito dell'amico che ti ha presentato.", "error");
+        return;
+      }
+      if(!name || !name.includes(" ")){
+        showToast("Inserisci il tuo Nome e Cognome completi.", "error");
+        return;
+      }
+      if(!priv){
+        showToast("Devi acconsentire al trattamento dati per procedere.", "error");
+        return;
+      }
+
+      const text =
+        "Ciao Re Long, vorrei iscrivermi alla *Fidelity Card* tramite il codice 'Porta un amico'.\n\n" +
+        "👤 Il mio Nome e Cognome: " + name + "\n" +
+        "🔑 Codice invito dell'amico: " + code + "\n\n" +
+        "Ti chiedo di attivare la Fidelity con questo codice così da ottenere i vantaggi previsti.\n" +
+        "Grazie!";
+
+      const url = waLink(text);
+      window.open(url, "_blank", "noopener");
+      showToast("Aprendo WhatsApp con il codice amico compilato.", "ok");
+    });
+  </script>
 </body>
 </html>
