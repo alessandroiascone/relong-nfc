@@ -127,6 +127,18 @@
       background:#0a0d14;border:1px solid var(--stroke);color:#eef3ff;
       border-radius:999px;padding:6px 10px;font-size:11px;min-width:130px
     }
+
+    /* Search input sempre visibile */
+    #searchInput{
+      background:#0a0d14;
+      border:1px solid var(--stroke);
+      color:#eef3ff;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      min-width:180px;
+      flex:1;
+    }
   </style>
 </head>
 <body>
@@ -202,8 +214,11 @@
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
+
+      <!-- Toolbar: Filtri + Ricerca sempre visibile -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
+        <input id="searchInput" placeholder="Cerca nome o telefono" />
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -217,7 +232,8 @@
         <button class="toggle" data-filter="preventivi">Preventivi</button>
       </div>
 
-      <div id="counter" class="label" style="margin-bottom:10px">Clienti: 0</div>
+      <div id="counter" class="label" style="margin-bottom:6px">Clienti: 0</div>
+      <div id="filterSummary" class="label" style="margin-bottom:10px;display:none"></div>
       <div id="list"></div>
     </div>
   </section>
@@ -460,7 +476,7 @@
       it.updatedAt=new Date().toISOString();
     }
 
-    // Proroga dei promemoria a partire da oggi, senza duplicare il cliente
+    // NON usiamo più prorogaPromemoria per non cambiare le date esistenti
     function prorogaPromemoria(it){
       if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
@@ -469,7 +485,7 @@
       it.updatedAt = new Date().toISOString();
     }
 
-    // Primo ciclo completato = tutti i main reminder (sim/energia/fissomobile/rate) inviati
+    // Primo ciclo completato = tutti i main reminder inviati
     function isMainCycleComplete(it){
       if(!it.reminders || !it.reminders.length) return false;
       const onlyMain = it.reminders.filter(r=> r.type!=='followup');
@@ -593,9 +609,11 @@
       const prev = byPhone || byName;
 
       if(prev){
+        // aggiorno dati anagrafici e attivazioni ma NON tocco i reminder esistenti
         prev.name = prev.name || name;
         prev.phone = prev.phone || phone;
         prev.activated = [...new Set([...(prev.activated||[]), ...act])];
+
         if(newItem.acceptance){
           prev.acceptance = true;
           prev.device = newItem.device;
@@ -603,24 +621,24 @@
         }
         if(newItem.fromPacchi) prev.fromPacchi = true;
 
-        if(normalizeName(prev.name)===normalizeName(name) && normalizePhone(prev.phone)===normalizePhone(phone)){
-          prorogaPromemoria(prev);
-          showToast('Cliente già presente: promemoria prorogati ✅');
-        } else {
-          prev.updatedAt = new Date().toISOString();
+        // non rigenero/remappo i promemoria: mantengo le date di prima
+        if(!prev.reminders || !prev.reminders.length){
+          ensureReminders(prev);
         }
 
-        ensureReminders(prev);
+        prev.updatedAt = new Date().toISOString();
+        showToast('Cliente già presente: dati aggiornati ✅');
       } else {
         ensureReminders(newItem);
         items.unshift(newItem);
+        showToast('Operazione registrata ✅');
       }
 
       saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
       nameInput.value=''; phoneInput.value='';
       activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
       $('#acceptWrap').style.display='none';
-      render(); showToast('Operazione registrata ✅');
+      render();
 
       try{
         if(isRepair){ window.open(waRepairIntake(name, phone),'_blank','noopener'); }
@@ -628,16 +646,19 @@
       }catch{}
     });
 
-    /* FILTRI */
+    /* FILTRI + RICERCA */
     let filterToday=false;
     let filterState={
       remindtoday:false,
       pacchi:false, sim:false, fisso:false, energia:false,
       rate:false, riparazioni:false, preventivi:false
     };
+    let searchTerm='';
 
     const toggleFiltersBtn = $('#toggleFilters');
     const filtersRow = $('#filtersRow');
+    const searchInput = document.getElementById('searchInput');
+    const filterSummary = document.getElementById('filterSummary');
 
     toggleFiltersBtn.addEventListener('click', ()=>{
       const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
@@ -645,15 +666,28 @@
       toggleFiltersBtn.classList.toggle('active', isHidden);
     });
 
+    // click sugli altri filtri
     filtersRow.addEventListener('click', e=>{
       const b=e.target.closest('.toggle'); if(!b) return;
       const key=b.dataset.filter;
       const on=!b.classList.contains('active');
       b.classList.toggle('active',on);
       filterState[key]=on;
-      if(key==='remindtoday') filterToday = on;
+
+      if(key === 'remindtoday'){
+        filterToday = on;
+      }
+
       render();
     });
+
+    // Ricerca sempre attiva
+    if(searchInput){
+      searchInput.addEventListener('input', ()=>{
+        searchTerm = searchInput.value.trim().toLowerCase();
+        render();
+      });
+    }
 
     function matchesCategoryFilters(it){
       const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && v);
@@ -872,6 +906,45 @@
       if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
+    /* Badge riassunto filtri */
+    function updateFilterSummary(visibleCount){
+      if(!filterSummary) return;
+
+      const parts = [];
+
+      if(searchTerm){
+        parts.push(`Ricerca: "${searchTerm}"`);
+      }
+
+      if(filterToday){
+        parts.push('Remind oggi');
+      }
+
+      const mapLabel = {
+        pacchi:'Pacchi',
+        sim:'SIM',
+        fisso:'Fisso',
+        energia:'Energia',
+        rate:'Rate',
+        riparazioni:'Riparazioni',
+        preventivi:'Preventivi'
+      };
+
+      Object.entries(filterState).forEach(([k,v])=>{
+        if(k==='remindtoday') return;
+        if(v) parts.push(mapLabel[k] || k);
+      });
+
+      if(!parts.length){
+        filterSummary.style.display='none';
+        filterSummary.textContent='';
+        return;
+      }
+
+      filterSummary.style.display='';
+      filterSummary.textContent = `Filtri attivi: ${parts.join(' • ')} | Risultati: ${visibleCount}`;
+    }
+
     /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
@@ -891,10 +964,24 @@
 
         if(!matchesCategoryFilters(it)) return false;
 
+        // ricerca: nome o telefono
+        if(searchTerm){
+          const nameText = (it.name || '').toLowerCase();
+          const phoneText = normalizePhone(it.phone || '');
+          const q = searchTerm.toLowerCase();
+          const qDigits = q.replace(/\D/g,'');
+
+          const nMatch = nameText.includes(q);
+          const pMatch = qDigits ? phoneText.includes(qDigits) : false;
+
+          if(!nMatch && !pMatch) return false;
+        }
+
         return true;
       });
 
       counter.textContent = 'Clienti: ' + source.length;
+      updateFilterSummary(source.length);
 
       source.forEach(it=>{
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
@@ -948,7 +1035,6 @@
                 saveLocal(); saveToGitHub(); render();
                 try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
 
-                // la dashboard leggerà ora questo incasso (quotePrice) perché lo stato è "consegnato"
                 if(dashModal && dashModal.classList.contains('on')) updateDashboard();
               }));
             }
@@ -969,7 +1055,7 @@
           actions.append(btnDelete(it));
         }
 
-        /* FIDELITY: saldo + aggiungi punti + invia card (gestione card via pillola Card) */
+        /* FIDELITY: saldo + aggiungi punti + invia card */
         if(pointsLine){
           pointsLine.innerHTML='';
           const currentPoints2 = Number(it.points || 0);
@@ -1002,7 +1088,7 @@
           pointsLine.append(lbl, add, sendCard);
         }
 
-        /* REMINDERS UI (semplificata, senza stop promo) */
+        /* REMINDERS UI */
         remWrap.innerHTML='';
 
         if(it.responded){
@@ -1029,7 +1115,6 @@
         list.append(el);
       });
 
-      // se la dashboard è aperta, aggiorna numeri live
       if(dashModal && dashModal.classList.contains('on')) updateDashboard();
     }
 
