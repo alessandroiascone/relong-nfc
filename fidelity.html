@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Re Long • Fidelity Card Digitale</title>
+  <title>Re Long • Fidelity Premium</title>
   <meta name="theme-color" content="#05060a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -353,24 +353,24 @@
       padding:30px 10px;
     }
 
-    .skeleton{
-      background:linear-gradient(90deg,#1b2030,#262c40,#1b2030);
-      background-size:200% 100%;
-      border-radius:999px;
-      height:12px;
-      animation:shimmer 1.2s infinite;
-    }
-    @keyframes shimmer{
-      0%{background-position:0% 0}
-      100%{background-position:-200% 0}
-    }
-    .skeleton-line{height:10px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
-    .skeleton-line div{height:100%;width:35%;background:linear-gradient(90deg,#1b2030,#2b3250,#1b2030);animation:shimmer 1.3s infinite;}
-
     .small-hint{
       font-size:10px;
       color:var(--muted);
       margin-top:4px;
+    }
+
+    /* Elenco premi */
+    .rewards-list{
+      list-style:none;
+      padding-left:0;
+      margin:4px 0 0;
+      display:grid;
+      gap:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .rewards-list li strong{
+      color:#fff;
     }
   </style>
 </head>
@@ -424,13 +424,13 @@
         </div>
       </div>
 
-      <!-- CODICE + LINK HUB -->
+      <!-- CODICE + NOTE -->
       <div class="id-row">
         <span>Codice Fidelity (inviti & promo):</span>
         <span class="code-pill" id="codePill">••••••</span>
       </div>
       <div class="small-hint">
-        Usa questo codice quando porti un amico o lo inviti a registrarsi.
+        Usa questo codice quando porti un amico o lo inviti a registrarti.
       </div>
     </section>
 
@@ -458,7 +458,7 @@
             </div>
             <div class="chips-row">
               <button id="shareInviteBtn" class="btn primary" type="button">
-                Invita ora su WhatsApp
+                Copia codice + WhatsApp
               </button>
               <button id="copyCodeBtn" class="chip-btn" type="button">
                 Copia il mio codice
@@ -508,6 +508,20 @@
             Raggiunte determinate soglie (es. 500, 1000 punti…) potrai accedere a sconti esclusivi, gadget o promo dedicate in negozio.</p>
         </div>
       </details>
+    </section>
+
+    <!-- ELENCO PREMI -->
+    <section class="card">
+      <div class="section-title">Elenco premi indicativo</div>
+      <div class="section-sub">
+        Esempio di soglie punti. I premi possono variare nel tempo:  
+        verifica sempre in negozio le promo attive.
+      </div>
+      <ul class="rewards-list">
+        <li><strong>500 punti</strong> – Sconto dedicato su accessori o servizio base.</li>
+        <li><strong>1000 punti</strong> – Bonus su acquisto smartphone o gadget selezionati.</li>
+        <li><strong>1500 punti</strong> – Vantaggi premium, bundle o promo speciali Re Long.</li>
+      </ul>
     </section>
 
     <!-- ERRORE / INFO -->
@@ -585,7 +599,7 @@
     }
 
     function renderPromos(){
-      const area = $('#promoArea');
+      const area = document.getElementById('promoArea');
       area.innerHTML='';
       const chosen = shuffle(PROMOS).slice(0,2);
       chosen.forEach(p=>{
@@ -603,13 +617,14 @@
     }
 
     function buildInviteText(name, code){
-      const safeName = name || 'Ciao';
+      const safeName = name || 'Un cliente Re Long';
       return (
         safeName + ` ti invita alla Fidelity Card Re Long!\n\n` +
         `Usa il suo codice invito: ${code}\n` +
         `✔ Tu ricevi subito +50 punti di benvenuto\n` +
         `✔ Lui guadagna +100 punti\n\n` +
-        `Scrivi a Re Long su WhatsApp per registrarti oppure passa in negozio.`
+        `Per registrarti, scrivi a Re Long su WhatsApp indicando il codice o passa in negozio.\n` +
+        `WhatsApp Re Long: ${RELONG_PHONE}`
       );
     }
 
@@ -617,7 +632,7 @@
       const params = new URLSearchParams(location.search);
       const idParam = params.get('id') || '';
       if(!idParam){
-        $('#errorBox').style.display='block';
+        document.getElementById('errorBox').style.display='block';
         return null;
       }
       try{
@@ -628,13 +643,13 @@
         const byPhone = all.find(x=> normalizePhone(x.phone)===normalizePhone(idParam));
         const client = byId || byPhone || null;
         if(!client){
-          $('#errorBox').style.display='block';
+          document.getElementById('errorBox').style.display='block';
           return null;
         }
         return client;
       }catch(e){
         console.error(e);
-        $('#errorBox').style.display='block';
+        document.getElementById('errorBox').style.display='block';
         return null;
       }
     }
@@ -649,31 +664,31 @@
       const points = Number(client.points||0);
       const code = genCodeFromId(String(client.id||normalizePhone(client.phone)||name));
 
-      $('#userNameSub').textContent = name;
-      $('#pointsValue').textContent = isNaN(points)? '0' : String(points);
+      document.getElementById('userNameSub').textContent = name;
+      document.getElementById('pointsValue').textContent = isNaN(points)? '0' : String(points);
 
       const prog = computeProgress(points);
-      $('#progressFill').style.width = (prog.ratio*100).toFixed(1)+'%';
-      $('#progressLabelLeft').textContent  = `${prog.prevThreshold} pt`;
-      $('#progressLabelRight').textContent = `Prossimo premio a ${prog.nextThreshold} pt`;
+      document.getElementById('progressFill').style.width = (prog.ratio*100).toFixed(1)+'%';
+      document.getElementById('progressLabelLeft').textContent  = `${prog.prevThreshold} pt`;
+      document.getElementById('progressLabelRight').textContent = `Prossimo premio a ${prog.nextThreshold} pt`;
       const missing = Math.max(0, prog.nextThreshold - points);
-      $('#miniCounter').textContent = missing>0
+      document.getElementById('miniCounter').textContent = missing>0
         ? `Ti mancano ${missing} punti al prossimo premio.`
         : `Hai superato una soglia di premio, passa in negozio per scoprire cosa puoi riscattare.`;
 
-      $('#codePill').textContent = code;
+      document.getElementById('codePill').textContent = code;
 
       // bottone "Come funziona"
-      $('#howBtn').addEventListener('click', ()=>{
-        const det = $('#howDetails');
+      document.getElementById('howBtn').addEventListener('click', ()=>{
+        const det = document.getElementById('howDetails');
         if(det){
           det.open = true;
           det.scrollIntoView({behavior:'smooth',block:'start'});
         }
       });
 
-      // copia codice
-      $('#copyCodeBtn').addEventListener('click', async ()=>{
+      // copia solo codice
+      document.getElementById('copyCodeBtn').addEventListener('click', async ()=>{
         try{
           await navigator.clipboard.writeText(code);
           alert('Codice copiato: ' + code);
@@ -682,10 +697,13 @@
         }
       });
 
-      // invito WhatsApp
-      $('#shareInviteBtn').addEventListener('click', ()=>{
+      // copia codice + apri WhatsApp (senza numero, il cliente sceglie a chi mandarlo)
+      document.getElementById('shareInviteBtn').addEventListener('click', async ()=>{
         const text = buildInviteText(name, code);
-        const url  = `https://wa.me/39${normalizePhone(RELONG_PHONE)}?text=${encodeURIComponent(text)}`;
+        try{
+          await navigator.clipboard.writeText(code);
+        }catch{}
+        const url  = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(url,'_blank','noopener');
       });
     })();
