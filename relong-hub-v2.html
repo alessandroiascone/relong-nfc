@@ -86,14 +86,13 @@
     .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
     .hero p{font-size:13px;color:var(--muted)}
     .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
-    /* spotlight extra soft */
     .hero::after{
       content:""; position:absolute; top:-40px; width:60%; height:120px; max-width:560px;
       background:radial-gradient(ellipse at center, rgba(255,120,0,.16) 0%, rgba(0,0,0,0) 70%);
       filter:blur(10px); pointer-events:none;
     }
 
-    /* Griglia (BUGFIX: 1fr 1fr 1fr) */
+    /* Griglia */
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
     @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
@@ -129,11 +128,19 @@
       border:1px solid rgba(0,0,0,.08);
     }
 
+    /* Badge oro Fidelity Card */
+    #fidelity-card .badge{
+      background:linear-gradient(90deg,#facc15,#f97316);
+      color:#3b2500;
+      box-shadow:0 10px 22px rgba(250,204,21,.65);
+      border:1px solid rgba(0,0,0,.08);
+    }
+
     .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
     .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
     .desc{font-size:13px;color:var(--muted);line-height:1.45}
 
-    /* CTA principale – 3D + sheen */
+    /* CTA principale */
     .btn{
       display:flex; align-items:center; justify-content:center;
       text-decoration:none; text-align:center; width:100%;
@@ -281,7 +288,16 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
-      <!-- 5 — SEASON CARD -->
+      <!-- 5 — FIDELITY CARD (AGGIORNATA) -->
+      <article class="card" data-anim id="fidelity-card">
+        <div class="badge">FIDELITY CARD</div>
+        <div class="title"><span class="ico">💳</span><span>Fidelity Card Re Long</span></div>
+        <p class="desc">Accumula punti ad ogni acquisto e sfrutta i vantaggi esclusivi per te e i tuoi amici.</p>
+        <!-- qui ora si va alla landing dedicata -->
+        <a class="btn" href="./fidelity-landing.html">Scopri di più</a>
+      </article>
+
+      <!-- 6 — SEASON CARD -->
       <article class="card" data-anim id="season-card">
         <div class="badge" id="season-badge">BLACK FRIDAY</div>
         <div class="highlight" id="season-highlight">🔥 IN EVIDENZA</div>
@@ -291,7 +307,7 @@
         <a class="btn" id="season-link" href="./black-friday.html" aria-label="Vai alla pagina stagionale">Vai alle Offerte Black Friday</a>
       </article>
 
-      <!-- 6 — CONTATTO RAPIDO -->
+      <!-- 7 — CONTATTO RAPIDO -->
       <article class="card" data-anim id="biz-mobile">
         <div class="badge">CONTATTO RAPIDO</div>
         <div class="title"><span class="ico">💬</span><span>Contattaci per altre info</span></div>
@@ -359,7 +375,7 @@
       document.querySelectorAll('[data-anim]').forEach(el=>obs.observe(el));
     })();
 
-    /* “Tilt” 3D al mouse (disabilitato con reduced-motion) */
+    /* “Tilt” 3D al mouse */
     (function(){
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(prefersReduced) return;
