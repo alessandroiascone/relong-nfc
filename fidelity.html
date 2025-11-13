@@ -125,23 +125,41 @@
       gap:10px;
       margin:10px 0 6px;
     }
+
+    /* CODICE INVITO MOLTO PIÙ VISIBILE */
     .code-chip{
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      padding:6px 11px;
+      border:1px solid rgba(255,215,0,1);
+      padding:8px 14px;
       font-size:13px;
       display:inline-flex;
       align-items:center;
       gap:6px;
       cursor:pointer;
-      background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(0,0,0,.7));
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#2b1900;
+      box-shadow:
+        0 0 22px rgba(255,215,0,.9),
+        0 0 2px rgba(0,0,0,.8);
     }
-    .code-chip strong{letter-spacing:.14em;font-family:monospace;}
-    .code-chip small{font-size:10px;color:var(--muted);text-transform:uppercase;}
+    .code-chip strong{
+      letter-spacing:.20em;
+      font-family:monospace;
+      font-size:15px;
+    }
+    .code-chip small{
+      font-size:10px;
+      color:#2b1900;
+      text-transform:uppercase;
+      opacity:.9;
+    }
     .code-chip:hover{
-      border-color:rgba(255,215,0,.8);
-      box-shadow:0 0 0 1px rgba(255,215,0,.25);
+      box-shadow:
+        0 0 30px rgba(255,215,0,1),
+        0 0 6px rgba(0,0,0,1);
+      transform:translateY(-1px);
     }
+
     .points-pill{
       border-radius:999px;
       border:1px solid rgba(0,140,255,.4);
@@ -395,9 +413,7 @@
             <div class="progress-bar">
               <span id="progressFill"></span>
             </div>
-            <div class="tiers" id="tiersRow">
-              <!-- riempito da JS -->
-            </div>
+            <div class="tiers" id="tiersRow"></div>
           </div>
 
           <div class="btn-row">
@@ -418,9 +434,7 @@
     <div class="section">
       <h2>Premi disponibili</h2>
       <p>Ogni volta che raggiungi una soglia punti, puoi scegliere il premio corrispondente.</p>
-      <div class="rewards-list" id="rewardsList">
-        <!-- JS -->
-      </div>
+      <div class="rewards-list" id="rewardsList"></div>
       <p class="small-note">
         I premi sono soggetti a disponibilità in negozio. In caso di mancanza di uno specifico modello,
         ti proporremo un prodotto equivalente o superiore.
@@ -612,7 +626,6 @@
       setTimeout(()=>t.remove(),2400);
     }
 
-    // Pulsanti
     document.getElementById("codeChip").addEventListener("click",()=>{
       const code = elCode.textContent.trim();
       if(code) copyToClipboard(code);
