@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32m (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Scadenzario v32b (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -29,7 +29,6 @@
     .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
     .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
-    .btn.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
     label{font-size:12px;color:var(--muted)}
@@ -42,44 +41,65 @@
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
     .item .head{width:100%; display:flex; gap:10px; align-items:center;padding:12px 14px;background:transparent;color:#eaf2ff;border:0;cursor:pointer;font-weight:800;letter-spacing:.2px;text-align:left;justify-content:space-between}
     .details{padding:12px 14px; border-top:1px solid var(--stroke)}
-    .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .wa-btn{font-size:12px;padding:6px 8px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;text-decoration:none;display:inline-flex;gap:6px;align-items:center;font-weight:800;letter-spacing:.2px}
-    .wa-btn.ok{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.18)}
+    .r-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+    .wa-btn{font-size:12px;padding:6px 8px;border-radius:999px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02));color:#dbeaff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+    .wa-btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
     .wa-btn.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
-    .pillbtn{font-size:12px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
-      background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
-      color:#e6f1ff;display:inline-flex;gap:8px;align-items:center;font-weight:800;letter-spacing:.2px}
-    .pillbtn:active{transform:translateY(1px)}
-    .pillbtn.energy{border-color:rgba(255,221,87,.35);box-shadow:0 6px 18px rgba(255,221,87,.12)}
-    .pillbtn.sim{border-color:rgba(0,200,255,.35);box-shadow:0 6px 18px rgba(0,200,255,.12)}
-    .pillbtn.fisso{border-color:rgba(120,180,255,.35);box-shadow:0 6px 18px rgba(120,180,255,.12)}
-    .pillbtn.rate{border-color:rgba(255,140,0,.35);box-shadow:0 6px 18px rgba(255,140,0,.12)}
     #toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:100000}
     .toast{background:linear-gradient(180deg,rgba(0,140,255,.12),rgba(0,140,255,.05));border:1px solid rgba(0,140,255,.25);color:#e6f1ff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);animation:toastIn .2s ease, toastOut .2s ease 3.3s forwards;font-size:13px;letter-spacing:.2px}
     .toast.ok{background:linear-gradient(180deg,rgba(37,211,102,.18),rgba(37,211,102,.06));border-color:rgba(37,211,102,.25)}
     .toast.err{background:linear-gradient(180deg,rgba(255,77,79,.18),rgba(255,77,79,.06));border-color:rgba(255,77,79,.25)}
     @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes toastOut{to{transform:translateY(6px);opacity:0}}
-    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;justify-content:space-between;flex-wrap:wrap}
-    .toolbar-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .toolbar-right{display:flex;gap:8px;align-items:center}
-    .toolbar-filters{display:flex;gap:6px;flex-wrap:wrap}
-    .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+    .toolbar-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .toggle{border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:13px}
     .toggle.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent}
-    .label{font-size:12px;color:#e6f1ff;padding:8px 10px;border:1px solid var(--stroke);border-radius:999px;background:#0a0d14}
+    .label{font-size:12px;color:var(--muted);padding:8px 10px;border:1px solid var(--stroke);border-radius:10px;background:#0a0d14}
 
-    .remind-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:10px;margin-top:8px}
-    .remind-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;font-weight:800;letter-spacing:.2px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff}
-    .remind-toggle.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0;box-shadow:0 8px 24px rgba(255,77,79,.35)}
-    .r-chip{font-size:11px;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 8px;display:inline-flex;gap:6px;align-items:center;margin:4px 6px 0 0;color:#e6f1ff;text-decoration:none}
-    .r-chip:link,.r-chip:visited{color:#e6f1ff}
-    .r-chip.due{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#fff;border:0}
-    .r-chip.sent{opacity:.6;filter:grayscale(1);pointer-events:none}
+    /* Mini badge Fidelity nella lista */
+    .badge-mini{
+      margin-left:8px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,0,.7);
+      background:linear-gradient(135deg,rgba(255,215,0,.22),rgba(255,215,0,.05));
+      font-size:11px;
+      color:#fff9d6;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
 
-    .extra-wrap{display:none;margin-top:8px}
-    .extra-toggle{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 10px;font-weight:800;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#e6f1ff;font-size:12px}
-    .extra-menu{display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;padding:8px;margin-top:6px}
+    /* Pulsanti servizio (Energia/SIM/Fisso/Rate/Card) stile modern */
+    .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
+    .svc-btn{
+      border-radius:999px;
+      border:1px solid rgba(0,140,255,.35);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.18),rgba(0,0,0,.96));
+      padding:8px 14px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:13px;
+      font-weight:700;
+      color:#eaf2ff;
+      cursor:pointer;
+      box-shadow:0 0 0 1px rgba(0,0,0,.8) inset;
+    }
+    .svc-btn span.icon{font-size:15px}
+    .svc-btn--energia{border-color:rgba(255,215,0,.8);}
+    .svc-btn--sim{border-color:rgba(255,165,0,.8);}
+    .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
+    .svc-btn--rate{border-color:rgba(173,216,230,.9);}
+    .svc-btn--card{border-color:rgba(255,215,0,.9);}
+    .svc-btn span.date{
+      font-size:11px;
+      opacity:.75;
+      margin-left:4px;
+    }
 
+    /* DASHBOARD (copiata da v32m + incasso riparazioni) */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
     .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -123,6 +143,7 @@
     </div>
   </header>
 
+  <!-- CARD DATI CLIENTE -->
   <section class="card">
     <h2>Dati Cliente</h2>
     <div class="content grid2">
@@ -151,6 +172,8 @@
               <option>Console</option>
             </select>
           </div>
+
+          <!-- Marca: input libero + select per Smartphone + "Altro" con campo dedicato -->
           <div>
             <label>Marca</label>
             <input id="a_brand" placeholder="Apple/Samsung…" />
@@ -166,7 +189,8 @@
               <input id="a_brand_other" placeholder="Inserisci marca…" style="display:none;margin-top:6px" />
             </div>
           </div>
-          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max, S25 Ultra…"></div>
+
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax,S25 Ultra…"></div>
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
@@ -174,26 +198,26 @@
     </div>
   </section>
 
+  <!-- CARD ELENCO -->
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
       <div class="toolbar">
-        <div class="toolbar-left">
-          <button id="toggleToday" class="toggle">Remind oggi</button>
-          <div id="filterCats" class="toolbar-filters">
-            <button type="button" class="toggle filter-toggle" data-cat="pacchi">Pacchi</button>
-            <button type="button" class="toggle filter-toggle" data-cat="sim">SIM</button>
-            <button type="button" class="toggle filter-toggle" data-cat="fisso">Fisso</button>
-            <button type="button" class="toggle filter-toggle" data-cat="energia">Energia</button>
-            <button type="button" class="toggle filter-toggle" data-cat="rate">Rate</button>
-            <button type="button" class="toggle filter-toggle" data-cat="riparazione">Riparazioni</button>
-            <button type="button" class="toggle filter-toggle" data-cat="preventivi">Preventivi</button>
-          </div>
-        </div>
-        <div class="toolbar-right">
-          <span id="clientCounter" class="label">Clienti: 0</span>
-        </div>
+        <button id="toggleFilters" class="toggle">Filtri</button>
       </div>
+
+      <div id="filtersRow" class="toolbar-filters" style="display:none">
+        <button class="toggle" data-filter="remindtoday">Remind oggi</button>
+        <button class="toggle" data-filter="pacchi">Pacchi</button>
+        <button class="toggle" data-filter="sim">SIM</button>
+        <button class="toggle" data-filter="fisso">Fisso</button>
+        <button class="toggle" data-filter="energia">Energia</button>
+        <button class="toggle" data-filter="rate">Rate</button>
+        <button class="toggle" data-filter="riparazioni">Riparazioni</button>
+        <button class="toggle" data-filter="preventivi">Preventivi</button>
+      </div>
+
+      <div id="counter" class="label" style="margin-bottom:10px">Clienti: 0</div>
       <div id="list"></div>
     </div>
   </section>
@@ -206,22 +230,14 @@
       </button>
       <div class="details" hidden>
         <div class="r-line actions"></div>
-        <div class="r-line">
-          <button class="remind-toggle" type="button">Remind (0)</button>
-        </div>
-        <div class="remind-menu"></div>
-        <div class="extra-wrap">
-          <button class="extra-toggle" type="button">Extra ▾</button>
-          <div class="extra-menu">
-            <a href="#" class="wa-btn ok extra-90">+90GG</a>
-            <a href="#" class="wa-btn ok extra-pers">+PERS.</a>
-          </div>
-        </div>
+        <div class="r-line points"></div>
+        <div class="r-line reminders"></div>
         <div class="r-line review"></div>
       </div>
     </div>
   </template>
 
+  <!-- DASHBOARD MODAL -->
   <div id="dashModal" class="modal" aria-hidden="true">
     <div class="dash" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
       <header>
@@ -271,6 +287,7 @@
           <div class="kpi rip">
             <div class="k">🔧 Riparazioni</div>
             <div class="v" id="k_rip">0</div>
+            <div class="e" id="e_rip">€ 0</div>
           </div>
           <div class="kpi prev">
             <div class="k">🧾 Preventivi</div>
@@ -286,14 +303,17 @@
   </div>
 
   <script>
+    /* Utils & UI */
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     const STORE_KEY='relong-scadenzario-v32b';
     const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
     const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
+    const FIDELITY_URL='https://alessandroiascone.github.io/relong-nfc/fidelity.html';
     const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
+    /* Guadagni stimati per la Dashboard */
     const GAIN_PACCHI  = 0.5;
     const GAIN_SIM     = 30;
     const GAIN_FISSO   = 110;
@@ -301,16 +321,15 @@
     const GAIN_RATE    = 45;
 
     function showToast(t, type='ok'){
-      const w=$('#toast'); const el=document.createElement('div');
-      el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t;
-      w.appendChild(el); setTimeout(()=>el.remove(), 3600);
+      const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
     }
     const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
-    const normalizeName = n => String(n||'').trim().replace(/\s+/g,' ').toLowerCase();
+    const normalizeName  = n => String(n||'').trim().replace(/\s+/g,' ').toLowerCase();
     const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
+    /* GitHub Sync */
     const syncState=$('#syncState'), cfgBtn=$('#cfgSync');
     const GH={
       cfg(){ try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||'null'); }catch{return null} },
@@ -323,7 +342,7 @@
       async put(path, text, msg){
         const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
         let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32m', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const body={ message:msg||'Update v32b', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
         if(sha) body.sha=sha;
         const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){
@@ -370,38 +389,45 @@
     async function saveToGitHub(){
       const cfg=GH.cfg(); const tk=GH.token(); const p=cfg?.path||'data/items.json';
       if(cfg && tk){
-        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32m sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
+        try{ await GH.put(p, JSON.stringify(items||[]), 'Scadenzario v32b sync'); syncBadge(true); return true; }catch(e){ syncBadge(false); return false; }
       }
       return false;
     }
 
+    /* WA templates */
     function walink(phone, text){ return `https://wa.me/39${phone}?text=${encodeURIComponent(text)}`; }
     function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPosso proporti una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
     function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`; return walink(phone,t); }
     function waPacchiFisso(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo a te dedicata. 🏠📡`; return walink(phone,t); }
     function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate Senza Busta Paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
     function waPacchiMemo(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`; return walink(phone,t); }
+
     function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
     function waReview(name, phone){ const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return walink(phone,t); }
-    function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧`; return walink(phone,t); }
-    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato. Grazie 📦`; return walink(phone,t); }
-    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
 
+    /* Messaggi automatici conferma/avanzamento */
+    function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧`; return walink(phone,t); }
+    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato.Grazie 📦`; return walink(phone,t); }
+    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, Grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
+
+    /* Reminders plan */
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
 
     const complementByKey={
-      sim:['energia','fissomobile','rate'],
-      energia:['sim','fissomobile','rate'],
-      fisso:['sim','energia','rate'],
-      rate:['energia','sim','fissomobile'],
-      pacchi:['sim','energia','fissomobile','rate'],
+      sim:        ['energia','fissomobile','rate'],
+      energia:    ['sim','fissomobile','rate'],
+      fisso:      ['sim','energia','rate'],
+      rate:       ['energia','sim','fissomobile'],
+      pacchi:     ['sim','energia','fissomobile','rate'],
       riparazione:['sim','energia','fissomobile','rate'],
-      preventivi:[]
+      preventivi: []
     };
 
-    function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+    function shuffle(arr){
+      const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a;
+    }
 
     function getReminderTypesForItem(it){
       if(it.acceptance || it.fromPacchi) return [...REM_TYPES];
@@ -434,6 +460,7 @@
       it.updatedAt=new Date().toISOString();
     }
 
+    // Proroga dei promemoria a partire da oggi, senza duplicare il cliente
     function prorogaPromemoria(it){
       if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
@@ -442,30 +469,22 @@
       it.updatedAt = new Date().toISOString();
     }
 
-    function maybeScheduleNextCycle(it){
-      if(it.responded) return;
-      if(!it.reminders || !it.reminders.length) return;
+    // Primo ciclo completato = tutti i main reminder (sim/energia/fissomobile/rate) inviati
+    function isMainCycleComplete(it){
+      if(!it.reminders || !it.reminders.length) return false;
       const onlyMain = it.reminders.filter(r=> r.type!=='followup');
-      if(onlyMain.length===0) return;
-      const allSent = onlyMain.every(r=>r.sent);
-      if(!allSent) return;
-      const start = addDays(new Date(), 45);
-      const types = shuffle(getReminderTypesForItem(it));
-      it.reminders = buildReminders(start, types);
-      it.remindersCycle = (it.remindersCycle||1) + 1;
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub();
-      showToast(`Nuovo ciclo reminder pianificato (Ciclo ${it.remindersCycle})`);
+      if(onlyMain.length===0) return false;
+      return onlyMain.every(r=>r.sent);
     }
 
     function reminderLink(it, rem){
       switch(rem.type){
-        case 'sim': return waPacchiSIM(it.name,it.phone);
-        case 'energia': return waPacchiEnergia(it.name,it.phone);
+        case 'sim':         return waPacchiSIM(it.name,it.phone);
+        case 'energia':     return waPacchiEnergia(it.name,it.phone);
         case 'fissomobile': return waPacchiFisso(it.name,it.phone);
-        case 'rate': return waPacchiRate(it.name,it.phone);
-        case 'followup': return waPacchiMemo(it.name,it.phone);
-        default: return waPacchiMemo(it.name,it.phone);
+        case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
+        default:            return waPacchiMemo(it.name,it.phone);
       }
     }
 
@@ -475,13 +494,17 @@
       it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
       it.updatedAt=new Date().toISOString();
       saveLocal(); saveToGitHub(); render();
-      showToast('Promemoria unico (+90GG) aggiunto ✅');
+      showToast('Promemoria unico (+90g) aggiunto ✅');
     }
+
     function addFollowupCustom(it){
-      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (1–365)');
+      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
       if(val===null) return;
       const days = parseInt(String(val).trim(),10);
-      if(!Number.isFinite(days) || days<=0 || days>365){ alert('Inserisci un numero di giorni valido (1–365).'); return; }
+      if(!Number.isFinite(days) || days<=0 || days>365){
+        alert('Inserisci un numero di giorni valido (1–365).');
+        return;
+      }
       if(!it.reminders) it.reminders=[];
       const due = addDays(new Date(), days).toISOString();
       it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
@@ -490,6 +513,7 @@
       showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
     }
 
+    /* Insert logic */
     const activeSet=new Set(); const toggles=$('#toggles');
     toggles.addEventListener('click', e=>{
       const b=e.target.closest('.tbtn'); if(!b) return;
@@ -499,11 +523,12 @@
       if(on) activeSet.add(k); else activeSet.delete(k);
     });
 
-    const typeSel = $('#a_type');
-    const brandInput = $('#a_brand');
-    const brandSmartWrap = $('#brandSmartWrap');
-    const brandSelect = $('#a_brand_sel');
-    const brandOther = $('#a_brand_other');
+    // UI Marca per Smartphone + "Altro"
+    const typeSel = document.getElementById('a_type');
+    const brandInput = document.getElementById('a_brand');
+    const brandSmartWrap = document.getElementById('brandSmartWrap');
+    const brandSelect = document.getElementById('a_brand_sel');
+    const brandOther = document.getElementById('a_brand_other');
 
     function refreshBrandUI(){
       const isPhone = (typeSel.value === 'Smartphone');
@@ -520,22 +545,25 @@
     typeSel.addEventListener('change', refreshBrandUI);
     brandSelect.addEventListener('change', refreshBrandUI);
 
-    const nameInput = $('#c_name');
-    const phoneInput = $('#c_phone');
+    // Auto-compilazione campi: se esiste nome o telefono, precompila l'altro
+    const nameInput = document.getElementById('c_name');
+    const phoneInput = document.getElementById('c_phone');
 
     function findByPhone(p){ const np=normalizePhone(p); return items.find(x=>normalizePhone(x.phone)===np); }
     function findByName(n){ const nn=normalizeName(n); return items.find(x=>normalizeName(x.name)===nn); }
 
     nameInput.addEventListener('blur', ()=>{
       const n = nameInput.value;
-      if(!n || (phoneInput.value||'').trim()) return;
+      if(!n) return;
+      if((phoneInput.value||'').trim()) return;
       const hit = findByName(n);
       if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); showToast('Telefono precompilato dalla lista clienti'); }
     });
 
     phoneInput.addEventListener('blur', ()=>{
       const p = normalizePhone(phoneInput.value);
-      if(!p || (nameInput.value||'').trim()) return;
+      if(!p) return;
+      if((nameInput.value||'').trim()) return;
       const hit = findByPhone(p);
       if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
     });
@@ -551,7 +579,9 @@
 
       if(isRepair){
         const model=($('#a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
-        const brand = (typeSel.value==='Smartphone') ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value) : (brandInput.value||'');
+        const brand = (typeSel.value==='Smartphone')
+          ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value)
+          : (brandInput.value||'');
         newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:($('#a_issue').value||'').trim() };
         newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
       }
@@ -579,6 +609,7 @@
         } else {
           prev.updatedAt = new Date().toISOString();
         }
+
         ensureReminders(prev);
       } else {
         ensureReminders(newItem);
@@ -597,75 +628,108 @@
       }catch{}
     });
 
+    /* FILTRI */
     let filterToday=false;
-    $('#toggleToday').addEventListener('click', ()=>{
-      filterToday=!filterToday;
-      $('#toggleToday').classList.toggle('active', filterToday);
+    let filterState={
+      remindtoday:false,
+      pacchi:false, sim:false, fisso:false, energia:false,
+      rate:false, riparazioni:false, preventivi:false
+    };
+
+    const toggleFiltersBtn = $('#toggleFilters');
+    const filtersRow = $('#filtersRow');
+
+    toggleFiltersBtn.addEventListener('click', ()=>{
+      const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
+      filtersRow.style.display = isHidden ? 'flex' : 'none';
+      toggleFiltersBtn.classList.toggle('active', isHidden);
+    });
+
+    filtersRow.addEventListener('click', e=>{
+      const b=e.target.closest('.toggle'); if(!b) return;
+      const key=b.dataset.filter;
+      const on=!b.classList.contains('active');
+      b.classList.toggle('active',on);
+      filterState[key]=on;
+      if(key==='remindtoday') filterToday = on;
       render();
     });
 
-    const filterCats = new Set();
-    const filterBox = $('#filterCats');
-    function matchFilters(it){
-      if(filterCats.size===0) return true;
-      const act = Array.isArray(it.activated)? it.activated : [];
-      const hasPacchi = !!it.fromPacchi;
-      const hasSim = act.includes('sim');
-      const hasFisso = act.includes('fisso');
-      const hasEnergia = act.includes('energia');
-      const hasRate = act.includes('rate');
-      const hasRip = !!it.acceptance;
-      const hasPrev = act.includes('preventivi');
+    function matchesCategoryFilters(it){
+      const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && v);
+      if(!anyOn) return true;
 
-      if(filterCats.has('pacchi') && hasPacchi) return true;
-      if(filterCats.has('sim') && hasSim) return true;
-      if(filterCats.has('fisso') && hasFisso) return true;
-      if(filterCats.has('energia') && hasEnergia) return true;
-      if(filterCats.has('rate') && hasRate) return true;
-      if(filterCats.has('riparazione') && hasRip) return true;
-      if(filterCats.has('preventivi') && hasPrev) return true;
+      const acts = new Set(it.activated||[]);
+      const isPacchi = it.fromPacchi || acts.has('pacchi');
+      const isSim = acts.has('sim');
+      const isFisso = acts.has('fisso') || acts.has('fissomobile');
+      const isEnergia = acts.has('energia');
+      const isRate = acts.has('rate');
+      const isRip = it.acceptance || acts.has('riparazione');
+      const isPrev = acts.has('preventivi');
+
+      if(filterState.pacchi && isPacchi) return true;
+      if(filterState.sim && isSim) return true;
+      if(filterState.fisso && isFisso) return true;
+      if(filterState.energia && isEnergia) return true;
+      if(filterState.rate && isRate) return true;
+      if(filterState.riparazioni && isRip) return true;
+      if(filterState.preventivi && isPrev) return true;
 
       return false;
     }
-    filterBox.addEventListener('click', (e)=>{
-      const b=e.target.closest('.filter-toggle'); if(!b) return;
-      const cat=b.dataset.cat;
-      const on=!b.classList.contains('active');
-      b.classList.toggle('active', on);
-      if(on) filterCats.add(cat); else filterCats.delete(cat);
-      render();
-    });
 
-    function pill(lbl, cls, fn){
-      const a=document.createElement('a');
-      a.href='#'; a.className='pillbtn '+cls; a.textContent=lbl;
-      a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn();});
-      return a;
+    /* Helper: prossima data reminder per tipo */
+    function nextReminderDate(it, type){
+      if(!it.reminders) return null;
+      const arr = it.reminders
+        .filter(r=>r.type===type && !r.sent)
+        .sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
+      if(!arr.length) return null;
+      return fmt(arr[0].dueAt);
     }
+
+    /* Quick WA: stile pillole servizio con data + Card */
     function appendQuickWA(actions, it){
-      actions.append(
-        pill('⚡ Energia','energy',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener')),
-        pill('📶 SIM','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener')),
-        pill('🏠📡 Fisso','fisso',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener')),
-        pill('📱 Rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'))
-      );
-    }
-    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
-    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
+      const row = document.createElement('div');
+      row.className='svc-row';
 
-    const dashModal = $('#dashModal');
-    const openDashBtn = $('#openDash');
-    const closeDashBtn = $('#closeDash');
+      function mkSvc(label, icon, extraClass, typeKey, fn){
+        const b=document.createElement('button');
+        b.type='button';
+        b.className='svc-btn '+extraClass;
+        const dateStr = typeKey ? nextReminderDate(it,typeKey) : null;
+        b.innerHTML=`<span class="icon">${icon}</span><span>${label}</span>${dateStr?`<span class="date">${dateStr}</span>`:''}`;
+        b.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
+        row.appendChild(b);
+      }
+
+      mkSvc('Energia','⚡','svc-btn--energia','energia',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      mkSvc('SIM','📶','svc-btn--sim','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      mkSvc('Fisso','🏠📡','svc-btn--fisso','fissomobile',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      mkSvc('Rate','📱','svc-btn--rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+
+      // Pillola "Card" per gestire Fidelity
+      mkSvc('Card','💳','svc-btn--card',null,()=>{
+        const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+        window.open(url,'_blank','noopener');
+      });
+
+      actions.append(row);
+    }
+
+    /* DASHBOARD: funzioni */
+    const dashModal = document.getElementById('dashModal');
+    const openDashBtn = document.getElementById('openDash');
+    const closeDashBtn = document.getElementById('closeDash');
     let dashPeriod = 'all';
     let rangeFrom = null;
     let rangeTo = null;
 
     const dashPeriodBtns = $$('.dash-period');
-    const rangeWrap = $('#rangeWrap');
-    const rangeFromInput = $('#rangeFrom');
-    const rangeToInput = $('#rangeTo');
+    const rangeWrap = document.getElementById('rangeWrap');
+    const rangeFromInput = document.getElementById('rangeFrom');
+    const rangeToInput = document.getElementById('rangeTo');
 
     function parseDateInput(val){
       if(!val) return null;
@@ -682,8 +746,10 @@
       if(dashPeriod==='range') updateDashboard();
     }
 
-    rangeFromInput.addEventListener('change', syncRangeFromInputs);
-    rangeToInput.addEventListener('change', syncRangeFromInputs);
+    if(rangeFromInput && rangeToInput){
+      rangeFromInput.addEventListener('change', syncRangeFromInputs);
+      rangeToInput.addEventListener('change', syncRangeFromInputs);
+    }
 
     dashPeriodBtns.forEach(btnEl=>{
       btnEl.addEventListener('click', ()=>{
@@ -694,16 +760,22 @@
       });
     });
 
-    openDashBtn.addEventListener('click', ()=>{
-      updateDashboard();
-      dashModal.classList.add('on');
-      dashModal.setAttribute('aria-hidden','false');
-    });
-    closeDashBtn.addEventListener('click', ()=>{
-      dashModal.classList.remove('on');
-      dashModal.setAttribute('aria-hidden','true');
-    });
-    dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
+    if(openDashBtn){
+      openDashBtn.addEventListener('click', ()=>{
+        updateDashboard();
+        dashModal.classList.add('on');
+        dashModal.setAttribute('aria-hidden','false');
+      });
+    }
+    if(closeDashBtn){
+      closeDashBtn.addEventListener('click', ()=>{
+        dashModal.classList.remove('on');
+        dashModal.setAttribute('aria-hidden','true');
+      });
+    }
+    if(dashModal){
+      dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
+    }
 
     function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
 
@@ -734,37 +806,56 @@
       const subset = items.filter(itemInPeriod);
 
       let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
+      let gPacchi=0, gSim=0, gFisso=0, gEn=0, gRate=0, gRip=0;
+
       subset.forEach(it=>{
-        if(it.fromPacchi) pacchi++;
+        if(it.fromPacchi){ pacchi++; gPacchi += GAIN_PACCHI; }
         const act = Array.isArray(it.activated)? it.activated : [];
-        if(act.includes('sim')) sim++;
-        if(act.includes('fisso')) fisso++;
-        if(act.includes('energia')) energia++;
-        if(act.includes('rate')) rate++;
+        if(act.includes('sim'))   { sim++;   gSim   += GAIN_SIM; }
+        if(act.includes('fisso')) { fisso++; gFisso += GAIN_FISSO; }
+        if(act.includes('energia')){ energia++; gEn += GAIN_ENERGIA; }
+        if(act.includes('rate'))  { rate++;  gRate  += GAIN_RATE; }
         if(it.acceptance) rip++;
         if(act.includes('preventivi')) prev++;
+
+        // INCASSO RIPARAZIONI: somma dei preventivi accettati e consegnati
+        if(it.acceptance && it.repairStatus === 'consegnato' && it.quoteStatus === 'accepted'){
+          const val = parseFloat(it.quotePrice ?? 0);
+          if(!isNaN(val) && val > 0) gRip += val;
+        }
       });
 
-      const gPacchi = pacchi * GAIN_PACCHI;
-      const gSim    = sim    * GAIN_SIM;
-      const gFisso  = fisso  * GAIN_FISSO;
-      const gEn     = energia* GAIN_ENERGIA;
-      const gRate   = rate   * GAIN_RATE;
-      const totalGain = gPacchi + gSim + gFisso + gEn + gRate;
+      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + gRip;
 
-      $('#k_pacchi').textContent = pacchi;
-      $('#k_sim').textContent = sim;
-      $('#k_fisso').textContent = fisso;
-      $('#k_energia').textContent = energia;
-      $('#k_rate').textContent = rate;
-      $('#k_rip').textContent = rip;
-      $('#k_prev').textContent = prev;
+      const k_pacchi = document.getElementById('k_pacchi');
+      const k_sim = document.getElementById('k_sim');
+      const k_fisso = document.getElementById('k_fisso');
+      const k_energia = document.getElementById('k_energia');
+      const k_rate = document.getElementById('k_rate');
+      const k_rip = document.getElementById('k_rip');
+      const k_prev = document.getElementById('k_prev');
 
-      $('#e_pacchi').textContent = formatEuro(gPacchi);
-      $('#e_sim').textContent    = formatEuro(gSim);
-      $('#e_fisso').textContent  = formatEuro(gFisso);
-      $('#e_energia').textContent= formatEuro(gEn);
-      $('#e_rate').textContent   = formatEuro(gRate);
+      const e_pacchi = document.getElementById('e_pacchi');
+      const e_sim = document.getElementById('e_sim');
+      const e_fisso = document.getElementById('e_fisso');
+      const e_energia = document.getElementById('e_energia');
+      const e_rate = document.getElementById('e_rate');
+      const e_rip = document.getElementById('e_rip');
+
+      if(k_pacchi) k_pacchi.textContent = pacchi;
+      if(k_sim)    k_sim.textContent    = sim;
+      if(k_fisso)  k_fisso.textContent  = fisso;
+      if(k_energia)k_energia.textContent= energia;
+      if(k_rate)   k_rate.textContent   = rate;
+      if(k_rip)    k_rip.textContent    = rip;
+      if(k_prev)   k_prev.textContent   = prev;
+
+      if(e_pacchi) e_pacchi.textContent = formatEuro(gPacchi);
+      if(e_sim)    e_sim.textContent    = formatEuro(gSim);
+      if(e_fisso)  e_fisso.textContent  = formatEuro(gFisso);
+      if(e_energia)e_energia.textContent= formatEuro(gEn);
+      if(e_rate)   e_rate.textContent   = formatEuro(gRate);
+      if(e_rip)    e_rip.textContent    = formatEuro(gRip);
 
       let labelPeriodo = 'Tutto';
       if(dashPeriod==='today') labelPeriodo = 'Oggi';
@@ -775,47 +866,57 @@
         labelPeriodo = `Dal ${fromTxt} al ${toTxt}`;
       }
 
-      $('#k_total').textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
-      $('#k_total_gain').textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
+      const k_total = document.getElementById('k_total');
+      const k_total_gain = document.getElementById('k_total_gain');
+      if(k_total) k_total.textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
+      if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
+    /* Render */
     function render(){
       const list=$('#list'); list.innerHTML='';
+      const counter = $('#counter');
       const now=new Date(); const today0=startOfDay(now);
-
-      const counter=$('#clientCounter');
-      if(counter) counter.textContent = `Clienti: ${items.length}`;
 
       const source = items.slice().filter(it=>{
         ensureReminders(it);
+
         if(filterToday){
-          const anyToday = (it.reminders||[]).some(r=>{
+          const hasDueToday = (it.reminders||[]).some(r=>{
             const due0=startOfDay(r.dueAt);
             return (due0.getTime()===today0.getTime()) && !r.sent;
           });
-          if(!anyToday) return false;
+          if(!hasDueToday) return false;
         }
-        if(!matchFilters(it)) return false;
+
+        if(!matchesCategoryFilters(it)) return false;
+
         return true;
       });
 
+      counter.textContent = 'Clienti: ' + source.length;
+
       source.forEach(it=>{
-        maybeScheduleNextCycle(it);
-
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
-        el.querySelector('.title').innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
-        const head=el.querySelector('.head');
-        const details=el.querySelector('.details');
-        const actions=el.querySelector('.actions');
-        const review=el.querySelector('.review');
-        const remindToggle=el.querySelector('.remind-toggle');
-        const remindMenu=el.querySelector('.remind-menu');
-        const extraWrapEl=el.querySelector('.extra-wrap');
-        const extraToggleEl=el.querySelector('.extra-toggle');
-        const extraMenuEl=el.querySelector('.extra-menu');
+        const titleEl = el.querySelector('.title');
+        titleEl.innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
 
+        const currentPoints = Number(it.points || 0);
+        if(!isNaN(currentPoints) && currentPoints>0){
+          const badge = document.createElement('span');
+          badge.className = 'badge-mini';
+          badge.innerHTML = '★ Fidelity <strong>'+currentPoints+' pt</strong>';
+          titleEl.appendChild(badge);
+        }
+
+        const head=el.querySelector('.head'), details=el.querySelector('.details'),
+              actions=el.querySelector('.actions'),
+              pointsLine=el.querySelector('.points'),
+              review=el.querySelector('.review'),
+              remWrap=el.querySelector('.reminders');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
 
+        /* ACTIONS */
         actions.innerHTML='';
         if(it.acceptance){
           if(it.repairStatus==='diagnostica'){
@@ -846,11 +947,17 @@
                 it.updatedAt=new Date().toISOString();
                 saveLocal(); saveToGitHub(); render();
                 try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+
+                // la dashboard leggerà ora questo incasso (quotePrice) perché lo stato è "consegnato"
+                if(dashModal && dashModal.classList.contains('on')) updateDashboard();
               }));
             }
             actions.append(btnDelete(it));
             if(it.repairStatus==='consegnato' && it.deliveredAt){
-              const lab=document.createElement('span'); lab.className='label'; lab.textContent='Ritirato • '+fmt(it.deliveredAt); actions.append(lab);
+              const lab=document.createElement('span');
+              lab.className='label';
+              lab.textContent='Ritirato • '+fmt(it.deliveredAt);
+              actions.append(lab);
             }
           }
         } else {
@@ -862,60 +969,57 @@
           actions.append(btnDelete(it));
         }
 
-        const now0=startOfDay(new Date());
-        const copy = (it.reminders||[]).slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
-        const main = copy.filter(r=>r.type!=='followup');
-        const allMainSent = main.length>0 && main.every(r=>r.sent);
-        const dueToday = copy.filter(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
-        remindToggle.textContent = `Remind (${copy.length})`;
-        remindToggle.classList.toggle('due', dueToday.length>0);
-        remindToggle.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          const vis = remindMenu.style.display!=='none';
-          remindMenu.style.display = vis ? 'none' : 'block';
-        });
+        /* FIDELITY: saldo + aggiungi punti + invia card (gestione card via pillola Card) */
+        if(pointsLine){
+          pointsLine.innerHTML='';
+          const currentPoints2 = Number(it.points || 0);
+          const lbl = document.createElement('span');
+          lbl.className='label';
+          lbl.textContent = `Saldo punti Fidelity: ${isNaN(currentPoints2)?0:currentPoints2}`;
 
-        remindMenu.innerHTML='';
-        copy.forEach(rem=>{
-          const due = new Date(rem.dueAt);
-          const dueStr = fmt(due);
-          const dueNow = startOfDay(due).getTime()===now0.getTime() && !rem.sent;
-          const chip = document.createElement('a');
-          chip.href='#';
-          chip.className='r-chip'+(rem.sent?' sent':(dueNow?' due':''));
-          chip.textContent = `${typeLabel[rem.type]||rem.type} • ${dueStr} ` + (rem.sent ? '• Inviato' : (dueNow ? '• Invia ora' : '• In programma'));
-          chip.addEventListener('click', (e)=>{
-            e.preventDefault(); e.stopPropagation();
-            if(rem.sent) return;
-            if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
-            try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
-            rem.sent=true; rem.sentAt=new Date().toISOString();
-            it.updatedAt=new Date().toISOString();
-            saveLocal(); saveToGitHub();
-            chip.classList.remove('due'); chip.classList.add('sent');
-            chip.textContent = `${typeLabel[rem.type]||rem.type} • ${dueStr} • Inviato`;
-            const stillDue = (it.reminders||[]).some(r=>!r.sent && startOfDay(r.dueAt).getTime()===now0.getTime());
-            remindToggle.classList.toggle('due', stillDue);
-            render();
+          const add = aBtn('Aggiungi punti', ()=>{
+            const val = prompt('Quanti punti vuoi aggiungere o togliere? (es. 50 oppure -50)','50');
+            if(val===null) return;
+            const delta = parseInt(String(val).replace(',','.'),10);
+            if(!Number.isFinite(delta) || delta===0){
+              alert('Inserisci un numero valido di punti.');
+              return;
+            }
+            let np = Number(it.points || 0) + delta;
+            if(np < 0) np = 0;
+            it.points = np;
+            it.updatedAt = new Date().toISOString();
+            saveLocal(); saveToGitHub(); render();
+            showToast('Saldo Fidelity aggiornato ✅');
           });
-          remindMenu.appendChild(chip);
-        });
 
-        if(extraWrapEl){
-          extraWrapEl.style.display = allMainSent ? '' : 'none';
-          if(extraToggleEl && extraMenuEl){
-            extraMenuEl.style.display = 'none';
-            extraToggleEl.addEventListener('click', (e)=>{
-              e.stopPropagation();
-              extraMenuEl.style.display = (extraMenuEl.style.display!=='none') ? 'none' : 'block';
-            });
-            const add90 = extraMenuEl.querySelector('.extra-90');
-            const addPers = extraMenuEl.querySelector('.extra-pers');
-            if(add90) add90.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowup90(it); });
-            if(addPers) addPers.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); addFollowupCustom(it); });
-          }
+          const sendCard = aBtn('Invia card', ()=>{
+            const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+            const txt = `Ciao ${it.name}, questa è la tua Fidelity Card Re Long: ${url}`;
+            window.open(walink(it.phone, txt),'_blank','noopener');
+          });
+
+          pointsLine.append(lbl, add, sendCard);
         }
 
+        /* REMINDERS UI (semplificata, senza stop promo) */
+        remWrap.innerHTML='';
+
+        if(it.responded){
+          const stopped=document.createElement('span');
+          stopped.className='label';
+          stopped.textContent='Promo stoppata';
+          remWrap.append(stopped);
+        }
+
+        const mainComplete = isMainCycleComplete(it);
+        if(mainComplete && !it.responded){
+          const addFU=aBtn('+90GG', ()=> addFollowup90(it));
+          const addFUc=aBtn('+PERS.', ()=> addFollowupCustom(it));
+          remWrap.append(addFU, addFUc);
+        }
+
+        /* REVIEW ready */
         review.innerHTML='';
         if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
           const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
@@ -925,15 +1029,22 @@
         list.append(el);
       });
 
-      if(dashModal.classList.contains('on')) updateDashboard();
+      // se la dashboard è aperta, aggiorna numeri live
+      if(dashModal && dashModal.classList.contains('on')) updateDashboard();
     }
+
+    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
+    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
+    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
 
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32m pronta ✅');
+      showToast('v32b pronta ✅');
     })();
 
+    /* Toggle Elenco (Mostra/Nascondi) */
     (function(){
       const KEY='relong-elenco-hidden';
       const h2s=[...document.querySelectorAll('section.card > h2')];
