@@ -71,7 +71,7 @@
       gap:4px;
     }
 
-    /* Pulsanti servizio (Energia/SIM/Fisso/Rate) stile seconda foto */
+    /* Pulsanti servizio (Energia/SIM/Fisso/Rate/Card) stile modern */
     .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
     .svc-btn{
       border-radius:999px;
@@ -92,6 +92,7 @@
     .svc-btn--sim{border-color:rgba(255,165,0,.8);}
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
+    .svc-btn--card{border-color:rgba(255,215,0,.9);}
     .svc-btn span.date{
       font-size:11px;
       opacity:.75;
@@ -172,11 +173,11 @@
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
       <div class="toolbar">
-        <button id="toggleToday" class="toggle">Remind oggi</button>
         <button id="toggleFilters" class="toggle">Filtri</button>
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
+        <button class="toggle" data-filter="remindtoday">Remind oggi</button>
         <button class="toggle" data-filter="pacchi">Pacchi</button>
         <button class="toggle" data-filter="sim">SIM</button>
         <button class="toggle" data-filter="fisso">Fisso</button>
@@ -528,15 +529,10 @@
     /* FILTRI */
     let filterToday=false;
     let filterState={
+      remindtoday:false,
       pacchi:false, sim:false, fisso:false, energia:false,
       rate:false, riparazioni:false, preventivi:false
     };
-
-    $('#toggleToday').addEventListener('click', ()=>{
-      filterToday=!filterToday;
-      $('#toggleToday').classList.toggle('active', filterToday);
-      render();
-    });
 
     const toggleFiltersBtn = $('#toggleFilters');
     const filtersRow = $('#filtersRow');
@@ -553,11 +549,12 @@
       const on=!b.classList.contains('active');
       b.classList.toggle('active',on);
       filterState[key]=on;
+      if(key==='remindtoday') filterToday = on;
       render();
     });
 
     function matchesCategoryFilters(it){
-      const anyOn = Object.values(filterState).some(v=>v);
+      const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && v);
       if(!anyOn) return true;
 
       const acts = new Set(it.activated||[]);
@@ -590,7 +587,7 @@
       return fmt(arr[0].dueAt);
     }
 
-    /* Quick WA: stile pillole servizio con data */
+    /* Quick WA: stile pillole servizio con data + Card */
     function appendQuickWA(actions, it){
       const row = document.createElement('div');
       row.className='svc-row';
@@ -599,7 +596,7 @@
         const b=document.createElement('button');
         b.type='button';
         b.className='svc-btn '+extraClass;
-        const dateStr = nextReminderDate(it,typeKey);
+        const dateStr = typeKey ? nextReminderDate(it,typeKey) : null;
         b.innerHTML=`<span class="icon">${icon}</span><span>${label}</span>${dateStr?`<span class="date">${dateStr}</span>`:''}`;
         b.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
         row.appendChild(b);
@@ -610,9 +607,13 @@
       mkSvc('Fisso','🏠📡','svc-btn--fisso','fissomobile',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
       mkSvc('Rate','📱','svc-btn--rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
 
+      // Pillola "Card" per gestire Fidelity
+      mkSvc('Card','💳','svc-btn--card',null,()=>{
+        const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+        window.open(url,'_blank','noopener');
+      });
+
       actions.append(row);
-      const memoBtn = aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
-      actions.append(memoBtn);
     }
 
     /* Render */
@@ -709,7 +710,7 @@
           actions.append(btnDelete(it));
         }
 
-        /* FIDELITY: saldo + aggiungi punti + invia card + gestisci card */
+        /* FIDELITY: saldo + aggiungi punti + invia card (gestione card via pillola Card) */
         if(pointsLine){
           pointsLine.innerHTML='';
           const currentPoints = Number(it.points || 0);
@@ -739,23 +740,13 @@
             window.open(walink(it.phone, txt),'_blank','noopener');
           });
 
-          const manageCard = aBtn('Gestisci card', ()=>{
-            const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-            window.open(url,'_blank','noopener');
-          });
-
-          pointsLine.append(lbl, add, sendCard, manageCard);
+          pointsLine.append(lbl, add, sendCard);
         }
 
-        /* REMINDERS UI (semplificata) */
+        /* REMINDERS UI (semplificata, senza stop promo) */
         remWrap.innerHTML='';
 
-        if(!it.responded){
-          const stop=aBtn('Stop promo (ha risposto)', ()=>{
-            it.responded=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
-          });
-          remWrap.append(stop);
-        } else {
+        if(it.responded){
           const stopped=document.createElement('span');
           stopped.className='label';
           stopped.textContent='Promo stoppata';
