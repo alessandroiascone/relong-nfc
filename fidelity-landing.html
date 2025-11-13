@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Re Long • Fidelity Card</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#070a0f; --bg2:#020308;
+      --card:rgba(16,16,24,.96); --stroke:rgba(255,255,255,.08);
+      --muted:rgba(220,220,255,.72);
+      --gold1:#f7d46a; --gold2:#ffb347; --gold3:#ffe9a9;
+      --accent:#0aa2ff;
+    }
+    html,body{height:100%}
+    body{
+      min-height:100vh;
+      font-family:system-ui,-apple-system,"Inter",Roboto,sans-serif;
+      color:#f5f5ff;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(255,215,0,.10),transparent 55%),
+        radial-gradient(circle at 100% 100%,rgba(0,140,255,.16),transparent 55%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      padding:22px 18px 26px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .shell{
+      width:min(900px,100%);
+      max-width:900px;
+    }
+    .card{
+      background:radial-gradient(circle at 0 0,rgba(255,255,255,.05),transparent 55%),
+                 radial-gradient(circle at 100% 100%,rgba(0,140,255,.12),transparent 55%),
+                 var(--card);
+      border-radius:26px;
+      border:1px solid var(--stroke);
+      box-shadow:0 22px 60px rgba(0,0,0,.6);
+      padding:20px 18px 22px;
+    }
+    header.hero{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+    .hero-left h1{
+      font-size:22px;
+      letter-spacing:.4px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .hero-left h1 span.badge{
+      font-size:11px;
+      border-radius:999px;
+      padding:4px 10px;
+      background:linear-gradient(135deg,var(--gold1),var(--gold2));
+      color:#2c1b00;
+      text-transform:uppercase;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    .hero-left .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+      max-width:460px;
+    }
+    .hero-right{
+      text-align:right;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .hero-right strong{color:var(--gold3);font-size:12px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+    @media(max-width:720px){
+      .grid{grid-template-columns:1fr}
+      .hero-right{text-align:left}
+    }
+
+    .block{
+      border-radius:20px;
+      border:1px solid rgba(255,215,0,.26);
+      background:
+        linear-gradient(145deg,rgba(255,215,0,.18),rgba(0,0,0,.9));
+      padding:14px 14px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .block::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 0 0,rgba(255,255,255,.12),transparent 55%),
+        radial-gradient(circle at 100% 100%,rgba(255,255,255,.06),transparent 60%);
+      opacity:.35;
+      pointer-events:none;
+    }
+    .block-inner{position:relative;z-index:1}
+    .block h2{
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.3px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .block h2 span.icon{
+      font-size:18px;
+    }
+    .block p{
+      font-size:13px;
+      color:#fdf2d2;
+      margin-bottom:10px;
+    }
+    label{
+      display:block;
+      font-size:11px;
+      color:#fff9d6;
+      margin-bottom:4px;
+    }
+    input{
+      width:100%;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(0,0,0,.75);
+      color:#fff9d6;
+      font-size:13px;
+      padding:9px 12px;
+      margin-bottom:8px;
+      outline:none;
+    }
+    input::placeholder{color:rgba(255,249,214,.6)}
+    input:focus{
+      border-color:var(--gold3);
+      box-shadow:0 0 0 1px rgba(255,215,0,.65);
+    }
+    .btn{
+      appearance:none;
+      border:0;
+      outline:none;
+      border-radius:999px;
+      padding:9px 14px;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--gold2),var(--gold1));
+      color:#2b1400;
+      box-shadow:0 14px 30px rgba(0,0,0,.6);
+    }
+    .btn span.icon{font-size:15px}
+    .btn:active{transform:translateY(1px);box-shadow:0 8px 20px rgba(0,0,0,.7)}
+
+    .note{
+      margin-top:12px;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      gap:6px;
+      align-items:flex-start;
+    }
+    .note span.dot{
+      width:6px;height:6px;border-radius:999px;
+      background:linear-gradient(135deg,var(--gold1),var(--gold2));
+      margin-top:3px;
+      flex-shrink:0;
+    }
+
+    #toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      max-width:90vw;
+      z-index:9999;
+      display:none;
+    }
+    #toast span{
+      display:inline-block;
+      background:rgba(0,0,0,.85);
+      border-radius:999px;
+      padding:8px 14px;
+      border:1px solid rgba(255,255,255,.16);
+      color:#f5f5ff;
+      font-size:12px;
+      letter-spacing:.2px;
+      box-shadow:0 12px 28px rgba(0,0,0,.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <header class="hero">
+        <div class="hero-left">
+          <h1>
+            Re Long Fidelity
+            <span class="badge">Gold</span>
+          </h1>
+          <div class="sub">
+            Iscriviti alla Fidelity Card Re Long e accumula punti ad ogni acquisto,
+            riparazione o attivazione. Più ci scegli, più vantaggi sblocchi. 💳✨
+          </div>
+        </div>
+        <div class="hero-right">
+          <div><strong>WhatsApp Re Long</strong></div>
+          <div>081 195 78 844</div>
+          <div style="margin-top:4px;">Marano di Napoli</div>
+        </div>
+      </header>
+
+      <div class="grid">
+        <!-- BLOCCO 1: REGISTRAZIONE -->
+        <section class="block">
+          <div class="block-inner">
+            <h2><span class="icon">🪪</span>Registrati alla Fidelity Card</h2>
+            <p>
+              Compila nome e cognome: ti registriamo noi e ti inviamo la tua Fidelity digitale
+              direttamente su WhatsApp.
+            </p>
+            <div>
+              <label for="reg_name">Nome e Cognome</label>
+              <input id="reg_name" placeholder="Es. Mario Rossi" autocomplete="name" />
+            </div>
+            <button class="btn" id="btnReg">
+              <span class="icon">📲</span>
+              Invia richiesta su WhatsApp
+            </button>
+          </div>
+        </section>
+
+        <!-- BLOCCO 2: PORTA UN AMICO -->
+        <section class="block">
+          <div class="block-inner">
+            <h2><span class="icon">🤝</span>Porta un amico con il tuo codice</h2>
+            <p>
+              Inserisci il codice di chi ti ha presentato e i tuoi dati:
+              attiviamo la Fidelity e riconosciamo i vantaggi al tuo amico.
+            </p>
+            <div>
+              <label for="ref_code">Codice amico / numero Fidelity</label>
+              <input id="ref_code" placeholder="Es. RL-1234 o numero Fidelity" />
+            </div>
+            <div>
+              <label for="ref_name">Il tuo Nome e Cognome</label>
+              <input id="ref_name" placeholder="Es. Luca Bianchi" autocomplete="name" />
+            </div>
+            <button class="btn" id="btnRef">
+              <span class="icon">💬</span>
+              Invia richiesta porta un amico
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div class="note">
+        <span class="dot"></span>
+        <div>
+          Inviando la richiesta autorizzi Re Long al trattamento dei dati per la gestione
+          della Fidelity Card e delle promozioni collegate. Puoi richiedere la cancellazione
+          in qualsiasi momento via WhatsApp.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"><span></span></div>
+
+  <script>
+    const RELONG_PHONE = '08119578844';
+
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      const span = t.querySelector('span');
+      span.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(()=>{ t.style.display = 'none'; }, 2600);
+    }
+
+    function waUrl(text){
+      // 39 + numero fisso Re Long
+      return 'https://wa.me/39' + RELONG_PHONE.replace(/\D/g,'') + '?text=' + encodeURIComponent(text);
+    }
+
+    // Registrazione semplice
+    document.getElementById('btnReg').addEventListener('click', ()=>{
+      const name = (document.getElementById('reg_name').value || '').trim();
+      if(!name || name.split(' ').length < 2){
+        showToast('Inserisci Nome e Cognome completi per la registrazione.');
+        return;
+      }
+      const text =
+        `Ciao Alessandro 👋\n` +
+        `vorrei registrarmi alla Fidelity Card Re Long.\n\n` +
+        `Nome e Cognome: ${name}\n` +
+        `Richiesta inviata dal sito Fidelity.`;
+      window.open(waUrl(text),'_blank','noopener');
+    });
+
+    // Porta un amico
+    document.getElementById('btnRef').addEventListener('click', ()=>{
+      const code = (document.getElementById('ref_code').value || '').trim();
+      const name = (document.getElementById('ref_name').value || '').trim();
+      if(!code){
+        showToast('Inserisci il codice del tuo amico o il numero Fidelity.');
+        return;
+      }
+      if(!name || name.split(' ').length < 2){
+        showToast('Inserisci il tuo Nome e Cognome completi.');
+        return;
+      }
+      const text =
+        `Ciao Alessandro 👋\n` +
+        `vorrei iscrivermi alla Fidelity Card Re Long tramite porta un amico.\n\n` +
+        `Codice / Fidelity del mio amico: ${code}\n` +
+        `Il mio Nome e Cognome: ${name}\n` +
+        `Richiesta inviata dal sito Fidelity.`;
+      window.open(waUrl(text),'_blank','noopener');
+    });
+  </script>
+</body>
+</html>
