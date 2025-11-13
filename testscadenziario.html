@@ -92,6 +92,11 @@
     .svc-btn--sim{border-color:rgba(255,165,0,.8);}
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
+    .svc-btn span.date{
+      font-size:11px;
+      opacity:.75;
+      margin-left:4px;
+    }
   </style>
 </head>
 <body>
@@ -260,7 +265,7 @@
       localStorage.setItem(GH_CFG_KEY, JSON.stringify({owner,repo,branch,path,tokenStored:true}));
       localStorage.setItem(GH_TOKEN_KEY, token);
       syncBadge(true); showToast('Sync configurato ✅');
-      await saveToGitHub(); // prova un primo push
+      await saveToGitHub();
     });
 
     let items=[];
@@ -347,34 +352,26 @@
       const created = new Date(it.createdAt||Date.now());
       const types = shuffle(getReminderTypesForItem(it));
       it.reminders = buildReminders(created, types);
-      it.remindersCycle = 1; // primo ciclo
-      it.responded = !!it.responded; // default false
+      it.remindersCycle = 1;
+      it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
     }
 
     // Proroga dei promemoria a partire da oggi, senza duplicare il cliente
     function prorogaPromemoria(it){
-      if(it.responded) return; // se stoppato, non toccare
+      if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
       it.reminders = buildReminders(new Date(), types);
       it.remindersCycle = (it.remindersCycle||1) + 1;
       it.updatedAt = new Date().toISOString();
     }
 
-    function maybeScheduleNextCycle(it){
-      if(it.responded) return;
-      if(!it.reminders || !it.reminders.length) return;
+    // Primo ciclo completato = tutti i main reminder (sim/energia/fissomobile/rate) inviati
+    function isMainCycleComplete(it){
+      if(!it.reminders || !it.reminders.length) return false;
       const onlyMain = it.reminders.filter(r=> r.type!=='followup');
-      if(onlyMain.length===0) return;
-      const allSent = onlyMain.every(r=>r.sent);
-      if(!allSent) return;
-      const start = addDays(new Date(), 45);
-      const types = shuffle(getReminderTypesForItem(it));
-      it.reminders = buildReminders(start, types);
-      it.remindersCycle = (it.remindersCycle||1) + 1;
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub();
-      showToast(`Nuovo ciclo reminder pianificato (Ciclo ${it.remindersCycle})`);
+      if(onlyMain.length===0) return false;
+      return onlyMain.every(r=>r.sent);
     }
 
     function reminderLink(it, rem){
@@ -583,24 +580,35 @@
       return false;
     }
 
-    /* Quick WA: stile pillole servizio */
+    /* Helper: prossima data reminder per tipo */
+    function nextReminderDate(it, type){
+      if(!it.reminders) return null;
+      const arr = it.reminders
+        .filter(r=>r.type===type && !r.sent)
+        .sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
+      if(!arr.length) return null;
+      return fmt(arr[0].dueAt);
+    }
+
+    /* Quick WA: stile pillole servizio con data */
     function appendQuickWA(actions, it){
       const row = document.createElement('div');
       row.className='svc-row';
 
-      function mkSvc(label, icon, extraClass, fn){
+      function mkSvc(label, icon, extraClass, typeKey, fn){
         const b=document.createElement('button');
         b.type='button';
         b.className='svc-btn '+extraClass;
-        b.innerHTML=`<span class="icon">${icon}</span><span>${label}</span>`;
+        const dateStr = nextReminderDate(it,typeKey);
+        b.innerHTML=`<span class="icon">${icon}</span><span>${label}</span>${dateStr?`<span class="date">${dateStr}</span>`:''}`;
         b.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
         row.appendChild(b);
       }
 
-      mkSvc('Energia','⚡','svc-btn--energia',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-      mkSvc('SIM','📶','svc-btn--sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-      mkSvc('Fisso','🏠📡','svc-btn--fisso',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
-      mkSvc('Rate','📱','svc-btn--rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
+      mkSvc('Energia','⚡','svc-btn--energia','energia',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
+      mkSvc('SIM','📶','svc-btn--sim','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
+      mkSvc('Fisso','🏠📡','svc-btn--fisso','fissomobile',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
+      mkSvc('Rate','📱','svc-btn--rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
 
       actions.append(row);
       const memoBtn = aBtn('WA Promemoria', ()=> window.open(waPacchiMemo(it.name,it.phone),'_blank','noopener'));
@@ -632,8 +640,6 @@
       counter.textContent = 'Clienti: ' + source.length;
 
       source.forEach(it=>{
-        maybeScheduleNextCycle(it);
-
         const el=$('#tpl').content.firstElementChild.cloneNode(true);
         const titleEl = el.querySelector('.title');
         titleEl.innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
@@ -703,7 +709,7 @@
           actions.append(btnDelete(it));
         }
 
-        /* FIDELITY: saldo + aggiungi punti + apri card */
+        /* FIDELITY: saldo + aggiungi punti + invia card + gestisci card */
         if(pointsLine){
           pointsLine.innerHTML='';
           const currentPoints = Number(it.points || 0);
@@ -727,21 +733,22 @@
             showToast('Saldo Fidelity aggiornato ✅');
           });
 
-          const openCard = aBtn('Apri Fidelity Card', ()=>{
+          const sendCard = aBtn('Invia card', ()=>{
+            const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+            const txt = `Ciao ${it.name}, questa è la tua Fidelity Card Re Long: ${url}`;
+            window.open(walink(it.phone, txt),'_blank','noopener');
+          });
+
+          const manageCard = aBtn('Gestisci card', ()=>{
             const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
             window.open(url,'_blank','noopener');
           });
 
-          pointsLine.append(lbl, add, openCard);
+          pointsLine.append(lbl, add, sendCard, manageCard);
         }
 
-        /* REMINDERS UI */
+        /* REMINDERS UI (semplificata) */
         remWrap.innerHTML='';
-
-        const cycleBadge=document.createElement('span');
-        cycleBadge.className='label';
-        cycleBadge.textContent='Ciclo '+(it.remindersCycle||1);
-        remWrap.append(cycleBadge);
 
         if(!it.responded){
           const stop=aBtn('Stop promo (ha risposto)', ()=>{
@@ -755,35 +762,14 @@
           remWrap.append(stopped);
         }
 
-        const addFU=aBtn('+90GG', ()=> addFollowup90(it));
-        const addFUc=aBtn('+PERS.', ()=> addFollowupCustom(it));
-        remWrap.append(addFU, addFUc);
-
-        if(it.reminders && it.reminders.length){
-          const now0=startOfDay(new Date());
-          const copy = it.reminders.slice().sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
-          copy.forEach(rem=>{
-            const due = new Date(rem.dueAt);
-            const dueStr = fmt(due);
-            const dueNow = startOfDay(due).getTime()===now0.getTime() && !rem.sent;
-            const lbl = `${typeLabel[rem.type]||rem.type} • ${dueStr}`;
-            const a = document.createElement('a');
-            a.href='#';
-            a.className = 'wa-btn' + (rem.sent ? ' sent' : (dueNow ? ' ok':''));
-            a.textContent = rem.sent ? `${lbl} • Inviato` : (dueNow ? `${lbl} • Invia ora` : `${lbl} • In programma`);
-            a.addEventListener('click',(e)=>{
-              e.preventDefault(); e.stopPropagation();
-              if(rem.sent) return;
-              if(!dueNow){ showToast('Non è ancora il giorno previsto per questo remind','err'); return; }
-              try{ window.open(reminderLink(it, rem),'_blank','noopener'); }catch{}
-              rem.sent=true; rem.sentAt=new Date().toISOString();
-              it.updatedAt=new Date().toISOString();
-              saveLocal(); saveToGitHub(); render();
-            });
-            remWrap.append(a);
-          });
+        const mainComplete = isMainCycleComplete(it);
+        if(mainComplete && !it.responded){
+          const addFU=aBtn('+90GG', ()=> addFollowup90(it));
+          const addFUc=aBtn('+PERS.', ()=> addFollowupCustom(it));
+          remWrap.append(addFU, addFUc);
         }
 
+        /* REVIEW ready */
         review.innerHTML='';
         if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
           const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
