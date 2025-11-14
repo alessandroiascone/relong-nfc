@@ -85,7 +85,7 @@
       gap:4px;
     }
 
-    /* Pulsanti servizio (Energia/SIM/Fisso/Rate/Card) stile modern */
+    /* Pulsanti servizio */
     .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
     .svc-btn{
       border-radius:999px;
@@ -113,7 +113,7 @@
       margin-left:4px;
     }
 
-    /* DASHBOARD (Pacchi + servizi + riparazioni) */
+    /* DASHBOARD */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
     .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -142,7 +142,7 @@
       border-radius:999px;padding:6px 10px;font-size:11px;min-width:130px
     }
 
-    /* Search input sempre visibile */
+    /* Ricerca */
     #searchInput{
       background:#0a0d14;
       border:1px solid var(--stroke);
@@ -205,7 +205,7 @@
             </select>
           </div>
 
-          <!-- Marca: input libero + select per Smartphone + "Altro" con campo dedicato -->
+          <!-- Marca: input libero + select per Smartphone + "Altro" -->
           <div>
             <label>Marca</label>
             <input id="a_brand" placeholder="Apple/Samsung…" />
@@ -235,7 +235,7 @@
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
-      <!-- Toolbar: Filtri + Ricerca sempre visibile -->
+      <!-- Toolbar -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
         <input id="searchInput" placeholder="Cerca nome o telefono" />
@@ -349,7 +349,7 @@
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
     const RELONG_PHONE='08119578844';
 
-    /* Guadagni stimati per la Dashboard */
+    /* Guadagni stimati */
     const GAIN_PACCHI  = 0.5;
     const GAIN_SIM     = 30;
     const GAIN_FISSO   = 110;
@@ -451,33 +451,78 @@
 
     /* WA templates */
     function walink(phone, text){ return `https://wa.me/39${phone}?text=${encodeURIComponent(text)}`; }
-    function waPacchiEnergia(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPosso proporti una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`; return walink(phone,t); }
-    function waPacchiSIM(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`; return walink(phone,t); }
-    function waPacchiFisso(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo a te dedicata. 🏠📡`; return walink(phone,t); }
-    function waPacchiRate(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate Senza Busta Paga: vuoi vedere le offerte attuali? 📱🔥`; return walink(phone,t); }
-    function waPacchiMemo(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`; return walink(phone,t); }
+    function waPacchiEnergia(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPosso proporti una simulazione Luce & Gas davvero conveniente? ⚡️\nIn negozio o via WhatsApp, come preferisci.`;
+      return walink(phone,t);
+    }
+    function waPacchiSIM(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`;
+      return walink(phone,t);
+    }
+    function waPacchiFisso(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nFibra veloce per casa/ufficio: posso verificare la copertura e una promo a te dedicata. 🏠📡`;
+      return walink(phone,t);
+    }
+    function waPacchiRate(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSmartphone a rate Senza Busta Paga: vuoi vedere le offerte attuali? 📱🔥`;
+      return walink(phone,t);
+    }
+    function waPacchiMemo(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nPassa quando vuoi in negozio o scrivimi qui su WhatsApp: ti seguo io personalmente 😉`;
+      return walink(phone,t);
+    }
 
-    function waPickup(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`; return walink(phone,t); }
-    function waReview(name, phone){ const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`; return walink(phone,t); }
+    function waPickup(name, phone){
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo prodotto è PRONTO, puoi passare a ritirarlo.\nSiamo qui: ${MAPS_URL}`;
+      return walink(phone,t);
+    }
+    function waReview(name, phone){
+      const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`;
+      return walink(phone,t);
+    }
 
-    /* Messaggi automatici conferma/avanzamento */
-    function waRepairIntake(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧`; return walink(phone,t); }
-    function waPacchiReceived(name, phone){ const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato.Grazie 📦`; return walink(phone,t); }
-    function waDeliveredConfirm(name, phone){ const t=`Ciao ${name}, Grazie per la fiducia! Se hai bisogno, scrivimi pure qui. 🙏`; return walink(phone,t); }
+    /* Messaggi automatici con Fidelity */
 
-    /* Nuove versioni con Fidelity link */
+    // RIPARAZIONE: benvenuto + presa in carico + Card
     function waRepairIntakeWithCard(it){
       const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-      const t = `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nAbbiamo preso in carico il tuo dispositivo per diagnosi. Ti aggiorno con il preventivo. 🔧\n\nQuesta è la tua Fidelity Card Re Long:\n${cardUrl}`;
-      return walink(it.phone, t);
-    }
-    function waPacchiReceivedWithCard(it){
-      const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-      const t = `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nIl tuo pacco è stato registrato correttamente. 📦\n\nTi abbiamo attivato la tua Fidelity Card Re Long con i primi punti di benvenuto.\nLa trovi qui:\n${cardUrl}`;
+      const t =
+`Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
+Il tuo prodotto è stato preso in carico dal nostro laboratorio 🔧
+
+In qualità di cliente ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Clicca sul link per scoprire tutti i vantaggi a te dedicati:
+${cardUrl}`;
       return walink(it.phone, t);
     }
 
-    /* Reminders plan */
+    // PACCHI: grazie + Card
+    function waPacchiReceivedWithCard(it){
+      const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+      const t =
+`Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
+Grazie per aver scelto Re Long per il ritiro del tuo pacco 📦
+
+Per ringraziarti della fiducia ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Clicca sul link per scoprire tutti i dettagli:
+${cardUrl}`;
+      return walink(it.phone, t);
+    }
+
+    // NUOVO CLIENTE (SIM/FISSO/ENERGIA/RATE): benvenuto + Card
+    function waWelcomeWithCard(it){
+      const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+      const t =
+`Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
+Da oggi sei ufficialmente cliente Re Long 💼
+
+Ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Clicca sul link per scoprire tutti i vantaggi e restare aggiornato sulle promo:
+${cardUrl}`;
+      return walink(it.phone, t);
+    }
+
+    /* Reminders */
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
@@ -610,7 +655,7 @@
     typeSel.addEventListener('change', refreshBrandUI);
     brandSelect.addEventListener('change', refreshBrandUI);
 
-    // Auto-compilazione campi: se esiste nome o telefono, precompila l'altro
+    // Auto-compilazione campi
     const nameInput = document.getElementById('c_name');
     const phoneInput = document.getElementById('c_phone');
 
@@ -650,7 +695,7 @@
         acceptance:false,
         fromPacchi:false,
         done:false,
-        points:20 // Fidelity card di default con 20 punti
+        points:20 // Fidelity di default
       };
 
       if(isRepair){
@@ -702,12 +747,15 @@
       document.getElementById('acceptWrap').style.display='none';
       render();
 
+      // WhatsApp automatico: riparazioni, pacchi, nuovi clienti
       try{
         const target = prev || newItem;
         if(isRepair){
           window.open(waRepairIntakeWithCard(target),'_blank','noopener');
         } else if(target.fromPacchi){
           window.open(waPacchiReceivedWithCard(target),'_blank','noopener');
+        } else if(!prev){
+          window.open(waWelcomeWithCard(target),'_blank','noopener');
         }
       }catch{}
     });
@@ -1182,7 +1230,7 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('Gestionale pronto + Fidelity auto ✅');
+      showToast('Gestionale pronto + Fidelity auto + Benvenuto WhatsApp ✅');
     })();
 
     (function(){
