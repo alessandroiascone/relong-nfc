@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Scadenzario v32b (Pacchi + Reminder + Dashboard)</title>
+  <title>ReLong • Gestionale</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -99,6 +99,22 @@
       margin-left:4px;
     }
 
+    /* Pillola grande Fidelity */
+    .fidelity-pill{
+      grid-column:1 / -1;
+      margin-top:4px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,215,0,.8);
+      background:linear-gradient(135deg, #ffd600, #ffae00);
+      color:#3a2600;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+      text-align:center;
+      box-shadow:0 10px 24px rgba(0,0,0,.45);
+    }
+
     /* DASHBOARD (copiata da v32m + incasso riparazioni) */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
@@ -161,18 +177,24 @@
     <div class="content grid2">
       <div><label>Nome e Cognome</label><input id="c_name" placeholder="Mario Rossi"></div>
       <div><label>Telefono</label><input id="c_phone" placeholder="3331234567" inputmode="numeric"></div>
+
       <div style="grid-column:1/-1">
         <label>Seleziona operazione</label>
         <div class="toggle-grid" id="toggles">
           <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
-          <button type="button" class="tbtn" data-key="preventivi">Preventivo</button>
           <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
           <button type="button" class="tbtn" data-key="sim">SIM</button>
           <button type="button" class="tbtn" data-key="fisso">Fisso</button>
           <button type="button" class="tbtn" data-key="energia">Energia</button>
           <button type="button" class="tbtn" data-key="rate">Smartphone a rate</button>
+
+          <!-- Pillola Fidelity -->
+          <div class="fidelity-pill">
+            💳 Fidelity Card INCLUSA • 20 punti di benvenuto per ogni nuovo cliente registrato
+          </div>
         </div>
       </div>
+
       <div style="grid-column:1/-1;display:none" id="acceptWrap">
         <div class="grid2">
           <div>
@@ -206,6 +228,7 @@
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
+
       <div><button id="insertBtn" class="btn primary">Inserisci</button></div>
     </div>
   </section>
@@ -978,6 +1001,8 @@
     }
 
     /* Render */
+    const filterSummary = document.getElementById('filterSummary');
+
     function render(){
       const list=$('#list'); list.innerHTML='';
       const counter = $('#counter');
