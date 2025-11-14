@@ -26,8 +26,25 @@
     .pill{border:1px solid rgba(0,140,255,.22);color:#dbeaff;padding:8px 12px;border-radius:999px;font-size:12px;background:linear-gradient(180deg,rgba(0,140,255,.08),rgba(0,140,255,.02))}
     .pill.good{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border-color:transparent}
     .pill.bad{background:linear-gradient(135deg,#ff6b6b,var(--danger));color:#2b0a0a;border-color:transparent}
-    .btn{appearance:none;border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;background:transparent;color:#eef3ff}
-    .btn.primary{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35)}
+    .btn{
+      appearance:none;border:1px solid var(--stroke);border-radius:14px;
+      padding:10px 14px;font-weight:800;letter-spacing:.25px;cursor:pointer;
+      background:transparent;color:#eef3ff;
+      transition:.18s ease;
+    }
+    .btn[disabled]{
+      opacity:.4;
+      cursor:not-allowed;
+      pointer-events:none;
+      background:#141821;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:none;
+      color:var(--muted);
+    }
+    .btn.primary{
+      background:linear-gradient(135deg,var(--elec3),var(--elec2));
+      color:#04121f;border:0;box-shadow:0 8px 26px rgba(0,140,255,.35);
+    }
     .btn.ok{background:linear-gradient(135deg,#1fae60,var(--ok));color:#071b10;border:0}
     .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media (max-width:980px){ .grid2{grid-template-columns:1fr} }
@@ -50,6 +67,42 @@
       text-align:center;
       box-shadow:0 10px 24px rgba(0,0,0,.45);
     }
+
+    /* ANIMAZIONI NEON PER INSERISCI + FIDELITY */
+    #insertBtn{
+      width:100%;
+      padding:16px 18px;
+      font-size:16px;
+      border-radius:18px;
+      margin-top:4px;
+    }
+    .btn.primary.btn-ready{
+      animation:btnPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes btnPulse{
+      0%,100%{
+        box-shadow:0 0 0 rgba(0,140,255,0);
+        transform:translateY(0);
+      }
+      50%{
+        box-shadow:0 0 32px rgba(0,140,255,.75);
+        transform:translateY(-1px);
+      }
+    }
+    .fidelity-pill.glow{
+      animation:neonPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes neonPulse{
+      0%,100%{
+        box-shadow:0 0 0 rgba(255,215,0,0);
+        filter:brightness(1);
+      }
+      50%{
+        box-shadow:0 0 26px rgba(255,215,0,1);
+        filter:brightness(1.08);
+      }
+    }
+
     .tbtn{display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease}
     .tbtn.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 10px 30px rgba(0,140,255,.35)}
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
@@ -79,6 +132,18 @@
       background:linear-gradient(135deg,rgba(255,215,0,.22),rgba(255,215,0,.05));
       font-size:11px;
       color:#fff9d6;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .badge-top{
+      margin-left:8px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,140,0,.8);
+      background:linear-gradient(135deg,rgba(255,140,0,.35),rgba(255,69,0,.15));
+      font-size:11px;
+      color:#ffeede;
       display:inline-flex;
       align-items:center;
       gap:4px;
@@ -181,7 +246,7 @@
           <button type="button" class="tbtn" data-key="energia">Energia</button>
           <button type="button" class="tbtn" data-key="rate">Smartphone a rate</button>
 
-          <div class="fidelity-pill">
+          <div class="fidelity-pill" id="fidelityPill">
             💳 Fidelity Card INCLUSA • 20 punti di benvenuto per ogni nuovo cliente registrato
           </div>
         </div>
@@ -220,7 +285,9 @@
         </div>
       </div>
 
-      <div><button id="insertBtn" class="btn primary">Inserisci</button></div>
+      <div style="grid-column:1/-1">
+        <button id="insertBtn" class="btn primary" disabled>Inserisci</button>
+      </div>
     </div>
   </section>
 
@@ -640,9 +707,28 @@ ${cardUrl}`;
 
     const nameInput = document.getElementById('c_name');
     const phoneInput = document.getElementById('c_phone');
+    const insertBtn = document.getElementById('insertBtn');
+    const fidelityPill = document.getElementById('fidelityPill');
 
     function findByPhone(p){ const np=normalizePhone(p); return items.find(x=>normalizePhone(x.phone)===np); }
     function findByName(n){ const nn=normalizeName(n); return items.find(x=>normalizeName(x.name)===nn); }
+
+    function canInsert(){
+      const n = (nameInput.value||'').trim();
+      const p = normalizePhone(phoneInput.value||'');
+      if(!n || !/\s/.test(n)) return false;
+      if(!p || p.length<7) return false;
+      return true;
+    }
+    function updateInsertState(){
+      const ok = canInsert();
+      insertBtn.disabled = !ok;
+      insertBtn.classList.toggle('btn-ready', ok);
+      if(fidelityPill) fidelityPill.classList.toggle('glow', ok);
+    }
+
+    nameInput.addEventListener('input', updateInsertState);
+    phoneInput.addEventListener('input', updateInsertState);
 
     nameInput.addEventListener('blur', ()=>{
       const n = nameInput.value;
@@ -650,6 +736,7 @@ ${cardUrl}`;
       if((phoneInput.value||'').trim()) return;
       const hit = findByName(n);
       if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); showToast('Telefono precompilato dalla lista clienti'); }
+      updateInsertState();
     });
 
     phoneInput.addEventListener('blur', ()=>{
@@ -658,9 +745,10 @@ ${cardUrl}`;
       if((nameInput.value||'').trim()) return;
       const hit = findByPhone(p);
       if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
+      updateInsertState();
     });
 
-    document.getElementById('insertBtn').addEventListener('click', async ()=>{
+    insertBtn.addEventListener('click', async ()=>{
       const name=(nameInput.value||'').trim(); let phone=normalizePhone(phoneInput.value||'');
       if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
       if(!phone || phone.length<7) return alert('Telefono non valido');
@@ -727,6 +815,7 @@ ${cardUrl}`;
       nameInput.value=''; phoneInput.value='';
       activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
       document.getElementById('acceptWrap').style.display='none';
+      updateInsertState();
       render();
 
       try{
@@ -1075,9 +1164,22 @@ ${cardUrl}`;
         const currentPoints = Number(it.points || 0);
         if(!isNaN(currentPoints) && currentPoints>0){
           const badge = document.createElement('span');
-          badge.className = 'badge-mini';
-          badge.innerHTML = '★ Fidelity <strong>'+currentPoints+' pt</strong>';
+          badge.className='badge-mini';
+          badge.innerHTML='★ Fidelity <strong>'+currentPoints+' pt</strong>';
           titleEl.appendChild(badge);
+        }
+
+        // 👑 Cliente Top se ha almeno 3 "operazioni" diverse
+        let opsCount=0;
+        const actsSet=new Set(it.activated||[]);
+        if(it.fromPacchi) opsCount++;
+        ['sim','fisso','energia','rate','preventivi','riparazione'].forEach(k=>{ if(actsSet.has(k)) opsCount++; });
+        if(it.acceptance) opsCount++;
+        if(opsCount>=3){
+          const top=document.createElement('span');
+          top.className='badge-top';
+          top.innerHTML='👑 Cliente Top';
+          titleEl.appendChild(top);
         }
 
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
@@ -1248,6 +1350,7 @@ I nostri servizi: ${HUB_URL}`;
     (async function(){
       await loadFromGitHubOrLocal();
       render();
+      updateInsertState();
       showToast('Gestionale pronto + Fidelity auto + Benvenuto WhatsApp ✅');
     })();
 
