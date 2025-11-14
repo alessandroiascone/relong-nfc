@@ -297,6 +297,8 @@
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
         <input id="searchInput" placeholder="Cerca nome o telefono" />
+        <!-- 🔥 Nuovo bottone bonus globale Fidelity -->
+        <button id="bonusAll" class="toggle">Bonus Fidelity (tutti)</button>
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -558,7 +560,7 @@ ${cardUrl}`;
 Grazie per aver scelto Re Long per il ritiro del tuo pacco 📦
 
 Per ringraziarti della fiducia ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
-Clicca sul link per scoprire tutti i dettagli:
+Clicca per scoprire tutti i dettagli:
 ${cardUrl}`;
       return walink(it.phone, t);
     }
@@ -682,6 +684,7 @@ ${cardUrl}`;
       if(k==='riparazione') $('#acceptWrap').style.display = on? 'block':'none';
       b.classList.toggle('active',on);
       if(on) activeSet.add(k); else activeSet.delete(k);
+      updateInsertState(); // aggiorna stato tasto/pillola quando cambi operazioni
     });
 
     const typeSel = document.getElementById('a_type');
@@ -713,13 +716,16 @@ ${cardUrl}`;
     function findByPhone(p){ const np=normalizePhone(p); return items.find(x=>normalizePhone(x.phone)===np); }
     function findByName(n){ const nn=normalizeName(n); return items.find(x=>normalizeName(x.name)===nn); }
 
+    // controllo anche che ci sia almeno 1 operazione selezionata
     function canInsert(){
       const n = (nameInput.value||'').trim();
       const p = normalizePhone(phoneInput.value||'');
       if(!n || !/\s/.test(n)) return false;
       if(!p || p.length<7) return false;
+      if(activeSet.size === 0) return false;
       return true;
     }
+
     function updateInsertState(){
       const ok = canInsert();
       insertBtn.disabled = !ok;
@@ -752,6 +758,8 @@ ${cardUrl}`;
       const name=(nameInput.value||'').trim(); let phone=normalizePhone(phoneInput.value||'');
       if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
       if(!phone || phone.length<7) return alert('Telefono non valido');
+      if(activeSet.size===0) return alert('Seleziona almeno un’operazione');
+
       const act=[...activeSet];
 
       const isRepair=activeSet.has('riparazione');
@@ -842,6 +850,7 @@ ${cardUrl}`;
     const filtersRow = document.getElementById('filtersRow');
     const searchInput = document.getElementById('searchInput');
     const filterSummary = document.getElementById('filterSummary');
+    const bonusAllBtn = document.getElementById('bonusAll');
 
     toggleFiltersBtn.addEventListener('click', ()=>{
       const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
@@ -867,6 +876,37 @@ ${cardUrl}`;
       searchInput.addEventListener('input', ()=>{
         searchTerm = searchInput.value.trim().toLowerCase();
         render();
+      });
+    }
+
+    // 🔥 Bonus globale Fidelity
+    if(bonusAllBtn){
+      bonusAllBtn.addEventListener('click', async ()=>{
+        if(!items.length){
+          alert('Non ci sono clienti in elenco.');
+          return;
+        }
+        const val = prompt('Quanti punti vuoi aggiungere a TUTTE le Fidelity Card? Esempio: 20');
+        if(val === null) return;
+        const delta = parseInt(String(val).replace(',','.'),10);
+        if(!Number.isFinite(delta) || delta === 0){
+          alert('Inserisci un numero di punti valido (es. 10 oppure -10).');
+          return;
+        }
+        let modified = 0;
+        items.forEach(it=>{
+          let curr = Number(it.points || 0);
+          if(isNaN(curr)) curr = 0;
+          curr += delta;
+          if(curr < 0) curr = 0;
+          it.points = curr;
+          it.updatedAt = new Date().toISOString();
+          modified++;
+        });
+        saveLocal();
+        const ok = await saveToGitHub();
+        render();
+        showToast(`Bonus Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
       });
     }
 
@@ -1169,7 +1209,6 @@ ${cardUrl}`;
           titleEl.appendChild(badge);
         }
 
-        // 👑 Cliente Top se ha almeno 3 "operazioni" diverse
         let opsCount=0;
         const actsSet=new Set(it.activated||[]);
         if(it.fromPacchi) opsCount++;
