@@ -346,6 +346,44 @@
       margin-top:20px;
     }
 
+    /* Mini banner gift + pillola Hub */
+    .gift-banner{
+      margin:8px 0 10px;
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:12px;
+      background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(0,140,255,.16));
+      border:1px solid rgba(255,215,0,.5);
+      color:var(--accent3);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .gift-banner span.label{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .hub-pill{
+      border-radius:999px;
+      border:1px solid rgba(0,140,255,.7);
+      padding:4px 10px;
+      font-size:11px;
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.4),rgba(0,0,0,.85));
+      color:#e6f3ff;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .hub-pill:hover{
+      filter:brightness(1.05);
+      box-shadow:0 0 14px rgba(0,140,255,.6);
+    }
+
     @media (max-width:600px){
       body{padding:16px;}
       .card{padding:16px;}
@@ -382,6 +420,21 @@
         </div>
 
         <div id="headerInfo">
+          <!-- MINI BANNER GIFT + PILL HUB -->
+          <div class="gift-banner" id="giftBanner">
+            <span class="label">
+              <span>🎁</span>
+              <span id="giftText">Hai ricevuto o puoi ricevere Gift Fidelity speciali da Re Long.</span>
+            </span>
+            <a
+              href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html"
+              class="hub-pill"
+              id="hubPill"
+            >
+              <span>🚀 Apri Hub</span>
+            </a>
+          </div>
+
           <h1 id="clientName">Fidelity Card</h1>
           <div class="subtitle" id="subtitle">
             Accumula punti per ogni servizio Re Long e trasformali in premi tecnologici.
@@ -524,7 +577,6 @@
     const elRewardsList = document.getElementById("rewardsList");
     const errorBox = document.getElementById("errorBox");
     const cardInner = document.getElementById("cardInner");
-    const howSection = document.getElementById("howPoints");
 
     function fallbackCodeFromId(id){
       const digits = String(id||"").replace(/\D/g,"") || String(Date.now());
@@ -632,7 +684,7 @@
       if(code) copyToClipboard(code);
     });
 
-    // Toggle "Come accumulare punti"
+    const howSection = document.getElementById("howPoints");
     document.getElementById("btnHow").addEventListener("click",()=>{
       const isHidden = (howSection.style.display === "none" || howSection.style.display === "");
       howSection.style.display = isHidden ? "block" : "none";
@@ -644,10 +696,13 @@
     document.getElementById("btnInvite").addEventListener("click",()=>{
       const code = elCode.textContent.trim();
       const name = elName.textContent.trim() || "un amico";
-      const msg = `Ciao! 👋\nSto usando la Fidelity Card Re Long.\n`+
-                  `Usa il mio codice invito *${code}* quando ti registri alla Fidelity:\n`+
-                  `tu ricevi 40 punti di benvenuto e io ne ricevo 80.\n\n`+
-                  `Scopri Re Long e registrati dalla pagina del nostro hub:\n${HUB_URL}`;
+      const msg = `Ciao! 👋
+Sto usando la Fidelity Card Re Long.
+Usa il mio codice invito *${code}* quando ti registri alla Fidelity:
+tu ricevi 40 punti di benvenuto e io ne ricevo 80.
+
+Scopri Re Long e registrati dalla pagina del nostro hub:
+${HUB_URL}`;
       const url = "https://wa.me/?text="+encodeURIComponent(msg);
       window.open(url,"_blank","noopener");
     });
