@@ -154,6 +154,39 @@
       gap:4px;
     }
 
+    /* Badge livello cliente */
+    .lvl-badge{
+      margin-left:8px;
+      padding:2px 9px;
+      border-radius:999px;
+      font-size:11px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.55);
+    }
+    .lvl-bronze{
+      border-color:#cd7f32;
+      background:linear-gradient(135deg,rgba(205,127,50,.28),rgba(0,0,0,.9));
+      color:#ffe9d0;
+    }
+    .lvl-silver{
+      border-color:#c0c0c0;
+      background:linear-gradient(135deg,rgba(192,192,192,.28),rgba(0,0,0,.9));
+      color:#f5f7ff;
+    }
+    .lvl-gold{
+      border-color:#ffd700;
+      background:linear-gradient(135deg,rgba(255,215,0,.32),rgba(0,0,0,.9));
+      color:#fff9d6;
+    }
+    .lvl-black{
+      border-color:#ffffff;
+      background:linear-gradient(135deg,#000000,#272727);
+      color:#ffffff;
+    }
+
     .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
     .svc-btn{
       border-radius:999px;
@@ -175,6 +208,40 @@
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
     .svc-btn--card{border-color:rgba(255,215,0,.9);}
+
+    /* Radar servizi */
+    .svc-radar{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      align-items:center;
+    }
+    .svc-radar-label{
+      font-weight:600;
+      margin-right:4px;
+    }
+    .svc-radar-tag{
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.6);
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:11px;
+    }
+    .svc-radar-tag.off{
+      opacity:.45;
+      filter:grayscale(.7);
+      border-style:dashed;
+    }
+    .svc-radar-tag.on{
+      border-color:rgba(0,140,255,.8);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.32),rgba(0,0,0,.9));
+      color:#eaf4ff;
+    }
 
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
@@ -233,7 +300,7 @@
   <div id="toast"></div>
   <header class="title">
     <div>
-      <h1>ReLong • Scadenzario</h1>
+      <h1>ReLong • Gestionale</h1>
       <div class="subtitle">Ogni cliente che entra è un’occasione: trasformala in valore, supera le aspettative, domina la giornata</div>
     </div>
     <div class="status">
@@ -254,10 +321,10 @@
         <div class="toggle-grid" id="toggles">
           <button type="button" class="tbtn" data-key="riparazione">Riparazione</button>
           <button type="button" class="tbtn" data-key="pacchi">Pacchi</button>
-          <button type="button" class="tbtn" data-key="sim">SIM</button>
+          <button type="button" class="tbtn" data-key="sim">Sim</button>
           <button type="button" class="tbtn" data-key="fisso">Fisso</button>
           <button type="button" class="tbtn" data-key="energia">Energia</button>
-          <button type="button" class="tbtn" data-key="rate">Smartphone a rate</button>
+          <button type="button" class="tbtn" data-key="rate">Smartphone a Rate</button>
 
           <div class="fidelity-pill" id="fidelityPill">
             💳 Fidelity Card INCLUSA • 20 punti di benvenuto per ogni nuovo cliente registrato
@@ -369,6 +436,7 @@
         <div>▶</div>
       </button>
       <div class="details" hidden>
+        <div class="r-line services"></div>
         <div class="r-line actions"></div>
         <div class="r-line points"></div>
         <div class="r-line reminders"></div>
@@ -468,6 +536,15 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
+    // Livelli Fidelity
+    function getLevel(points){
+      const p = Number(points||0);
+      if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
+      if(p>=500)  return {name:'GOLD',  emoji:'🥇', class:'lvl-gold',  min:500,  next:1000};
+      if(p>=150)  return {name:'SILVER',emoji:'🥈', class:'lvl-silver',min:150,  next:500};
+      return {name:'BRONZE',emoji:'🥉', class:'lvl-bronze',min:0,    next:150};
+    }
+
     const syncState=$('#syncState'), cfgBtn=$('#cfgSync');
     const GH={
       cfg(){ try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||'null'); }catch{return null} },
@@ -558,7 +635,7 @@
       return walink(phone,t);
     }
     function waPacchiSIM(name, phone){
-      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`;
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga Top. 📶`;
       return walink(phone,t);
     }
     function waPacchiFisso(name, phone){
@@ -583,7 +660,7 @@
       return walink(phone,t);
     }
     function waReview(name, phone){
-      const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`;
+      const t=`Ciao ${name}, Grazie per averci preferito! 🙌\nSe ti va, lasciaci una recensione su Google: ${REVIEW_URL}`;
       return walink(phone,t);
     }
 
@@ -603,9 +680,9 @@ ${cardUrl}`;
       const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
       const t =
 `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
-Grazie per aver scelto Re Long per il ritiro del tuo pacco 📦
+Grazie per aver scelto Re Long per la gestione del tuo pacco 📦
 
-Per ringraziarti della fiducia ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Per ringraziarti della fiducia ti omaggiamo della Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
 Clicca per scoprire tutti i dettagli:
 ${cardUrl}`;
       return walink(it.phone, t);
@@ -617,7 +694,7 @@ ${cardUrl}`;
 `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
 Da oggi sei ufficialmente cliente Re Long 💼
 
-Ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Ti abbiamo omaggiato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
 Clicca sul link per scoprire tutti i vantaggi e restare aggiornato sulle promo:
 ${cardUrl}`;
       return walink(it.phone, t);
@@ -1318,7 +1395,7 @@ ${cardUrl}`;
           if(!nMatch && !pMatch) return false;
         }
 
-        return false?false:true;
+        return true;
       });
 
       counter.textContent = 'Clienti: ' + source.length;
@@ -1335,6 +1412,14 @@ ${cardUrl}`;
           badge.className='badge-mini';
           badge.innerHTML='★ Fidelity <strong>'+currentPoints+' pt</strong>';
           titleEl.appendChild(badge);
+
+          const lvl = getLevel(currentPoints);
+          if(lvl){
+            const lvlSpan = document.createElement('span');
+            lvlSpan.className = 'lvl-badge ' + lvl.class;
+            lvlSpan.textContent = `${lvl.emoji} ${lvl.name}`;
+            titleEl.appendChild(lvlSpan);
+          }
         }
 
         let opsCount=0;
@@ -1350,11 +1435,48 @@ ${cardUrl}`;
         }
 
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
+              svcLine=el.querySelector('.services'),
               actions=el.querySelector('.actions'),
               pointsLine=el.querySelector('.points'),
               review=el.querySelector('.review'),
               remWrap=el.querySelector('.reminders');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
+
+        // Radar servizi
+        if(svcLine){
+          const acts = new Set(it.activated||[]);
+          const flagPacchi = !!it.fromPacchi;
+          const flagSim    = acts.has('sim');
+          const flagEner   = acts.has('energia');
+          const flagFisso  = acts.has('fisso') || acts.has('fissomobile');
+          const flagRate   = acts.has('rate');
+          const flagRip    = !!it.acceptance || acts.has('riparazione');
+
+          const cfg = [
+            { on:flagPacchi, icon:'📦', label:'Pacchi' },
+            { on:flagSim,    icon:'📶', label:'SIM' },
+            { on:flagEner,   icon:'⚡', label:'Energia' },
+            { on:flagFisso,  icon:'🏠📡', label:'Fisso' },
+            { on:flagRate,   icon:'📱', label:'Rate' },
+            { on:flagRip,    icon:'🔧', label:'Riparazioni' },
+          ];
+
+          const row=document.createElement('div');
+          row.className='svc-radar';
+          const lbl=document.createElement('span');
+          lbl.className='svc-radar-label';
+          lbl.textContent='Profilo servizi:';
+          row.appendChild(lbl);
+
+          cfg.forEach(c=>{
+            const tag=document.createElement('span');
+            tag.className='svc-radar-tag ' + (c.on?'on':'off');
+            tag.innerHTML = `<span>${c.icon}</span><span>${c.label}</span>`;
+            row.appendChild(tag);
+          });
+
+          svcLine.appendChild(row);
+        }
 
         actions.innerHTML='';
         if(it.acceptance){
@@ -1518,7 +1640,7 @@ I nostri servizi: ${HUB_URL}`;
       await loadFromGitHubOrLocal();
       render();
       updateInsertState();
-      showToast('Gestionale pronto + Fidelity auto + Gift Fidelity ✅');
+      showToast('Gestionale pronto + Fidelity auto + Gift + Livelli + Radar ✅');
     })();
 
     (function(){
