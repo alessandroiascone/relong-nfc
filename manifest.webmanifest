@@ -1,6 +1,6 @@
 {
-  "name": "Re Long Informatica – Hub Digitale",
-  "short_name": "Re Long Hub",
+  "name": "ReLong Marano",
+  "short_name": "ReLong Marano",
   "start_url": "/relong-nfc/relong-hub-v2.html",
   "scope": "/relong-nfc/",
   "display": "standalone",
@@ -8,6 +8,11 @@
   "theme_color": "#0a0a0a",
   "description": "Smartphone a rate senza busta paga, offerte energia, Fidelity Card e gestionale clienti Re Long.",
   "icons": [
+    {
+      "src": "icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",

@@ -21,18 +21,21 @@
   <!-- SEO extras -->
   <link rel="canonical" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
   <meta name="robots" content="index,follow,max-image-preview:large">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
 
   <!-- Favicon inline -->
+  <!-- PWA / iOS -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ReLong Marano">
+
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
   <link rel="preconnect" href="https://www.google.com">
   <link rel="dns-prefetch" href="https://alessandroiascone.github.io">
   <link rel="prefetch" href="./catalogo-smartphone-reale-v3.html" as="document" crossorigin>
-
-  <!-- 🔹 AGGIUNTA PWA: manifest -->
-  <link rel="manifest" href="manifest.webmanifest">
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -291,11 +294,12 @@
         <a class="btn" href="./assistenza.html">Vai all’assistenza PC</a>
       </article>
 
-      <!-- 5 — FIDELITY CARD -->
+      <!-- 5 — FIDELITY CARD (AGGIORNATA) -->
       <article class="card" data-anim id="fidelity-card">
         <div class="badge">FIDELITY CARD</div>
         <div class="title"><span class="ico">💳</span><span>Fidelity Card Re Long</span></div>
         <p class="desc">Accumula punti ad ogni acquisto e sfrutta i vantaggi esclusivi per te e i tuoi amici.</p>
+        <!-- qui ora si va alla landing dedicata -->
         <a class="btn" href="./fidelity-landing.html">Scopri di più</a>
       </article>
 
@@ -472,7 +476,7 @@
 
   <noscript><style>#rl-loader{display:none!important}</style></noscript>
 
-  <!-- 🔹 AGGIUNTA PWA: registrazione Service Worker -->
+  <!-- PWA: registrazione Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -484,3 +488,4 @@
   </script>
 </body>
 </html>
+
