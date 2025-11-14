@@ -308,17 +308,41 @@
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
 
-      <!-- 🎁 Gift Fidelity GENERICO SOPRA -->
-      <div class="toolbar">
-        <button id="giftFidelity" class="toggle">🎁 Gift Fidelity</button>
-      </div>
-
-      <!-- Barra standard con filtri / ricerca / bonus / genera -->
+      <!-- Barra filtri + ricerca -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
         <input id="searchInput" placeholder="Cerca nome o telefono" />
-        <button id="bonusAll" class="toggle">Bonus Fidelity (tutti)</button>
-        <button id="generateMissing" class="toggle">Genera Fidelity mancanti</button>
+      </div>
+
+      <!-- Barra Fidelity: Gift sopra e sotto i due bottoni -->
+      <div class="toolbar" style="justify-content:flex-end">
+        <div style="display:flex;flex-direction:column;gap:6px;max-width:380px;width:100%">
+          <button
+            id="giftFidelity"
+            class="toggle"
+            style="width:100%;justify-content:center;text-align:center"
+          >
+            🎁 Gift Fidelity
+          </button>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
+            <button
+              id="bonusAll"
+              class="toggle"
+              style="flex:1 1 0"
+            >
+              Bonus Fidelity (tutti)
+            </button>
+
+            <button
+              id="generateMissing"
+              class="toggle"
+              style="flex:1 1 0"
+            >
+              Genera Fidelity mancanti
+            </button>
+          </div>
+        </div>
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -1294,7 +1318,7 @@ ${cardUrl}`;
           if(!nMatch && !pMatch) return false;
         }
 
-        return true;
+        return false?false:true;
       });
 
       counter.textContent = 'Clienti: ' + source.length;
