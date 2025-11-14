@@ -89,6 +89,7 @@
       color:var(--accent3);
       position:relative;
       overflow:hidden;
+      margin-bottom:4px;
     }
     .fidelity-badge::after{
       content:"";
@@ -100,11 +101,58 @@
       opacity:.7;
       pointer-events:none;
     }
-    .fidelity-badge span{position:relative;z-index:1}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .fidelity-badge span{
+      position:relative;
+      z-index:1;
+    }
 
-    h1{font-size:20px;margin-bottom:4px}
-    .subtitle{font-size:13px;color:var(--muted);margin-bottom:12px}
+    /* Badge livello Fidelity */
+    .level-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      margin-top:4px;
+    }
+    .lvl-bronze{
+      border-color:#cd7f32;
+      background:linear-gradient(135deg,rgba(205,127,50,.22),rgba(0,0,0,.9));
+      color:#ffe9d0;
+    }
+    .lvl-silver{
+      border-color:#c0c0c0;
+      background:linear-gradient(135deg,rgba(192,192,192,.24),rgba(0,0,0,.9));
+      color:#f5f7ff;
+    }
+    .lvl-gold{
+      border-color:#ffd700;
+      background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(0,0,0,.9));
+      color:#fff9d6;
+    }
+    .lvl-black{
+      border-color:#ffffff;
+      background:linear-gradient(135deg,#000000,#282828);
+      color:#ffffff;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg);}
+    }
+
+    h1{
+      font-size:20px;
+      margin-bottom:4px;
+    }
+    .subtitle{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
 
     .code-row{
       display:flex;
@@ -114,6 +162,7 @@
       margin:10px 0 6px;
     }
 
+    /* CODICE INVITO MOLTO VISIBILE */
     .code-chip{
       border-radius:999px;
       border:1px solid rgba(255,215,0,1);
@@ -125,7 +174,9 @@
       cursor:pointer;
       background:linear-gradient(135deg,var(--accent),var(--accent2));
       color:#2b1900;
-      box-shadow:0 0 22px rgba(255,215,0,.9),0 0 2px rgba(0,0,0,.8);
+      box-shadow:
+        0 0 22px rgba(255,215,0,.9),
+        0 0 2px rgba(0,0,0,.8);
     }
     .code-chip strong{
       letter-spacing:.20em;
@@ -139,7 +190,9 @@
       opacity:.9;
     }
     .code-chip:hover{
-      box-shadow:0 0 30px rgba(255,215,0,1),0 0 6px rgba(0,0,0,1);
+      box-shadow:
+        0 0 30px rgba(255,215,0,1),
+        0 0 6px rgba(0,0,0,1);
       transform:translateY(-1px);
     }
 
@@ -154,7 +207,9 @@
       gap:6px;
     }
 
-    .progress-wrap{margin:10px 0 14px}
+    .progress-wrap{
+      margin:10px 0 14px;
+    }
     .progress-label{
       display:flex;
       justify-content:space-between;
@@ -194,7 +249,7 @@
       gap:4px;
       color:var(--muted);
     }
-    .tier strong{color:#fff}
+    .tier strong{color:#fff;}
     .tier.active{
       border-color:rgba(255,215,0,.9);
       color:var(--accent3);
@@ -211,7 +266,7 @@
       animation:spin 4s linear infinite;
       opacity:.6;
     }
-    .tier span.label{position:relative;z-index:1}
+    .tier span.label{position:relative;z-index:1;}
 
     .btn-row{
       display:flex;
@@ -256,94 +311,107 @@
       margin-bottom:6px;
       line-height:1.4;
     }
-
-    /* LISTA PREMI SUPER PREMIUM */
     .rewards-list{
-      margin-top:8px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
+      margin-top:6px;
+      display:grid;
+      gap:6px;
+      font-size:13px;
     }
     .reward{
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(135deg,rgba(8,10,18,.98),rgba(0,0,0,.94));
-      box-shadow:0 8px 18px rgba(0,0,0,.65);
-      position:relative;
-      overflow:hidden;
-    }
-    .reward::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background:radial-gradient(circle at 0 0,rgba(255,215,0,.18),transparent 55%);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .2s ease;
-    }
-    .reward-left{
-      display:flex;
       align-items:center;
-      gap:10px;
-      position:relative;
-      z-index:1;
+      gap:8px;
+      padding:6px 8px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.6);
     }
-    .reward-badge{
-      min-width:64px;
-      padding:5px 9px;
-      border-radius:999px;
-      border:1px solid rgba(255,215,0,.85);
-      text-align:center;
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:.05em;
-      text-transform:uppercase;
-      background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(90,60,0,.9));
-      color:var(--accent3);
-      box-shadow:0 0 14px rgba(255,215,0,.7);
-    }
-    .reward-text strong{
+    .reward strong{
       font-size:13px;
-      display:block;
     }
-    .reward-text small{
+    .reward small{
       font-size:11px;
       color:var(--muted);
     }
-    .reward-icon{
-      font-size:18px;
-      position:relative;
-      z-index:1;
-    }
-
     .reward.unlocked{
       border-color:rgba(0,200,120,.9);
-      background:linear-gradient(135deg,rgba(0,200,120,.32),rgba(0,0,0,.92));
-      box-shadow:0 10px 22px rgba(0,200,120,.6);
+      background:linear-gradient(135deg,rgba(0,200,120,.3),rgba(0,0,0,.8));
     }
-    .reward.unlocked::before{
-      background:radial-gradient(circle at 0 0,rgba(0,255,170,.32),transparent 55%);
-      opacity:1;
+    .reward.next{
+      border-color:rgba(255,215,0,.9);
+      background:linear-gradient(135deg,rgba(255,215,0,.24),rgba(0,0,0,.8));
     }
 
-    .reward.next{
-      border-color:rgba(255,215,0,.95);
-      background:linear-gradient(135deg,rgba(255,215,0,.30),rgba(0,0,0,.94));
-      box-shadow:0 10px 24px rgba(255,215,0,.6);
+    .how-grid{
+      margin-top:8px;
+      display:grid;
+      gap:4px;
     }
-    .reward.next::before{
-      opacity:1;
+    .how-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      font-size:13px;
+      padding:4px 2px;
+    }
+    .how-row span.label{
+      color:#f7f7ff;
+    }
+    .how-row span.points{
+      font-weight:700;
+      color:var(--accent3);
+    }
+    .how-row span.points small{
+      font-size:11px;
+      color:var(--muted);
+      margin-left:2px;
     }
 
     .small-note{
       font-size:11px;
       color:var(--muted);
       margin-top:6px;
+    }
+
+    /* Sezione missioni */
+    .missions-list{
+      margin-top:8px;
+      display:grid;
+      gap:8px;
+    }
+    .mission-card{
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.75);
+      padding:8px 10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .mission-icon{
+      font-size:18px;
+      line-height:1;
+      margin-top:2px;
+    }
+    .mission-body{
+      flex:1;
+    }
+    .mission-title{
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:2px;
+    }
+    .mission-desc{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:2px;
+    }
+    .mission-bonus{
+      font-size:12px;
+      font-weight:700;
+      color:var(--accent3);
     }
 
     .error{
@@ -353,48 +421,35 @@
       margin-top:20px;
     }
 
-    /* Mini banner gift + pillola Hub */
-    .gift-banner{
-      margin:8px 0 10px;
+    @media (max-width:600px){
+      body{padding:16px;}
+      .card{padding:16px;}
+      .wrap{gap:14px;}
+    }
+
+    /* Mini banner verso hub */
+    .mini-banner{
+      margin-top:8px;
       font-size:11px;
-      padding:6px 10px;
-      border-radius:12px;
-      background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(0,140,255,.16));
-      border:1px solid rgba(255,215,0,.5);
-      color:var(--accent3);
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,140,255,.5);
+      background:linear-gradient(135deg,rgba(0,140,255,.22),rgba(0,0,0,.9));
+      color:#e4f1ff;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:8px;
     }
-    .gift-banner span.label{
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .hub-pill{
-      border-radius:999px;
-      border:1px solid rgba(0,140,255,.7);
-      padding:4px 10px;
+    .mini-banner a{
+      font-weight:700;
       font-size:11px;
-      background:radial-gradient(circle at 0 0,rgba(0,140,255,.4),rgba(0,0,0,.85));
-      color:#e6f3ff;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
       text-decoration:none;
-      white-space:nowrap;
-    }
-    .hub-pill:hover{
-      filter:brightness(1.05);
-      box-shadow:0 0 14px rgba(0,140,255,.6);
-    }
-
-    @media (max-width:600px){
-      body{padding:16px}
-      .card{padding:16px}
-      .wrap{gap:14px}
+      color:#fff;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(0,0,0,.7);
+      border:1px solid rgba(255,255,255,.2);
     }
   </style>
 </head>
@@ -408,40 +463,34 @@
             <div class="fidelity-badge">
               <span>Fidelity Premium</span>
             </div>
-            <div style="
-              margin-top:6px;
-              font-size:11px;
-              padding:6px 10px;
-              border-radius:12px;
-              background:rgba(255,215,0,.12);
-              border:1px solid rgba(255,215,0,.35);
-              color:var(--accent3);
-              text-align:center;
-              letter-spacing:.3px;
-              backdrop-filter:blur(4px);
-              max-width:260px;
-            ">
-              ⭐ Porta un amico = punti extra per entrambi ⭐
+            <div id="levelPill" class="level-pill lvl-bronze">
+              🥉 Livello: BRONZE
             </div>
           </div>
         </div>
 
-        <div id="headerInfo">
-          <!-- MINI BANNER GIFT + PILL HUB -->
-          <div class="gift-banner" id="giftBanner">
-            <span class="label">
-              <span>🎁</span>
-              <span id="giftText">Hai ricevuto o puoi ricevere Gift Fidelity speciali da Re Long.</span>
-            </span>
-            <a
-              href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html"
-              class="hub-pill"
-              id="hubPill"
-            >
-              <span>🚀 Apri Hub</span>
-            </a>
-          </div>
+        <div style="
+          margin-top:6px;
+          font-size:11px;
+          padding:6px 10px;
+          border-radius:12px;
+          background:rgba(255,215,0,.12);
+          border:1px solid rgba(255,215,0,.35);
+          color:var(--accent3);
+          text-align:center;
+          letter-spacing:.3px;
+          backdrop-filter:blur(4px);
+          max-width:100%;
+        ">
+          ⭐ Porta un amico = punti extra per entrambi ⭐
+        </div>
 
+        <div class="mini-banner">
+          <span>Vuoi scoprire tutti i servizi Re Long?</span>
+          <a href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html" target="_blank" rel="noopener">Apri l’hub</a>
+        </div>
+
+        <div id="headerInfo">
           <h1 id="clientName">Fidelity Card</h1>
           <div class="subtitle" id="subtitle">
             Accumula punti per ogni servizio Re Long e trasformali in premi tecnologici.
@@ -553,6 +602,16 @@
       </p>
     </div>
 
+    <!-- SEZIONE MISSIONI -->
+    <div class="section" id="missionsSection" style="display:none">
+      <h2>Missioni attive per te</h2>
+      <p>
+        Completa queste missioni per far crescere più velocemente i tuoi punti Fidelity.
+        Mostra questa schermata in negozio e aggiorneremo la card insieme.
+      </p>
+      <div class="missions-list" id="missionsList"></div>
+    </div>
+
     <div id="errorBox" class="error" style="display:none">
       Impossibile trovare i dati della tua Fidelity Card.<br/>
       Contatta Re Long per attivare o verificare la tua card.
@@ -584,11 +643,24 @@
     const elRewardsList = document.getElementById("rewardsList");
     const errorBox = document.getElementById("errorBox");
     const cardInner = document.getElementById("cardInner");
+    const howSection = document.getElementById("howPoints");
+    const levelPill = document.getElementById("levelPill");
+    const missionsSection = document.getElementById("missionsSection");
+    const missionsList = document.getElementById("missionsList");
 
     function fallbackCodeFromId(id){
       const digits = String(id||"").replace(/\D/g,"") || String(Date.now());
       const last6 = digits.slice(-6);
       return last6.padStart(6,"0");
+    }
+
+    // Livello Fidelity (stessa logica del gestionale)
+    function getLevel(points){
+      const p = Number(points||0);
+      if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
+      if(p>=500)  return {name:'GOLD',  emoji:'🥇', class:'lvl-gold',  min:500,  next:1000};
+      if(p>=150)  return {name:'SILVER',emoji:'🥈', class:'lvl-silver',min:150,  next:500};
+      return {name:'BRONZE',emoji:'🥉', class:'lvl-bronze',min:0,    next:150};
     }
 
     function computeProgress(points){
@@ -640,25 +712,21 @@
         const div = document.createElement("div");
         div.className = "reward";
 
-        let icon = "⏳";
         if(points >= r.threshold){
           div.classList.add("unlocked");
-          icon = "✅";
         }else if(!nextAssigned){
           div.classList.add("next");
-          icon = "🎯";
           nextAssigned = true;
         }
 
         div.innerHTML = `
-          <div class="reward-left">
-            <div class="reward-badge">${r.threshold} pt</div>
-            <div class="reward-text">
-              <strong>${r.label}</strong>
-              <small>Premio Fidelity Re Long</small>
-            </div>
+          <div>
+            <strong>${r.threshold} punti</strong><br/>
+            <small>${r.label}</small>
           </div>
-          <div class="reward-icon">${icon}</div>
+          <div>
+            ${points >= r.threshold ? "✅" : "🎯"}
+          </div>
         `;
         elRewardsList.appendChild(div);
       });
@@ -695,7 +763,7 @@
       if(code) copyToClipboard(code);
     });
 
-    const howSection = document.getElementById("howPoints");
+    // Toggle "Come accumulare punti"
     document.getElementById("btnHow").addEventListener("click",()=>{
       const isHidden = (howSection.style.display === "none" || howSection.style.display === "");
       howSection.style.display = isHidden ? "block" : "none";
@@ -707,16 +775,90 @@
     document.getElementById("btnInvite").addEventListener("click",()=>{
       const code = elCode.textContent.trim();
       const name = elName.textContent.trim() || "un amico";
-      const msg = `Ciao! 👋
-Sto usando la Fidelity Card Re Long.
-Usa il mio codice invito *${code}* quando ti registri alla Fidelity:
-tu ricevi 40 punti di benvenuto e io ne ricevo 80.
-
-Scopri Re Long e registrati dalla pagina del nostro hub:
-${HUB_URL}`;
+      const msg = `Ciao! 👋\nSto usando la Fidelity Card Re Long.\n`+
+                  `Usa il mio codice invito *${code}* quando ti registri alla Fidelity:\n`+
+                  `tu ricevi 40 punti di benvenuto e io ne ricevo 80.\n\n`+
+                  `Scopri Re Long e registrati dalla pagina del nostro hub:\n${HUB_URL}`;
       const url = "https://wa.me/?text="+encodeURIComponent(msg);
       window.open(url,"_blank","noopener");
     });
+
+    function renderMissions(item, points){
+      missionsList.innerHTML = "";
+      let missions = [];
+
+      const acts = new Set(item.activated || []);
+      const hasEnergia = acts.has("energia");
+      const hasSim = acts.has("sim");
+      const hasRip = !!item.acceptance || acts.has("riparazione");
+      const lvl = getLevel(points);
+
+      if(!hasEnergia){
+        missions.push({
+          icon:"⚡",
+          title:"Missione Energia",
+          desc:"Attiva una fornitura Luce & Gas con Re Long e porta la tua Fidelity al livello successivo.",
+          bonus:"+100 punti Fidelity"
+        });
+      }
+
+      if(!hasSim){
+        missions.push({
+          icon:"📶",
+          title:"Missione SIM",
+          desc:"Attiva una SIM mobile con Re Long e abbina minuti e Giga alle tue esigenze.",
+          bonus:"+30 punti Fidelity"
+        });
+      }
+
+      if(!hasRip){
+        missions.push({
+          icon:"🔧",
+          title:"Missione Assistenza",
+          desc:"Porta uno smartphone o un PC in laboratorio per una diagnosi o riparazione.",
+          bonus:"+25 punti Fidelity"
+        });
+      }
+
+      missions.push({
+        icon:"👥",
+        title:"Missione Porta un amico",
+        desc:"Fai registrare un nuovo cliente usando il tuo codice invito Fidelity.",
+        bonus:"+80 punti per te, +40 punti per il tuo amico"
+      });
+
+      if(lvl.name === "BRONZE" || lvl.name === "SILVER"){
+        const toNext = lvl.next ? (lvl.next - points) : 0;
+        if(toNext > 0){
+          missions.push({
+            icon:"🚀",
+            title:`Obiettivo livello successivo`,
+            desc:`Ti mancano circa ${toNext} punti per arrivare a ${lvl.name === "BRONZE" ? "SILVER" : "GOLD"}. Chiedi in negozio come accumularli più velocemente.`,
+            bonus:`Ancora ~${toNext} punti`
+          });
+        }
+      }
+
+      if(!missions.length){
+        missionsSection.style.display = "none";
+        return;
+      }
+
+      missionsSection.style.display = "block";
+      missions.forEach(m=>{
+        const div = document.createElement("div");
+        div.className = "mission-card";
+        div.innerHTML = `
+          <div class="mission-icon">${m.icon}</div>
+          <div class="mission-body">
+            <div class="mission-title">${m.title}</div>
+            <div class="mission-desc">${m.desc}</div>
+            <div class="mission-bonus">${m.bonus}</div>
+          </div>
+        `;
+        missionsList.appendChild(div);
+      });
+    }
 
     async function init(){
       if(!idParam){
@@ -725,7 +867,7 @@ ${HUB_URL}`;
         return;
       }
       try{
-        const res = await fetch("https://raw.githubusercontent.com/alessandroiascone/relong-nfc/main/data/items.json",{cache:"no-store"});
+        const res = await fetch(DATA_URL,{cache:"no-store"});
         if(!res.ok) throw new Error("HTTP "+res.status);
         const data = await res.json();
         if(!Array.isArray(data)) throw new Error("Formato non valido");
@@ -745,6 +887,13 @@ ${HUB_URL}`;
         elPoints.textContent = isNaN(pts)? "0" : String(pts);
         elCode.textContent = code;
 
+        // Livello visivo
+        const lvl = getLevel(isNaN(pts)?0:pts);
+        if(levelPill){
+          levelPill.textContent = `${lvl.emoji} Livello: ${lvl.name}`;
+          levelPill.className = "level-pill " + lvl.class;
+        }
+
         const prog = computeProgress(isNaN(pts)?0:pts);
         elNextLabel.textContent = prog.label;
         const ratio = Math.max(0,Math.min(1,prog.ratio));
@@ -754,6 +903,7 @@ ${HUB_URL}`;
 
         renderTiers(isNaN(pts)?0:pts);
         renderRewards(isNaN(pts)?0:pts);
+        renderMissions(item, isNaN(pts)?0:pts);
 
       }catch(e){
         console.error(e);
