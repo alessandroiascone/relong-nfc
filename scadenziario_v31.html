@@ -558,7 +558,7 @@
       return walink(phone,t);
     }
     function waPacchiSIM(name, phone){
-      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga top. 📶`;
+      const t=`Ciao ${name}, sono Alessandro di Re Long (${RELONG_PHONE}).\nSe vuoi, ti preparo una proposta SIM dedicata con Minuti e Giga Top. 📶`;
       return walink(phone,t);
     }
     function waPacchiFisso(name, phone){
@@ -583,7 +583,7 @@
       return walink(phone,t);
     }
     function waReview(name, phone){
-      const t=`Ciao ${name}, grazie per averci preferito! 🙌\nSe ti va, lascia una recensione su Google: ${REVIEW_URL}`;
+      const t=`Ciao ${name}, Grazie per averci preferito! 🙌\nSe ti va, lasciaci una recensione su Google: ${REVIEW_URL}`;
       return walink(phone,t);
     }
 
@@ -603,9 +603,9 @@ ${cardUrl}`;
       const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
       const t =
 `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
-Grazie per aver scelto Re Long per il ritiro del tuo pacco 📦
+Grazie per aver scelto Re Long per la gestione del tuo pacco 📦
 
-Per ringraziarti della fiducia ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Per ringraziarti della fiducia ti omaggiamo della Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
 Clicca per scoprire tutti i dettagli:
 ${cardUrl}`;
       return walink(it.phone, t);
@@ -617,7 +617,7 @@ ${cardUrl}`;
 `Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
 Da oggi sei ufficialmente cliente Re Long 💼
 
-Ti abbiamo attivato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
+Ti abbiamo omaggiato la Fidelity Card Re Long con un bonus di benvenuto di 20 punti 🎁
 Clicca sul link per scoprire tutti i vantaggi e restare aggiornato sulle promo:
 ${cardUrl}`;
       return walink(it.phone, t);
