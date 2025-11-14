@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Re Long • Fidelity Card Digitale</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Fidelity Card digitale Re Long: punti, vantaggi esclusivi e accesso rapido all'Hub Re Long.">
+
+  <!-- SEO / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Fidelity Card Re Long">
+  <meta property="og:description" content="Controlla i tuoi punti e accedi all'Hub Re Long in un tap.">
+  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+  <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/fidelity.html">
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    :root{
+      --bg1:#05060a;
+      --bg2:#000;
+      --card:rgba(15,17,26,.96);
+      --stroke:rgba(255,255,255,.08);
+      --muted:rgba(220,230,255,.7);
+      --accent1:#ff3b1a;
+      --accent2:#ff9a1a;
+      --gold1:#ffd54f;
+      --gold2:#ffb300;
+      --wa1:#25D366;
+      --wa2:#128C7E;
+    }
+    body{
+      min-height:100vh;
+      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%,rgba(255,120,0,.18) 0,transparent 55%),
+        radial-gradient(circle at 80% 100%,rgba(0,140,255,.25) 0,transparent 55%),
+        radial-gradient(circle at 50% 50%,var(--bg1),var(--bg2) 70%);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .wrap{
+      width:100%;
+      max-width:420px;
+      position:relative;
+    }
+    .brand{
+      text-align:center;
+      margin-bottom:16px;
+    }
+    .brand-logo{
+      width:42px;
+      height:42px;
+      display:inline-block;
+      margin-bottom:6px;
+    }
+    .brand-title{
+      font-size:19px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .brand-sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:22px;
+      padding:18px 18px 16px;
+      border:1px solid var(--stroke);
+      box-shadow:
+        0 20px 45px rgba(0,0,0,.85),
+        0 0 60px rgba(255,90,0,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 0 0,rgba(255,255,255,.05) 0,transparent 45%),
+        radial-gradient(circle at 100% 100%,rgba(255,153,0,.08) 0,transparent 50%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .card-inner{
+      position:relative;
+      z-index:1;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,0,.9);
+      background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,140,0,.09));
+      font-size:11px;
+      font-weight:800;
+      color:#fff9d6;
+      margin-bottom:10px;
+    }
+    .tag span.emoji{font-size:13px}
+    .name{
+      font-size:17px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:2px;
+    }
+    .id{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:10px;
+      word-break:break-all;
+    }
+    .points-row{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      margin:10px 0 16px;
+    }
+    .points-main{
+      display:flex;
+      flex-direction:column;
+    }
+    .points-label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .points-value{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:.05em;
+      background:linear-gradient(135deg,var(--gold1),var(--gold2));
+      -webkit-background-clip:text;
+      color:transparent;
+      text-shadow:0 0 18px rgba(0,0,0,.8);
+    }
+    .points-badge{
+      font-size:11px;
+      color:#ffe6b3;
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,150,.7);
+      background:linear-gradient(135deg,rgba(255,215,170,.3),rgba(255,153,0,.12));
+    }
+    .benefits{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-bottom:14px;
+    }
+    .benefits ul{
+      list-style:none;
+      margin-top:6px;
+    }
+    .benefits li{
+      display:flex;
+      align-items:flex-start;
+      gap:6px;
+      margin-bottom:4px;
+    }
+    .benefits li span.bullet{font-size:13px;margin-top:1px}
+    .btn-group{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:6px;
+    }
+    .btn{
+      appearance:none;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      padding:11px 14px;
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.02em;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      color:#f5f6ff;
+      background:#05070d;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .btn span.icon{font-size:16px}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      border:none;
+      color:#080301;
+      box-shadow:0 12px 32px rgba(255,90,0,.5);
+    }
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 18px 40px rgba(255,90,0,.65);filter:brightness(1.03)}
+    .btn-outline:hover{border-color:rgba(255,255,255,.25);background:#080b12}
+    .btn-wa{
+      background:linear-gradient(135deg,var(--wa1),var(--wa2));
+      border:none;
+      color:#02120a;
+      box-shadow:0 10px 26px rgba(18,140,126,.55);
+    }
+    .btn-wa:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(18,140,126,.75);filter:brightness(1.02)}
+    .hint{
+      margin-top:10px;
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .hint b{color:#fff}
+    .safe-footer{
+      margin-top:14px;
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .safe-footer a{
+      color:var(--muted);
+      text-decoration:none;
+    }
+    .safe-footer a:hover{text-decoration:underline}
+
+    .pill-app{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,140,255,.5);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.35),rgba(0,0,0,.8));
+      margin-bottom:8px;
+      color:#e6f3ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%">
+            <stop offset="0%" stop-color="#ff3b1a" />
+            <stop offset="100%" stop-color="#ff9a1a" />
+          </linearGradient>
+        </defs>
+        <path d="M4 18L12 6l8 12" fill="none" stroke="url(#g1)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="brand-title">Re Long Fidelity</div>
+      <div class="brand-sub">Smartphone, Energia & Assistenza • Marano di Napoli</div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <div class="tag">
+          <span class="emoji">💳</span>
+          <span>Fidelity Card Digitale Re Long</span>
+        </div>
+
+        <div class="pill-app">
+          <span>📲 Usa questa card insieme alla tua App Re Long per avere tutto sempre a portata di mano.</span>
+        </div>
+
+        <div class="name" id="custName">Cliente Re Long</div>
+        <div class="id" id="custId">ID: –</div>
+
+        <div class="points-row">
+          <div class="points-main">
+            <div class="points-label">Punti disponibili</div>
+            <div class="points-value" id="pointsValue">20+</div>
+          </div>
+          <div class="points-badge" id="tierBadge">Benvenuto Re Long</div>
+        </div>
+
+        <div class="benefits">
+          Goditi i vantaggi dedicati ai clienti Fidelity Re Long:
+          <ul>
+            <li><span class="bullet">⭐</span><span>Punti ogni volta che fai acquisti, attivi offerte o ritiri pacchi</span></li>
+            <li><span class="bullet">🎁</span><span>Bonus speciali in occasioni come Natale, Black Friday e compleanni</span></li>
+            <li><span class="bullet">📱</span><span>Accesso diretto al Catalogo Smartphone, Energia e Assistenza</span></li>
+          </ul>
+        </div>
+
+        <div class="btn-group">
+          <!-- HUB PRINCIPALE -->
+          <a href="./relong-hub-v2.html" class="btn btn-primary">
+            <span class="icon">🚀</span>
+            <span>Apri il mio Hub Re Long</span>
+          </a>
+
+          <!-- COLLEGAMENTI VELOCI ALL’HUB -->
+          <a href="./catalogo-smartphone-reale-v3.html" class="btn btn-outline">
+            <span class="icon">📱</span>
+            <span>Vai al Catalogo Smartphone</span>
+          </a>
+
+          <a href="./index.html" class="btn btn-outline">
+            <span class="icon">⚡</span>
+            <span>Simula la tua bolletta Luce & Gas</span>
+          </a>
+
+          <a href="https://wa.me/3908119578844?text=Ciao%20Re%20Long%2C%20ti%20scrivo%20dalla%20mia%20Fidelity%20Card.%20Vorrei%20informazioni%20su%20punti%20e%20promo." class="btn btn-wa">
+            <span class="icon">💬</span>
+            <span>Scrivici su WhatsApp</span>
+          </a>
+        </div>
+
+        <div class="hint">
+          Suggerimento: <b>aggiungi questa pagina ai preferiti</b> o alla schermata Home del tuo smartphone,
+          così avrai sempre la tua Fidelity e l’accesso rapido all’Hub Re Long.
+        </div>
+
+        <div class="safe-footer">
+          Re Long Informatica •
+          <a href="tel:+3908119578844">08119578844</a> •
+          <a href="https://maps.app.goo.gl/dwpNWoUwFQD4NppU6" target="_blank" rel="noopener">Come arrivare in negozio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id') || '';
+      const idEl = document.getElementById('custId');
+      const nameEl = document.getElementById('custName');
+      const ptsEl = document.getElementById('pointsValue');
+      const tierEl = document.getElementById('tierBadge');
+
+      if(id){
+        idEl.textContent = 'ID: ' + id;
+      } else {
+        idEl.textContent = 'ID: non disponibile';
+      }
+
+      function setTier(points){
+        const p = Number(points || 0);
+        ptsEl.textContent = isNaN(p) ? '20+' : p.toString();
+
+        if(p >= 300){
+          tierEl.textContent = 'Cliente Top Re Long';
+        } else if(p >= 150){
+          tierEl.textContent = 'Cliente Premium';
+        } else if(p >= 20){
+          tierEl.textContent = 'Attivo Fidelity';
+        } else {
+          tierEl.textContent = 'Benvenuto Re Long';
+        }
+      }
+
+      // Fallback se non riusciamo a leggere i dati reali
+      if(!id){
+        setTier(20);
+        return;
+      }
+
+      // Proviamo a leggere i dati reali dal file JSON del gestionale
+      fetch('./data/items.json', {cache:'no-store'})
+        .then(r=>{
+          if(!r.ok) throw new Error('HTTP '+r.status);
+          return r.json();
+        })
+        .then(arr=>{
+          if(!Array.isArray(arr)) throw new Error('Formato non valido');
+          const found = arr.find(it => String(it.id) === String(id));
+          if(!found){
+            // ID non trovato -> fallback generico
+            setTier(20);
+            return;
+          }
+          if(found.name){
+            nameEl.textContent = found.name;
+          }
+          setTier(found.points != null ? found.points : 20);
+        })
+        .catch(()=>{
+          // in caso di errore, mostriamo comunque qualcosa di sensato
+          setTier(20);
+        });
+    })();
+  </script>
+</body>
+</html>
