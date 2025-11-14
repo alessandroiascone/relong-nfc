@@ -170,11 +170,6 @@
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
     .svc-btn--card{border-color:rgba(255,215,0,.9);}
-    .svc-btn span.date{
-      font-size:11px;
-      opacity:.75;
-      margin-left:4px;
-    }
 
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
@@ -294,10 +289,18 @@
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
+
+      <!-- 🎁 Gift Fidelity GENERICO -->
+      <div class="toolbar">
+        <button id="giftFidelity" class="toggle">🎁 Gift Fidelity</button>
+      </div>
+
+      <!-- Barra standard con filtri / ricerca / bonus / genera -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
         <input id="searchInput" placeholder="Cerca nome o telefono" />
         <button id="bonusAll" class="toggle">Bonus Fidelity (tutti)</button>
+        <!-- 🔥 Nuovo bottone: genera Fidelity mancante -->
         <button id="generateMissing" class="toggle">Genera Fidelity mancanti</button>
       </div>
 
@@ -315,31 +318,6 @@
       <div id="counter" class="label" style="margin-bottom:6px">Clienti: 0</div>
       <div id="filterSummary" class="label" style="margin-bottom:10px;display:none"></div>
       <div id="list"></div>
-    </div>
-  </section>
-
-  <!-- NUOVA SEZIONE CAMPAGNE BONUS / CHRISTMAS GIFT -->
-  <section class="card">
-    <h2>Christmas Gift & Campagne Bonus</h2>
-    <div class="content" id="campaignContent">
-      <p class="subtitle" style="margin-bottom:10px;font-size:13px;color:var(--muted);">
-        Quando lanci un bonus Fidelity (Natale, Black Friday, Compleanno…), qui trovi la lista dei
-        clienti coinvolti con il messaggio già pronto da mandare via WhatsApp.
-      </p>
-
-      <label for="campaignText">Testo messaggio campagna</label>
-      <textarea id="campaignText" rows="4" style="margin-top:6px;">
-Ciao {{NOME}}, sono Alessandro di Re Long 🎄
-Ti ho caricato un bonus speciale di {{PUNTI}} punti sulla tua Fidelity Card Re Long.
-
-Questa è la tua card personale:
-{{LINK_CARD}}
-
-Grazie per la fiducia e buone feste da Re Long Marano! 🔥
-      </textarea>
-
-      <div class="label" id="campaignInfo" style="margin-top:10px;">Nessun bonus globale ancora inviato.</div>
-      <div id="campaignList" style="margin-top:8px;"></div>
     </div>
   </section>
 
@@ -438,7 +416,6 @@ Grazie per la fiducia e buone feste da Re Long Marano! 🔥
     const GAIN_ENERGIA = 150;
     const GAIN_RATE    = 45;
 
-    // Ultima campagna bonus lanciata (per pannello Christmas Gift)
     let lastBonusRecipients = [];
 
     function showToast(t, type='ok'){
@@ -879,6 +856,7 @@ ${cardUrl}`;
     const filterSummary = document.getElementById('filterSummary');
     const bonusAllBtn = document.getElementById('bonusAll');
     const generateMissingBtn = document.getElementById('generateMissing');
+    const giftFidelityBtn = document.getElementById('giftFidelity');
 
     toggleFiltersBtn.addEventListener('click', ()=>{
       const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
@@ -904,53 +882,6 @@ ${cardUrl}`;
       searchInput.addEventListener('input', ()=>{
         searchTerm = searchInput.value.trim().toLowerCase();
         render();
-      });
-    }
-
-    function renderCampaignPanel(){
-      const info = document.getElementById('campaignInfo');
-      const list = document.getElementById('campaignList');
-      const textarea = document.getElementById('campaignText');
-      if(!info || !list) return;
-      list.innerHTML='';
-      if(!lastBonusRecipients.length){
-        info.textContent='Nessun bonus globale ancora inviato. Lancia un "Bonus Fidelity (tutti)" o "Genera Fidelity mancanti".';
-        return;
-      }
-      info.textContent = `Clienti coinvolti nell’ultimo bonus: ${lastBonusRecipients.length}`;
-      lastBonusRecipients.forEach(it=>{
-        const row=document.createElement('div');
-        row.className='item';
-        const head=document.createElement('div');
-        head.className='head';
-        head.style.cursor='default';
-        head.innerHTML = `<div class="title">${it.name} • <b>${it.phone}</b><span class="badge-mini">★ ${Number(it.points||0)} pt</span></div>`;
-        const body=document.createElement('div');
-        body.className='details';
-        body.hidden=false;
-        const line=document.createElement('div');
-        line.className='r-line';
-        const btn = document.createElement('a');
-        btn.href='#';
-        btn.className='wa-btn ok';
-        btn.textContent='Invia su WhatsApp';
-        btn.addEventListener('click', e=>{
-          e.preventDefault();
-          const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-          let msg = textarea ? (textarea.value || '') : '';
-          if(!msg){
-            msg = `Ciao ${it.name}, ti ho caricato un bonus speciale sulla tua Fidelity Re Long. Card: ${cardUrl}`;
-          }
-          msg = msg.replace(/{{NOME}}/gi, it.name)
-                   .replace(/{{PUNTI}}/gi, String(it.points||0))
-                   .replace(/{{LINK_CARD}}/gi, cardUrl);
-          window.open(walink(it.phone, msg),'_blank','noopener');
-        });
-        line.appendChild(btn);
-        body.appendChild(line);
-        row.appendChild(head);
-        row.appendChild(body);
-        list.appendChild(row);
       });
     }
 
@@ -982,7 +913,6 @@ ${cardUrl}`;
         saveLocal();
         const ok = await saveToGitHub();
         render();
-        renderCampaignPanel();
         showToast(`Bonus Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
       });
     }
@@ -994,7 +924,6 @@ ${cardUrl}`;
           return;
         }
         let modified = 0;
-        lastBonusRecipients = [];
         items.forEach(it=>{
           let curr = it.points;
           let num = Number(curr);
@@ -1003,19 +932,71 @@ ${cardUrl}`;
             it.points = 20;
             it.updatedAt = new Date().toISOString();
             modified++;
-            lastBonusRecipients.push(it);
           }
         });
         if(!modified){
           showToast('Tutti i clienti hanno già una Fidelity attiva ✅');
-          renderCampaignPanel();
           return;
         }
         saveLocal();
         const ok = await saveToGitHub();
         render();
-        renderCampaignPanel();
         showToast(`Fidelity creata per ${modified} clienti senza card ✅`, ok ? 'ok' : 'err');
+      });
+    }
+
+
+    // 🎁 Gift Fidelity: punti + messaggio generico per campagne
+    if(giftFidelityBtn){
+      giftFidelityBtn.addEventListener('click', async ()=>{
+        if(!items.length){
+          alert('Non ci sono clienti in elenco.');
+          return;
+        }
+
+        // 1) quanti punti regalo?
+        const val = prompt('Quanti punti vuoi regalare a TUTTE le Fidelity Card? (es. 20)','20');
+        if(val === null) return;
+        const delta = parseInt(String(val).replace(',','.'),10);
+        if(!Number.isFinite(delta) || delta === 0){
+          alert('Inserisci un numero di punti valido (es. 10 oppure -10).');
+          return;
+        }
+
+        // 2) messaggio generico (Natale, promo, ecc.) che ti tieni per copia/incolla
+        const msg = prompt(
+          'Scrivi il messaggio generico che userai per avvisare i clienti del regalo (verrà solo salvato localmente per copia/incolla):',
+          '🎁 Da Re Long un regalo per te! Ti abbiamo caricato punti bonus sulla tua Fidelity Card digitale.'
+        );
+
+        let modified = 0;
+        items.forEach(it=>{
+          let curr = Number(it.points || 0);
+          if(isNaN(curr)) curr = 0;
+          curr += delta;
+          if(curr < 0) curr = 0;
+          it.points = curr;
+          it.updatedAt = new Date().toISOString();
+          modified++;
+        });
+
+        saveLocal();
+        const ok = await saveToGitHub();
+        render();
+
+        if(msg){
+          try{
+            localStorage.setItem('relong-last-gift-message', msg);
+          }catch(e){}
+
+          alert(
+            `Gift Fidelity applicato a ${modified} clienti.\n\n` +
+            `Messaggio suggerito per le tue liste broadcast WhatsApp:\n\n` +
+            msg
+          );
+        }else{
+          showToast(`Gift Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
+        }
       });
     }
 
@@ -1499,8 +1480,7 @@ I nostri servizi: ${HUB_URL}`;
       await loadFromGitHubOrLocal();
       render();
       updateInsertState();
-      renderCampaignPanel();
-      showToast('Gestionale pronto + Fidelity auto + Benvenuto WhatsApp ✅');
+      showToast('Gestionale pronto + Fidelity auto + Gift Fidelity ✅');
     })();
 
     (function(){
