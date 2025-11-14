@@ -154,39 +154,6 @@
       gap:4px;
     }
 
-    /* Badge livello cliente */
-    .lvl-badge{
-      margin-left:8px;
-      padding:2px 9px;
-      border-radius:999px;
-      font-size:11px;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.55);
-    }
-    .lvl-bronze{
-      border-color:#cd7f32;
-      background:linear-gradient(135deg,rgba(205,127,50,.28),rgba(0,0,0,.9));
-      color:#ffe9d0;
-    }
-    .lvl-silver{
-      border-color:#c0c0c0;
-      background:linear-gradient(135deg,rgba(192,192,192,.28),rgba(0,0,0,.9));
-      color:#f5f7ff;
-    }
-    .lvl-gold{
-      border-color:#ffd700;
-      background:linear-gradient(135deg,rgba(255,215,0,.32),rgba(0,0,0,.9));
-      color:#fff9d6;
-    }
-    .lvl-black{
-      border-color:#ffffff;
-      background:linear-gradient(135deg,#000000,#272727);
-      color:#ffffff;
-    }
-
     .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
     .svc-btn{
       border-radius:999px;
@@ -208,40 +175,6 @@
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
     .svc-btn--card{border-color:rgba(255,215,0,.9);}
-
-    /* Radar servizi */
-    .svc-radar{
-      font-size:12px;
-      color:var(--muted);
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      align-items:center;
-    }
-    .svc-radar-label{
-      font-weight:600;
-      margin-right:4px;
-    }
-    .svc-radar-tag{
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.6);
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      font-size:11px;
-    }
-    .svc-radar-tag.off{
-      opacity:.45;
-      filter:grayscale(.7);
-      border-style:dashed;
-    }
-    .svc-radar-tag.on{
-      border-color:rgba(0,140,255,.8);
-      background:radial-gradient(circle at 0 0,rgba(0,140,255,.32),rgba(0,0,0,.9));
-      color:#eaf4ff;
-    }
 
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
@@ -360,8 +293,32 @@
             </div>
           </div>
 
-          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max, S25 Ultra…"></div>
-          <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
+          <div style="grid-column:1/-1">
+            <label>Modello</label>
+            <input id="a_model" placeholder="iPhone 17 Pro Max, S25 Ultra…">
+          </div>
+
+          <div style="grid-column:1/-1">
+            <label>Difetto</label>
+            <textarea id="a_issue" placeholder="Descrivi il problema…"></textarea>
+            <!-- AI SMART SCANNER -->
+            <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button
+                type="button"
+                class="btn"
+                id="aiSuggestBtn"
+                style="padding:6px 10px;font-size:12px;border-radius:999px"
+              >
+                🤖 Analizza problema
+              </button>
+              <span id="aiSuggestBadge" class="label" style="display:none"></span>
+            </div>
+            <div
+              id="aiSuggestBox"
+              class="label"
+              style="margin-top:6px;display:none;font-size:12px;line-height:1.4"
+            ></div>
+          </div>
         </div>
       </div>
 
@@ -436,7 +393,6 @@
         <div>▶</div>
       </button>
       <div class="details" hidden>
-        <div class="r-line services"></div>
         <div class="r-line actions"></div>
         <div class="r-line points"></div>
         <div class="r-line reminders"></div>
@@ -535,15 +491,6 @@
     const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
-
-    // Livelli Fidelity
-    function getLevel(points){
-      const p = Number(points||0);
-      if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
-      if(p>=500)  return {name:'GOLD',  emoji:'🥇', class:'lvl-gold',  min:500,  next:1000};
-      if(p>=150)  return {name:'SILVER',emoji:'🥈', class:'lvl-silver',min:150,  next:500};
-      return {name:'BRONZE',emoji:'🥉', class:'lvl-bronze',min:0,    next:150};
-    }
 
     const syncState=$('#syncState'), cfgBtn=$('#cfgSync');
     const GH={
@@ -815,6 +762,10 @@ ${cardUrl}`;
     const brandSmartWrap = document.getElementById('brandSmartWrap');
     const brandSelect = document.getElementById('a_brand_sel');
     const brandOther = document.getElementById('a_brand_other');
+    const issueInput = document.getElementById('a_issue');
+    const aiSuggestBtn = document.getElementById('aiSuggestBtn');
+    const aiSuggestBadge = document.getElementById('aiSuggestBadge');
+    const aiSuggestBox = document.getElementById('aiSuggestBox');
 
     function refreshBrandUI(){
       const isPhone = (typeSel.value === 'Smartphone');
@@ -830,6 +781,89 @@ ${cardUrl}`;
     refreshBrandUI();
     typeSel.addEventListener('change', refreshBrandUI);
     brandSelect.addEventListener('change', refreshBrandUI);
+
+    // 🤖 AI SMART SCANNER – analisi testo difetto
+    function aiAnalyzeIssue(text, deviceType){
+      const t = String(text||'').toLowerCase();
+      let category='Diagnosi generale';
+      let cause='Da verificare in laboratorio.';
+      let level='Standard';
+      let hint='Procediamo con una diagnosi completa del dispositivo per capire il problema.';
+      let price='Indicativamente da 30 € a 60 € circa per le diagnosi base.';
+
+      if(t.includes('schermo') && (t.includes('rotto') || t.includes('crep') || t.includes('riga') || t.includes('linea'))){
+        category='Display / Touch';
+        cause='Possibile rottura del pannello LCD/OLED o del digitalizzatore.';
+        level='Alta';
+        hint='Probabile sostituzione display completo. Tempi medi 24/48 ore salvo disponibilità ricambio.';
+        price='Da 70 € a 250 € in base al modello.';
+      } else if(t.includes('non si accende') || t.includes('morto') || t.includes('non parte') || t.includes('schermo nero')){
+        category='Alimentazione / Scheda logica';
+        cause='Possibile problema alla scheda madre, corto circuito o alimentazione difettosa.';
+        level='Alta';
+        hint='Serve diagnosi approfondita con eventuale intervento su scheda logica.';
+        price='Da 60 € a 180 € in base a modello e danno.';
+      } else if(t.includes('batteria') || t.includes('si spegne') || t.includes('scarica') || t.includes('autonomia')){
+        category='Batteria / Alimentazione';
+        cause='Batteria usurata o problema di gestione della carica.';
+        level='Media';
+        hint='Possibile sostituzione batteria con ricambio di qualità.';
+        price='Da 40 € a 90 € circa.';
+      } else if(t.includes('non carica') || t.includes('presa') || t.includes('cavo') || t.includes('connettore')){
+        category='Connettore di ricarica';
+        cause='Usura o ossidazione del connettore di ricarica.';
+        level='Media';
+        hint='Pulizia professionale o sostituzione del connettore, dopo diagnosi.';
+        price='Da 40 € a 100 € circa.';
+      } else if(t.includes('lento') || t.includes('blocca') || t.includes('si blocca') || t.includes('lag')){
+        category='Software / Memoria';
+        cause='Possibile saturazione memoria, troppi dati o sistema operativo appesantito.';
+        level='Standard';
+        hint='Possibile ripristino, ottimizzazione o reinstallazione software con backup dati.';
+        price='Da 30 € a 80 € circa.';
+      } else if(t.includes('non prende') || t.includes('segnale') || t.includes('rete') || t.includes('chiamata')){
+        category='Rete / Antenna';
+        cause='Problema di rete, antenna o componenti radio (modulo RF).';
+        level='Media';
+        hint='Test rete + eventuale intervento hardware, dopo diagnosi in laboratorio.';
+        price='Da 50 € a 150 € circa.';
+      } else if(t.includes('fotocamera') || t.includes('camera') || t.includes('foto mosse') || t.includes('messa a fuoco')){
+        category='Fotocamera';
+        cause='Modulo camera difettoso o problema di stabilizzazione.';
+        level='Media';
+        hint='Possibile sostituzione modulo fotocamera o intervento su stabilizzatore.';
+        price='Da 50 € a 160 € circa.';
+      }
+
+      if(deviceType && deviceType.toLowerCase()!=='smartphone'){
+        price = price.replace('display', 'componente').replace('telefono','dispositivo');
+      }
+
+      return {category,cause,level,hint,price};
+    }
+
+    if(aiSuggestBtn && issueInput){
+      aiSuggestBtn.addEventListener('click', ()=>{
+        const txt = (issueInput.value||'').trim();
+        if(!txt){
+          alert('Scrivi prima il difetto raccontato dal cliente, poi l’AI lo analizza per te.');
+          return;
+        }
+        const info = aiAnalyzeIssue(txt, typeSel.value);
+        if(aiSuggestBadge){
+          aiSuggestBadge.style.display='';
+          aiSuggestBadge.textContent = `AI: ${info.category} • Priorità ${info.level}`;
+        }
+        if(aiSuggestBox){
+          aiSuggestBox.style.display='';
+          aiSuggestBox.innerHTML =
+            `<strong>Possibile causa:</strong> ${info.cause}<br>`+
+            `<strong>Suggerimento:</strong> ${info.hint}<br>`+
+            `<strong>Indicazione di costo:</strong> ${info.price}`;
+        }
+        showToast('Analisi AI completata ✅');
+      });
+    }
 
     const nameInput = document.getElementById('c_name');
     const phoneInput = document.getElementById('c_phone');
@@ -903,7 +937,17 @@ ${cardUrl}`;
         const brand = (typeSel.value==='Smartphone')
           ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value)
           : (brandInput.value||'');
-        newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:(document.getElementById('a_issue').value||'').trim() };
+        const issueText = (issueInput.value||'').trim();
+        const aiInfo = aiAnalyzeIssue(issueText, typeSel.value);
+
+        newItem.acceptance=true;
+        newItem.device={
+          type:typeSel.value,
+          brand,
+          model,
+          issue:issueText,
+          aiHint: aiInfo ? aiInfo.category : null
+        };
         newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
       }
 
@@ -945,6 +989,8 @@ ${cardUrl}`;
       nameInput.value=''; phoneInput.value='';
       activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
       document.getElementById('acceptWrap').style.display='none';
+      if(aiSuggestBadge){ aiSuggestBadge.style.display='none'; }
+      if(aiSuggestBox){ aiSuggestBox.style.display='none'; aiSuggestBox.textContent=''; }
       updateInsertState();
       render();
 
@@ -1412,14 +1458,6 @@ ${cardUrl}`;
           badge.className='badge-mini';
           badge.innerHTML='★ Fidelity <strong>'+currentPoints+' pt</strong>';
           titleEl.appendChild(badge);
-
-          const lvl = getLevel(currentPoints);
-          if(lvl){
-            const lvlSpan = document.createElement('span');
-            lvlSpan.className = 'lvl-badge ' + lvl.class;
-            lvlSpan.textContent = `${lvl.emoji} ${lvl.name}`;
-            titleEl.appendChild(lvlSpan);
-          }
         }
 
         let opsCount=0;
@@ -1435,48 +1473,11 @@ ${cardUrl}`;
         }
 
         const head=el.querySelector('.head'), details=el.querySelector('.details'),
-              svcLine=el.querySelector('.services'),
               actions=el.querySelector('.actions'),
               pointsLine=el.querySelector('.points'),
               review=el.querySelector('.review'),
               remWrap=el.querySelector('.reminders');
         head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
-
-        // Radar servizi
-        if(svcLine){
-          const acts = new Set(it.activated||[]);
-          const flagPacchi = !!it.fromPacchi;
-          const flagSim    = acts.has('sim');
-          const flagEner   = acts.has('energia');
-          const flagFisso  = acts.has('fisso') || acts.has('fissomobile');
-          const flagRate   = acts.has('rate');
-          const flagRip    = !!it.acceptance || acts.has('riparazione');
-
-          const cfg = [
-            { on:flagPacchi, icon:'📦', label:'Pacchi' },
-            { on:flagSim,    icon:'📶', label:'SIM' },
-            { on:flagEner,   icon:'⚡', label:'Energia' },
-            { on:flagFisso,  icon:'🏠📡', label:'Fisso' },
-            { on:flagRate,   icon:'📱', label:'Rate' },
-            { on:flagRip,    icon:'🔧', label:'Riparazioni' },
-          ];
-
-          const row=document.createElement('div');
-          row.className='svc-radar';
-          const lbl=document.createElement('span');
-          lbl.className='svc-radar-label';
-          lbl.textContent='Profilo servizi:';
-          row.appendChild(lbl);
-
-          cfg.forEach(c=>{
-            const tag=document.createElement('span');
-            tag.className='svc-radar-tag ' + (c.on?'on':'off');
-            tag.innerHTML = `<span>${c.icon}</span><span>${c.label}</span>`;
-            row.appendChild(tag);
-          });
-
-          svcLine.appendChild(row);
-        }
 
         actions.innerHTML='';
         if(it.acceptance){
@@ -1640,7 +1641,7 @@ I nostri servizi: ${HUB_URL}`;
       await loadFromGitHubOrLocal();
       render();
       updateInsertState();
-      showToast('Gestionale pronto + Fidelity auto + Gift + Livelli + Radar ✅');
+      showToast('Gestionale pronto + AI Smart Scanner + Fidelity auto ✅');
     })();
 
     (function(){
