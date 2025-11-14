@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ReLong • Gestionale</title>
+  <title>ReLong • Scadenzario v32b (Pacchi + Reminder + Dashboard)</title>
   <meta name="theme-color" content="#0a0a0a" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -36,6 +36,20 @@
     textarea{min-height:84px;resize:vertical}
     .toggle-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:8px}
     @media (max-width:980px){.toggle-grid{grid-template-columns:repeat(2,1fr)}}
+    .fidelity-pill{
+      grid-column:1 / -1;
+      margin-top:4px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,215,0,.8);
+      background:linear-gradient(135deg, #ffd600, #ffae00);
+      color:#3a2600;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+      text-align:center;
+      box-shadow:0 10px 24px rgba(0,0,0,.45);
+    }
     .tbtn{display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,140,255,.22);background:linear-gradient(180deg,rgba(0,140,255,.10),rgba(0,140,255,.03));color:#dbeaff;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:.2s ease}
     .tbtn.active{background:linear-gradient(135deg,var(--elec3),var(--elec2));color:#04121f;border-color:transparent;box-shadow:0 10px 30px rgba(0,140,255,.35)}
     .item{border:1px solid var(--stroke);border-radius:16px;background:#0a0d14;margin-bottom:10px;overflow:hidden}
@@ -99,23 +113,7 @@
       margin-left:4px;
     }
 
-    /* Pillola grande Fidelity */
-    .fidelity-pill{
-      grid-column:1 / -1;
-      margin-top:4px;
-      padding:10px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,215,0,.8);
-      background:linear-gradient(135deg, #ffd600, #ffae00);
-      color:#3a2600;
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.2px;
-      text-align:center;
-      box-shadow:0 10px 24px rgba(0,0,0,.45);
-    }
-
-    /* DASHBOARD (copiata da v32m + incasso riparazioni) */
+    /* DASHBOARD (Pacchi + servizi + riparazioni) */
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
     .modal.on{display:grid}
     .dash{width:min(1100px,96vw);background:var(--card);border:1px solid var(--stroke);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -161,7 +159,7 @@
   <div id="toast"></div>
   <header class="title">
     <div>
-      <h1>ReLong • Gestionale</h1>
+      <h1>ReLong • Scadenzario</h1>
       <div class="subtitle">Ogni cliente che entra è un’occasione: trasformala in valore, supera le aspettative, domina la giornata</div>
     </div>
     <div class="status">
@@ -224,7 +222,7 @@
             </div>
           </div>
 
-          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17ProMax,S25 Ultra…"></div>
+          <div style="grid-column:1/-1"><label>Modello</label><input id="a_model" placeholder="iPhone 17 Pro Max, S25 Ultra…"></div>
           <div style="grid-column:1/-1"><label>Difetto</label><textarea id="a_issue" placeholder="Descrivi il problema…"></textarea></div>
         </div>
       </div>
@@ -237,7 +235,6 @@
   <section class="card">
     <h2>Elenco</h2>
     <div class="content" id="elencoContent">
-
       <!-- Toolbar: Filtri + Ricerca sempre visibile -->
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
@@ -375,24 +372,43 @@
       token(){ return localStorage.getItem(GH_TOKEN_KEY)||'' },
       headers(){ return { 'Accept':'application/vnd.github+json', 'Authorization':'Bearer '+this.token() } },
       async get(path){
-        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
-        const res=await fetch(url,{headers:this.headers()}); if(!res.ok) throw new Error('GET '+res.status); return res.json();
+        const c=this.cfg(); if(!c) throw new Error('Nessuna configurazione GitHub');
+        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
+        const res=await fetch(url,{
+          headers:{
+            'Accept':'application/vnd.github+json',
+            'Authorization':'Bearer '+this.token()
+          }
+        });
+        if(!res.ok) throw new Error('GET '+res.status);
+        return res.json();
       },
       async put(path, text, msg){
-        const c=this.cfg(); const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
-        let sha=null; try{ const meta=await this.get(path); sha=meta.sha; }catch(e){}
-        const body={ message:msg||'Update v32b', content:btoa(unescape(encodeURIComponent(text))), branch:c.branch||'main' };
+        const c=this.cfg(); if(!c) throw new Error('Nessuna configurazione GitHub');
+        const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}`;
+        let sha=null;
+        try{
+          const meta=await this.get(path);
+          sha=meta.sha;
+        }catch(e){}
+        const body={
+          message: msg || 'Update v32b',
+          content: btoa(unescape(encodeURIComponent(text))),
+          branch: c.branch || 'main'
+        };
         if(sha) body.sha=sha;
-        const res=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
-        if(!res.ok){
-          if(res.status===409){
-            const meta=await this.get(path); const body2={...body,sha:meta.sha};
-            const r2=await fetch(url,{method:'PUT',headers:{...this.headers(),'Content-Type':'application/json'},body:JSON.stringify(body2)});
-            if(!r2.ok) throw new Error('PUT '+r2.status);
-            return r2.json();
-          }
-          throw new Error('PUT '+res.status);
+        const headers={
+          'Accept':'application/vnd.github+json',
+          'Authorization':'Bearer '+this.token(),
+          'Content-Type':'application/json'
+        };
+        let res=await fetch(url,{method:'PUT',headers,body:JSON.stringify(body)});
+        if(res.status===409){
+          const meta=await this.get(path);
+          body.sha=meta.sha;
+          res=await fetch(url,{method:'PUT',headers,body:JSON.stringify(body)});
         }
+        if(!res.ok) throw new Error('PUT '+res.status);
         return res.json();
       }
     };
@@ -511,7 +527,6 @@
       it.updatedAt=new Date().toISOString();
     }
 
-    // NON usiamo più prorogaPromemoria per non cambiare le date esistenti
     function prorogaPromemoria(it){
       if(it.responded) return;
       const types = shuffle(getReminderTypesForItem(it));
@@ -520,7 +535,6 @@
       it.updatedAt = new Date().toISOString();
     }
 
-    // Primo ciclo completato = tutti i main reminder inviati
     function isMainCycleComplete(it){
       if(!it.reminders || !it.reminders.length) return false;
       const onlyMain = it.reminders.filter(r=> r.type!=='followup');
@@ -619,7 +633,7 @@
       if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
     });
 
-    $('#insertBtn').addEventListener('click', async ()=>{
+    document.getElementById('insertBtn').addEventListener('click', async ()=>{
       const name=(nameInput.value||'').trim(); let phone=normalizePhone(phoneInput.value||'');
       if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
       if(!phone || phone.length<7) return alert('Telefono non valido');
@@ -640,11 +654,11 @@
       };
 
       if(isRepair){
-        const model=($('#a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
+        const model=(document.getElementById('a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
         const brand = (typeSel.value==='Smartphone')
           ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value)
           : (brandInput.value||'');
-        newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:($('#a_issue').value||'').trim() };
+        newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:(document.getElementById('a_issue').value||'').trim() };
         newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
       }
 
@@ -655,7 +669,6 @@
       const prev = byPhone || byName;
 
       if(prev){
-        // aggiorno dati anagrafici e attivazioni ma NON tocco i reminder esistenti
         prev.name = prev.name || name;
         prev.phone = prev.phone || phone;
         prev.activated = [...new Set([...(prev.activated||[]), ...act])];
@@ -668,11 +681,9 @@
         if(newItem.fromPacchi) prev.fromPacchi = true;
 
         if(prev.points == null){
-          // se è un cliente vecchio senza Fidelity, lo inizializziamo ora
           prev.points = 20;
         }
 
-        // non rigenero/remappo i promemoria: mantengo le date di prima
         if(!prev.reminders || !prev.reminders.length){
           ensureReminders(prev);
         }
@@ -688,7 +699,7 @@
       saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
       nameInput.value=''; phoneInput.value='';
       activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
-      $('#acceptWrap').style.display='none';
+      document.getElementById('acceptWrap').style.display='none';
       render();
 
       try{
@@ -710,8 +721,8 @@
     };
     let searchTerm='';
 
-    const toggleFiltersBtn = $('#toggleFilters');
-    const filtersRow = $('#filtersRow');
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
+    const filtersRow = document.getElementById('filtersRow');
     const searchInput = document.getElementById('searchInput');
     const filterSummary = document.getElementById('filterSummary');
 
@@ -721,7 +732,6 @@
       toggleFiltersBtn.classList.toggle('active', isHidden);
     });
 
-    // click sugli altri filtri
     filtersRow.addEventListener('click', e=>{
       const b=e.target.closest('.toggle'); if(!b) return;
       const key=b.dataset.filter;
@@ -736,7 +746,6 @@
       render();
     });
 
-    // Ricerca sempre attiva
     if(searchInput){
       searchInput.addEventListener('input', ()=>{
         searchTerm = searchInput.value.trim().toLowerCase();
@@ -768,7 +777,6 @@
       return false;
     }
 
-    /* Helper: prossima data reminder per tipo */
     function nextReminderDate(it, type){
       if(!it.reminders) return null;
       const arr = it.reminders
@@ -778,7 +786,6 @@
       return fmt(arr[0].dueAt);
     }
 
-    /* Quick WA: stile pillole servizio con data + Card */
     function appendQuickWA(actions, it){
       const row = document.createElement('div');
       row.className='svc-row';
@@ -798,7 +805,6 @@
       mkSvc('Fisso','🏠📡','svc-btn--fisso','fissomobile',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
       mkSvc('Rate','📱','svc-btn--rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
 
-      // Pillola "Card" per gestire Fidelity
       mkSvc('Card','💳','svc-btn--card',null,()=>{
         const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
         window.open(url,'_blank','noopener');
@@ -807,7 +813,7 @@
       actions.append(row);
     }
 
-    /* DASHBOARD: funzioni */
+    /* DASHBOARD */
     const dashModal = document.getElementById('dashModal');
     const openDashBtn = document.getElementById('openDash');
     const closeDashBtn = document.getElementById('closeDash');
@@ -815,7 +821,7 @@
     let rangeFrom = null;
     let rangeTo = null;
 
-    const dashPeriodBtns = $$('.dash-period');
+    const dashPeriodBtns = [...document.querySelectorAll('.dash-period')];
     const rangeWrap = document.getElementById('rangeWrap');
     const rangeFromInput = document.getElementById('rangeFrom');
     const rangeToInput = document.getElementById('rangeTo');
@@ -907,7 +913,6 @@
         if(it.acceptance) rip++;
         if(act.includes('preventivi')) prev++;
 
-        // INCASSO RIPARAZIONI: somma dei preventivi accettati e consegnati
         if(it.acceptance && it.repairStatus === 'consegnato' && it.quoteStatus === 'accepted'){
           const val = parseFloat(it.quotePrice ?? 0);
           if(!isNaN(val) && val > 0) gRip += val;
@@ -961,7 +966,6 @@
       if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
     }
 
-    /* Badge riassunto filtri */
     function updateFilterSummary(visibleCount){
       if(!filterSummary) return;
 
@@ -1000,12 +1004,9 @@
       filterSummary.textContent = `Filtri attivi: ${parts.join(' • ')} | Risultati: ${visibleCount}`;
     }
 
-    /* Render */
-    const filterSummary = document.getElementById('filterSummary');
-
     function render(){
-      const list=$('#list'); list.innerHTML='';
-      const counter = $('#counter');
+      const list=document.getElementById('list'); list.innerHTML='';
+      const counter = document.getElementById('counter');
       const now=new Date(); const today0=startOfDay(now);
 
       const source = items.slice().filter(it=>{
@@ -1021,7 +1022,6 @@
 
         if(!matchesCategoryFilters(it)) return false;
 
-        // ricerca: nome o telefono
         if(searchTerm){
           const nameText = (it.name || '').toLowerCase();
           const phoneText = normalizePhone(it.phone || '');
@@ -1041,7 +1041,7 @@
       updateFilterSummary(source.length);
 
       source.forEach(it=>{
-        const el=$('#tpl').content.firstElementChild.cloneNode(true);
+        const el=document.getElementById('tpl').content.firstElementChild.cloneNode(true);
         const titleEl = el.querySelector('.title');
         titleEl.innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
 
@@ -1162,7 +1162,6 @@
           remWrap.append(addFU, addFUc);
         }
 
-        /* REVIEW ready */
         review.innerHTML='';
         if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
           const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
@@ -1183,10 +1182,9 @@
     (async function(){
       await loadFromGitHubOrLocal();
       render();
-      showToast('v32b pronta + Fidelity auto ✅');
+      showToast('Gestionale pronto + Fidelity auto ✅');
     })();
 
-    /* Toggle Elenco (Mostra/Nascondi) */
     (function(){
       const KEY='relong-elenco-hidden';
       const h2s=[...document.querySelectorAll('section.card > h2')];
