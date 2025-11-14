@@ -24,12 +24,6 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
 
   <!-- Favicon inline -->
-  <!-- PWA / iOS -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ReLong Marano">
-
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://maps.app.goo.gl">
@@ -224,7 +218,146 @@
     @keyframes fall{ to{ transform:translateY(105vh); opacity:.92; } }
 
     .brand, .brand:visited, .brand:hover { color:#fff !important; text-decoration:none !important; }
+  
+    /* Banner interno install app */
+    .install-banner{
+      position:fixed;
+      left:10px;
+      right:10px;
+      bottom:calc(var(--seasonbar-h) + 10px + var(--safe-bottom));
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(10,10,10,.96);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 16px 40px rgba(0,0,0,.9);
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      z-index:2102;
+      font-size:12px;
+    }
+    .install-banner__text{color:var(--muted);}
+    .install-banner__text strong{color:#fff;}
+    .install-banner__actions{display:flex;gap:6px;flex-shrink:0;}
+    .install-banner__btn{
+      border:none;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .install-banner__btn--primary{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      color:#000;
+      box-shadow:0 10px 20px rgba(255,90,0,.45);
+    }
+    .install-banner__btn--ghost{
+      background:transparent;
+      color:var(--muted2);
+      border:1px solid rgba(255,255,255,.3);
+    }
+
+    /* Onboarding WOW */
+    .onboarding-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.75);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:2103;
+      backdrop-filter:blur(6px);
+    }
+    .onboarding-card{
+      width:90%;
+      max-width:360px;
+      background:radial-gradient(circle at 0 0,rgba(255,123,0,.2),transparent 55%),#111;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      padding:16px 16px 12px;
+      box-shadow:0 22px 48px rgba(0,0,0,.85);
+      color:#fff;
+      font-size:13px;
+    }
+    .onboarding-title{
+      font-size:16px;
+      font-weight:800;
+      margin-bottom:4px;
+    }
+    .onboarding-steps{
+      margin:8px 0 10px;
+    }
+    .onboarding-step{
+      display:none;
+    }
+    .onboarding-step.active{
+      display:block;
+    }
+    .onboarding-bullets{
+      display:flex;
+      gap:4px;
+      margin-bottom:8px;
+    }
+    .onboarding-bullets span{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:rgba(255,255,255,.25);
+    }
+    .onboarding-bullets span.active{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+    }
+    .onboarding-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:6px;
+    }
+    .onboarding-actions button{
+      border:none;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .onboarding-skip{
+      background:transparent;
+      color:var(--muted2);
+      border:1px solid rgba(255,255,255,.3);
+    }
+    .onboarding-next{
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      color:#000;
+      box-shadow:0 10px 20px rgba(255,90,0,.45);
+    }
+    .onboarding-note{
+      font-size:11px;
+      color:var(--muted2);
+      margin-top:4px;
+    }
+    .onboarding-btn-notif{
+      margin-top:8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.4);
+      background:rgba(0,0,0,.4);
+      color:#fff;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
   </style>
+
+  <!-- PWA META + iOS -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ReLong Marano">
+
 </head>
 <body>
 
@@ -346,6 +479,58 @@
   </div>
 
   <div class="toast" role="status" aria-live="polite"></div>
+
+  
+  <!-- Banner interno "Installa l'app" -->
+  <div class="install-banner" id="installBanner" aria-live="polite">
+    <div class="install-banner__text">
+      <strong>Installa ReLong Marano</strong><br>
+      Aggiungi l’app alla schermata Home per avere Catalogo, Energia e Fidelity sempre a 1 tap.
+    </div>
+    <div class="install-banner__actions">
+      <button class="install-banner__btn install-banner__btn--ghost" id="installLaterBtn">
+        Più tardi
+      </button>
+      <button class="install-banner__btn install-banner__btn--primary" id="installNowBtn">
+        Installa
+      </button>
+    </div>
+  </div>
+
+  <!-- Onboarding WOW -->
+  <div class="onboarding-backdrop" id="onboardingOverlay" aria-hidden="true">
+    <div class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+      <div class="onboarding-title" id="onboardingTitle">Benvenuto in ReLong Marano</div>
+      <div class="onboarding-bullets">
+        <span data-step-bullet="1" class="active"></span>
+        <span data-step-bullet="2"></span>
+        <span data-step-bullet="3"></span>
+      </div>
+      <div class="onboarding-steps">
+        <div class="onboarding-step active" data-step="1">
+          <p><strong>Step 1 • Catalogo & Rate</strong></p>
+          <p>Da “Scegli il tuo Smartphone” entri nel catalogo digitale con le rate dedicate e le proposte Vodafone & Compass.</p>
+        </div>
+        <div class="onboarding-step" data-step="2">
+          <p><strong>Step 2 • Energia & Bollette</strong></p>
+          <p>Da “Accendi la tua Energia” puoi inviare la foto della bolletta e avere una verifica immediata delle offerte luce & gas.</p>
+          <button type="button" class="onboarding-btn-notif" id="onboardingNotifBtn">
+            🔔 Attiva una notifica di benvenuto
+          </button>
+        </div>
+        <div class="onboarding-step" data-step="3">
+          <p><strong>Step 3 • Fidelity & Contatto Rapido</strong></p>
+          <p>Con la Fidelity accumuli punti e vantaggi; con “Contattaci” ti rispondiamo subito su WhatsApp per qualsiasi dubbio.</p>
+          <p class="onboarding-note">Puoi sempre riaprire questa guida cancellando i dati del sito o da una futura voce dedicata.</p>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button type="button" class="onboarding-skip" id="onboardingSkipBtn">Salta</button>
+        <button type="button" class="onboarding-next" id="onboardingNextBtn">Avanti</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Script UX -->
   <script>
@@ -474,18 +659,136 @@
   }
   </script>
 
-  <noscript><style>#rl-loader{display:none!important}</style></noscript>
-
-  <!-- PWA: registrazione Service Worker -->
+  
+  <!-- Banner install + Onboarding + Notifiche locali -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker
-          .register('/relong-nfc/sw.js')
-          .catch(function(err){ console.log('SW registration failed:', err); });
-      });
-    }
+    (function(){
+      const DISMISS_KEY = 'relong_install_dismissed';
+      let deferredPrompt = null;
+      const banner = document.getElementById('installBanner');
+      const btnNow = document.getElementById('installNowBtn');
+      const btnLater = document.getElementById('installLaterBtn');
+
+      if (banner && btnNow && btnLater) {
+        if (localStorage.getItem(DISMISS_KEY) !== '1') {
+          window.addEventListener('beforeinstallprompt', function(e){
+            e.preventDefault();
+            deferredPrompt = e;
+            banner.style.display = 'flex';
+          });
+
+          btnNow.addEventListener('click', async function(){
+            if (!deferredPrompt) {
+              alert(
+                "Per installare l’app:\n\n" +
+                "• su Android: menu ⋮ > Aggiungi a schermata Home\n" +
+                "• su iPhone: tasto Condividi > Aggiungi a Home"
+              );
+              banner.style.display = 'none';
+              localStorage.setItem(DISMISS_KEY, '1');
+              return;
+            }
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            banner.style.display = 'none';
+            if (choice.outcome === 'dismissed') {
+              localStorage.setItem(DISMISS_KEY, '1');
+            }
+          });
+
+          btnLater.addEventListener('click', function(){
+            banner.style.display = 'none';
+            localStorage.setItem(DISMISS_KEY, '1');
+          });
+        }
+      }
+
+      // Onboarding WOW
+      const ONBOARD_KEY = 'relong_onboard_done';
+      const overlay = document.getElementById('onboardingOverlay');
+      const btnSkip = document.getElementById('onboardingSkipBtn');
+      const btnNext = document.getElementById('onboardingNextBtn');
+      const btnNotif = document.getElementById('onboardingNotifBtn');
+      const steps = overlay ? overlay.querySelectorAll('.onboarding-step') : [];
+      const bullets = overlay ? overlay.querySelectorAll('[data-step-bullet]') : [];
+      let currentStep = 1;
+      const maxStep = 3;
+
+      function setStep(step){
+        currentStep = step;
+        steps.forEach(el=>{
+          const s = parseInt(el.getAttribute('data-step'),10);
+          el.classList.toggle('active', s === currentStep);
+        });
+        bullets.forEach(b=>{
+          const s = parseInt(b.getAttribute('data-step-bullet'),10);
+          b.classList.toggle('active', s === currentStep);
+        });
+        if (btnNext) {
+          btnNext.textContent = (currentStep === maxStep) ? 'Fine' : 'Avanti';
+        }
+      }
+
+      function closeOnboarding(){
+        if (!overlay) return;
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden','true');
+        localStorage.setItem(ONBOARD_KEY, '1');
+      }
+
+      if (overlay && !localStorage.getItem(ONBOARD_KEY)) {
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden','false');
+        setStep(1);
+
+        if (btnSkip) {
+          btnSkip.addEventListener('click', closeOnboarding);
+        }
+        if (btnNext) {
+          btnNext.addEventListener('click', function(){
+            if (currentStep < maxStep) {
+              setStep(currentStep + 1);
+            } else {
+              closeOnboarding();
+            }
+          });
+        }
+        if (btnNotif) {
+          btnNotif.addEventListener('click', async function(){
+            if (!('Notification' in window)) {
+              alert('Le notifiche non sono supportate su questo dispositivo.');
+              return;
+            }
+            const perm = await Notification.requestPermission();
+            if (perm === 'granted') {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const reg = await navigator.serviceWorker.ready;
+                  reg.showNotification('Benvenuto in ReLong Marano', {
+                    body: 'Da oggi puoi usare l’hub come una vera app per Smartphone, Energia e Fidelity.',
+                    icon: 'icons/icon-192.png',
+                    badge: 'icons/icon-192.png'
+                  });
+                } else {
+                  new Notification('Benvenuto in ReLong Marano', {
+                    body: 'Da oggi puoi usare l’hub come una vera app per Smartphone, Energia e Fidelity.',
+                    icon: 'icons/icon-192.png'
+                  });
+                }
+              } catch(e){
+                console.warn('Notifica non inviata:', e);
+              }
+            } else if (perm === 'denied') {
+              alert('Hai bloccato le notifiche per questo sito. Puoi riattivarle dalle impostazioni del browser.');
+            }
+          });
+        }
+      }
+    })();
   </script>
+
+
+  <noscript><style>#rl-loader{display:none!important}</style></noscript>
 </body>
 </html>
-
