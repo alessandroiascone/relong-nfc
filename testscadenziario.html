@@ -297,8 +297,9 @@
       <div class="toolbar">
         <button id="toggleFilters" class="toggle">Filtri</button>
         <input id="searchInput" placeholder="Cerca nome o telefono" />
-        <!-- 🔥 Nuovo bottone bonus globale Fidelity -->
         <button id="bonusAll" class="toggle">Bonus Fidelity (tutti)</button>
+        <!-- 🔥 Nuovo bottone: genera Fidelity mancante -->
+        <button id="generateMissing" class="toggle">Genera Fidelity mancanti</button>
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -684,7 +685,7 @@ ${cardUrl}`;
       if(k==='riparazione') $('#acceptWrap').style.display = on? 'block':'none';
       b.classList.toggle('active',on);
       if(on) activeSet.add(k); else activeSet.delete(k);
-      updateInsertState(); // aggiorna stato tasto/pillola quando cambi operazioni
+      updateInsertState();
     });
 
     const typeSel = document.getElementById('a_type');
@@ -716,7 +717,6 @@ ${cardUrl}`;
     function findByPhone(p){ const np=normalizePhone(p); return items.find(x=>normalizePhone(x.phone)===np); }
     function findByName(n){ const nn=normalizeName(n); return items.find(x=>normalizeName(x.name)===nn); }
 
-    // controllo anche che ci sia almeno 1 operazione selezionata
     function canInsert(){
       const n = (nameInput.value||'').trim();
       const p = normalizePhone(phoneInput.value||'');
@@ -851,6 +851,7 @@ ${cardUrl}`;
     const searchInput = document.getElementById('searchInput');
     const filterSummary = document.getElementById('filterSummary');
     const bonusAllBtn = document.getElementById('bonusAll');
+    const generateMissingBtn = document.getElementById('generateMissing');
 
     toggleFiltersBtn.addEventListener('click', ()=>{
       const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
@@ -879,7 +880,6 @@ ${cardUrl}`;
       });
     }
 
-    // 🔥 Bonus globale Fidelity
     if(bonusAllBtn){
       bonusAllBtn.addEventListener('click', async ()=>{
         if(!items.length){
@@ -907,6 +907,35 @@ ${cardUrl}`;
         const ok = await saveToGitHub();
         render();
         showToast(`Bonus Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
+      });
+    }
+
+    // 🔥 Genera Fidelity mancanti = assegna 20 pt solo a chi non ce l'ha / 0
+    if(generateMissingBtn){
+      generateMissingBtn.addEventListener('click', async ()=>{
+        if(!items.length){
+          alert('Non ci sono clienti in elenco.');
+          return;
+        }
+        let modified = 0;
+        items.forEach(it=>{
+          let curr = it.points;
+          let num = Number(curr);
+          const isMissing = (curr == null || curr === '' || isNaN(num) || num <= 0);
+          if(isMissing){
+            it.points = 20;
+            it.updatedAt = new Date().toISOString();
+            modified++;
+          }
+        });
+        if(!modified){
+          showToast('Tutti i clienti hanno già una Fidelity attiva ✅');
+          return;
+        }
+        saveLocal();
+        const ok = await saveToGitHub();
+        render();
+        showToast(`Fidelity creata per ${modified} clienti senza card ✅`, ok ? 'ok' : 'err');
       });
     }
 
