@@ -2,617 +2,165 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Re Long Informatica, Telefonia, Energia & Assistenza PC</title>
-
-  <!-- META SEO / SOCIAL -->
   <meta name="description" content="Hub Re Long: Smartphone a rate senza busta paga, offerte Business, Energia Casa e Assistenza PC. Marano di Napoli. Tel 08119578844.">
   <meta name="theme-color" content="#0a0a0a">
 
+  <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Re Long Informatica – Telefonia, Energia & Assistenza PC">
-  <meta property="og:description" content="Smartphone a rate, Offerte Business, Energia Casa, Fidelity Card e Gestionale Clienti. Tel: 08119578844.">
+  <meta property="og:description" content="Smartphone a rate, Offerte Business, Energia Casa e Assistenza PC. Tel: 08119578844.">
   <meta property="og:url" content="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
+  <meta property="og:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Re Long Informatica">
+  <meta name="twitter:description" content="Smartphone a rate, Energia, Business, Assistenza PC.">
+  <meta name="twitter:image" content="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
 
-  <!-- PWA -->
+  <!-- SEO extras -->
+  <link rel="canonical" href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://alessandroiascone.github.io/relong-nfc/og-cover.jpg">
+
+  <!-- Favicon inline -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='56' fill='%230a0a0a'/%3E%3Cpath d='M60 176l68-96l68 96' fill='none' stroke='%23ff3b1a' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='128' cy='96' r='14' fill='%23ff9a1a'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://wa.me">
+  <link rel="preconnect" href="https://maps.app.goo.gl">
+  <link rel="preconnect" href="https://www.google.com">
+  <link rel="dns-prefetch" href="https://alessandroiascone.github.io">
+  <link rel="prefetch" href="./catalogo-smartphone-reale-v3.html" as="document" crossorigin>
+
+  <!-- 🔹 AGGIUNTA PWA: manifest -->
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
     :root{
-      --bg1:#05060a;
-      --bg2:#0b0d12;
-      --card:rgba(14,16,22,.94);
-      --stroke:rgba(255,255,255,.08);
-      --elec:#0aa2ff;
-      --accent:#ff3b30;
-      --ok:#25D366;
-      --muted:rgba(210,220,255,.75);
+      --bg1:#0a0a0a;--bg2:#000;--brand1:#ff0000;--brand2:#ff7b00;
+      --muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.5);
+      --card:rgba(20,20,20,.94);--stroke:rgba(255,255,255,.08);
+      --wa1:#25D366;--wa2:#128C7E;--focus:#ffd166;
+      --seasonbar-h:96px;
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+    @keyframes fadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:12px}
+
+    /* Loader */
+    #rl-loader{
+      position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+      background:radial-gradient(circle at 20% 20%, var(--bg1) 0%, var(--bg2) 70%);
+      transition:opacity .45s ease, visibility .45s ease;
+      animation: loaderAutoHide 0s linear 3.2s forwards;
+    }
+    #rl-loader.hidden{opacity:0;visibility:hidden}
+    .rl-loading-text{margin-top:18px;font:700 12px/1.2 system-ui,-apple-system,Inter,Roboto,sans-serif;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase}
+    .rl-cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;animation:rl-rotate 2.6s linear infinite;filter:drop-shadow(0 16px 42px rgba(255,90,0,.35))}
+    .rl-cube .face{position:absolute;inset:0;background:linear-gradient(135deg,var(--brand1),var(--brand2));border:1px solid rgba(255,255,255,.12);border-radius:10px;opacity:.96}
+    .rl-cube .f1{transform:translateZ(42px)} .rl-cube .f2{transform:rotateY(180deg) translateZ(42px)}
+    .rl-cube .f3{transform:rotateY(90deg) translateZ(42px)} .rl-cube .f4{transform:rotateY(-90deg) translateZ(42px)}
+    .rl-cube .f5{transform:rotateX(90deg) translateZ(42px)} .rl-cube .f6{transform:rotateX(-90deg) translateZ(42px)}
+    @keyframes rl-rotate{0%{transform:rotateX(-18deg) rotateY(0)}50%{transform:rotateX(18deg) rotateY(180deg)}100%{transform:rotateX(-18deg) rotateY(360deg)}}
+    @keyframes loaderAutoHide {to{opacity:0;visibility:hidden}}
+
+    body{
+      font-family:system-ui,-apple-system,Inter,Roboto,sans-serif;
+      background:radial-gradient(circle at 20% 20%,var(--bg1) 0%, var(--bg2) 70%);
+      color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow-x:hidden
+    }
+    body::before{
+      content:"";position:fixed;inset:auto;left:50%;top:40%;
+      transform:translateX(-50%);width:1200px;height:1200px;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,120,0,.12) 0%, rgba(255,120,0,0) 60%);
+      filter:blur(6px);pointer-events:none;z-index:0
+    }
+    .wrap{width:100%;max-width:920px;display:grid;gap:22px;padding-bottom:110px;position:relative;z-index:1}
+    @media(max-width:480px){.wrap{padding-bottom:130px}}
+
+    .head{text-align:center;padding:8px 8px 0 8px}
+    .brand{display:inline-flex;gap:10px;align-items:center;font-size:24px;font-weight:900;letter-spacing:-.04em;animation:fadeUp .5s ease both}
+    .brand .logo{width:24px;height:24px;display:inline-block}
+    .sub{font-size:12px;color:var(--muted);margin-top:4px;animation:fadeUp .6s ease both}
+
+    .hero{margin-top:4px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;position:relative}
+    .hero h1{font-size:18px;font-weight:900;letter-spacing:-.01em}
+    .hero p{font-size:13px;color:var(--muted)}
+    .hero .line{width:86%;max-width:560px;height:1px;background:linear-gradient(90deg,transparent,#ff7b00 40%,#ff0000 60%,transparent);opacity:.35;border-radius:999px}
+    .hero::after{
+      content:""; position:absolute; top:-40px; width:60%; height:120px; max-width:560px;
+      background:radial-gradient(ellipse at center, rgba(255,120,0,.16) 0%, rgba(0,0,0,0) 70%);
+      filter:blur(10px); pointer-events:none;
     }
 
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at top, rgba(255,59,48,.18) 0, transparent 55%),
-                  radial-gradient(circle at bottom, rgba(10,162,255,.24) 0, transparent 60%),
-                  linear-gradient(145deg, var(--bg1), var(--bg2));
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      color: #f7f9ff;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
+    /* Griglia */
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:720px){.grid{grid-template-columns: 1fr 1fr}}
+    @media(min-width:1024px){.grid{grid-template-columns: 1fr 1fr 1fr}}
+
+    /* Card */
+    .card{
+      position:relative;background:linear-gradient(150deg,var(--card) 0%,rgba(0,0,0,.6) 100%);
+      border:1px solid var(--stroke);border-radius:18px;padding:18px;
+      box-shadow:0 24px 56px rgba(0,0,0,.85),0 0 60px rgba(255,0,0,.14);
+      display:flex;flex-direction:column;gap:10px;
+      transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, filter .28s ease;
+      transform-style:preserve-3d;
+      will-change:transform;
+    }
+    .card[data-anim]{opacity:0;transform:translateY(18px)}
+    .card.in{opacity:1;transform:none;animation:fadeUp .6s ease both}
+    .card:hover{transform:perspective(900px) rotateX(2deg) rotateY(-2deg) translateZ(6px);box-shadow:0 36px 84px rgba(0,0,0,.92), 0 0 90px rgba(255,59,0,.22);border-color:rgba(255,255,255,.18)}
+
+    .badge{
+      position:absolute;top:-11px;left:14px;color:#000;font-size:11px;font-weight:800;
+      padding:6px 10px;border-radius:999px;box-shadow:0 10px 18px rgba(255,80,0,.45);
+      animation:pulse 2.2s ease-in-out infinite;border:1px solid rgba(0,0,0,.06);z-index:2
+    }
+    article.card:nth-of-type(1) .badge{background:linear-gradient(90deg,#ff2a2a,#ffd166)}
+    article.card:nth-of-type(2) .badge{background:linear-gradient(90deg,#00b4d8,#0077b6)}
+    article.card:nth-of-type(3) .badge{background:linear-gradient(90deg,#ffd166,#ffb703)}
+    article.card:nth-of-type(4) .badge{background:linear-gradient(90deg,#a78bfa,#7c3aed)}
+
+    #biz-mobile .badge{
+      background:linear-gradient(90deg,#10B981,#84CC16);
+      box-shadow:0 10px 22px rgba(16,185,129,.55);
+      color:#042;
+      border:1px solid rgba(0,0,0,.08);
     }
 
-    .app-shell{
-      width: 100%;
-      max-width: 540px;
-      padding: 18px 16px 90px;
-      margin: 0 auto;
+    /* Badge oro Fidelity Card */
+    #fidelity-card .badge{
+      background:linear-gradient(90deg,#facc15,#f97316);
+      color:#3b2500;
+      box-shadow:0 10px 22px rgba(250,204,21,.65);
+      border:1px solid rgba(0,0,0,.08);
     }
 
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:12px;
+    .title{font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
+    .title .ico{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:1.1em}
+    .desc{font-size:13px;color:var(--muted);line-height:1.45}
+
+    /* CTA principale */
+    .btn{
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none; text-align:center; width:100%;
+      padding:14px 18px; border-radius:16px;
+      font-size:15.5px; font-weight:900; letter-spacing:.2px; color:#000;
+      background:linear-gradient(90deg,var(--brand1),var(--brand2));
+      box-shadow:0 18px 36px rgba(255,90,0,.38), 0 0 0 1px rgba(0,0,0,.2) inset;
+      transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+      transform-style:preserve-3d; position:relative; overflow:hidden;
     }
-
-    .logo-wrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    .btn::after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.45) 45%, rgba(255,255,255,0) 70%);
+      transform:translateX(-120%);
     }
+    .btn:hover{ transform:perspective(700px) translateZ(12px) scale(1.03) rotateX(1.5deg); box-shadow:0 28px 54px rgba(255,90,0,.55), 0 0 0 1px rgba(0,0,0,.26) inset; filter:brightness(1.05) }
+    .btn:hover::after{ animation:sheenMove .9s ease forwards }
+    @keyframes sheenMove { to{ transform:translateX(120%); } }
 
-    .logo-circle{
-      width:38px;
-      height:38px;
-      border-radius:14px;
-      background: radial-gradient(circle at 30% 0, #fff 0, #ffe4e2 18%, #ff3b30 55%, #8b0000 100%);
-      box-shadow:0 0 18px rgba(255,59,48,.6);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      font-size:18px;
-      color:#fff;
-    }
-
-    .brand-title{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-
-    .brand-title span:first-child{
-      font-size:16px;
-      font-weight:700;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-
-    .brand-title span:last-child{
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .tag-pill{
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:radial-gradient(circle at 0 0, rgba(10,162,255,.4), transparent 55%);
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:var(--muted);
-    }
-
-    .hero-card{
-      margin-top:10px;
-      padding:16px 14px 14px;
-      border-radius:22px;
-      border:1px solid var(--stroke);
-      background:
-        radial-gradient(circle at 0 0, rgba(10,162,255,.24), transparent 55%),
-        radial-gradient(circle at 100% 0, rgba(255,59,48,.18), transparent 55%),
-        var(--card);
-      box-shadow:0 22px 55px rgba(0,0,0,.7);
-    }
-
-    .hero-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:10px;
-    }
-
-    .hero-text h1{
-      font-size:20px;
-      line-height:1.2;
-      margin-bottom:6px;
-    }
-
-    .hero-text p{
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .points-chip{
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.22);
-      font-size:11px;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      text-align:right;
-    }
-
-    .points-chip span:first-child{
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.1em;
-      color:var(--muted);
-    }
-
-    .points-chip span:last-child{
-      font-size:13px;
-      font-weight:700;
-      color:#fff;
-    }
-
-    .hero-bottom{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-top:4px;
-    }
-
-    .hero-pill{
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .hero-pill strong{
-      color:#fff;
-    }
-
-    .whatsapp-mini{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-size:11px;
-      cursor:pointer;
-      text-decoration:none;
-      color:#e4ffe9;
-    }
-
-    .whatsapp-dot{
-      width:18px;
-      height:18px;
-      border-radius:999px;
-      background:#25D366;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:11px;
-      box-shadow:0 0 12px rgba(37,211,102,.7);
-    }
-
-    /* ROTAZIONE OFFERTE */
-    .offers-card{
-      margin-top:14px;
-      padding:14px 12px;
-      border-radius:20px;
-      border:1px solid var(--stroke);
-      background:linear-gradient(135deg, rgba(10,162,255,.22), rgba(6,7,11,.95));
-    }
-
-    .offers-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:8px;
-    }
-
-    .offers-header span{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.1em;
-      color:var(--muted);
-    }
-
-    .offers-badge{
-      padding:4px 9px;
-      border-radius:999px;
-      font-size:10px;
-      background:rgba(0,0,0,.6);
-      border:1px solid rgba(255,255,255,.22);
-      color:#ffd9d6;
-    }
-
-    .offer-main{
-      min-height:54px;
-      transition:opacity .4s ease, transform .4s ease;
-    }
-
-    .offer-title{
-      font-size:15px;
-      font-weight:700;
-      margin-bottom:2px;
-    }
-
-    .offer-text{
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .offer-meta{
-      margin-top:6px;
-      font-size:10px;
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-    }
-
-    .offer-main.fade{
-      opacity:0;
-      transform:translateY(4px);
-    }
-
-    /* PULSANTI AZIONE */
-    .cta-grid{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .btn-cta{
-      border:none;
-      border-radius:16px;
-      padding:12px 10px;
-      font-size:13px;
-      font-weight:600;
-      cursor:pointer;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      background:linear-gradient(135deg,#ff3b30,#b31217);
-      color:#fff;
-      box-shadow:0 10px 26px rgba(255,59,48,.55);
-    }
-
-    .btn-cta.secondary{
-      background:linear-gradient(135deg,#0aa2ff,#005bea);
-      box-shadow:0 10px 26px rgba(10,162,255,.55);
-    }
-
-    .btn-cta.whatsapp{
-      grid-column:1/3;
-      background:linear-gradient(135deg,#25D366,#128C7E);
-      box-shadow:0 10px 26px rgba(37,211,102,.6);
-      font-size:14px;
-    }
-
-    /* NOTIFICHE */
-    .notify-card{
-      margin-top:14px;
-      padding:12px 11px;
-      border-radius:18px;
-      border:1px dashed rgba(255,255,255,.25);
-      background:rgba(0,0,0,.55);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-    }
-
-    .notify-text{
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .notify-text strong{
-      color:#fff;
-    }
-
-    .notify-btn{
-      border:none;
-      border-radius:999px;
-      padding:7px 12px;
-      font-size:11px;
-      font-weight:600;
-      cursor:pointer;
-      background:rgba(10,162,255,.18);
-      color:#fff;
-      border:1px solid rgba(10,162,255,.6);
-      white-space:nowrap;
-    }
-
-    /* BANNER "AGGIUNGI ALLA HOME" */
-    .install-banner{
-      position:fixed;
-      left:10px;
-      right:10px;
-      bottom:10px;
-      padding:10px 11px;
-      border-radius:18px;
-      background:rgba(3,3,8,.96);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 18px 40px rgba(0,0,0,.9);
-      display:none;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      z-index:20;
-    }
-
-    .install-text{
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .install-text strong{
-      color:#fff;
-    }
-
-    .install-actions{
-      display:flex;
-      gap:6px;
-    }
-
-    .install-actions button{
-      border:none;
-      border-radius:999px;
-      padding:7px 10px;
-      font-size:11px;
-      font-weight:600;
-      cursor:pointer;
-    }
-
-    .btn-install{
-      background:#ff3b30;
-      color:#fff;
-    }
-
-    .btn-later{
-      background:transparent;
-      color:var(--muted);
-      border:1px solid rgba(255,255,255,.3);
-    }
-
-    @media (min-width:600px){
-      .app-shell{
-        padding-top:26px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="app-shell">
-    <header>
-      <div class="logo-wrap">
-        <div class="logo-circle">R</div>
-        <div class="brand-title">
-          <span>Re Long Informatica</span>
-          <span>Telefonia • Energia • Assistenza PC</span>
-        </div>
-      </div>
-      <div class="tag-pill">Hub Digitale NFC</div>
-    </header>
-
-    <!-- HERO / FIDELITY / INTRO -->
-    <section class="hero-card">
-      <div class="hero-top">
-        <div class="hero-text">
-          <h1>Smartphone a rate, offerte e Fidelity in un unico Hub.</h1>
-          <p>Accedi al catalogo, al gestionale, alla Fidelity Card e alle promo energia direttamente da qui.</p>
-        </div>
-        <div class="points-chip">
-          <span>Fidelity Card</span>
-          <span>Raccogli punti, porta un amico, sblocca omaggi.</span>
-        </div>
-      </div>
-      <div class="hero-bottom">
-        <div class="hero-pill">
-          Sempre attivo per <strong>Marano di Napoli</strong> e dintorni.
-        </div>
-        <a class="whatsapp-mini" href="https://wa.me/3908119578844" target="_blank" rel="noopener">
-          <div class="whatsapp-dot">W</div>
-          <span>WhatsApp dedicato</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- ROTAZIONE OFFERTE -->
-    <section class="offers-card">
-      <div class="offers-header">
-        <span>Offerta in evidenza</span>
-        <div class="offers-badge" id="offerBadge">Flash Promo</div>
-      </div>
-      <div class="offer-main" id="offerMain">
-        <div class="offer-title" id="offerTitle"></div>
-        <div class="offer-text" id="offerText"></div>
-        <div class="offer-meta">
-          <span id="offerTag"></span>
-          <span>Scorri, scopri, passa in negozio.</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA PRINCIPALI -->
-    <section class="cta-grid">
-      <a class="btn-cta" href="catalogo-smartphone-reale-v3.html">
-        📱 Catalogo Smartphone
-      </a>
-      <a class="btn-cta secondary" href="scadenziario_v32b.html">
-        📊 Gestionale & Promemoria
-      </a>
-      <a class="btn-cta whatsapp" href="https://wa.me/3908119578844" target="_blank" rel="noopener">
-        💬 Scrivici su WhatsApp
-      </a>
-    </section>
-
-    <!-- NOTIFICHE OFFERTE -->
-    <section class="notify-card">
-      <div class="notify-text">
-        <strong>Non perderti le promo lampo.</strong><br>
-        Attiva le notifiche per offerte smartphone, Fidelity e energia. Niente spam, solo occasioni serie.
-      </div>
-      <button class="notify-btn" id="enableNotifBtn">Attiva notifiche</button>
-    </section>
-  </div>
-
-  <!-- BANNER "AGGIUNGI ALLA HOME" -->
-  <div class="install-banner" id="installBanner">
-    <div class="install-text">
-      <strong>Installa Re Long Hub</strong><br>
-      Aggiungi l’app alla schermata Home per avere catalogo, gestionale e Fidelity sempre a 1 tap.
-    </div>
-    <div class="install-actions">
-      <button class="btn-later" id="btnLater">Più tardi</button>
-      <button class="btn-install" id="btnInstall">Installa ora</button>
-    </div>
-  </div>
-
-  <script>
-    // 🌟 ROTAZIONE OFFERTE
-    const offers = [
-      {
-        title: "Smartphone a rate senza busta paga.",
-        text: "Vodafone • Wind3 • Compass. Blocca il tuo smartphone top di gamma senza anticipo e con consulenza completa in negozio.",
-        tag: "Finanziamenti smart",
-        badge: "Re Long Special"
-      },
-      {
-        title: "Porta un amico, raddoppi i vantaggi.",
-        text: "Con la Fidelity raccogli punti anche presentando un amico: sblocca omaggi, sconti su accessori e promo dedicate.",
-        tag: "Fidelity & Referral",
-        badge: "Fidelity Card"
-      },
-      {
-        title: "Luce & Gas: bollette sotto controllo.",
-        text: "Simulatore energia dedicato: confrontiamo insieme le offerte e ti aiutiamo a risparmiare in modo trasparente.",
-        tag: "Energia Casa & Business",
-        badge: "Check bolletta"
-      },
-      {
-        title: "Assistenza PC & Console con reminder WhatsApp.",
-        text: "Ritiro, diagnosi, preventivo e reminder automatici: sai sempre a che punto è la tua riparazione.",
-        tag: "Laboratorio Re Long",
-        badge: "Servizio Premium"
-      }
-    ];
-
-    let offerIndex = 0;
-    const offerTitle = document.getElementById("offerTitle");
-    const offerText = document.getElementById("offerText");
-    const offerTag = document.getElementById("offerTag");
-    const offerBadge = document.getElementById("offerBadge");
-    const offerMain = document.getElementById("offerMain");
-
-    function renderOffer(index){
-      const off = offers[index];
-      if(!off) return;
-      offerMain.classList.add("fade");
-      setTimeout(() => {
-        offerTitle.textContent = off.title;
-        offerText.textContent = off.text;
-        offerTag.textContent = off.tag;
-        offerBadge.textContent = off.badge;
-        offerMain.classList.remove("fade");
-      }, 250);
-    }
-
-    renderOffer(offerIndex);
-    setInterval(() => {
-      offerIndex = (offerIndex + 1) % offers.length;
-      renderOffer(offerIndex);
-    }, 6000);
-
-    // 📲 BANNER "AGGIUNGI ALLA HOME"
-    let deferredPrompt = null;
-    const installBanner = document.getElementById("installBanner");
-    const btnInstall = document.getElementById("btnInstall");
-    const btnLater = document.getElementById("btnLater");
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (!localStorage.getItem("relong_install_dismissed")) {
-        installBanner.style.display = "flex";
-      }
-    });
-
-    if (btnInstall) {
-      btnInstall.addEventListener("click", async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBanner.style.display = "none";
-        if (choice.outcome === "dismissed") {
-          localStorage.setItem("relong_install_dismissed", "1");
-        }
-      });
-    }
-
-    if (btnLater) {
-      btnLater.addEventListener("click", () => {
-        installBanner.style.display = "none";
-        localStorage.setItem("relong_install_dismissed", "1");
-      });
-    }
-
-    // 🔔 NOTIFICHE (BASE)
-    const notifBtn = document.getElementById("enableNotifBtn");
-
-    async function enableNotifications(){
-      if (!("Notification" in window)) {
-        alert("Le notifiche non sono supportate su questo dispositivo.");
-        return;
-      }
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        localStorage.setItem("relong_notif_enabled", "1");
-        if ("serviceWorker" in navigator) {
-          const reg = await navigator.serviceWorker.ready;
-          reg.showNotification("Re Long attivato ✅", {
-            body: "Riceverai gli aggiornamenti sulle offerte più interessanti.",
-            icon: "icons/icon-192.png",
-            badge: "icons/icon-192.png",
-            data: { url: "/relong-nfc/relong-hub-v2.html" }
-          });
-        }
-      } else {
-        localStorage.setItem("relong_notif_enabled", "0");
-      }
-    }
-
-    if (notifBtn) {
-      notifBtn.addEventListener("click", enableNotifications);
-    }
-
-    // 🛠 REGISTRAZIONE SERVICE WORKER PWA
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/relong-nfc/sw.js")
-          .catch(err => console.log("SW registration failed:", err));
-      });
-    }
-  </script>
-</body>
-</html>
+    .footer{text-align:center;color:var(--muted2);f
