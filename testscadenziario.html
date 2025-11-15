@@ -184,14 +184,16 @@
       font-size:12px;
       color:var(--muted);
       display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      align-items:center;
+      flex-direction:column;
+      gap:4px;
+      align-items:flex-start;
     }
     .svc-radar-label{
       font-weight:600;
       margin-right:4px;
     }
+
+    /* Tag vecchi (li lasciamo ma non li usiamo più per i remind) */
     .svc-radar-tag{
       padding:3px 8px;
       border-radius:999px;
@@ -211,6 +213,51 @@
       border-color:rgba(0,140,255,.8);
       background:radial-gradient(circle at 0 0,rgba(0,140,255,.32),rgba(0,0,0,.9));
       color:#eaf4ff;
+    }
+
+    /* ---- Radar servizi pillole nuove ---- */
+    .radar-pills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:4px;
+    }
+    .radar-pill{
+      padding:8px 13px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.17);
+      background:linear-gradient(135deg,var(--elec2),var(--elec3));
+      color:#020308;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      transition:.22s ease;
+      box-shadow:0 0 9px rgba(10,162,255,.45);
+    }
+    .radar-pill.radar-warning{
+      background:linear-gradient(135deg,#fff4c2,#ffb347);
+      color:#3a2600;
+      box-shadow:0 0 12px rgba(255,215,0,.7);
+      border-color:rgba(255,215,0,.9);
+    }
+    .radar-pill.radar-danger{
+      background:linear-gradient(135deg,#ff8684,var(--danger));
+      color:#140103;
+      border-color:rgba(255,255,255,.2);
+      box-shadow:0 0 12px rgba(255,77,79,.9);
+    }
+    .radar-pill.radar-ok{
+      background:linear-gradient(135deg,#7cf2a3,var(--ok));
+      color:#021107;
+      border-color:rgba(255,255,255,.23);
+      box-shadow:0 0 12px rgba(37,211,102,.9);
+    }
+
+    /* Nasconde la data "Creato il..." sotto i servizi */
+    .meta-created{
+      display:none !important;
     }
 
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
@@ -270,6 +317,15 @@
       gap:10px;
       flex-wrap:wrap;
       margin-top:10px;
+    }
+    .fid-actions .btn{
+      border-radius:999px;
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-size:13px;
     }
     .fid-btn-main{
       background:linear-gradient(135deg,#ffcf40,#ff9b1a);
@@ -627,7 +683,6 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
-    // (Ancora presente se in futuro serve, ma non lo mostriamo più a schermo)
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -792,6 +847,7 @@ ${cardUrl}`;
 
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
+    const RADAR_WARNING_DAYS = 3; // giorni prima per pillola gialla
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
 
     const complementByKey={
@@ -849,6 +905,71 @@ ${cardUrl}`;
         case 'followup':    return waPacchiMemo(it.name,it.phone);
         default:            return waPacchiMemo(it.name,it.phone);
       }
+    }
+
+    // ---- RADAR: colori pillole in base a data/sent ----
+    function parseISODate(str){
+      if(!str) return null;
+      const [y,m,d] = str.split('-').map(Number);
+      if(!y||!m||!d) return null;
+      const dt=new Date(y, m-1, d);
+      dt.setHours(0,0,0,0);
+      return dt;
+    }
+
+    function updateRadarPillColors(){
+      const today = startOfDay(new Date());
+      $$('.radar-pill').forEach(pill=>{
+        pill.classList.remove('radar-warning','radar-danger','radar-ok');
+        const sent = pill.dataset.remSent === '1';
+        if(sent){
+          pill.classList.add('radar-ok');
+          return;
+        }
+        const dateStr = pill.dataset.remDate;
+        const due = parseISODate(dateStr);
+        if(!due) return;
+        const diffMs = due.getTime() - today.getTime();
+        const diffDays = Math.round(diffMs / 86400000);
+        if(diffDays <= 0){
+          pill.classList.add('radar-danger');
+        }else if(diffDays <= RADAR_WARNING_DAYS){
+          pill.classList.add('radar-warning');
+        }
+      });
+    }
+
+    function setupRadarClicks(){
+      $$('.radar-pill').forEach(pill=>{
+        pill.addEventListener('click', ()=>{
+          const clientId = pill.dataset.clientId;
+          const service  = (pill.dataset.service || '').toLowerCase();
+          if(!clientId || !service) return;
+
+          const it = items.find(x=>x.id===clientId);
+          if(!it) return;
+
+          ensureReminders(it);
+          const rem = (it.reminders||[]).find(r=>r.type===service);
+          if(!rem){
+            return;
+          }
+
+          // Apri WhatsApp con messaggio dedicato al servizio
+          try{
+            const link = reminderLink(it, rem);
+            window.open(link,'_blank','noopener');
+          }catch(e){}
+
+          // Segna reminder come inviato -> pillola verde
+          rem.sent = true;
+          rem.sentAt = new Date().toISOString();
+          it.updatedAt = new Date().toISOString();
+          saveLocal();
+          saveToGitHub();
+          render();
+        }, { once:false });
+      });
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -1099,42 +1220,52 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
       const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
 
-    // Radar servizi = servizi proponibili (cliccabili) in base a servizi attivi
+    // Radar servizi a pillole per SIM / Fisso / Energia / Rate
     function appendQuickWA(actions, it){
-      const radar = document.createElement('div');
-      radar.className = 'svc-radar';
+      ensureReminders(it);
+
+      const radar=document.createElement('div');
+      radar.className='svc-radar';
+
       const lbl=document.createElement('span');
       lbl.className='svc-radar-label';
       lbl.textContent='Radar servizi:';
       radar.appendChild(lbl);
 
-      const services = [
-        { key:'sim',        label:'SIM',          icon:'📶', link:()=>waPacchiSIM(it.name,it.phone) },
-        { key:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡', link:()=>waPacchiFisso(it.name,it.phone) },
-        { key:'energia',    label:'Energia',      icon:'⚡',   link:()=>waPacchiEnergia(it.name,it.phone) },
-        { key:'rate',       label:'Rate',         icon:'📱',   link:()=>waPacchiRate(it.name,it.phone) }
-      ];
-      const actSet = new Set(it.activated || []);
+      const pillsWrap=document.createElement('div');
+      pillsWrap.className='radar-pills';
 
-      services.forEach(s=>{
-        const t=document.createElement('span');
-        const isActive = actSet.has(s.key);
-        t.className='svc-radar-tag ' + (isActive ? 'off':'on');
-        t.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
-        if(!isActive){
-          t.style.cursor='pointer';
-          t.title='Clicca per proporre '+s.label;
-          t.addEventListener('click', ()=>{
-            try{
-              window.open(s.link(),'_blank','noopener');
-            }catch{}
-          });
-        } else {
-          t.title='Già attivo su questo cliente';
-        }
-        radar.appendChild(t);
+      const byType={};
+      (it.reminders||[]).forEach(r=>{
+        if(!byType[r.type]) byType[r.type]=r;
       });
 
+      const defs=[
+        { type:'sim',        label:'SIM',          icon:'📶' },
+        { type:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡' },
+        { type:'energia',    label:'Energia',      icon:'⚡' },
+        { type:'rate',       label:'Rate',         icon:'📱' }
+      ];
+
+      defs.forEach(def=>{
+        const rem = byType[def.type];
+        if(!rem) return;
+        const d = new Date(rem.dueAt || it.createdAt || Date.now());
+        const iso = d.toISOString().slice(0,10);
+
+        const pill=document.createElement('button');
+        pill.type='button';
+        pill.className='radar-pill';
+        pill.dataset.clientId = it.id;
+        pill.dataset.service  = def.type;
+        pill.dataset.remDate  = iso;
+        pill.dataset.remSent  = rem.sent ? '1':'0';
+        pill.textContent = `${def.icon} ${def.label}`;
+
+        pillsWrap.appendChild(pill);
+      });
+
+      radar.appendChild(pillsWrap);
       actions.appendChild(radar);
     }
 
@@ -1245,6 +1376,8 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
 
       arr.forEach(it=>{
         ensureBaseFields(it);
+        ensureReminders(it);
+
         const clone=document.getElementById('tpl').content.firstElementChild.cloneNode(true);
         const head=clone.querySelector('.head');
         const details=clone.querySelector('.details');
@@ -1366,7 +1499,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         }
 
         const createdInfo=document.createElement('span');
-        createdInfo.className='label';
+        createdInfo.className='label meta-created';
         createdInfo.textContent=`Creato il ${fmt(it.createdAt||new Date())}`;
         services.appendChild(createdInfo);
 
@@ -1377,7 +1510,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           services.appendChild(pacchiBadge);
         }
 
-        // Radar servizi proponibili (clic + WhatsApp precompilato)
+        // Radar servizi a pillole
         appendQuickWA(actions, it);
 
         if(it.acceptance){
@@ -1475,7 +1608,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         const bAddPts = document.createElement('button');
         bAddPts.type='button';
         bAddPts.className='btn fid-btn-main';
-        bAddPts.textContent='+ Punti Fidelity';
+        bAddPts.innerHTML='⭐ + Punti Fidelity';
         bAddPts.addEventListener('click', ()=>{
           const val = prompt('Quanti punti vuoi aggiungere/sottrarre? (es. 10 o -20)');
           if(val===null) return;
@@ -1492,7 +1625,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         const bSendCard = document.createElement('button');
         bSendCard.type='button';
         bSendCard.className='btn fid-btn-ghost';
-        bSendCard.textContent='Invia Fidelity Card';
+        bSendCard.innerHTML='📲 Invia Fidelity Card';
         bSendCard.addEventListener('click', ()=>{
           try{
             window.open(waWelcomeWithCard(it),'_blank','noopener');
@@ -1502,7 +1635,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         const bOpenCard = document.createElement('button');
         bOpenCard.type='button';
         bOpenCard.className='btn fid-btn-ghost';
-        bOpenCard.textContent='Apri Fidelity Card';
+        bOpenCard.innerHTML='💳 Apri Fidelity Card';
         bOpenCard.addEventListener('click', ()=>{
           const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
           window.open(url,'_blank','noopener');
@@ -1545,33 +1678,8 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           points.appendChild(boxPts);
         }
 
-        // Reminder con messaggi WA precompilati per tipo
-        if(it.reminders && it.reminders.length){
-          const today=startOfDay(new Date());
-          const dueToday=it.reminders.filter(r=>{
-            if(r.sent) return false;
-            const d=startOfDay(new Date(r.dueAt));
-            return d.getTime()===today.getTime();
-          });
-          if(dueToday.length){
-            const w=document.createElement('div');
-            w.className='r-line';
-            dueToday.forEach(rem=>{
-              const b=document.createElement('a');
-              b.href=reminderLink(it, rem);
-              b.target='_blank';
-              b.rel='noopener';
-              b.className='wa-btn ok';
-              b.textContent=`Invia reminder ${typeLabel[rem.type]||rem.type}`;
-              b.addEventListener('click',()=>{
-                rem.sent=true; rem.sentAt=new Date().toISOString();
-                it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
-              });
-              w.appendChild(b);
-            });
-            reminders.appendChild(w);
-          }
-        }
+        // (Vecchio blocco "Invia reminder" sostituito dal radar pillole)
+        // reminders rimane vuoto, lo teniamo solo come struttura.
 
         if(it.postReviewAt){
           const should = new Date(it.postReviewAt)<=new Date() && !it.postReviewSent;
@@ -1599,6 +1707,8 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
       });
 
       updateDashboard();
+      updateRadarPillColors();
+      setupRadarClicks();
     }
 
     const dashModal=document.getElementById('dashModal');
