@@ -302,7 +302,10 @@
       padding:14px 14px 15px;
     }
 
-    /* Header cliccabile delle sezioni */
+    /* Toggle sezioni con RADIO */
+    .section-toggle{
+      display:none;
+    }
     .section-header{
       width:100%;
       display:flex;
@@ -323,15 +326,15 @@
       font-size:14px;
       transition:transform .2s ease;
     }
-
     .section-body{
       margin-top:6px;
       display:none;
     }
-    .section.open .section-body{
+    /* quando il radio è checked, mostra il body */
+    .section-toggle:checked + .section-header + .section-body{
       display:block;
     }
-    .section.open .section-chevron{
+    .section-toggle:checked + .section-header .section-chevron{
       transform:rotate(180deg);
     }
 
@@ -614,12 +617,13 @@
       </div>
     </div>
 
-    <!-- SEZIONE PREMI (collassabile, aperta di default) -->
-    <div class="section open" id="rewardsSection">
-      <button class="section-header" type="button">
+    <!-- SEZIONE PREMI (radio, aperta di default) -->
+    <div class="section" id="rewardsSection">
+      <input type="radio" name="fidSection" id="secRewards" class="section-toggle" checked>
+      <label class="section-header" for="secRewards">
         <span class="section-title">Premi disponibili</span>
         <span class="section-chevron">▾</span>
-      </button>
+      </label>
       <div class="section-body" id="rewardsBody">
         <p>Ogni volta che raggiungi una soglia punti, puoi scegliere il premio corrispondente.</p>
         <div class="rewards-list" id="rewardsList"></div>
@@ -630,12 +634,13 @@
       </div>
     </div>
 
-    <!-- SEZIONE STORICO PUNTI (collassabile) -->
+    <!-- SEZIONE STORICO PUNTI (radio, nascosta finché non ci sono movimenti) -->
     <div class="section" id="historySection" style="display:none">
-      <button class="section-header" type="button">
+      <input type="radio" name="fidSection" id="secHistory" class="section-toggle">
+      <label class="section-header" for="secHistory">
         <span class="section-title">Storico movimenti punti</span>
         <span class="section-chevron">▾</span>
-      </button>
+      </label>
       <div class="section-body" id="historyBody">
         <p>
           Qui trovi tutti i punti caricati o scalati dalla tua Fidelity Card, con la motivazione associata.
@@ -699,12 +704,13 @@
       </p>
     </div>
 
-    <!-- SEZIONE MISSIONI (collassabile) -->
+    <!-- SEZIONE MISSIONI (radio, nascosta finché non ci sono missioni) -->
     <div class="section" id="missionsSection" style="display:none">
-      <button class="section-header" type="button">
+      <input type="radio" name="fidSection" id="secMissions" class="section-toggle">
+      <label class="section-header" for="secMissions">
         <span class="section-title">Missioni attive per te</span>
         <span class="section-chevron">▾</span>
-      </button>
+      </label>
       <div class="section-body" id="missionsBody">
         <p>
           Completa queste missioni per far crescere più velocemente i tuoi punti Fidelity.
@@ -716,7 +722,7 @@
 
     <div id="errorBox" class="error" style="display:none">
       Impossibile trovare i dati della tua Fidelity Card.<br/>
-      Contatta Re Long per attivare o verificare la tua card.
+      Contatta Re Long per attivare o verificare la card.
     </div>
   </div>
 
@@ -887,40 +893,6 @@
       window.open(url,"_blank","noopener");
     });
 
-    // Fisarmoniche semplici: solo una sezione aperta alla volta
-    function setupCollapsibles(){
-      const ids = ["rewardsSection","historySection","missionsSection"];
-
-      function openOnly(sectionToOpen){
-        ids.forEach(id=>{
-          const sec = document.getElementById(id);
-          if(!sec) return;
-          if(sec === sectionToOpen){
-            sec.classList.add("open");
-          }else{
-            sec.classList.remove("open");
-          }
-        });
-      }
-
-      ids.forEach(id=>{
-        const section = document.getElementById(id);
-        if(!section) return;
-        const header = section.querySelector(".section-header");
-        if(!header) return;
-
-        header.addEventListener("click",()=>{
-          const isOpen = section.classList.contains("open");
-          if(isOpen){
-            section.classList.remove("open"); // chiudi tutto se riclicchi
-          }else{
-            openOnly(section); // apri solo questa
-            section.scrollIntoView({behavior:"smooth", block:"start"});
-          }
-        });
-      });
-    }
-
     function renderMissions(item, points){
       missionsList.innerHTML = "";
       let missions = [];
@@ -1057,8 +1029,6 @@
     }
 
     async function init(){
-      setupCollapsibles(); // attivo le fisarmoniche
-
       if(!idParam){
         errorBox.style.display="block";
         cardInner.style.opacity=".4";
