@@ -887,24 +887,35 @@
       window.open(url,"_blank","noopener");
     });
 
-    // Fisarmoniche: solo una sezione aperta alla volta (Premi, Storico, Missioni)
+    // Fisarmoniche semplici: solo una sezione aperta alla volta
     function setupCollapsibles(){
-      const sections = Array.from(document.querySelectorAll(".section"));
-      const clickableSections = sections.filter(s => s.querySelector(".section-header"));
+      const ids = ["rewardsSection","historySection","missionsSection"];
 
-      clickableSections.forEach(section=>{
-        const btn = section.querySelector(".section-header");
-        if(!btn) return;
+      function openOnly(sectionToOpen){
+        ids.forEach(id=>{
+          const sec = document.getElementById(id);
+          if(!sec) return;
+          if(sec === sectionToOpen){
+            sec.classList.add("open");
+          }else{
+            sec.classList.remove("open");
+          }
+        });
+      }
 
-        btn.addEventListener("click",()=>{
+      ids.forEach(id=>{
+        const section = document.getElementById(id);
+        if(!section) return;
+        const header = section.querySelector(".section-header");
+        if(!header) return;
+
+        header.addEventListener("click",()=>{
           const isOpen = section.classList.contains("open");
-
-          // chiudi tutte
-          clickableSections.forEach(s=>s.classList.remove("open"));
-
-          // se quella cliccata non era aperta, aprila
-          if(!isOpen){
-            section.classList.add("open");
+          if(isOpen){
+            section.classList.remove("open"); // chiudi tutto se riclicchi
+          }else{
+            openOnly(section); // apri solo questa
+            section.scrollIntoView({behavior:"smooth", block:"start"});
           }
         });
       });
