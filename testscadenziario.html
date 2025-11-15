@@ -180,29 +180,7 @@
       gap:4px;
     }
 
-    .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
-    .svc-btn{
-      border-radius:999px;
-      border:1px solid rgba(0,140,255,.35);
-      background:radial-gradient(circle at 0 0,rgba(0,140,255,.18),rgba(0,0,0,.96));
-      padding:8px 14px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      font-size:13px;
-      font-weight:700;
-      color:#eaf2ff;
-      cursor:pointer;
-      box-shadow:0 0 0 1px rgba(0,0,0,.8) inset;
-    }
-    .svc-btn span.icon{font-size:15px}
-    .svc-btn--energia{border-color:rgba(255,215,0,.8);}
-    .svc-btn--sim{border-color:rgba(255,165,0,.8);}
-    .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
-    .svc-btn--rate{border-color:rgba(173,216,230,.9);}
-    .svc-btn--card{border-color:rgba(255,215,0,.9);}
-
-    /* Radar servizi */
+    /* Pillole stile radar (usate anche per "Proponi") */
     .svc-radar{
       font-size:12px;
       color:var(--muted);
@@ -277,7 +255,7 @@
       flex:1;
     }
 
-    /* Pulsante Nascondi elenco piccolo, discreto */
+    /* Pulsante Nascondi elenco */
     #toggleElenco{
       position:absolute;
       right:18px;
@@ -367,7 +345,10 @@
   </section>
 
   <section class="card">
-    <h2>Elenco</h2>
+    <h2>
+      Elenco
+      <button id="toggleElenco" class="btn" type="button">Nascondi</button>
+    </h2>
     <div class="content" id="elencoContent">
 
       <!-- Barra filtri + ricerca -->
@@ -501,21 +482,20 @@
     const GAIN_RATE    = 45;
 
     // Punti Fidelity automatici per servizi conclusi
-    const POINTS_REPAIR_PC     = 50;  // Riparazione computer
-    const POINTS_REPAIR_PHONE  = 25;  // Riparazione smartphone
-    const POINTS_SIM           = 30;  // SIM mobile
-    const POINTS_FISSO         = 80;  // Linea fissa
-    const POINTS_ENERGIA       = 100; // Luce & Gas
-    const POINTS_RATE          = 40;  // Smartphone a rate
+    const POINTS_REPAIR_PC     = 50;
+    const POINTS_REPAIR_PHONE  = 25;
+    const POINTS_SIM           = 30;
+    const POINTS_FISSO         = 80;
+    const POINTS_ENERGIA       = 100;
+    const POINTS_RATE          = 40;
 
-    // Movimento punti Fidelity (evita doppi accrediti con "code")
+    // Movimento punti Fidelity
     function addFidelityMovement(it, code, label, delta){
       delta = Number(delta || 0);
       if(!delta) return;
       if(!it) return;
 
       if(!Array.isArray(it.pointsMovements)) it.pointsMovements = [];
-      // Se esiste già un movimento con lo stesso code, non ricarico i punti
       if(it.pointsMovements.some(m => m.code === code)) return;
 
       let curr = Number(it.points || 0);
@@ -549,12 +529,7 @@
       async get(path){
         const c=this.cfg(); if(!c) throw new Error('Nessuna configurazione GitHub');
         const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
-        const res=await fetch(url,{
-          headers:{
-            'Accept':'application/vnd.github+json',
-            'Authorization':'Bearer '+this.token()
-          }
-        });
+        const res=await fetch(url,{ headers:this.headers() });
         if(!res.ok) throw new Error('GET '+res.status);
         return res.json();
       },
@@ -572,11 +547,7 @@
           branch: c.branch || 'main'
         };
         if(sha) body.sha=sha;
-        const headers={
-          'Accept':'application/vnd.github+json',
-          'Authorization':'Bearer '+this.token(),
-          'Content-Type':'application/json'
-        };
+        const headers={...this.headers(),'Content-Type':'application/json'};
         let res=await fetch(url,{method:'PUT',headers,body:JSON.stringify(body)});
         if(res.status===409){
           const meta=await this.get(path);
@@ -696,6 +667,17 @@ ${cardUrl}`;
       return walink(it.phone, t);
     }
 
+    function waSendCard(it){
+      const cardUrl = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+      const t =
+`Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
+Qui trovi la tua Fidelity Card digitale Re Long con saldo punti sempre aggiornato e lo storico dei movimenti:
+${cardUrl}
+
+Salvala tra i preferiti così ce l'hai sempre a portata di mano 😉`;
+      return walink(it.phone, t);
+    }
+
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
@@ -743,57 +725,6 @@ ${cardUrl}`;
       it.remindersCycle = 1;
       it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
-    }
-
-    function prorogaPromemoria(it){
-      if(it.responded) return;
-      const types = shuffle(getReminderTypesForItem(it));
-      it.reminders = buildReminders(new Date(), types);
-      it.remindersCycle = (it.remindersCycle||1) + 1;
-      it.updatedAt = new Date().toISOString();
-    }
-
-    function isMainCycleComplete(it){
-      if(!it.reminders || !it.reminders.length) return false;
-      const onlyMain = it.reminders.filter(r=> r.type!=='followup');
-      if(onlyMain.length===0) return false;
-      return onlyMain.every(r=>r.sent);
-    }
-
-    function reminderLink(it, rem){
-      switch(rem.type){
-        case 'sim':         return waPacchiSIM(it.name,it.phone);
-        case 'energia':     return waPacchiEnergia(it.name,it.phone);
-        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
-        case 'rate':        return waPacchiRate(it.name,it.phone);
-        case 'followup':    return waPacchiMemo(it.name,it.phone);
-        default:            return waPacchiMemo(it.name,it.phone);
-      }
-    }
-
-    function addFollowup90(it){
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), 90).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast('Promemoria unico (+90g) aggiunto ✅');
-    }
-
-    function addFollowupCustom(it){
-      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
-      if(val===null) return;
-      const days = parseInt(String(val).trim(),10);
-      if(!Number.isFinite(days) || days<=0 || days>365){
-        alert('Inserisci un numero di giorni valido (1–365).');
-        return;
-      }
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), days).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -902,7 +833,6 @@ ${cardUrl}`;
           pointsMovements:[]
         };
 
-        // 20 punti benvenuto solo primo ingresso
         addFidelityMovement(found, 'welcome-20', 'Bonus benvenuto Fidelity', 20);
         try{
           window.open(waWelcomeWithCard(found),'_blank','noopener');
@@ -990,73 +920,44 @@ ${cardUrl}`;
       const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
 
+    // Radar servizi PROPOSIZIONALE: pillole "Proponi" basate sui servizi NON attivi
     function appendQuickWA(actions, it){
-      const row=document.createElement('div');
-      row.className='svc-row';
-
+      const acts = new Set(it.activated || []);
       const radar = document.createElement('div');
       radar.className='svc-radar';
       const lbl=document.createElement('span');
       lbl.className='svc-radar-label';
-      lbl.textContent='Radar servizi:';
+      lbl.textContent='Servizi proponibili:';
       radar.appendChild(lbl);
 
       const services = [
-        { key:'sim',        label:'SIM',          icon:'📶' },
-        { key:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡' },
-        { key:'energia',    label:'Energia',      icon:'⚡' },
-        { key:'rate',       label:'Rate',         icon:'📱' }
+        { key:'sim',        label:'SIM',          icon:'📶', fn:waPacchiSIM },
+        { key:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡', fn:waPacchiFisso },
+        { key:'energia',    label:'Energia',      icon:'⚡',   fn:waPacchiEnergia },
+        { key:'rate',       label:'Rate',         icon:'📱',   fn:waPacchiRate }
       ];
-      const actSet = new Set(it.activated || []);
+
+      let hasAny=false;
       services.forEach(s=>{
-        const t=document.createElement('span');
-        t.className='svc-radar-tag ' + (actSet.has(s.key)?'on':'off');
-        t.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
-        t.addEventListener('click', ()=>{
-          let arr = Array.isArray(it.activated) ? [...it.activated] : [];
-          const has = arr.includes(s.key);
-          if(has){
-            arr = arr.filter(k => k !== s.key);
-          } else {
-            arr.push(s.key);
-          }
-          it.activated = arr;
-          it.updatedAt = new Date().toISOString();
-          saveLocal(); saveToGitHub(); render();
+        if(acts.has(s.key)) return; // se è attivo, NON lo proponiamo
+        hasAny=true;
+        const pill=document.createElement('span');
+        pill.className='svc-radar-tag off';
+        pill.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
+        pill.addEventListener('click',()=>{
+          window.open(s.fn(it.name,it.phone),'_blank','noopener');
         });
-        radar.appendChild(t);
+        radar.appendChild(pill);
       });
 
-      const acts = new Set(it.activated || []);
-
-      const btnSim=document.createElement('button');
-      btnSim.className='svc-btn svc-btn--sim';
-      btnSim.innerHTML='<span class="icon">📶</span><span>Proponi SIM</span>';
-      btnSim.addEventListener('click',()=>{ window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'); });
-
-      const btnFisso=document.createElement('button');
-      btnFisso.className='svc-btn svc-btn--fisso';
-      btnFisso.innerHTML='<span class="icon">🏠📡</span><span>Proponi Fisso</span>';
-      btnFisso.addEventListener('click',()=>{ window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'); });
-
-      const btnEnergia=document.createElement('button');
-      btnEnergia.className='svc-btn svc-btn--energia';
-      btnEnergia.innerHTML='<span class="icon">⚡</span><span>Proponi Energia</span>';
-      btnEnergia.addEventListener('click',()=>{ window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'); });
-
-      const btnRate=document.createElement('button');
-      btnRate.className='svc-btn svc-btn--rate';
-      btnRate.innerHTML='<span class="icon">📱</span><span>Proponi Rate</span>';
-      btnRate.addEventListener('click',()=>{ window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'); });
-
-      // Mostra solo i servizi NON attivi
-      if(!acts.has('sim'))        row.appendChild(btnSim);
-      if(!acts.has('fissomobile'))row.appendChild(btnFisso);
-      if(!acts.has('energia'))    row.appendChild(btnEnergia);
-      if(!acts.has('rate'))       row.appendChild(btnRate);
+      if(!hasAny){
+        const none=document.createElement('span');
+        none.className='svc-radar-tag on';
+        none.textContent='Tutti i servizi attivi';
+        radar.appendChild(none);
+      }
 
       actions.appendChild(radar);
-      actions.appendChild(row);
     }
 
     function btnDelete(it){
@@ -1213,6 +1114,7 @@ ${cardUrl}`;
         title.appendChild(phoneSpan);
         title.appendChild(pointsSpan);
 
+        // Servizi attivi: radar cliccabile (gestisce lo stato)
         const svcRow=document.createElement('div');
         svcRow.className='svc-radar';
         const lbl=document.createElement('span');
@@ -1265,9 +1167,10 @@ ${cardUrl}`;
           services.appendChild(pacchiBadge);
         }
 
-        if(it.acceptance){
-          appendQuickWA(actions, it);
+        // SERVIZI PROPONIBILI: pillole "Proponi" (trasformato radar servizi)
+        appendQuickWA(actions, it);
 
+        if(it.acceptance){
           if(it.quoteStatus==='pending'){
             actions.append(btn('Invia preventivo', ()=>{
               it.quoteStatus='sent'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
@@ -1284,7 +1187,6 @@ ${cardUrl}`;
             actions.append(btnOk('Da consegnare (avvisa cliente)', ()=>{
               it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
               window.open(waPickup(it.name, it.phone),'_blank','noopener');
-
               if(dashModal && dashModal.classList.contains('on')) updateDashboard();
             }));
           } else if(it.repairStatus==='pronto'){
@@ -1312,15 +1214,12 @@ ${cardUrl}`;
               saveToGitHub();
               render();
               try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
-
               if(dashModal && dashModal.classList.contains('on')) updateDashboard();
             }));
           } else if(it.repairStatus==='consegnato'){
             const lab=document.createElement('span'); lab.className='label'; lab.textContent='Riparazione consegnata'; actions.append(lab);
           }
         } else {
-          appendQuickWA(actions, it);
-
           if(!it.done){
             actions.append(btn('Completato', ()=>{
               try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
@@ -1359,6 +1258,40 @@ ${cardUrl}`;
 
           actions.append(btnDelete(it));
         }
+
+        // SEZIONE FIDELITY: tasti + storico ultimi movimenti
+        const pointsActions=document.createElement('div');
+        pointsActions.className='r-line';
+
+        const addPtsBtn=btn('+ Punti Fidelity', ()=>{
+          const val = prompt('Quanti punti vuoi aggiungere/sottrarre a questo cliente? (es. 10 o -20)');
+          if(val===null) return;
+          const delta = parseInt(String(val).trim(),10);
+          if(!Number.isFinite(delta) || delta===0){
+            alert('Inserisci un numero di punti valido (es. 10 o -20).');
+            return;
+          }
+          const lblRaw = prompt('Motivazione (es. Black Friday ReLong, correzione punti, omaggio Natale, ecc.)','Operazione manuale Fidelity');
+          const label = (lblRaw && lblRaw.trim()) || 'Operazione manuale Fidelity';
+          const code = 'manual-' + Date.now();
+          addFidelityMovement(it, code, label, delta);
+          it.updatedAt = new Date().toISOString();
+          saveLocal(); saveToGitHub(); render();
+        });
+        pointsActions.appendChild(addPtsBtn);
+
+        const sendCardBtn=btn('Invia Fidelity Card', ()=>{
+          window.open(waSendCard(it),'_blank','noopener');
+        });
+        pointsActions.appendChild(sendCardBtn);
+
+        const openCardBtn=btn('Apri Fidelity Card', ()=>{
+          const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+          window.open(url,'_blank','noopener');
+        });
+        pointsActions.appendChild(openCardBtn);
+
+        points.appendChild(pointsActions);
 
         if(Array.isArray(it.pointsMovements) && it.pointsMovements.length){
           const wrap=document.createElement('div');
@@ -1461,6 +1394,17 @@ ${cardUrl}`;
       dashModal.classList.remove('on');
     });
 
+    function reminderLink(it, rem){
+      switch(rem.type){
+        case 'sim':         return waPacchiSIM(it.name,it.phone);
+        case 'energia':     return waPacchiEnergia(it.name,it.phone);
+        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
+        case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
+        default:            return waPacchiMemo(it.name,it.phone);
+      }
+    }
+
     function summarize(period){
       const now=new Date();
       let fromDate=null, toDate=null;
@@ -1549,6 +1493,17 @@ ${cardUrl}`;
 
     document.getElementById('rangeFrom').addEventListener('change',updateDashboard);
     document.getElementById('rangeTo').addEventListener('change',updateDashboard);
+
+    // Nascondi/mostra elenco
+    const elencoContent=document.getElementById('elencoContent');
+    const toggleElencoBtn=document.getElementById('toggleElenco');
+    if(toggleElencoBtn){
+      toggleElencoBtn.addEventListener('click',()=>{
+        const hidden = elencoContent.style.display==='none';
+        elencoContent.style.display = hidden ? 'block':'none';
+        toggleElencoBtn.textContent = hidden ? 'Nascondi' : 'Mostra';
+      });
+    }
 
     document.addEventListener('DOMContentLoaded', async ()=>{
       await loadFromGitHubOrLocal();
