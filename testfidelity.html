@@ -583,6 +583,10 @@
           <span class="points">+30 <small>punti</small></span>
         </div>
         <div class="how-row">
+          <span class="label">Smartphone a rate</span>
+          <span class="points">+40 <small>punti</small></span>
+        </div>
+        <div class="how-row">
           <span class="label">Luce & Gas</span>
           <span class="points">+100 <small>punti</small></span>
         </div>
@@ -684,8 +688,8 @@
       }
       const base = currentTier ? currentTier.threshold : 0;
       const span = nextTier.threshold - base;
-      const clamped = Math.max(0, Math.min(points - base, span));
-      const ratio = span>0 ? (clamped/span) : 0;
+      const progInSpan = points - base;
+      const ratio = Math.max(0, Math.min(1, progInSpan/span));
       return {
         current: currentTier,
         next: nextTier,
@@ -694,222 +698,207 @@
       };
     }
 
-    function renderTiers(points){
+    function buildRewards(points){
+      elRewardsList.innerHTML = "";
+      rewardsConfig.forEach(r=>{
+        const row = document.createElement("div");
+        row.className = "reward";
+        if(points >= r.threshold){
+          row.classList.add("unlocked");
+        }else{
+          const nextAbove = rewardsConfig.find(x => x.threshold > points);
+          if(nextAbove && nextAbove.threshold === r.threshold){
+            row.classList.add("next");
+          }
+        }
+        const left = document.createElement("div");
+        left.innerHTML = `<strong>${r.label}</strong><br/><small>Soglia: ${r.threshold} pt</small>`;
+        const right = document.createElement("div");
+        right.innerHTML = `<small>${points >= r.threshold ? "Disponibile 🎁" : `ti mancano ${r.threshold - points} pt`}</small>`;
+        row.appendChild(left);
+        row.appendChild(right);
+        elRewardsList.appendChild(row);
+      });
+    }
+
+    function updateLevelPill(points){
+      const lvl = getLevel(points);
+      levelPill.className = "level-pill " + lvl.class;
+      levelPill.textContent = `${lvl.emoji} Livello: ${lvl.name}`;
+    }
+
+    function updateTiers(points){
       elTiersRow.innerHTML = "";
       rewardsConfig.forEach(r=>{
         const div = document.createElement("div");
-        const unlocked = points >= r.threshold;
-        div.className = "tier" + (unlocked ? " active" : "");
-        div.innerHTML = `<span class="label"><strong>${r.threshold} pt</strong> • ${r.label}</span>`;
+        div.className = "tier";
+        if(points >= r.threshold){
+          div.classList.add("active");
+        }
+        div.innerHTML = `<span class="label">${r.threshold} pt</span>`;
         elTiersRow.appendChild(div);
       });
     }
 
-    function renderRewards(points){
-      elRewardsList.innerHTML = "";
-      let nextAssigned = false;
-      rewardsConfig.forEach(r=>{
-        const div = document.createElement("div");
-        div.className = "reward";
-
-        if(points >= r.threshold){
-          div.classList.add("unlocked");
-        }else if(!nextAssigned){
-          div.classList.add("next");
-          nextAssigned = true;
-        }
-
-        div.innerHTML = `
-          <div>
-            <strong>${r.threshold} punti</strong><br/>
-            <small>${r.label}</small>
-          </div>
-          <div>
-            ${points >= r.threshold ? "✅" : "🎯"}
-          </div>
-        `;
-        elRewardsList.appendChild(div);
-      });
-    }
-
-    function copyToClipboard(text){
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(()=>{
-          toast("Codice copiato negli appunti ✅");
-        }).catch(()=>{});
+    async function fetchData(){
+      try{
+        const res = await fetch(DATA_URL);
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return await res.json();
+      }catch(e){
+        console.error("Errore caricamento dati Fidelity:", e);
+        return null;
       }
     }
 
-    function toast(msg){
-      const t = document.createElement("div");
-      t.style.position="fixed";
-      t.style.left="50%";
-      t.style.bottom="18px";
-      t.style.transform="translateX(-50%)";
-      t.style.background="rgba(0,0,0,.9)";
-      t.style.border="1px solid rgba(255,255,255,.25)";
-      t.style.color="#fff";
-      t.style.padding="8px 14px";
-      t.style.borderRadius="999px";
-      t.style.fontSize="12px";
-      t.style.zIndex="9999";
-      t.textContent=msg;
-      document.body.appendChild(t);
-      setTimeout(()=>t.remove(),2400);
+    function normalizePhone(phone){
+      return String(phone||"").replace(/\D/g,"");
     }
 
-    document.getElementById("codeChip").addEventListener("click",()=>{
-      const code = elCode.textContent.trim();
-      if(code) copyToClipboard(code);
-    });
-
-    // Toggle "Come accumulare punti"
-    document.getElementById("btnHow").addEventListener("click",()=>{
-      const isHidden = (howSection.style.display === "none" || howSection.style.display === "");
-      howSection.style.display = isHidden ? "block" : "none";
-      if(isHidden){
-        howSection.scrollIntoView({behavior:"smooth", block:"start"});
+    function pickCustomer(list, id){
+      if(id){
+        const byId = list.find(x => String(x.id) === String(id));
+        if(byId) return byId;
       }
-    });
+      if(list.length === 1) return list[0];
+      return list[list.length-1];
+    }
 
-    document.getElementById("btnInvite").addEventListener("click",()=>{
-      const code = elCode.textContent.trim();
-      const name = elName.textContent.trim() || "un amico";
-      const msg = `Ciao! 👋\nSto usando la Fidelity Card Re Long.\n`+
-                  `Usa il mio codice invito *${code}* quando ti registri alla Fidelity:\n`+
-                  `tu ricevi 40 punti di benvenuto e io ne ricevo 80.\n\n`+
-                  `Scopri Re Long e registrati dalla pagina del nostro hub:\n${HUB_URL}`;
-      const url = "https://wa.me/?text="+encodeURIComponent(msg);
-      window.open(url,"_blank","noopener");
-    });
-
-    function renderMissions(item, points){
+    function buildMissions(customer){
       missionsList.innerHTML = "";
-      let missions = [];
+      const pts = Number(customer.points || 0);
+      const missions = [];
 
-      const acts = new Set(item.activated || []);
-      const hasEnergia = acts.has("energia");
-      const hasSim = acts.has("sim");
-      const hasRip = !!item.acceptance || acts.has("riparazione");
-      const lvl = getLevel(points);
+      missions.push({
+        icon:"📶",
+        title:"Attiva una SIM o una linea fissa",
+        desc:"Hai già la tua Fidelity: ogni nuova SIM o attivazione Fisso/FTTH spinge i tuoi punti verso i premi.",
+        bonus:"+30 / +80 punti"
+      });
 
-      if(!hasEnergia){
-        missions.push({
-          icon:"⚡",
-          title:"Missione Energia",
-          desc:"Attiva una fornitura Luce & Gas con Re Long e porta la tua Fidelity al livello successivo.",
-          bonus:"+100 punti Fidelity"
-        });
-      }
+      missions.push({
+        icon:"⚡",
+        title:"Passa a una tariffa Luce & Gas Re Long",
+        desc:"Porta la tua bolletta in negozio: se troviamo un risparmio reale, attiviamo l’offerta e ti carichiamo il massimo dei punti.",
+        bonus:"+100 punti"
+      });
 
-      if(!hasSim){
-        missions.push({
-          icon:"📶",
-          title:"Missione SIM",
-          desc:"Attiva una SIM mobile con Re Long e abbina minuti e Giga alle tue esigenze.",
-          bonus:"+30 punti Fidelity"
-        });
-      }
-
-      if(!hasRip){
-        missions.push({
-          icon:"🔧",
-          title:"Missione Assistenza",
-          desc:"Porta uno smartphone o un PC in laboratorio per una diagnosi o riparazione.",
-          bonus:"+25 punti Fidelity"
-        });
-      }
+      missions.push({
+        icon:"📱",
+        title:"Scegli uno smartphone a rate",
+        desc:"Blocca il tuo prossimo smartphone top di gamma senza pensieri: abbiniamo offerta + punti Fidelity.",
+        bonus:"+40 punti"
+      });
 
       missions.push({
         icon:"👥",
-        title:"Missione Porta un amico",
-        desc:"Fai registrare un nuovo cliente usando il tuo codice invito Fidelity.",
-        bonus:"+80 punti per te, +40 punti per il tuo amico"
+        title:"Porta un amico",
+        desc:"Condividi il tuo codice e invita un amico a passare da Re Long per attivare un servizio o fare un acquisto.",
+        bonus:"+80 pt per chi invita, +40 pt per il nuovo cliente"
       });
 
-      if(lvl.name === "BRONZE" || lvl.name === "SILVER"){
-        const toNext = lvl.next ? (lvl.next - points) : 0;
-        if(toNext > 0){
-          missions.push({
-            icon:"🚀",
-            title:`Obiettivo livello successivo`,
-            desc:`Ti mancano circa ${toNext} punti per arrivare a ${lvl.name === "BRONZE" ? "SILVER" : "GOLD"}. Chiedi in negozio come accumularli più velocemente.`,
-            bonus:`Ancora ~${toNext} punti`
-          });
-        }
-      }
-
-      if(!missions.length){
-        missionsSection.style.display = "none";
-        return;
-      }
+      missions.forEach(m=>{
+        const card = document.createElement("div");
+        card.className = "mission-card";
+        const icon = document.createElement("div");
+        icon.className = "mission-icon";
+        icon.textContent = m.icon;
+        const body = document.createElement("div");
+        body.className = "mission-body";
+        const title = document.createElement("div");
+        title.className = "mission-title";
+        title.textContent = m.title;
+        const desc = document.createElement("div");
+        desc.className = "mission-desc";
+        desc.textContent = m.desc;
+        const bonus = document.createElement("div");
+        bonus.className = "mission-bonus";
+        bonus.textContent = m.bonus;
+        body.appendChild(title);
+        body.appendChild(desc);
+        body.appendChild(bonus);
+        card.appendChild(icon);
+        card.appendChild(body);
+        missionsList.appendChild(card);
+      });
 
       missionsSection.style.display = "block";
-      missions.forEach(m=>{
-        const div = document.createElement("div");
-        div.className = "mission-card";
-        div.innerHTML = `
-          <div class="mission-icon">${m.icon}</div>
-          <div class="mission-body">
-            <div class="mission-title">${m.title}</div>
-            <div class="mission-desc">${m.desc}</div>
-            <div class="mission-bonus">${m.bonus}</div>
-          </div>
-        `;
-        missionsList.appendChild(div);
+    }
+
+    function setupInvite(customer){
+      const btnInvite = document.getElementById("btnInvite");
+      const code = fallbackCodeFromId(customer.id || customer.phone || customer.name);
+      const inviteText =
+`Ciao, ti condivido la mia Fidelity Card Re Long 📲
+Con questo codice potrai avere sconti, promozioni e punti extra su riparazioni, telefonia ed energia.
+
+Codice amico: ${code}
+
+Passa in negozio da Re Long a Marano di Napoli oppure scrivi su WhatsApp: 08119578844.`;
+      btnInvite.addEventListener("click", ()=>{
+        if(navigator.share){
+          navigator.share({
+            title:"Fidelity Card Re Long",
+            text:inviteText
+          }).catch(()=>{});
+        }else{
+          navigator.clipboard.writeText(inviteText).then(()=>{
+            alert("Testo invito copiato. Incollalo su WhatsApp o dove preferisci.");
+          });
+        }
       });
     }
 
+    function setupCodeChip(customer){
+      const chip = document.getElementById("codeChip");
+      const code = fallbackCodeFromId(customer.id || customer.phone || customer.name);
+      elCode.textContent = code;
+      chip.addEventListener("click", ()=>{
+        navigator.clipboard.writeText(code).then(()=>{
+          alert("Codice invito copiato negli appunti.");
+        });
+      });
+    }
+
+    document.getElementById("btnHow").addEventListener("click", ()=>{
+      const isVisible = howSection.style.display !== "none";
+      howSection.style.display = isVisible ? "none" : "block";
+    });
+
     async function init(){
-      if(!idParam){
-        errorBox.style.display="block";
-        cardInner.style.opacity=".4";
+      const data = await fetchData();
+      if(!data || !Array.isArray(data) || data.length === 0){
+        errorBox.style.display = "block";
+        cardInner.style.display = "none";
         return;
       }
-      try{
-        const res = await fetch(DATA_URL,{cache:"no-store"});
-        if(!res.ok) throw new Error("HTTP "+res.status);
-        const data = await res.json();
-        if(!Array.isArray(data)) throw new Error("Formato non valido");
-        const item = data.find(x=> String(x.id) === String(idParam));
-        if(!item){
-          errorBox.style.display="block";
-          cardInner.style.opacity=".4";
-          return;
-        }
 
-        const name = item.name || "Cliente Re Long";
-        const pts = Number(item.points || 0);
-        const code = item.fidCode || fallbackCodeFromId(item.id);
-
-        elName.textContent = name;
-        elSubtitle.textContent = `Ciao ${name.split(" ")[0]}, questa è la tua Fidelity Card Re Long.`;
-        elPoints.textContent = isNaN(pts)? "0" : String(pts);
-        elCode.textContent = code;
-
-        // Livello visivo
-        const lvl = getLevel(isNaN(pts)?0:pts);
-        if(levelPill){
-          levelPill.textContent = `${lvl.emoji} Livello: ${lvl.name}`;
-          levelPill.className = "level-pill " + lvl.class;
-        }
-
-        const prog = computeProgress(isNaN(pts)?0:pts);
-        elNextLabel.textContent = prog.label;
-        const ratio = Math.max(0,Math.min(1,prog.ratio));
-        requestAnimationFrame(()=>{
-          elProgressFill.style.transform = `scaleX(${ratio})`;
-        });
-
-        renderTiers(isNaN(pts)?0:pts);
-        renderRewards(isNaN(pts)?0:pts);
-        renderMissions(item, isNaN(pts)?0:pts);
-
-      }catch(e){
-        console.error(e);
-        errorBox.style.display="block";
-        cardInner.style.opacity=".4";
+      let customer = pickCustomer(data, idParam);
+      if(!customer){
+        errorBox.style.display = "block";
+        cardInner.style.display = "none";
+        return;
       }
+
+      const name = customer.name || "Cliente Re Long";
+      const pts = Number(customer.points || 0);
+
+      elName.textContent = name;
+      elSubtitle.textContent = "Questa è la tua Fidelity Card personale. Ogni servizio Re Long ti carica punti automatici.";
+      elPoints.textContent = pts;
+
+      const lvl = getLevel(pts);
+      updateLevelPill(pts);
+
+      const prog = computeProgress(pts);
+      elNextLabel.textContent = prog.label;
+      elProgressFill.style.transform = `scaleX(${prog.ratio})`;
+
+      updateTiers(pts);
+      buildRewards(pts);
+      buildMissions(customer);
+      setupInvite(customer);
+      setupCodeChip(customer);
     }
 
     init();
