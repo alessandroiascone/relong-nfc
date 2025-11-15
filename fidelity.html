@@ -286,14 +286,70 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
+      flex:1 1 0;
+      justify-content:center;
+      text-align:center;
+      min-width:0;
     }
+    .btn span.icon{font-size:16px}
     .btn-primary{
       border-color:rgba(255,215,0,.9);
       background:linear-gradient(135deg,var(--accent),var(--accent2));
       color:#2b1900;
       box-shadow:0 10px 26px rgba(0,0,0,.7),0 0 18px rgba(255,215,0,.8);
     }
-    .btn span.icon{font-size:16px}
+
+    /* Effetto neon per "Porta un amico" */
+    @keyframes neonPulse{
+      0%{
+        box-shadow:
+          0 0 10px rgba(255,255,180,.7),
+          0 0 24px rgba(255,215,0,.6),
+          0 0 0 rgba(255,215,0,.0);
+        transform:translateY(0);
+      }
+      100%{
+        box-shadow:
+          0 0 16px rgba(255,255,210,1),
+          0 0 40px rgba(255,215,0,1),
+          0 0 70px rgba(255,215,0,.9);
+        transform:translateY(-1px);
+      }
+    }
+    #btnInvite{
+      position:relative;
+      overflow:hidden;
+      animation:neonPulse 1.7s ease-in-out infinite alternate;
+    }
+    #btnInvite::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:radial-gradient(circle at 0 0,rgba(255,255,255,.5),transparent 55%);
+      opacity:.4;
+      mix-blend-mode:screen;
+      pointer-events:none;
+    }
+
+    /* Effetto bordo gold lampeggiante per "Come accumulare punti" */
+    @keyframes goldGlow{
+      0%{
+        box-shadow:0 0 0 rgba(255,215,0,0);
+      }
+      50%{
+        box-shadow:
+          0 0 10px rgba(255,215,0,.4),
+          0 0 22px rgba(255,215,0,.7);
+      }
+      100%{
+        box-shadow:0 0 0 rgba(255,215,0,0);
+      }
+    }
+    #btnHow{
+      border-color:rgba(255,215,0,.85);
+      background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(0,0,0,.9));
+      animation:goldGlow 2.4s ease-in-out infinite;
+    }
 
     .section{
       background:rgba(5,7,14,.9);
@@ -565,13 +621,13 @@
 
         <div class="mini-banner">
           <span>Vuoi scoprire tutti i servizi Re Long?</span>
-          <a href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html" target="_blank" rel="noopener">Apri l’hub</a>
+          <a href="https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html" target="_blank" rel="noopener">Portami al sito</a>
         </div>
 
         <div id="headerInfo">
           <h1 id="clientName">Fidelity Card</h1>
           <div class="subtitle" id="subtitle">
-            Accumula punti per ogni servizio Re Long e trasformali in premi tecnologici.
+            Accumula punti per ogni servizio Re Long e transformali in premi tecnologici.
           </div>
 
           <div class="code-row">
@@ -617,7 +673,7 @@
       </div>
     </div>
 
-    <!-- SEZIONE PREMI (radio, aperta di default) -->
+    <!-- SEZIONE PREMI -->
     <div class="section" id="rewardsSection">
       <input type="radio" name="fidSection" id="secRewards" class="section-toggle" checked>
       <label class="section-header" for="secRewards">
@@ -634,7 +690,7 @@
       </div>
     </div>
 
-    <!-- SEZIONE STORICO PUNTI (radio, nascosta finché non ci sono movimenti) -->
+    <!-- SEZIONE STORICO PUNTI -->
     <div class="section" id="historySection" style="display:none">
       <input type="radio" name="fidSection" id="secHistory" class="section-toggle">
       <label class="section-header" for="secHistory">
@@ -652,7 +708,7 @@
       </div>
     </div>
 
-    <!-- SEZIONE COME ACCUMULARE PUNTI (sempre separata, togglata dal bottone) -->
+    <!-- SEZIONE COME ACCUMULARE PUNTI -->
     <div class="section" id="howPoints" style="display:none">
       <h2 class="section-title" style="margin-bottom:6px;">Come accumulare punti</h2>
       <p>
@@ -704,7 +760,7 @@
       </p>
     </div>
 
-    <!-- SEZIONE MISSIONI (radio, nascosta finché non ci sono missioni) -->
+    <!-- SEZIONE MISSIONI -->
     <div class="section" id="missionsSection" style="display:none">
       <input type="radio" name="fidSection" id="secMissions" class="section-toggle">
       <label class="section-header" for="secMissions">
