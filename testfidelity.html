@@ -301,10 +301,40 @@
       border:1px solid rgba(255,255,255,.06);
       padding:14px 14px 15px;
     }
-    .section h2{
-      font-size:15px;
-      margin-bottom:6px;
+
+    /* Header cliccabile delle sezioni */
+    .section-header{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      background:transparent;
+      border:none;
+      padding:2px 0 4px;
+      cursor:pointer;
     }
+    .section-title{
+      font-size:15px;
+      font-weight:600;
+      text-align:left;
+    }
+    .section-chevron{
+      font-size:14px;
+      transition:transform .2s ease;
+    }
+
+    .section-body{
+      margin-top:6px;
+      display:none;
+    }
+    .section.open .section-body{
+      display:block;
+    }
+    .section.open .section-chevron{
+      transform:rotate(180deg);
+    }
+
     .section p{
       font-size:13px;
       color:var(--muted);
@@ -584,32 +614,42 @@
       </div>
     </div>
 
-    <!-- SEZIONE PREMI -->
-    <div class="section">
-      <h2>Premi disponibili</h2>
-      <p>Ogni volta che raggiungi una soglia punti, puoi scegliere il premio corrispondente.</p>
-      <div class="rewards-list" id="rewardsList"></div>
-      <p class="small-note">
-        I premi sono soggetti a disponibilità in negozio. In caso di mancanza di uno specifico modello,
-        ti proporremo un prodotto equivalente o superiore.
-      </p>
+    <!-- SEZIONE PREMI (collassabile, aperta di default) -->
+    <div class="section open" id="rewardsSection">
+      <button class="section-header" type="button">
+        <span class="section-title">Premi disponibili</span>
+        <span class="section-chevron">▾</span>
+      </button>
+      <div class="section-body" id="rewardsBody">
+        <p>Ogni volta che raggiungi una soglia punti, puoi scegliere il premio corrispondente.</p>
+        <div class="rewards-list" id="rewardsList"></div>
+        <p class="small-note">
+          I premi sono soggetti a disponibilità in negozio. In caso di mancanza di uno specifico modello,
+          ti proporremo un prodotto equivalente o superiore.
+        </p>
+      </div>
     </div>
 
-    <!-- SEZIONE STORICO PUNTI -->
+    <!-- SEZIONE STORICO PUNTI (collassabile) -->
     <div class="section" id="historySection" style="display:none">
-      <h2>Storico movimenti punti</h2>
-      <p>
-        Qui trovi tutti i punti caricati o scalati dalla tua Fidelity Card, con la motivazione associata.
-      </p>
-      <div class="history-list" id="historyList"></div>
-      <p class="small-note">
-        Lo storico è in ordine dal movimento più recente al più vecchio.
-      </p>
+      <button class="section-header" type="button">
+        <span class="section-title">Storico movimenti punti</span>
+        <span class="section-chevron">▾</span>
+      </button>
+      <div class="section-body" id="historyBody">
+        <p>
+          Qui trovi tutti i punti caricati o scalati dalla tua Fidelity Card, con la motivazione associata.
+        </p>
+        <div class="history-list" id="historyList"></div>
+        <p class="small-note">
+          Lo storico è in ordine dal movimento più recente al più vecchio.
+        </p>
+      </div>
     </div>
 
-    <!-- SEZIONE COME ACCUMULARE PUNTI (COLLASSABILE) -->
+    <!-- SEZIONE COME ACCUMULARE PUNTI (sempre separata, togglata dal bottone) -->
     <div class="section" id="howPoints" style="display:none">
-      <h2>Come accumulare punti</h2>
+      <h2 class="section-title" style="margin-bottom:6px;">Come accumulare punti</h2>
       <p>
         Usa la tua Fidelity Card ogni volta che attivi un servizio o fai un acquisto da Re Long:
         i punti si sommano e ti avvicinano ai premi.
@@ -659,14 +699,19 @@
       </p>
     </div>
 
-    <!-- SEZIONE MISSIONI -->
+    <!-- SEZIONE MISSIONI (collassabile) -->
     <div class="section" id="missionsSection" style="display:none">
-      <h2>Missioni attive per te</h2>
-      <p>
-        Completa queste missioni per far crescere più velocemente i tuoi punti Fidelity.
-        Mostra questa schermata in negozio e aggiorneremo la card insieme.
-      </p>
-      <div class="missions-list" id="missionsList"></div>
+      <button class="section-header" type="button">
+        <span class="section-title">Missioni attive per te</span>
+        <span class="section-chevron">▾</span>
+      </button>
+      <div class="section-body" id="missionsBody">
+        <p>
+          Completa queste missioni per far crescere più velocemente i tuoi punti Fidelity.
+          Mostra questa schermata in negozio e aggiorneremo la card insieme.
+        </p>
+        <div class="missions-list" id="missionsList"></div>
+      </div>
     </div>
 
     <div id="errorBox" class="error" style="display:none">
@@ -842,6 +887,29 @@
       window.open(url,"_blank","noopener");
     });
 
+    // Fisarmoniche: solo una sezione aperta alla volta (Premi, Storico, Missioni)
+    function setupCollapsibles(){
+      const sections = Array.from(document.querySelectorAll(".section"));
+      const clickableSections = sections.filter(s => s.querySelector(".section-header"));
+
+      clickableSections.forEach(section=>{
+        const btn = section.querySelector(".section-header");
+        if(!btn) return;
+
+        btn.addEventListener("click",()=>{
+          const isOpen = section.classList.contains("open");
+
+          // chiudi tutte
+          clickableSections.forEach(s=>s.classList.remove("open"));
+
+          // se quella cliccata non era aperta, aprila
+          if(!isOpen){
+            section.classList.add("open");
+          }
+        });
+      });
+    }
+
     function renderMissions(item, points){
       missionsList.innerHTML = "";
       let missions = [];
@@ -978,6 +1046,8 @@
     }
 
     async function init(){
+      setupCollapsibles(); // attivo le fisarmoniche
+
       if(!idParam){
         errorBox.style.display="block";
         cardInner.style.opacity=".4";
