@@ -154,39 +154,6 @@
       gap:4px;
     }
 
-    /* Badge livello cliente */
-    .lvl-badge{
-      margin-left:8px;
-      padding:2px 9px;
-      border-radius:999px;
-      font-size:11px;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.55);
-    }
-    .lvl-bronze{
-      border-color:#cd7f32;
-      background:linear-gradient(135deg,rgba(205,127,50,.28),rgba(0,0,0,.9));
-      color:#ffe9d0;
-    }
-    .lvl-silver{
-      border-color:#c0c0c0;
-      background:linear-gradient(135deg,rgba(192,192,192,.28),rgba(0,0,0,.9));
-      color:#f5f7ff;
-    }
-    .lvl-gold{
-      border-color:#ffd700;
-      background:linear-gradient(135deg,rgba(255,215,0,.32),rgba(0,0,0,.9));
-      color:#fff9d6;
-    }
-    .lvl-black{
-      border-color:#ffffff;
-      background:linear-gradient(135deg,#000000,#272727);
-      color:#ffffff;
-    }
-
     .svc-row{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
     .svc-btn{
       border-radius:999px;
@@ -213,7 +180,6 @@
       filter:grayscale(.6);
     }
 
-    /* Radar servizi */
     .svc-radar{
       font-size:12px;
       color:var(--muted);
@@ -286,7 +252,7 @@
       flex:1;
     }
 
-    /* Pulsante Nascondi elenco piccolo, discreto */
+    /* Pulsante Nascondi elenco */
     #toggleElenco{
       position:absolute;
       right:18px;
@@ -299,7 +265,7 @@
     }
     #toggleElenco:hover{opacity:1;}
 
-    /* Fidelity buttons più moderni */
+    /* Fidelity buttons moderni */
     .fid-actions{
       gap:10px;
       flex-wrap:wrap;
@@ -322,6 +288,50 @@
     .fid-btn-ghost:hover{
       transform:translateY(-1px);
       box-shadow:0 10px 26px rgba(0,0,0,.7);
+    }
+
+    /* Overlay temporanea per messaggio broadcast */
+    .overlay-msg{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(4px);
+      z-index:200000;
+    }
+    .overlay-msg-box{
+      max-width:420px;
+      width:calc(100% - 40px);
+      background:#0a0d14;
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.75);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .overlay-msg-box h4{
+      margin-bottom:6px;
+      font-size:14px;
+    }
+    .overlay-msg-box pre{
+      white-space:pre-line;
+      font-family:inherit;
+      margin:10px 0 14px;
+    }
+    .overlay-msg-footer{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .overlay-msg-hint{
+      flex:1;
+      font-size:11px;
+      color:var(--muted);
     }
   </style>
 </head>
@@ -413,35 +423,15 @@
         <input id="searchInput" placeholder="Cerca nome o telefono" />
       </div>
 
-      <!-- Barra Fidelity -->
+      <!-- Operazione Fidelity massiva -->
       <div class="toolbar" style="justify-content:flex-end">
-        <div style="display:flex;flex-direction:column;gap:6px;max-width:380px;width:100%">
-          <button
-            id="giftFidelity"
-            class="toggle"
-            style="width:100%;justify-content:center;text-align:center"
-          >
-            🎁 Gift Fidelity
-          </button>
-
-          <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%">
-            <button
-              id="bonusAll"
-              class="toggle"
-              style="flex:1 1 0"
-            >
-              Bonus Fidelity (tutti)
-            </button>
-
-            <button
-              id="generateMissing"
-              class="toggle"
-              style="flex:1 1 0"
-            >
-              Genera Fidelity mancanti
-            </button>
-          </div>
-        </div>
+        <button
+          id="bulkFidelity"
+          class="toggle"
+          style="width:100%;max-width:380px;justify-content:center;text-align:center"
+        >
+          ✨ Operazione Fidelity massiva
+        </button>
       </div>
 
       <div id="filtersRow" class="toolbar-filters" style="display:none">
@@ -590,12 +580,54 @@
     function showToast(t, type='ok'){
       const w=$('#toast'); const el=document.createElement('div'); el.className='toast '+(type==='ok'?'ok':type==='err'?'err':''); el.textContent=t; w.appendChild(el); setTimeout(()=>el.remove(), 3600);
     }
+
+    // Overlay temporanea con testo copiabile
+    function showTempMessage(text){
+      const wrap=document.createElement('div');
+      wrap.className='overlay-msg';
+
+      const box=document.createElement('div');
+      box.className='overlay-msg-box';
+
+      const title=document.createElement('h4');
+      title.textContent='Testo suggerito per WhatsApp broadcast';
+      box.appendChild(title);
+
+      const pre=document.createElement('pre');
+      pre.textContent=text;
+      box.appendChild(pre);
+
+      const footer=document.createElement('div');
+      footer.className='overlay-msg-footer';
+
+      const hint=document.createElement('span');
+      hint.className='overlay-msg-hint';
+      hint.textContent='Suggerimento: tieni premuto sul testo per copiarlo e incollarlo nella lista broadcast.';
+      footer.appendChild(hint);
+
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='btn ok';
+      btn.textContent='Chiudi';
+      footer.appendChild(btn);
+
+      box.appendChild(footer);
+      wrap.appendChild(box);
+      document.body.appendChild(wrap);
+
+      const close=()=>{ if(document.body.contains(wrap)) wrap.remove(); };
+      btn.addEventListener('click', close);
+      wrap.addEventListener('click', e=>{ if(e.target===wrap) close(); });
+      setTimeout(close, 25000);
+    }
+
     const normalizePhone = p => String(p||'').trim().replace(/\D/g,'');
     const normalizeName  = n => String(n||'').trim().replace(/\s+/g,' ').toLowerCase();
     const fmt = d => new Date(d).toLocaleDateString('it-IT',{year:'numeric',month:'2-digit',day:'2-digit'});
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
+    // (Ancora presente se in futuro serve, ma non lo mostriamo più a schermo)
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -807,6 +839,18 @@ ${cardUrl}`;
       it.updatedAt=new Date().toISOString();
     }
 
+    // Link messaggi reminder specifici per tipo
+    function reminderLink(it, rem){
+      switch(rem.type){
+        case 'sim':         return waPacchiSIM(it.name,it.phone);
+        case 'energia':     return waPacchiEnergia(it.name,it.phone);
+        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
+        case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
+        default:            return waPacchiMemo(it.name,it.phone);
+      }
+    }
+
     const activeSet=new Set(); const toggles=$('#toggles');
     toggles.addEventListener('click', e=>{
       const b=e.target.closest('.tbtn'); if(!b) return;
@@ -1009,6 +1053,45 @@ ${cardUrl}`;
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', render);
 
+    // Operazione Fidelity massiva -> overlay temporanea
+    const bulkBtn = document.getElementById('bulkFidelity');
+
+    bulkBtn.addEventListener('click', ()=>{
+      const val = prompt('Quanti punti vuoi aggiungere/sottrarre a TUTTI i clienti? (es. 10 o -20)');
+      if(val===null) return;
+      const delta = parseInt(String(val).trim(),10);
+      if(!Number.isFinite(delta) || delta===0){
+        alert('Valore non valido.');
+        return;
+      }
+      const label = prompt('Descrizione del movimento (es. Promo Black Friday, correzione errore, ecc.)','Promo speciale Re Long') || 'Operazione di massa Fidelity';
+      const now = new Date().toISOString();
+      const updated = [];
+      const ts = Date.now();
+
+      items.forEach((it, idx)=>{
+        ensureBaseFields(it);
+        addFidelityMovement(it, `bulk-${ts}-${idx}`, label, delta);
+        it.updatedAt = now;
+        updated.push(it);
+      });
+
+      if(updated.length){
+        saveLocal(); saveToGitHub();
+        const signWord = delta>0 ? 'accreditato' : 'stornato';
+        const msg =
+`Ciao 👋
+sono Alessandro di Re Long (${RELONG_PHONE}).
+Ti abbiamo ${signWord} ${Math.abs(delta)} punti sulla Fidelity Card Re Long per: ${label}.
+
+Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
+        showTempMessage(msg);
+        showToast(`Operazione Fidelity applicata a ${updated.length} clienti ✅`);
+      } else {
+        showToast('Nessun cliente trovato','err');
+      }
+    });
+
     function btn(label,fn){
       const b=document.createElement('button'); b.className='btn'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
@@ -1016,7 +1099,7 @@ ${cardUrl}`;
       const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
 
-    // Radar servizi = servizi proponibili (cliccabili)
+    // Radar servizi = servizi proponibili (cliccabili) in base a servizi attivi
     function appendQuickWA(actions, it){
       const radar = document.createElement('div');
       radar.className = 'svc-radar';
@@ -1062,72 +1145,6 @@ ${cardUrl}`;
       });
       return b;
     }
-
-    const bonusAllBtn = document.getElementById('bonusAll');
-    const giftFidelityBtn = document.getElementById('giftFidelity');
-    const generateMissingBtn = document.getElementById('generateMissing');
-
-    bonusAllBtn.addEventListener('click', ()=>{
-      const now=new Date().toISOString();
-      const updated=[];
-      items.forEach(it=>{
-        ensureBaseFields(it);
-        if(!it.pointsMovements.some(m=>m.code==='mass-bonus-10')){
-          addFidelityMovement(it,'mass-bonus-10','Bonus speciale Fidelity +10 pt',10);
-          it.updatedAt=now;
-          updated.push(it);
-        }
-      });
-      if(updated.length){
-        saveLocal(); saveToGitHub();
-        lastBonusRecipients = updated.map(x=>x.name||x.phone||x.id);
-        showToast(`Bonus assegnato a ${updated.length} clienti ✅`);
-      }else{
-        showToast('Tutti i clienti avevano già ricevuto questo bonus','err');
-      }
-      render();
-    });
-
-    giftFidelityBtn.addEventListener('click', ()=>{
-      const now=new Date().toISOString();
-      const updated=[];
-      items.forEach(it=>{
-        ensureBaseFields(it);
-        if(!it.pointsMovements.some(m=>m.code==='gift-20')){
-          addFidelityMovement(it,'gift-20','Gift Fidelity +20 pt',20);
-          it.updatedAt=now;
-          updated.push(it);
-        }
-      });
-      if(updated.length){
-        saveLocal(); saveToGitHub();
-        lastBonusRecipients = updated.map(x=>x.name||x.phone||x.id);
-        showToast(`Gift Fidelity omaggiato a ${updated.length} clienti ✅`);
-      }else{
-        showToast('Tutti i clienti avevano già ricevuto il gift Fidelity','err');
-      }
-      render();
-    });
-
-    generateMissingBtn.addEventListener('click', ()=>{
-      const now=new Date().toISOString();
-      const updated=[];
-      items.forEach(it=>{
-        ensureBaseFields(it);
-        if(!it.pointsMovements.length){
-          addFidelityMovement(it,'gen-missing-20','Fidelity generata (bonus iniziale)',20);
-          it.updatedAt=now;
-          updated.push(it);
-        }
-      });
-      if(updated.length){
-        saveLocal(); saveToGitHub();
-        showToast(`Generate Fidelity e 20 pt per ${updated.length} clienti ✅`);
-      }else{
-        showToast('Non ci sono clienti senza Fidelity','err');
-      }
-      render();
-    });
 
     function filterItems(){
       let out=[...items];
@@ -1207,10 +1224,23 @@ ${cardUrl}`;
         return;
       }
 
+      // ORDINAMENTO ALFABETICO per Nome e Cognome (con fallback su telefono)
       arr.sort((a,b)=>{
+        const na = (a.name || '').trim().toLowerCase();
+        const nb = (b.name || '').trim().toLowerCase();
+        if(na && nb){
+          const cmp = na.localeCompare(nb,'it-IT');
+          if(cmp!==0) return cmp;
+        }
+        const pa = normalizePhone(a.phone || '');
+        const pb = normalizePhone(b.phone || '');
+        if(pa && pb){
+          const cmp2 = pa.localeCompare(pb,'it-IT');
+          if(cmp2!==0) return cmp2;
+        }
         const da = new Date(a.updatedAt||a.createdAt||0).getTime();
         const db = new Date(b.updatedAt||b.createdAt||0).getTime();
-        return db-da;
+        return da-db;
       });
 
       arr.forEach(it=>{
@@ -1224,11 +1254,6 @@ ${cardUrl}`;
         const points=clone.querySelector('.points');
         const reminders=clone.querySelector('.reminders');
         const review=clone.querySelector('.review');
-
-        const lvl=getLevel(it.points||0);
-        const badge=document.createElement('span');
-        badge.className='lvl-badge '+lvl.class;
-        badge.textContent=`${lvl.emoji} ${lvl.name}`;
 
         const nameSpan=document.createElement('span');
         nameSpan.textContent=it.name || 'Cliente senza nome';
@@ -1244,9 +1269,8 @@ ${cardUrl}`;
         title.appendChild(nameSpan);
         title.appendChild(phoneSpan);
         title.appendChild(pointsSpan);
-        title.appendChild(badge);
 
-        // --- Servizi attivi cliccabili ---
+        // Servizi attivi cliccabili (attiva/disattiva)
         const svcRow=document.createElement('div');
         svcRow.className='svc-radar';
         const lblSA=document.createElement('span');
@@ -1279,7 +1303,7 @@ ${cardUrl}`;
         });
         services.appendChild(svcRow);
 
-        // Storico riparazioni a scomparsa (con pillole stato)
+        // Storico riparazioni a scomparsa
         const repairs = [];
         if(Array.isArray(it.acceptanceHistory)) repairs.push(...it.acceptanceHistory);
         if(it.acceptance) repairs.push(it.acceptance);
@@ -1353,7 +1377,7 @@ ${cardUrl}`;
           services.appendChild(pacchiBadge);
         }
 
-        // Radar servizi = proposte
+        // Radar servizi proponibili (clic + WhatsApp precompilato)
         appendQuickWA(actions, it);
 
         if(it.acceptance){
@@ -1444,7 +1468,7 @@ ${cardUrl}`;
           actions.append(btnDelete(it));
         }
 
-        // Strumenti Fidelity singolo cliente (moderni)
+        // Strumenti Fidelity singolo cliente
         const fidRow = document.createElement('div');
         fidRow.className = 'r-line fid-actions';
 
@@ -1521,6 +1545,7 @@ ${cardUrl}`;
           points.appendChild(boxPts);
         }
 
+        // Reminder con messaggi WA precompilati per tipo
         if(it.reminders && it.reminders.length){
           const today=startOfDay(new Date());
           const dueToday=it.reminders.filter(r=>{
@@ -1533,7 +1558,7 @@ ${cardUrl}`;
             w.className='r-line';
             dueToday.forEach(rem=>{
               const b=document.createElement('a');
-              b.href=walink(it.phone, 'Ciao '+it.name+', sono Alessandro di Re Long.');
+              b.href=reminderLink(it, rem);
               b.target='_blank';
               b.rel='noopener';
               b.className='wa-btn ok';
