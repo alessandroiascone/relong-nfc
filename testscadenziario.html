@@ -184,16 +184,14 @@
       font-size:12px;
       color:var(--muted);
       display:flex;
-      flex-direction:column;
-      gap:4px;
-      align-items:flex-start;
+      flex-wrap:wrap;
+      gap:6px;
+      align-items:center;
     }
     .svc-radar-label{
       font-weight:600;
       margin-right:4px;
     }
-
-    /* Tag vecchi (li lasciamo ma non li usiamo più per i remind) */
     .svc-radar-tag{
       padding:3px 8px;
       border-radius:999px;
@@ -215,7 +213,7 @@
       color:#eaf4ff;
     }
 
-    /* ---- Radar servizi pillole nuove ---- */
+    /* Radar servizi – pillole stile “Servizi attivi” con colori remind */
     .radar-pills{
       display:flex;
       flex-wrap:wrap;
@@ -223,18 +221,25 @@
       margin-top:4px;
     }
     .radar-pill{
-      padding:8px 13px;
+      padding:6px 12px;
       border-radius:999px;
+      border:1px solid rgba(0,140,255,.35);
+      background:radial-gradient(circle at 0 0,rgba(0,140,255,.18),rgba(0,0,0,.96));
       font-size:12px;
-      border:1px solid rgba(255,255,255,.17);
-      background:linear-gradient(135deg,var(--elec2),var(--elec3));
-      color:#020308;
+      color:#eaf2ff;
       display:inline-flex;
       align-items:center;
       gap:6px;
       cursor:pointer;
-      transition:.22s ease;
-      box-shadow:0 0 9px rgba(10,162,255,.45);
+      box-shadow:0 0 0 1px rgba(0,0,0,.8) inset;
+      transition:.18s ease;
+    }
+    .radar-pill[data-disabled="1"]{
+      opacity:.35;
+      filter:grayscale(.7);
+      border-style:dashed;
+      cursor:default;
+      box-shadow:none;
     }
     .radar-pill.radar-warning{
       background:linear-gradient(135deg,#fff4c2,#ffb347);
@@ -253,11 +258,6 @@
       color:#021107;
       border-color:rgba(255,255,255,.23);
       box-shadow:0 0 12px rgba(37,211,102,.9);
-    }
-
-    /* Nasconde la data "Creato il..." sotto i servizi */
-    .meta-created{
-      display:none !important;
     }
 
     .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:100001}
@@ -317,15 +317,6 @@
       gap:10px;
       flex-wrap:wrap;
       margin-top:10px;
-    }
-    .fid-actions .btn{
-      border-radius:999px;
-      min-height:44px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-size:13px;
     }
     .fid-btn-main{
       background:linear-gradient(135deg,#ffcf40,#ff9b1a);
@@ -609,6 +600,8 @@
     const POINTS_ENERGIA       = 100;
     const POINTS_RATE          = 40;
 
+    const RADAR_WARNING_DAYS   = 3; // giorni prima per il giallo
+
     function addFidelityMovement(it, code, label, delta){
       delta = Number(delta || 0);
       if(!delta) return;
@@ -683,6 +676,7 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
+    // (Ancora presente se in futuro serve, ma non lo mostriamo più a schermo)
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -847,7 +841,6 @@ ${cardUrl}`;
 
     const REMINDER_OFFSETS=[6,13,21,30];
     const REM_TYPES=['sim','energia','fissomobile','rate'];
-    const RADAR_WARNING_DAYS = 3; // giorni prima per pillola gialla
     const typeLabel={ sim:'SIM', energia:'Energia', fissomobile:'Fisso + Mobile', rate:'Smartphone a rate', followup:'Richiamo' };
 
     const complementByKey={
@@ -905,71 +898,6 @@ ${cardUrl}`;
         case 'followup':    return waPacchiMemo(it.name,it.phone);
         default:            return waPacchiMemo(it.name,it.phone);
       }
-    }
-
-    // ---- RADAR: colori pillole in base a data/sent ----
-    function parseISODate(str){
-      if(!str) return null;
-      const [y,m,d] = str.split('-').map(Number);
-      if(!y||!m||!d) return null;
-      const dt=new Date(y, m-1, d);
-      dt.setHours(0,0,0,0);
-      return dt;
-    }
-
-    function updateRadarPillColors(){
-      const today = startOfDay(new Date());
-      $$('.radar-pill').forEach(pill=>{
-        pill.classList.remove('radar-warning','radar-danger','radar-ok');
-        const sent = pill.dataset.remSent === '1';
-        if(sent){
-          pill.classList.add('radar-ok');
-          return;
-        }
-        const dateStr = pill.dataset.remDate;
-        const due = parseISODate(dateStr);
-        if(!due) return;
-        const diffMs = due.getTime() - today.getTime();
-        const diffDays = Math.round(diffMs / 86400000);
-        if(diffDays <= 0){
-          pill.classList.add('radar-danger');
-        }else if(diffDays <= RADAR_WARNING_DAYS){
-          pill.classList.add('radar-warning');
-        }
-      });
-    }
-
-    function setupRadarClicks(){
-      $$('.radar-pill').forEach(pill=>{
-        pill.addEventListener('click', ()=>{
-          const clientId = pill.dataset.clientId;
-          const service  = (pill.dataset.service || '').toLowerCase();
-          if(!clientId || !service) return;
-
-          const it = items.find(x=>x.id===clientId);
-          if(!it) return;
-
-          ensureReminders(it);
-          const rem = (it.reminders||[]).find(r=>r.type===service);
-          if(!rem){
-            return;
-          }
-
-          // Apri WhatsApp con messaggio dedicato al servizio
-          try{
-            const link = reminderLink(it, rem);
-            window.open(link,'_blank','noopener');
-          }catch(e){}
-
-          // Segna reminder come inviato -> pillola verde
-          rem.sent = true;
-          rem.sentAt = new Date().toISOString();
-          it.updatedAt = new Date().toISOString();
-          saveLocal();
-          saveToGitHub();
-          render();
-        }, { once:false });
-      });
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -1220,47 +1148,58 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
       const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
 
-    // Radar servizi a pillole per SIM / Fisso / Energia / Rate
+    // Radar servizi – usa i remind con colori e spegne quelli già attivi
     function appendQuickWA(actions, it){
       ensureReminders(it);
 
-      const radar=document.createElement('div');
-      radar.className='svc-radar';
+      const radar = document.createElement('div');
+      radar.className = 'svc-radar';
 
-      const lbl=document.createElement('span');
-      lbl.className='svc-radar-label';
-      lbl.textContent='Radar servizi:';
+      const lbl = document.createElement('span');
+      lbl.className = 'svc-radar-label';
+      lbl.textContent = 'Radar servizi:';
       radar.appendChild(lbl);
 
-      const pillsWrap=document.createElement('div');
-      pillsWrap.className='radar-pills';
+      const pillsWrap = document.createElement('div');
+      pillsWrap.className = 'radar-pills';
 
-      const byType={};
-      (it.reminders||[]).forEach(r=>{
-        if(!byType[r.type]) byType[r.type]=r;
+      const byType = {};
+      (it.reminders || []).forEach(r=>{
+        if(!byType[r.type]) byType[r.type] = r;
       });
 
-      const defs=[
+      const defs = [
         { type:'sim',        label:'SIM',          icon:'📶' },
         { type:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡' },
         { type:'energia',    label:'Energia',      icon:'⚡' },
         { type:'rate',       label:'Rate',         icon:'📱' }
       ];
 
+      const actSet = new Set(it.activated || []);
+
       defs.forEach(def=>{
         const rem = byType[def.type];
         if(!rem) return;
-        const d = new Date(rem.dueAt || it.createdAt || Date.now());
-        const iso = d.toISOString().slice(0,10);
 
-        const pill=document.createElement('button');
+        const pill = document.createElement('button');
         pill.type='button';
         pill.className='radar-pill';
         pill.dataset.clientId = it.id;
         pill.dataset.service  = def.type;
-        pill.dataset.remDate  = iso;
-        pill.dataset.remSent  = rem.sent ? '1':'0';
-        pill.textContent = `${def.icon} ${def.label}`;
+        pill.innerHTML = `<span>${def.icon}</span><span>${def.label}</span>`;
+
+        const isActiveSvc =
+          def.type === 'fissomobile'
+            ? (actSet.has('fisso') || actSet.has('fissomobile'))
+            : actSet.has(def.type);
+
+        if(isActiveSvc){
+          pill.dataset.disabled = '1';
+        }else{
+          const d = new Date(rem.dueAt || it.createdAt || Date.now());
+          pill.dataset.remDate = d.toISOString().slice(0,10);
+          pill.dataset.remSent = rem.sent ? '1':'0';
+        }
 
         pillsWrap.appendChild(pill);
       });
@@ -1498,11 +1437,6 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           services.appendChild(boxRep);
         }
 
-        const createdInfo=document.createElement('span');
-        createdInfo.className='label meta-created';
-        createdInfo.textContent=`Creato il ${fmt(it.createdAt||new Date())}`;
-        services.appendChild(createdInfo);
-
         if(it.fromPacchi){
           const pacchiBadge=document.createElement('span');
           pacchiBadge.className='badge-mini';
@@ -1510,7 +1444,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           services.appendChild(pacchiBadge);
         }
 
-        // Radar servizi a pillole
+        // Radar servizi con remind
         appendQuickWA(actions, it);
 
         if(it.acceptance){
@@ -1678,9 +1612,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           points.appendChild(boxPts);
         }
 
-        // (Vecchio blocco "Invia reminder" sostituito dal radar pillole)
-        // reminders rimane vuoto, lo teniamo solo come struttura.
-
+        // Sezione recensioni
         if(it.postReviewAt){
           const should = new Date(it.postReviewAt)<=new Date() && !it.postReviewSent;
           if(should){
@@ -1706,9 +1638,73 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         listEl.appendChild(clone);
       });
 
-      updateDashboard();
+      // aggiorna colori e click delle pillole radar dopo aver creato la lista
       updateRadarPillColors();
       setupRadarClicks();
+
+      updateDashboard();
+    }
+
+    // Colori pillole radar in base alla data di remind
+    function updateRadarPillColors(){
+      const today = startOfDay(new Date());
+      $$('.radar-pill').forEach(pill=>{
+        if(pill.dataset.disabled === '1') return;
+
+        pill.classList.remove('radar-warning','radar-danger','radar-ok');
+
+        const sent = pill.dataset.remSent === '1';
+        if(sent){
+          pill.classList.add('radar-ok');
+          return;
+        }
+        const dateStr = pill.dataset.remDate;
+        if(!dateStr) return;
+
+        const due = new Date(dateStr);
+        due.setHours(0,0,0,0);
+        const diffMs = due.getTime() - today.getTime();
+        const diffDays = Math.round(diffMs / 86400000);
+
+        if(diffDays <= 0){
+          pill.classList.add('radar-danger');
+        }else if(diffDays <= RADAR_WARNING_DAYS){
+          pill.classList.add('radar-warning');
+        }
+      });
+    }
+
+    // Click sulle pillole radar = invio remind e passaggio a verde
+    function setupRadarClicks(){
+      $$('.radar-pill').forEach(pill=>{
+        pill.onclick = null;
+        pill.addEventListener('click', ()=>{
+          if(pill.dataset.disabled === '1') return;
+
+          const clientId = pill.dataset.clientId;
+          const service  = (pill.dataset.service || '').toLowerCase();
+          if(!clientId || !service) return;
+
+          const it = items.find(x=>x.id===clientId);
+          if(!it) return;
+
+          ensureReminders(it);
+          const rem = (it.reminders || []).find(r=>r.type===service);
+          if(!rem) return;
+
+          try{
+            const link = reminderLink(it, rem);
+            window.open(link,'_blank','noopener');
+          }catch(e){}
+
+          rem.sent = true;
+          rem.sentAt = new Date().toISOString();
+          it.updatedAt = new Date().toISOString();
+          saveLocal();
+          saveToGitHub();
+          render();
+        });
+      });
     }
 
     const dashModal=document.getElementById('dashModal');
