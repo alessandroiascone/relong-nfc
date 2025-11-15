@@ -208,6 +208,11 @@
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
     .svc-btn--card{border-color:rgba(255,215,0,.9);}
+    .svc-btn[disabled]{
+      opacity:.35;
+      cursor:not-allowed;
+      filter:grayscale(.6);
+    }
 
     /* Radar servizi */
     .svc-radar{
@@ -372,7 +377,10 @@
   </section>
 
   <section class="card">
-    <h2>Elenco</h2>
+    <h2>
+      Elenco
+      <button id="toggleElenco" class="btn">Nascondi</button>
+    </h2>
     <div class="content" id="elencoContent">
 
       <!-- Barra filtri + ricerca -->
@@ -527,7 +535,7 @@
 
     // Punti Fidelity automatici per servizi conclusi
     const POINTS_REPAIR_PC     = 50;  // Riparazione computer
-    const POINTS_REPAIR_PHONE  = 25;  // Riparazione smartphone
+    thePOINTS_REPAIR_PHONE  = 25;  // Riparazione smartphone
     const POINTS_SIM           = 30;  // SIM mobile
     const POINTS_FISSO         = 80;  // Linea fissa
     const POINTS_ENERGIA       = 100; // Luce & Gas
@@ -789,13 +797,6 @@ ${cardUrl}`;
       it.updatedAt = new Date().toISOString();
     }
 
-    function isMainCycleComplete(it){
-      if(!it.reminders || !it.reminders.length) return false;
-      const onlyMain = it.reminders.filter(r=> r.type!=='followup');
-      if(onlyMain.length===0) return false;
-      return onlyMain.every(r=>r.sent);
-    }
-
     function reminderLink(it, rem){
       switch(rem.type){
         case 'sim':         return waPacchiSIM(it.name,it.phone);
@@ -805,31 +806,6 @@ ${cardUrl}`;
         case 'followup':    return waPacchiMemo(it.name,it.phone);
         default:            return waPacchiMemo(it.name,it.phone);
       }
-    }
-
-    function addFollowup90(it){
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), 90).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast('Promemoria unico (+90g) aggiunto ✅');
-    }
-
-    function addFollowupCustom(it){
-      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
-      if(val===null) return;
-      const days = parseInt(String(val).trim(),10);
-      if(!Number.isFinite(days) || days<=0 || days>365){
-        alert('Inserisci un numero di giorni valido (1–365).');
-        return;
-      }
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), days).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -930,6 +906,7 @@ ${cardUrl}`;
           updatedAt:new Date().toISOString(),
           activated:[],
           acceptance:null,
+          acceptanceHistory:[],
           fromPacchi:false,
           reminders:null,
           remindersCycle:0,
@@ -953,6 +930,12 @@ ${cardUrl}`;
       });
 
       if(activeSet.has('riparazione')){
+        // se esiste già una riparazione, spostala in storico
+        if(found.acceptance){
+          if(!Array.isArray(found.acceptanceHistory)) found.acceptanceHistory = [];
+          found.acceptanceHistory.push(found.acceptance);
+        }
+
         const devType = typeSel.value;
         const brand = (devType==='Smartphone')
           ? (brandSelect.value==='Altro' ? (brandOther.value||'Altro') : brandSelect.value)
@@ -993,6 +976,15 @@ ${cardUrl}`;
     }
 
     insertBtn.addEventListener('click', insert);
+
+    // Nascondi / mostra elenco
+    const elencoContent = document.getElementById('elencoContent');
+    const toggleElencoBtn = document.getElementById('toggleElenco');
+    toggleElencoBtn.addEventListener('click', ()=>{
+      const hidden = elencoContent.style.display === 'none';
+      elencoContent.style.display = hidden ? 'block' : 'none';
+      toggleElencoBtn.textContent = hidden ? 'Nascondi' : 'Mostra';
+    });
 
     const filtersRow = document.getElementById('filtersRow');
     const toggleFiltersBtn = document.getElementById('toggleFilters');
@@ -1055,21 +1047,25 @@ ${cardUrl}`;
       btnSim.className='svc-btn svc-btn--sim';
       btnSim.innerHTML='<span class="icon">📶</span><span>Proponi SIM</span>';
       btnSim.addEventListener('click',()=>{ window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'); });
+      if(actSet.has('sim')) btnSim.disabled = true;
 
       const btnFisso=document.createElement('button');
       btnFisso.className='svc-btn svc-btn--fisso';
       btnFisso.innerHTML='<span class="icon">🏠📡</span><span>Proponi Fisso</span>';
       btnFisso.addEventListener('click',()=>{ window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'); });
+      if(actSet.has('fissomobile') || actSet.has('fisso')) btnFisso.disabled = true;
 
       const btnEnergia=document.createElement('button');
       btnEnergia.className='svc-btn svc-btn--energia';
       btnEnergia.innerHTML='<span class="icon">⚡</span><span>Proponi Energia</span>';
       btnEnergia.addEventListener('click',()=>{ window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'); });
+      if(actSet.has('energia')) btnEnergia.disabled = true;
 
       const btnRate=document.createElement('button');
       btnRate.className='svc-btn svc-btn--rate';
       btnRate.innerHTML='<span class="icon">📱</span><span>Proponi Rate</span>';
       btnRate.addEventListener('click',()=>{ window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'); });
+      if(actSet.has('rate')) btnRate.disabled = true;
 
       row.appendChild(btnSim);
       row.appendChild(btnFisso);
@@ -1271,12 +1267,13 @@ ${cardUrl}`;
         title.appendChild(pointsSpan);
         title.appendChild(badge);
 
+        // --- Servizi attivi cliccabili ---
         const svcRow=document.createElement('div');
         svcRow.className='svc-radar';
-        const lbl=document.createElement('span');
-        lbl.className='svc-radar-label';
-        lbl.textContent='Servizi attivi:';
-        svcRow.appendChild(lbl);
+        const lblSA=document.createElement('span');
+        lblSA.className='svc-radar-label';
+        lblSA.textContent='Servizi attivi:';
+        svcRow.appendChild(lblSA);
 
         const servicesList=[
           { key:'sim',        label:'SIM',          icon:'📶' },
@@ -1289,14 +1286,51 @@ ${cardUrl}`;
           const t=document.createElement('span');
           t.className='svc-radar-tag ' + (actSet.has(s.key)?'on':'off');
           t.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
+          t.dataset.key = s.key;
+          t.style.cursor='pointer';
+          t.title='Clicca per attivare/disattivare servizio';
+          t.addEventListener('click', ()=>{
+            const set = new Set(it.activated || []);
+            if(set.has(s.key)) set.delete(s.key); else set.add(s.key);
+            it.activated = [...set];
+            it.updatedAt = new Date().toISOString();
+            saveLocal(); saveToGitHub(); render();
+          });
           svcRow.appendChild(t);
         });
         services.appendChild(svcRow);
 
-        if(it.acceptance){
-          const d=document.createElement('div');
-          d.textContent=`Riparazione: ${it.acceptance.type||''} ${it.acceptance.brand||''} ${it.acceptance.model||''}`;
-          services.appendChild(d);
+        // Storico riparazioni a scomparsa
+        const repairs = [];
+        if(Array.isArray(it.acceptanceHistory)) repairs.push(...it.acceptanceHistory);
+        if(it.acceptance) repairs.push(it.acceptance);
+
+        if(repairs.length){
+          const headerRep = document.createElement('div');
+          headerRep.className='label';
+          headerRep.style.cursor='pointer';
+          headerRep.textContent='Storico riparazioni ▾';
+
+          const boxRep = document.createElement('div');
+          boxRep.className='r-line';
+          boxRep.style.display='none';
+          boxRep.style.flexDirection='column';
+
+          repairs.forEach(r=>{
+            const line=document.createElement('div');
+            const d = r.createdAt ? fmt(r.createdAt) : (it.createdAt ? fmt(it.createdAt) : '');
+            line.textContent = `${d ? d+' • ' : ''}${r.type||''} ${r.brand||''} ${r.model||''} – ${r.issue||''}`;
+            boxRep.appendChild(line);
+          });
+
+          headerRep.addEventListener('click', ()=>{
+            const open = boxRep.style.display==='none';
+            boxRep.style.display = open ? 'flex' : 'none';
+            headerRep.textContent = open ? 'Storico riparazioni ▴' : 'Storico riparazioni ▾';
+          });
+
+          services.appendChild(headerRep);
+          services.appendChild(boxRep);
         }
 
         const createdInfo=document.createElement('span');
@@ -1311,12 +1345,8 @@ ${cardUrl}`;
           services.appendChild(pacchiBadge);
         }
 
-        // --- Radar servizi + Proponi (UNA VOLTA SOLA) ---
-        if(it.acceptance){
-          appendQuickWA(actions, it);
-        } else {
-          appendQuickWA(actions, it);
-        }
+        // Radar + Proponi (una volta sola)
+        appendQuickWA(actions, it);
 
         if(it.acceptance){
           if(it.quoteStatus==='pending'){
@@ -1345,13 +1375,12 @@ ${cardUrl}`;
               it.postReviewAt = addDays(new Date(), 3).toISOString();
               it.postReviewSent = false;
 
-              // Fidelity: accredito punti per riparazione conclusa
               const devType = (it.device && it.device.type ? String(it.device.type).toLowerCase() : '');
               let delta = 0;
               if(devType === 'computer'){
-                delta = POINTS_REPAIR_PC;    // 50 punti
+                delta = POINTS_REPAIR_PC;
               }else if(devType === 'smartphone'){
-                delta = POINTS_REPAIR_PHONE; // 25 punti
+                delta = POINTS_REPAIR_PHONE;
               }
               if(delta > 0){
                 const code  = 'repair-' + (devType || 'altro') + '-delivered';
@@ -1378,7 +1407,6 @@ ${cardUrl}`;
               it.done = true;
               it.doneAt = new Date().toISOString();
 
-              // Fidelity: accredito punti per pratiche concluse (no pacchi)
               const acts = new Set(it.activated || []);
               const isPacchi = !!it.fromPacchi || acts.has('pacchi');
 
@@ -1445,23 +1473,35 @@ ${cardUrl}`;
         fidRow.appendChild(bOpenCard);
         actions.appendChild(fidRow);
 
+        // Storico punti a scomparsa
         if(Array.isArray(it.pointsMovements) && it.pointsMovements.length){
-          const wrap=document.createElement('div');
-          wrap.className='r-line';
-          const label=document.createElement('span');
-          label.className='label';
-          label.textContent='Ultimi movimenti punti:';
-          wrap.appendChild(label);
+          const headerPts=document.createElement('div');
+          headerPts.className='label';
+          headerPts.style.cursor='pointer';
+          headerPts.textContent='Storico punti ▾';
 
-          const last=it.pointsMovements.slice(-3).reverse();
+          const boxPts=document.createElement('div');
+          boxPts.className='r-line';
+          boxPts.style.display='none';
+          boxPts.style.flexDirection='column';
+
+          const last=it.pointsMovements.slice(-10).reverse();
           last.forEach(m=>{
-            const t=document.createElement('span');
+            const t=document.createElement('div');
             t.className='badge-mini';
             const sign = m.delta>0?'+':'';
             t.textContent=`${sign}${m.delta} pt • ${m.label}`;
-            wrap.appendChild(t);
+            boxPts.appendChild(t);
           });
-          points.appendChild(wrap);
+
+          headerPts.addEventListener('click',()=>{
+            const open = boxPts.style.display==='none';
+            boxPts.style.display = open ? 'flex' : 'none';
+            headerPts.textContent = open ? 'Storico punti ▴' : 'Storico punti ▾';
+          });
+
+          points.appendChild(headerPts);
+          points.appendChild(boxPts);
         }
 
         if(it.reminders && it.reminders.length){
