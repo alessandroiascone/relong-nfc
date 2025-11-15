@@ -1311,7 +1311,12 @@ ${cardUrl}`;
           services.appendChild(pacchiBadge);
         }
 
-        appendQuickWA(actions, it);
+        // --- Radar servizi + Proponi (UNA VOLTA SOLA) ---
+        if(it.acceptance){
+          appendQuickWA(actions, it);
+        } else {
+          appendQuickWA(actions, it);
+        }
 
         if(it.acceptance){
           if(it.quoteStatus==='pending'){
@@ -1366,7 +1371,6 @@ ${cardUrl}`;
             const lab=document.createElement('span'); lab.className='label'; lab.textContent='Riparazione consegnata'; actions.append(lab);
           }
         } else {
-          appendQuickWA(actions, it);
 
           if(!it.done){
             actions.append(btn('Completato', ()=>{
@@ -1407,6 +1411,39 @@ ${cardUrl}`;
 
           actions.append(btnDelete(it));
         }
+
+        // --- STRUMENTI FIDELITY PER SINGOLO CLIENTE ---
+        const fidRow = document.createElement('div');
+        fidRow.className = 'r-line';
+
+        const bAddPts = btn('+ Punti Fidelity', ()=>{
+          const val = prompt('Quanti punti vuoi aggiungere/sottrarre? (es. 10 o -20)');
+          if(val===null) return;
+          const delta = parseInt(String(val).trim(),10);
+          if(!Number.isFinite(delta) || delta===0){
+            alert('Valore non valido.');
+            return;
+          }
+          addFidelityMovement(it, 'manual-'+Date.now(), 'Movimento manuale Fidelity', delta);
+          it.updatedAt = new Date().toISOString();
+          saveLocal(); saveToGitHub(); render();
+        });
+
+        const bSendCard = btn('Invia Fidelity Card', ()=>{
+          try{
+            window.open(waWelcomeWithCard(it),'_blank','noopener');
+          }catch{}
+        });
+
+        const bOpenCard = btn('Apri Fidelity Card', ()=>{
+          const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+          window.open(url,'_blank','noopener');
+        });
+
+        fidRow.appendChild(bAddPts);
+        fidRow.appendChild(bSendCard);
+        fidRow.appendChild(bOpenCard);
+        actions.appendChild(fidRow);
 
         if(Array.isArray(it.pointsMovements) && it.pointsMovements.length){
           const wrap=document.createElement('div');
