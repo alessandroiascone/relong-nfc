@@ -627,6 +627,7 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
+    // (Ancora presente se in futuro serve, ma non lo mostriamo più a schermo)
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -836,6 +837,18 @@ ${cardUrl}`;
       it.remindersCycle = 1;
       it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
+    }
+
+    // Link messaggi reminder specifici per tipo
+    function reminderLink(it, rem){
+      switch(rem.type){
+        case 'sim':         return waPacchiSIM(it.name,it.phone);
+        case 'energia':     return waPacchiEnergia(it.name,it.phone);
+        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
+        case 'rate':        return waPacchiRate(it.name,it.phone);
+        case 'followup':    return waPacchiMemo(it.name,it.phone);
+        default:            return waPacchiMemo(it.name,it.phone);
+      }
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -1086,7 +1099,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
       const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
     }
 
-    // Radar servizi = servizi proponibili (cliccabili)
+    // Radar servizi = servizi proponibili (cliccabili) in base a servizi attivi
     function appendQuickWA(actions, it){
       const radar = document.createElement('div');
       radar.className = 'svc-radar';
@@ -1211,10 +1224,23 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         return;
       }
 
+      // ORDINAMENTO ALFABETICO per Nome e Cognome (con fallback su telefono)
       arr.sort((a,b)=>{
+        const na = (a.name || '').trim().toLowerCase();
+        const nb = (b.name || '').trim().toLowerCase();
+        if(na && nb){
+          const cmp = na.localeCompare(nb,'it-IT');
+          if(cmp!==0) return cmp;
+        }
+        const pa = normalizePhone(a.phone || '');
+        const pb = normalizePhone(b.phone || '');
+        if(pa && pb){
+          const cmp2 = pa.localeCompare(pb,'it-IT');
+          if(cmp2!==0) return cmp2;
+        }
         const da = new Date(a.updatedAt||a.createdAt||0).getTime();
         const db = new Date(b.updatedAt||b.createdAt||0).getTime();
-        return db-da;
+        return da-db;
       });
 
       arr.forEach(it=>{
@@ -1244,7 +1270,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
         title.appendChild(phoneSpan);
         title.appendChild(pointsSpan);
 
-        // Servizi attivi cliccabili
+        // Servizi attivi cliccabili (attiva/disattiva)
         const svcRow=document.createElement('div');
         svcRow.className='svc-radar';
         const lblSA=document.createElement('span');
@@ -1351,7 +1377,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           services.appendChild(pacchiBadge);
         }
 
-        // Radar servizi (proposte)
+        // Radar servizi proponibili (clic + WhatsApp precompilato)
         appendQuickWA(actions, it);
 
         if(it.acceptance){
@@ -1519,6 +1545,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
           points.appendChild(boxPts);
         }
 
+        // Reminder con messaggi WA precompilati per tipo
         if(it.reminders && it.reminders.length){
           const today=startOfDay(new Date());
           const dueToday=it.reminders.filter(r=>{
@@ -1531,7 +1558,7 @@ Per il saldo aggiornato scrivimi qui su WhatsApp o passa in negozio.`;
             w.className='r-line';
             dueToday.forEach(rem=>{
               const b=document.createElement('a');
-              b.href=walink(it.phone, 'Ciao '+it.name+', sono Alessandro di Re Long.');
+              b.href=reminderLink(it, rem);
               b.target='_blank';
               b.rel='noopener';
               b.className='wa-btn ok';
