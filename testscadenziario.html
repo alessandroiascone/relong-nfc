@@ -207,7 +207,6 @@
     .svc-btn--sim{border-color:rgba(255,165,0,.8);}
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
-    .svc-btn--card{border-color:rgba(255,215,0,.9);}
     .svc-btn[disabled]{
       opacity:.35;
       cursor:not-allowed;
@@ -299,6 +298,31 @@
       opacity:.8;
     }
     #toggleElenco:hover{opacity:1;}
+
+    /* Fidelity buttons più moderni */
+    .fid-actions{
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .fid-btn-main{
+      background:linear-gradient(135deg,#ffcf40,#ff9b1a);
+      color:#2b1800;
+      border:0;
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      flex:1 1 120px;
+    }
+    .fid-btn-ghost{
+      background:rgba(10,13,20,.9);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 6px 16px rgba(0,0,0,.5);
+      flex:1 1 120px;
+    }
+    .fid-btn-main:hover,
+    .fid-btn-ghost:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 26px rgba(0,0,0,.7);
+    }
   </style>
 </head>
 <body>
@@ -532,13 +556,12 @@
     const GAIN_ENERGIA = 150;
     const GAIN_RATE    = 45;
 
-    // Punti Fidelity automatici per servizi conclusi
-    const POINTS_REPAIR_PC     = 50;  // Riparazione computer
-    const POINTS_REPAIR_PHONE  = 25;  // Riparazione smartphone
-    const POINTS_SIM           = 30;  // SIM mobile
-    const POINTS_FISSO         = 80;  // Linea fissa
-    const POINTS_ENERGIA       = 100; // Luce & Gas
-    const POINTS_RATE          = 40;  // Smartphone a rate
+    const POINTS_REPAIR_PC     = 50;
+    const POINTS_REPAIR_PHONE  = 25;
+    const POINTS_SIM           = 30;
+    const POINTS_FISSO         = 80;
+    const POINTS_ENERGIA       = 100;
+    const POINTS_RATE          = 40;
 
     function addFidelityMovement(it, code, label, delta){
       delta = Number(delta || 0);
@@ -573,7 +596,6 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
-    // Livelli Fidelity
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -783,17 +805,6 @@ ${cardUrl}`;
       it.remindersCycle = 1;
       it.responded = !!it.responded;
       it.updatedAt=new Date().toISOString();
-    }
-
-    function reminderLink(it, rem){
-      switch(rem.type){
-        case 'sim':         return waPacchiSIM(it.name,it.phone);
-        case 'energia':     return waPacchiEnergia(it.name,it.phone);
-        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
-        case 'rate':        return waPacchiRate(it.name,it.phone);
-        case 'followup':    return waPacchiMemo(it.name,it.phone);
-        default:            return waPacchiMemo(it.name,it.phone);
-      }
     }
 
     const activeSet=new Set(); const toggles=$('#toggles');
@@ -1268,7 +1279,7 @@ ${cardUrl}`;
         });
         services.appendChild(svcRow);
 
-        // Storico riparazioni a scomparsa (con info preventivo + consegna)
+        // Storico riparazioni a scomparsa (con pillole stato)
         const repairs = [];
         if(Array.isArray(it.acceptanceHistory)) repairs.push(...it.acceptanceHistory);
         if(it.acceptance) repairs.push(it.acceptance);
@@ -1293,21 +1304,29 @@ ${cardUrl}`;
             boxRep.appendChild(line);
 
             if(idx === repairs.length-1){
-              // ultima = riparazione corrente, aggiungi info preventivo + consegna
+              const chips=document.createElement('div');
+              chips.className='r-line';
+              chips.style.marginTop='4px';
+
               if(it.quoteStatus){
                 const st = it.quoteStatus==='pending'
                   ? 'Preventivo in attesa'
                   : it.quoteStatus==='sent'
                     ? 'Preventivo inviato'
                     : 'Preventivo accettato';
-                const l2=document.createElement('div');
-                l2.textContent = st;
-                boxRep.appendChild(l2);
+                const chip1=document.createElement('span');
+                chip1.className='label';
+                chip1.textContent=st;
+                chips.appendChild(chip1);
               }
               if(it.deliveredAt){
-                const l3=document.createElement('div');
-                l3.textContent = 'Prodotto consegnato il '+fmt(it.deliveredAt);
-                boxRep.appendChild(l3);
+                const chip2=document.createElement('span');
+                chip2.className='label';
+                chip2.textContent='Prodotto consegnato il '+fmt(it.deliveredAt);
+                chips.appendChild(chip2);
+              }
+              if(chips.children.length){
+                boxRep.appendChild(chips);
               }
             }
           });
@@ -1346,8 +1365,6 @@ ${cardUrl}`;
             actions.append(btn('Accetta preventivo', ()=>{
               it.quoteStatus='accepted'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
             }));
-          } else if(it.quoteStatus==='accepted'){
-            const lab=document.createElement('span'); lab.className='label'; lab.textContent='Preventivo accettato'; actions.append(lab);
           }
 
           if(it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
@@ -1385,8 +1402,6 @@ ${cardUrl}`;
 
               if(dashModal && dashModal.classList.contains('on')) updateDashboard();
             }));
-          } else if(it.repairStatus==='consegnato'){
-            const lab=document.createElement('span'); lab.className='label'; lab.textContent='Riparazione consegnata'; actions.append(lab);
           }
         } else {
 
@@ -1429,11 +1444,15 @@ ${cardUrl}`;
           actions.append(btnDelete(it));
         }
 
-        // Strumenti Fidelity singolo cliente
+        // Strumenti Fidelity singolo cliente (moderni)
         const fidRow = document.createElement('div');
-        fidRow.className = 'r-line';
+        fidRow.className = 'r-line fid-actions';
 
-        const bAddPts = btn('+ Punti Fidelity', ()=>{
+        const bAddPts = document.createElement('button');
+        bAddPts.type='button';
+        bAddPts.className='btn fid-btn-main';
+        bAddPts.textContent='+ Punti Fidelity';
+        bAddPts.addEventListener('click', ()=>{
           const val = prompt('Quanti punti vuoi aggiungere/sottrarre? (es. 10 o -20)');
           if(val===null) return;
           const delta = parseInt(String(val).trim(),10);
@@ -1446,13 +1465,21 @@ ${cardUrl}`;
           saveLocal(); saveToGitHub(); render();
         });
 
-        const bSendCard = btn('Invia Fidelity Card', ()=>{
+        const bSendCard = document.createElement('button');
+        bSendCard.type='button';
+        bSendCard.className='btn fid-btn-ghost';
+        bSendCard.textContent='Invia Fidelity Card';
+        bSendCard.addEventListener('click', ()=>{
           try{
             window.open(waWelcomeWithCard(it),'_blank','noopener');
           }catch{}
         });
 
-        const bOpenCard = btn('Apri Fidelity Card', ()=>{
+        const bOpenCard = document.createElement('button');
+        bOpenCard.type='button';
+        bOpenCard.className='btn fid-btn-ghost';
+        bOpenCard.textContent='Apri Fidelity Card';
+        bOpenCard.addEventListener('click', ()=>{
           const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
           window.open(url,'_blank','noopener');
         });
@@ -1506,7 +1533,7 @@ ${cardUrl}`;
             w.className='r-line';
             dueToday.forEach(rem=>{
               const b=document.createElement('a');
-              b.href=reminderLink(it, rem);
+              b.href=walink(it.phone, 'Ciao '+it.name+', sono Alessandro di Re Long.');
               b.target='_blank';
               b.rel='noopener';
               b.className='wa-btn ok';
