@@ -207,7 +207,11 @@
     .svc-btn--sim{border-color:rgba(255,165,0,.8);}
     .svc-btn--fisso{border-color:rgba(135,206,250,.9);}
     .svc-btn--rate{border-color:rgba(173,216,230,.9);}
-    .svc-btn--card{border-color:rgba(255,215,0,.9);}
+    .svc-btn[disabled]{
+      opacity:.35;
+      cursor:not-allowed;
+      filter:grayscale(.6);
+    }
 
     /* Radar servizi */
     .svc-radar{
@@ -294,6 +298,31 @@
       opacity:.8;
     }
     #toggleElenco:hover{opacity:1;}
+
+    /* Fidelity buttons più moderni */
+    .fid-actions{
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .fid-btn-main{
+      background:linear-gradient(135deg,#ffcf40,#ff9b1a);
+      color:#2b1800;
+      border:0;
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      flex:1 1 120px;
+    }
+    .fid-btn-ghost{
+      background:rgba(10,13,20,.9);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 6px 16px rgba(0,0,0,.5);
+      flex:1 1 120px;
+    }
+    .fid-btn-main:hover,
+    .fid-btn-ghost:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 26px rgba(0,0,0,.7);
+    }
   </style>
 </head>
 <body>
@@ -372,7 +401,10 @@
   </section>
 
   <section class="card">
-    <h2>Elenco</h2>
+    <h2>
+      Elenco
+      <button id="toggleElenco" class="btn">Nascondi</button>
+    </h2>
     <div class="content" id="elencoContent">
 
       <!-- Barra filtri + ricerca -->
@@ -381,7 +413,7 @@
         <input id="searchInput" placeholder="Cerca nome o telefono" />
       </div>
 
-      <!-- Barra Fidelity: Gift sopra e sotto i due bottoni -->
+      <!-- Barra Fidelity -->
       <div class="toolbar" style="justify-content:flex-end">
         <div style="display:flex;flex-direction:column;gap:6px;max-width:380px;width:100%">
           <button
@@ -513,7 +545,6 @@
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     const STORE_KEY='relong-scadenzario-v32b';
     const GH_CFG_KEY='relong-gh-config-v31', GH_TOKEN_KEY='relong-gh-token-v31';
-    const HUB_URL='https://alessandroiascone.github.io/relong-nfc/relong-hub-v2.html';
     const FIDELITY_URL='https://alessandroiascone.github.io/relong-nfc/fidelity.html';
     const MAPS_URL='https://maps.app.goo.gl/s4ytGUBeGDAEaFG59';
     const REVIEW_URL='http://g.page/r/CeN076xNHzDmEAE/review';
@@ -524,6 +555,35 @@
     const GAIN_FISSO   = 110;
     const GAIN_ENERGIA = 150;
     const GAIN_RATE    = 45;
+
+    const POINTS_REPAIR_PC     = 50;
+    const POINTS_REPAIR_PHONE  = 25;
+    const POINTS_SIM           = 30;
+    const POINTS_FISSO         = 80;
+    const POINTS_ENERGIA       = 100;
+    const POINTS_RATE          = 40;
+
+    function addFidelityMovement(it, code, label, delta){
+      delta = Number(delta || 0);
+      if(!delta) return;
+      if(!it) return;
+
+      if(!Array.isArray(it.pointsMovements)) it.pointsMovements = [];
+      if(it.pointsMovements.some(m => m.code === code)) return;
+
+      let curr = Number(it.points || 0);
+      if(isNaN(curr)) curr = 0;
+      curr += delta;
+      if(curr < 0) curr = 0;
+      it.points = curr;
+
+      it.pointsMovements.push({
+        code,
+        label,
+        delta,
+        at: new Date().toISOString()
+      });
+    }
 
     let lastBonusRecipients = [];
 
@@ -536,7 +596,6 @@
     const addDays=(d,n)=>{const x=new Date(d); x.setDate(x.getDate()+n); return x};
     const startOfDay = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
 
-    // Livelli Fidelity
     function getLevel(points){
       const p = Number(points||0);
       if(p>=1000) return {name:'BLACK', emoji:'🖤', class:'lvl-black', min:1000, next:null};
@@ -549,7 +608,6 @@
     const GH={
       cfg(){ try{ return JSON.parse(localStorage.getItem(GH_CFG_KEY)||'null'); }catch{return null} },
       token(){ return localStorage.getItem(GH_TOKEN_KEY)||'' },
-      headers(){ return { 'Accept':'application/vnd.github+json', 'Authorization':'Bearer '+this.token() } },
       async get(path){
         const c=this.cfg(); if(!c) throw new Error('Nessuna configurazione GitHub');
         const url=`https://api.github.com/repos/${c.owner}/${c.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(c.branch||'main')}`;
@@ -749,57 +807,6 @@ ${cardUrl}`;
       it.updatedAt=new Date().toISOString();
     }
 
-    function prorogaPromemoria(it){
-      if(it.responded) return;
-      const types = shuffle(getReminderTypesForItem(it));
-      it.reminders = buildReminders(new Date(), types);
-      it.remindersCycle = (it.remindersCycle||1) + 1;
-      it.updatedAt = new Date().toISOString();
-    }
-
-    function isMainCycleComplete(it){
-      if(!it.reminders || !it.reminders.length) return false;
-      const onlyMain = it.reminders.filter(r=> r.type!=='followup');
-      if(onlyMain.length===0) return false;
-      return onlyMain.every(r=>r.sent);
-    }
-
-    function reminderLink(it, rem){
-      switch(rem.type){
-        case 'sim':         return waPacchiSIM(it.name,it.phone);
-        case 'energia':     return waPacchiEnergia(it.name,it.phone);
-        case 'fissomobile': return waPacchiFisso(it.name,it.phone);
-        case 'rate':        return waPacchiRate(it.name,it.phone);
-        case 'followup':    return waPacchiMemo(it.name,it.phone);
-        default:            return waPacchiMemo(it.name,it.phone);
-      }
-    }
-
-    function addFollowup90(it){
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), 90).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast('Promemoria unico (+90g) aggiunto ✅');
-    }
-
-    function addFollowupCustom(it){
-      const val = prompt('Tra quanti giorni vuoi il promemoria unico? (es. 60, 120)');
-      if(val===null) return;
-      const days = parseInt(String(val).trim(),10);
-      if(!Number.isFinite(days) || days<=0 || days>365){
-        alert('Inserisci un numero di giorni valido (1–365).');
-        return;
-      }
-      if(!it.reminders) it.reminders=[];
-      const due = addDays(new Date(), days).toISOString();
-      it.reminders.push({ type:'followup', dueAt: due, sent:false, sentAt:null });
-      it.updatedAt=new Date().toISOString();
-      saveLocal(); saveToGitHub(); render();
-      showToast(`Promemoria unico (+${days}g) aggiunto ✅`);
-    }
-
     const activeSet=new Set(); const toggles=$('#toggles');
     toggles.addEventListener('click', e=>{
       const b=e.target.closest('.tbtn'); if(!b) return;
@@ -863,806 +870,816 @@ ${cardUrl}`;
       if(!n) return;
       if((phoneInput.value||'').trim()) return;
       const hit = findByName(n);
-      if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); showToast('Telefono precompilato dalla lista clienti'); }
-      updateInsertState();
+      if(hit && hit.phone){ phoneInput.value = normalizePhone(hit.phone); updateInsertState(); }
     });
 
     phoneInput.addEventListener('blur', ()=>{
-      const p = normalizePhone(phoneInput.value);
+      const p = phoneInput.value;
       if(!p) return;
       if((nameInput.value||'').trim()) return;
       const hit = findByPhone(p);
-      if(hit && hit.name){ nameInput.value = hit.name; showToast('Nome precompilato dalla lista clienti'); }
-      updateInsertState();
+      if(hit && hit.name){ nameInput.value = hit.name; updateInsertState(); }
     });
 
-    insertBtn.addEventListener('click', async ()=>{
-      const name=(nameInput.value||'').trim(); let phone=normalizePhone(phoneInput.value||'');
-      if(!name || !/\s/.test(name)) return alert('Inserisci Nome e Cognome');
-      if(!phone || phone.length<7) return alert('Telefono non valido');
-      if(activeSet.size===0) return alert('Seleziona almeno un’operazione');
+    function ensureBaseFields(it){
+      if(typeof it.points!=='number') it.points = 0;
+      if(!Array.isArray(it.pointsMovements)) it.pointsMovements = [];
+      if(!Array.isArray(it.activated)) it.activated = [];
+      if(!Array.isArray(it.acceptanceHistory)) it.acceptanceHistory = [];
+      if(!it.id) it.id = String(Date.now())+'-'+Math.random().toString(16).slice(2);
+    }
 
-      const act=[...activeSet];
+    function insert(){
+      const name=(nameInput.value||'').trim();
+      const phone=normalizePhone(phoneInput.value||'');
+      if(!name || !phone || activeSet.size===0) return;
 
-      const isRepair=activeSet.has('riparazione');
-      let newItem={
-        id:Date.now()+Math.random().toString(16).slice(2),
-        name,
-        phone,
-        createdAt:new Date().toISOString(),
-        updatedAt:new Date().toISOString(),
-        activated:act,
-        acceptance:false,
-        fromPacchi:false,
-        done:false,
-        points:20
-      };
-
-      if(isRepair){
-        const model=(document.getElementById('a_model').value||'').trim(); if(!model) return alert('Inserisci il modello');
-        const brand = (typeSel.value==='Smartphone')
-          ? ((brandSelect.value==='Altro') ? (brandOther.value||'Altro') : brandSelect.value)
-          : (brandInput.value||'');
-        newItem.acceptance=true; newItem.device={ type:typeSel.value, brand, model, issue:(document.getElementById('a_issue').value||'').trim() };
-        newItem.repairStatus='diagnostica'; newItem.quoteStatus=null; newItem.quotePrice=null;
-      }
-
-      if(activeSet.has('pacchi')) newItem.fromPacchi=true;
-
-      const byPhone = findByPhone(phone);
-      const byName  = findByName(name);
-      const prev = byPhone || byName;
-
-      if(prev){
-        prev.name = prev.name || name;
-        prev.phone = prev.phone || phone;
-        prev.activated = [...new Set([...(prev.activated||[]), ...act])];
-
-        if(newItem.acceptance){
-          prev.acceptance = true;
-          prev.device = newItem.device;
-          prev.repairStatus = prev.repairStatus || 'diagnostica';
-        }
-        if(newItem.fromPacchi) prev.fromPacchi = true;
-
-        if(prev.points == null){
-          prev.points = 20;
-        }
-
-        if(!prev.reminders || !prev.reminders.length){
-          ensureReminders(prev);
-        }
-
-        prev.updatedAt = new Date().toISOString();
-        showToast('Cliente già presente: dati aggiornati ✅');
+      let found=findByPhone(phone) || findByName(name);
+      if(found){
+        if(!found.phone) found.phone = phone;
+        if(!found.name)  found.name  = name;
       } else {
-        ensureReminders(newItem);
-        items.unshift(newItem);
-        showToast('Operazione registrata + Fidelity 20 punti ✅');
+        found={
+          id:String(Date.now())+'-'+Math.random().toString(16).slice(2),
+          name, phone,
+          createdAt:new Date().toISOString(),
+          updatedAt:new Date().toISOString(),
+          activated:[],
+          acceptance:null,
+          acceptanceHistory:[],
+          fromPacchi:false,
+          reminders:null,
+          remindersCycle:0,
+          responded:false,
+          points:0,
+          pointsMovements:[]
+        };
+
+        addFidelityMovement(found, 'welcome-20', 'Bonus benvenuto Fidelity', 20);
+        try{
+          window.open(waWelcomeWithCard(found),'_blank','noopener');
+        }catch{}
+        items.push(found);
       }
 
-      saveLocal(); const ok=await saveToGitHub(); if(!ok) showToast('Salvato in locale (sync KO)','err');
+      ensureBaseFields(found);
+
+      activeSet.forEach(k=>{
+        if(!found.activated.includes(k)) found.activated.push(k);
+      });
+
+      if(activeSet.has('riparazione')){
+        if(found.acceptance){
+          found.acceptanceHistory.push(found.acceptance);
+        }
+
+        const devType = typeSel.value;
+        const brand = (devType==='Smartphone')
+          ? (brandSelect.value==='Altro' ? (brandOther.value||'Altro') : brandSelect.value)
+          : (document.getElementById('a_brand').value || '');
+        const model = document.getElementById('a_model').value || '';
+        const issue = document.getElementById('a_issue').value || '';
+
+        found.acceptance = {
+          type:devType, brand, model, issue,
+          createdAt:new Date().toISOString()
+        };
+        found.repairStatus = 'in_lavorazione';
+        found.quoteStatus = 'pending';
+        found.deliveredAt = null;
+
+        try{
+          window.open(waRepairIntakeWithCard(found),'_blank','noopener');
+        }catch{}
+      }
+
+      if(activeSet.has('pacchi')){
+        found.fromPacchi = true;
+        try{
+          window.open(waPacchiReceivedWithCard(found),'_blank','noopener');
+        }catch{}
+      }
+
+      ensureReminders(found);
+      found.updatedAt=new Date().toISOString();
+
+      saveLocal(); saveToGitHub(); render();
       nameInput.value=''; phoneInput.value='';
+      document.getElementById('a_model').value='';
+      document.getElementById('a_issue').value='';
       activeSet.clear(); $$('#toggles .tbtn').forEach(b=>b.classList.remove('active'));
-      document.getElementById('acceptWrap').style.display='none';
+      $('#acceptWrap').style.display='none';
       updateInsertState();
-      render();
+      showToast('Cliente inserito e Fidelity aggiornata ✅');
+    }
 
-      try{
-        const target = prev || newItem;
-        if(isRepair){
-          window.open(waRepairIntakeWithCard(target),'_blank','noopener');
-        } else if(target.fromPacchi){
-          window.open(waPacchiReceivedWithCard(target),'_blank','noopener');
-        } else if(!prev){
-          window.open(waWelcomeWithCard(target),'_blank','noopener');
-        }
-      }catch{}
+    insertBtn.addEventListener('click', insert);
+
+    // Nascondi / mostra elenco
+    const elencoContent = document.getElementById('elencoContent');
+    const toggleElencoBtn = document.getElementById('toggleElenco');
+    toggleElencoBtn.addEventListener('click', ()=>{
+      const hidden = elencoContent.style.display === 'none';
+      elencoContent.style.display = hidden ? 'block' : 'none';
+      toggleElencoBtn.textContent = hidden ? 'Nascondi' : 'Mostra';
     });
 
-    let filterToday=false;
-    let filterState={
-      remindtoday:false,
-      pacchi:false, sim:false, fisso:false, energia:false,
-      rate:false, riparazioni:false, preventivi:false
-    };
-    let searchTerm='';
-
-    const toggleFiltersBtn = document.getElementById('toggleFilters');
     const filtersRow = document.getElementById('filtersRow');
-    const searchInput = document.getElementById('searchInput');
-    const filterSummary = document.getElementById('filterSummary');
-    const bonusAllBtn = document.getElementById('bonusAll');
-    const generateMissingBtn = document.getElementById('generateMissing');
-    const giftFidelityBtn = document.getElementById('giftFidelity');
-
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
     toggleFiltersBtn.addEventListener('click', ()=>{
-      const isHidden = filtersRow.style.display==='none' || !filtersRow.style.display;
-      filtersRow.style.display = isHidden ? 'flex' : 'none';
-      toggleFiltersBtn.classList.toggle('active', isHidden);
+      const vis = filtersRow.style.display!=='none';
+      filtersRow.style.display = vis ? 'none':'flex';
     });
 
-    filtersRow.addEventListener('click', e=>{
-      const b=e.target.closest('.toggle'); if(!b) return;
-      const key=b.dataset.filter;
-      const on=!b.classList.contains('active');
-      b.classList.toggle('active',on);
-      filterState[key]=on;
+    let activeFilter = null;
+    $$('#filtersRow .toggle').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const key = b.dataset.filter;
+        if(activeFilter === key){
+          activeFilter = null;
+          b.classList.remove('active');
+        } else {
+          activeFilter = key;
+          $$('#filtersRow .toggle').forEach(x=>x.classList.toggle('active', x===b));
+        }
+        render();
+      });
+    });
 
-      if(key === 'remindtoday'){
-        filterToday = on;
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', render);
+
+    function btn(label,fn){
+      const b=document.createElement('button'); b.className='btn'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
+    }
+    function btnOk(label,fn){
+      const b=document.createElement('button'); b.className='btn ok'; b.type='button'; b.textContent=label; b.addEventListener('click', fn); return b;
+    }
+
+    // Radar servizi = servizi proponibili (cliccabili)
+    function appendQuickWA(actions, it){
+      const radar = document.createElement('div');
+      radar.className = 'svc-radar';
+      const lbl=document.createElement('span');
+      lbl.className='svc-radar-label';
+      lbl.textContent='Radar servizi:';
+      radar.appendChild(lbl);
+
+      const services = [
+        { key:'sim',        label:'SIM',          icon:'📶', link:()=>waPacchiSIM(it.name,it.phone) },
+        { key:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡', link:()=>waPacchiFisso(it.name,it.phone) },
+        { key:'energia',    label:'Energia',      icon:'⚡',   link:()=>waPacchiEnergia(it.name,it.phone) },
+        { key:'rate',       label:'Rate',         icon:'📱',   link:()=>waPacchiRate(it.name,it.phone) }
+      ];
+      const actSet = new Set(it.activated || []);
+
+      services.forEach(s=>{
+        const t=document.createElement('span');
+        const isActive = actSet.has(s.key);
+        t.className='svc-radar-tag ' + (isActive ? 'off':'on');
+        t.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
+        if(!isActive){
+          t.style.cursor='pointer';
+          t.title='Clicca per proporre '+s.label;
+          t.addEventListener('click', ()=>{
+            try{
+              window.open(s.link(),'_blank','noopener');
+            }catch{}
+          });
+        } else {
+          t.title='Già attivo su questo cliente';
+        }
+        radar.appendChild(t);
+      });
+
+      actions.appendChild(radar);
+    }
+
+    function btnDelete(it){
+      const b=btn('Elimina',()=>{
+        if(!confirm('Vuoi eliminare questo cliente dal gestionale?')) return;
+        items=items.filter(x=>x!==it); saveLocal(); saveToGitHub(); render();
+      });
+      return b;
+    }
+
+    const bonusAllBtn = document.getElementById('bonusAll');
+    const giftFidelityBtn = document.getElementById('giftFidelity');
+    const generateMissingBtn = document.getElementById('generateMissing');
+
+    bonusAllBtn.addEventListener('click', ()=>{
+      const now=new Date().toISOString();
+      const updated=[];
+      items.forEach(it=>{
+        ensureBaseFields(it);
+        if(!it.pointsMovements.some(m=>m.code==='mass-bonus-10')){
+          addFidelityMovement(it,'mass-bonus-10','Bonus speciale Fidelity +10 pt',10);
+          it.updatedAt=now;
+          updated.push(it);
+        }
+      });
+      if(updated.length){
+        saveLocal(); saveToGitHub();
+        lastBonusRecipients = updated.map(x=>x.name||x.phone||x.id);
+        showToast(`Bonus assegnato a ${updated.length} clienti ✅`);
+      }else{
+        showToast('Tutti i clienti avevano già ricevuto questo bonus','err');
       }
-
       render();
     });
 
-    if(searchInput){
-      searchInput.addEventListener('input', ()=>{
-        searchTerm = searchInput.value.trim().toLowerCase();
-        render();
-      });
-    }
-
-    if(bonusAllBtn){
-      bonusAllBtn.addEventListener('click', async ()=>{
-        if(!items.length){
-          alert('Non ci sono clienti in elenco.');
-          return;
-        }
-        const val = prompt('Quanti punti vuoi aggiungere a TUTTE le Fidelity Card? Esempio: 20');
-        if(val === null) return;
-        const delta = parseInt(String(val).replace(',','.'),10);
-        if(!Number.isFinite(delta) || delta === 0){
-          alert('Inserisci un numero di punti valido (es. 10 oppure -10).');
-          return;
-        }
-        let modified = 0;
-        lastBonusRecipients = [];
-        items.forEach(it=>{
-          let curr = Number(it.points || 0);
-          if(isNaN(curr)) curr = 0;
-          curr += delta;
-          if(curr < 0) curr = 0;
-          it.points = curr;
-          it.updatedAt = new Date().toISOString();
-          modified++;
-          lastBonusRecipients.push(it);
-        });
-        saveLocal();
-        const ok = await saveToGitHub();
-        render();
-        showToast(`Bonus Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
-      });
-    }
-
-    if(generateMissingBtn){
-      generateMissingBtn.addEventListener('click', async ()=>{
-        if(!items.length){
-          alert('Non ci sono clienti in elenco.');
-          return;
-        }
-        let modified = 0;
-        items.forEach(it=>{
-          let curr = it.points;
-          let num = Number(curr);
-          const isMissing = (curr == null || curr === '' || isNaN(num) || num <= 0);
-          if(isMissing){
-            it.points = 20;
-            it.updatedAt = new Date().toISOString();
-            modified++;
-          }
-        });
-        if(!modified){
-          showToast('Tutti i clienti hanno già una Fidelity attiva ✅');
-          return;
-        }
-        saveLocal();
-        const ok = await saveToGitHub();
-        render();
-        showToast(`Fidelity creata per ${modified} clienti senza card ✅`, ok ? 'ok' : 'err');
-      });
-    }
-
-    // 🎁 Gift Fidelity: punti + messaggio generico per campagne
-    if(giftFidelityBtn){
-      giftFidelityBtn.addEventListener('click', async ()=>{
-        if(!items.length){
-          alert('Non ci sono clienti in elenco.');
-          return;
-        }
-
-        const val = prompt('Quanti punti vuoi regalare a TUTTE le Fidelity Card? (es. 20)','20');
-        if(val === null) return;
-        const delta = parseInt(String(val).replace(',','.'),10);
-        if(!Number.isFinite(delta) || delta === 0){
-          alert('Inserisci un numero di punti valido (es. 10 oppure -10).');
-          return;
-        }
-
-        const msg = prompt(
-          'Scrivi il messaggio generico che userai per avvisare i clienti del regalo (verrà solo salvato localmente per copia/incolla):',
-          '🎁 Da Re Long un regalo per te! Ti abbiamo caricato punti bonus sulla tua Fidelity Card digitale.'
-        );
-
-        let modified = 0;
-        items.forEach(it=>{
-          let curr = Number(it.points || 0);
-          if(isNaN(curr)) curr = 0;
-          curr += delta;
-          if(curr < 0) curr = 0;
-          it.points = curr;
-          it.updatedAt = new Date().toISOString();
-          modified++;
-        });
-
-        saveLocal();
-        const ok = await saveToGitHub();
-        render();
-
-        if(msg){
-          try{
-            localStorage.setItem('relong-last-gift-message', msg);
-          }catch(e){}
-
-          alert(
-            `Gift Fidelity applicato a ${modified} clienti.\n\n` +
-            `Messaggio suggerito per le tue liste broadcast WhatsApp:\n\n` +
-            msg
-          );
-        }else{
-          showToast(`Gift Fidelity applicato a ${modified} clienti ✅`, ok ? 'ok' : 'err');
+    giftFidelityBtn.addEventListener('click', ()=>{
+      const now=new Date().toISOString();
+      const updated=[];
+      items.forEach(it=>{
+        ensureBaseFields(it);
+        if(!it.pointsMovements.some(m=>m.code==='gift-20')){
+          addFidelityMovement(it,'gift-20','Gift Fidelity +20 pt',20);
+          it.updatedAt=now;
+          updated.push(it);
         }
       });
-    }
-
-    function matchesCategoryFilters(it){
-      const anyOn = Object.entries(filterState).some(([k,v])=>k!=='remindtoday' && v);
-      if(!anyOn) return true;
-
-      const acts = new Set(it.activated||[]);
-      const isPacchi = it.fromPacchi || acts.has('pacchi');
-      const isSim = acts.has('sim');
-      const isFisso = acts.has('fisso') || acts.has('fissomobile');
-      const isEnergia = acts.has('energia');
-      const isRate = acts.has('rate');
-      const isRip = it.acceptance || acts.has('riparazione');
-      const isPrev = acts.has('preventivi');
-
-      if(filterState.pacchi && isPacchi) return true;
-      if(filterState.sim && isSim) return true;
-      if(filterState.fisso && isFisso) return true;
-      if(filterState.energia && isEnergia) return true;
-      if(filterState.rate && isRate) return true;
-      if(filterState.riparazioni && isRip) return true;
-      if(filterState.preventivi && isPrev) return true;
-
-      return false;
-    }
-
-    function nextReminderDate(it, type){
-      if(!it.reminders) return null;
-      const arr = it.reminders
-        .filter(r=>r.type===type && !r.sent)
-        .sort((a,b)=> new Date(a.dueAt)-new Date(b.dueAt));
-      if(!arr.length) return null;
-      return fmt(arr[0].dueAt);
-    }
-
-    function appendQuickWA(actions, it){
-      const row = document.createElement('div');
-      row.className='svc-row';
-
-      function mkSvc(label, icon, extraClass, typeKey, fn){
-        const b=document.createElement('button');
-        b.type='button';
-        b.className='svc-btn '+extraClass;
-        const dateStr = typeKey ? nextReminderDate(it,typeKey) : null;
-        b.innerHTML=`<span class="icon">${icon}</span><span>${label}</span>${dateStr?`<span class="date">${dateStr}</span>`:''}`;
-        b.addEventListener('click', e=>{ e.stopPropagation(); fn(); });
-        row.appendChild(b);
+      if(updated.length){
+        saveLocal(); saveToGitHub();
+        lastBonusRecipients = updated.map(x=>x.name||x.phone||x.id);
+        showToast(`Gift Fidelity omaggiato a ${updated.length} clienti ✅`);
+      }else{
+        showToast('Tutti i clienti avevano già ricevuto il gift Fidelity','err');
       }
-
-      mkSvc('Energia','⚡','svc-btn--energia','energia',()=> window.open(waPacchiEnergia(it.name,it.phone),'_blank','noopener'));
-      mkSvc('SIM','📶','svc-btn--sim','sim',()=> window.open(waPacchiSIM(it.name,it.phone),'_blank','noopener'));
-      mkSvc('Fisso','🏠📡','svc-btn--fisso','fissomobile',()=> window.open(waPacchiFisso(it.name,it.phone),'_blank','noopener'));
-      mkSvc('Rate','📱','svc-btn--rate','rate',()=> window.open(waPacchiRate(it.name,it.phone),'_blank','noopener'));
-
-      mkSvc('Card','💳','svc-btn--card',null,()=>{
-        const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-        window.open(url,'_blank','noopener');
-      });
-
-      actions.append(row);
-    }
-
-    const dashModal = document.getElementById('dashModal');
-    const openDashBtn = document.getElementById('openDash');
-    const closeDashBtn = document.getElementById('closeDash');
-    let dashPeriod = 'all';
-    let rangeFrom = null;
-    let rangeTo = null;
-
-    const dashPeriodBtns = [...document.querySelectorAll('.dash-period')];
-    const rangeWrap = document.getElementById('rangeWrap');
-    const rangeFromInput = document.getElementById('rangeFrom');
-    const rangeToInput = document.getElementById('rangeTo');
-
-    function parseDateInput(val){
-      if(!val) return null;
-      const [y,m,d] = val.split('-').map(x=>parseInt(x,10));
-      if(!y || !m || !d) return null;
-      const dt = new Date(y, m-1, d);
-      if(isNaN(dt.getTime())) return null;
-      return dt;
-    }
-
-    function syncRangeFromInputs(){
-      rangeFrom = parseDateInput(rangeFromInput.value);
-      rangeTo = parseDateInput(rangeToInput.value);
-      if(dashPeriod==='range') updateDashboard();
-    }
-
-    if(rangeFromInput && rangeToInput){
-      rangeFromInput.addEventListener('change', syncRangeFromInputs);
-      rangeToInput.addEventListener('change', syncRangeFromInputs);
-    }
-
-    dashPeriodBtns.forEach(btnEl=>{
-      btnEl.addEventListener('click', ()=>{
-        dashPeriod = btnEl.dataset.period || 'all';
-        dashPeriodBtns.forEach(b=>b.classList.toggle('active', b===btnEl));
-        rangeWrap.style.display = (dashPeriod==='range') ? 'flex' : 'none';
-        updateDashboard();
-      });
+      render();
     });
 
-    if(openDashBtn){
-      openDashBtn.addEventListener('click', ()=>{
-        updateDashboard();
-        dashModal.classList.add('on');
-        dashModal.setAttribute('aria-hidden','false');
-      });
-    }
-    if(closeDashBtn){
-      closeDashBtn.addEventListener('click', ()=>{
-        dashModal.classList.remove('on');
-        dashModal.setAttribute('aria-hidden','true');
-      });
-    }
-    if(dashModal){
-      dashModal.addEventListener('click', (e)=>{ if(e.target===dashModal){ dashModal.classList.remove('on'); dashModal.setAttribute('aria-hidden','true'); } });
-    }
-
-    function formatEuro(v){ return v.toLocaleString('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0}); }
-
-    function itemInPeriod(it){
-      const d = new Date(it.createdAt || it.updatedAt || Date.now());
-      const now = new Date();
-      const today0 = startOfDay(now);
-      const item0 = startOfDay(d);
-      if(dashPeriod==='today') return item0.getTime()===today0.getTime();
-      if(dashPeriod==='month') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
-      if(dashPeriod==='range'){
-        if(!rangeFrom && !rangeTo) return true;
-        const day = startOfDay(d).getTime();
-        if(rangeFrom){
-          const fromDay = startOfDay(rangeFrom).getTime();
-          if(day < fromDay) return false;
-        }
-        if(rangeTo){
-          const toDay = startOfDay(rangeTo).getTime();
-          if(day > toDay) return false;
-        }
-        return true;
-      }
-      return true;
-    }
-
-    function updateDashboard(){
-      const subset = items.filter(itemInPeriod);
-
-      let pacchi=0, sim=0, fisso=0, energia=0, rate=0, rip=0, prev=0;
-      let gPacchi=0, gSim=0, gFisso=0, gEn=0, gRate=0, gRip=0;
-
-      subset.forEach(it=>{
-        if(it.fromPacchi){ pacchi++; gPacchi += GAIN_PACCHI; }
-        const act = Array.isArray(it.activated)? it.activated : [];
-        if(act.includes('sim'))   { sim++;   gSim   += GAIN_SIM; }
-        if(act.includes('fisso')) { fisso++; gFisso += GAIN_FISSO; }
-        if(act.includes('energia')){ energia++; gEn += GAIN_ENERGIA; }
-        if(act.includes('rate'))  { rate++;  gRate  += GAIN_RATE; }
-        if(it.acceptance) rip++;
-        if(act.includes('preventivi')) prev++;
-
-        if(it.acceptance && it.repairStatus === 'consegnato' && it.quoteStatus === 'accepted'){
-          const val = parseFloat(it.quotePrice ?? 0);
-          if(!isNaN(val) && val > 0) gRip += val;
+    generateMissingBtn.addEventListener('click', ()=>{
+      const now=new Date().toISOString();
+      const updated=[];
+      items.forEach(it=>{
+        ensureBaseFields(it);
+        if(!it.pointsMovements.length){
+          addFidelityMovement(it,'gen-missing-20','Fidelity generata (bonus iniziale)',20);
+          it.updatedAt=now;
+          updated.push(it);
         }
       });
+      if(updated.length){
+        saveLocal(); saveToGitHub();
+        showToast(`Generate Fidelity e 20 pt per ${updated.length} clienti ✅`);
+      }else{
+        showToast('Non ci sono clienti senza Fidelity','err');
+      }
+      render();
+    });
 
-      const totalGain = gPacchi + gSim + gFisso + gEn + gRate + gRip;
-
-      const k_pacchi = document.getElementById('k_pacchi');
-      const k_sim = document.getElementById('k_sim');
-      const k_fisso = document.getElementById('k_fisso');
-      const k_energia = document.getElementById('k_energia');
-      const k_rate = document.getElementById('k_rate');
-      const k_rip = document.getElementById('k_rip');
-      const k_prev = document.getElementById('k_prev');
-
-      const e_pacchi = document.getElementById('e_pacchi');
-      const e_sim = document.getElementById('e_sim');
-      const e_fisso = document.getElementById('e_fisso');
-      const e_energia = document.getElementById('e_energia');
-      const e_rate = document.getElementById('e_rate');
-      const e_rip = document.getElementById('e_rip');
-
-      if(k_pacchi) k_pacchi.textContent = pacchi;
-      if(k_sim)    k_sim.textContent    = sim;
-      if(k_fisso)  k_fisso.textContent  = fisso;
-      if(k_energia)k_energia.textContent= energia;
-      if(k_rate)   k_rate.textContent   = rate;
-      if(k_rip)    k_rip.textContent    = rip;
-      if(k_prev)   k_prev.textContent   = prev;
-
-      if(e_pacchi) e_pacchi.textContent = formatEuro(gPacchi);
-      if(e_sim)    e_sim.textContent    = formatEuro(gSim);
-      if(e_fisso)  e_fisso.textContent  = formatEuro(gFisso);
-      if(e_energia)e_energia.textContent= formatEuro(gEn);
-      if(e_rate)   e_rate.textContent   = formatEuro(gRate);
-      if(e_rip)    e_rip.textContent    = formatEuro(gRip);
-
-      let labelPeriodo = 'Tutto';
-      if(dashPeriod==='today') labelPeriodo = 'Oggi';
-      else if(dashPeriod==='month') labelPeriodo = 'Mese corrente';
-      else if(dashPeriod==='range'){
-        const fromTxt = rangeFrom ? fmt(rangeFrom) : 'inizio';
-        const toTxt   = rangeTo   ? fmt(rangeTo)   : 'oggi';
-        labelPeriodo = `Dal ${fromTxt} al ${toTxt}`;
+    function filterItems(){
+      let out=[...items];
+      const q=(searchInput.value||'').trim().toLowerCase();
+      if(q){
+        out=out.filter(it=>{
+          const full=((it.name||'')+' '+(it.phone||'')).toLowerCase();
+          return full.includes(q);
+        });
       }
 
-      const k_total = document.getElementById('k_total');
-      const k_total_gain = document.getElementById('k_total_gain');
-      if(k_total) k_total.textContent = `Totale clienti (${labelPeriodo}): ${subset.length}`;
-      if(k_total_gain) k_total_gain.textContent = `Guadagno totale (${labelPeriodo}): ${formatEuro(totalGain)}`;
-    }
+      if(!activeFilter) return out;
 
-    function updateFilterSummary(visibleCount){
-      if(!filterSummary) return;
-
-      const parts = [];
-
-      if(searchTerm){
-        parts.push(`Ricerca: "${searchTerm}"`);
+      const today = startOfDay(new Date());
+      if(activeFilter==='remindtoday'){
+        out = out.filter(it=>{
+          if(!Array.isArray(it.reminders)) return false;
+          return it.reminders.some(r=>{
+            if(r.sent) return false;
+            const d=startOfDay(new Date(r.dueAt));
+            return d.getTime()===today.getTime();
+          });
+        });
+        return out;
       }
 
-      if(filterToday){
-        parts.push('Remind oggi');
+      if(activeFilter==='pacchi'){
+        out = out.filter(it=> it.fromPacchi);
+        return out;
       }
 
-      const mapLabel = {
-        pacchi:'Pacchi',
-        sim:'SIM',
-        fisso:'Fisso',
-        energia:'Energia',
-        rate:'Rate',
-        riparazioni:'Riparazioni',
-        preventivi:'Preventivi'
-      };
-
-      Object.entries(filterState).forEach(([k,v])=>{
-        if(k==='remindtoday') return;
-        if(v) parts.push(mapLabel[k] || k);
-      });
-
-      if(!parts.length){
-        filterSummary.style.display='none';
-        filterSummary.textContent='';
-        return;
+      if(activeFilter==='sim' || activeFilter==='fisso' || activeFilter==='energia' || activeFilter==='rate'){
+        out = out.filter(it=> (it.activated||[]).includes(activeFilter) || (activeFilter==='fisso' && (it.activated||[]).includes('fissomobile')));
+        return out;
       }
 
-      filterSummary.style.display='';
-      filterSummary.textContent = `Filtri attivi: ${parts.join(' • ')} | Risultati: ${visibleCount}`;
+      if(activeFilter==='riparazioni'){
+        out = out.filter(it=> !!it.acceptance);
+        return out;
+      }
+
+      if(activeFilter==='preventivi'){
+        out = out.filter(it=> it.quoteStatus==='pending');
+        return out;
+      }
+
+      return out;
     }
 
     function render(){
-      const list=document.getElementById('list'); list.innerHTML='';
-      const counter = document.getElementById('counter');
-      const now=new Date(); const today0=startOfDay(now);
+      const listEl=document.getElementById('list');
+      const counterEl=document.getElementById('counter');
+      const filterSummary=document.getElementById('filterSummary');
 
-      const source = items.slice().filter(it=>{
-        ensureReminders(it);
+      const arr=filterItems();
+      counterEl.textContent=`Clienti: ${arr.length}`;
+      if(activeFilter){
+        filterSummary.style.display='block';
+        const map={
+          remindtoday:'Remind in scadenza oggi',
+          pacchi:'Solo da pacchi',
+          sim:'Solo SIM',
+          fisso:'Solo Fisso',
+          energia:'Solo Energia',
+          rate:'Solo Rate',
+          riparazioni:'Solo Riparazioni',
+          preventivi:'Solo Preventivi'
+        };
+        filterSummary.textContent=map[activeFilter]||'Filtro attivo';
+      }else{
+        filterSummary.style.display='none';
+      }
 
-        if(filterToday){
-          const hasDueToday = (it.reminders||[]).some(r=>{
-            const due0=startOfDay(r.dueAt);
-            return (due0.getTime()===today0.getTime()) && !r.sent;
-          });
-          if(!hasDueToday) return false;
-        }
+      listEl.innerHTML='';
+      if(!arr.length){
+        listEl.innerHTML='<div class="label">Nessun cliente trovato.</div>';
+        return;
+      }
 
-        if(!matchesCategoryFilters(it)) return false;
-
-        if(searchTerm){
-          const nameText = (it.name || '').toLowerCase();
-          const phoneText = normalizePhone(it.phone || '');
-          const q = searchTerm.toLowerCase();
-          const qDigits = q.replace(/\D/g,'');
-
-          const nMatch = nameText.includes(q);
-          const pMatch = qDigits ? phoneText.includes(qDigits) : false;
-
-          if(!nMatch && !pMatch) return false;
-        }
-
-        return true;
+      arr.sort((a,b)=>{
+        const da = new Date(a.updatedAt||a.createdAt||0).getTime();
+        const db = new Date(b.updatedAt||b.createdAt||0).getTime();
+        return db-da;
       });
 
-      counter.textContent = 'Clienti: ' + source.length;
-      updateFilterSummary(source.length);
+      arr.forEach(it=>{
+        ensureBaseFields(it);
+        const clone=document.getElementById('tpl').content.firstElementChild.cloneNode(true);
+        const head=clone.querySelector('.head');
+        const details=clone.querySelector('.details');
+        const title=clone.querySelector('.title');
+        const services=clone.querySelector('.services');
+        const actions=clone.querySelector('.actions');
+        const points=clone.querySelector('.points');
+        const reminders=clone.querySelector('.reminders');
+        const review=clone.querySelector('.review');
 
-      source.forEach(it=>{
-        const el=document.getElementById('tpl').content.firstElementChild.cloneNode(true);
-        const titleEl = el.querySelector('.title');
-        titleEl.innerHTML = `${it.name} • <b>${it.phone}</b>` + (it.acceptance? ` • <i>${it.device?.brand||''} ${it.device?.model||''}</i>`:'');
+        const lvl=getLevel(it.points||0);
+        const badge=document.createElement('span');
+        badge.className='lvl-badge '+lvl.class;
+        badge.textContent=`${lvl.emoji} ${lvl.name}`;
 
-        const currentPoints = Number(it.points || 0);
-        if(!isNaN(currentPoints) && currentPoints>0){
-          const badge = document.createElement('span');
-          badge.className='badge-mini';
-          badge.innerHTML='★ Fidelity <strong>'+currentPoints+' pt</strong>';
-          titleEl.appendChild(badge);
+        const nameSpan=document.createElement('span');
+        nameSpan.textContent=it.name || 'Cliente senza nome';
 
-          const lvl = getLevel(currentPoints);
-          if(lvl){
-            const lvlSpan = document.createElement('span');
-            lvlSpan.className = 'lvl-badge ' + lvl.class;
-            lvlSpan.textContent = `${lvl.emoji} ${lvl.name}`;
-            titleEl.appendChild(lvlSpan);
-          }
-        }
+        const phoneSpan=document.createElement('span');
+        phoneSpan.className='badge-mini';
+        phoneSpan.textContent=normalizePhone(it.phone||'');
 
-        let opsCount=0;
-        const actsSet=new Set(it.activated||[]);
-        if(it.fromPacchi) opsCount++;
-        ['sim','fisso','energia','rate','preventivi','riparazione'].forEach(k=>{ if(actsSet.has(k)) opsCount++; });
-        if(it.acceptance) opsCount++;
-        if(opsCount>=3){
-          const top=document.createElement('span');
-          top.className='badge-top';
-          top.innerHTML='👑 Cliente Top';
-          titleEl.appendChild(top);
-        }
+        const pointsSpan=document.createElement('span');
+        pointsSpan.className='badge-top';
+        pointsSpan.textContent=`⭐ ${it.points||0} pt`;
 
-        const head=el.querySelector('.head'), details=el.querySelector('.details'),
-              svcLine=el.querySelector('.services'),
-              actions=el.querySelector('.actions'),
-              pointsLine=el.querySelector('.points'),
-              review=el.querySelector('.review'),
-              remWrap=el.querySelector('.reminders');
-        head.addEventListener('click', ()=>{ details.hidden=!details.hidden; });
+        title.appendChild(nameSpan);
+        title.appendChild(phoneSpan);
+        title.appendChild(pointsSpan);
+        title.appendChild(badge);
 
-        // Radar servizi
-        if(svcLine){
-          const acts = new Set(it.activated||[]);
-          const flagPacchi = !!it.fromPacchi;
-          const flagSim    = acts.has('sim');
-          const flagEner   = acts.has('energia');
-          const flagFisso  = acts.has('fisso') || acts.has('fissomobile');
-          const flagRate   = acts.has('rate');
-          const flagRip    = !!it.acceptance || acts.has('riparazione');
+        // --- Servizi attivi cliccabili ---
+        const svcRow=document.createElement('div');
+        svcRow.className='svc-radar';
+        const lblSA=document.createElement('span');
+        lblSA.className='svc-radar-label';
+        lblSA.textContent='Servizi attivi:';
+        svcRow.appendChild(lblSA);
 
-          const cfg = [
-            { on:flagPacchi, icon:'📦', label:'Pacchi' },
-            { on:flagSim,    icon:'📶', label:'SIM' },
-            { on:flagEner,   icon:'⚡', label:'Energia' },
-            { on:flagFisso,  icon:'🏠📡', label:'Fisso' },
-            { on:flagRate,   icon:'📱', label:'Rate' },
-            { on:flagRip,    icon:'🔧', label:'Riparazioni' },
-          ];
+        const servicesList=[
+          { key:'sim',        label:'SIM',          icon:'📶' },
+          { key:'fissomobile',label:'Fisso / FTTH',icon:'🏠📡' },
+          { key:'energia',    label:'Energia',      icon:'⚡' },
+          { key:'rate',       label:'Rate',         icon:'📱' }
+        ];
+        const actSet=new Set(it.activated||[]);
+        servicesList.forEach(s=>{
+          const t=document.createElement('span');
+          t.className='svc-radar-tag ' + (actSet.has(s.key)?'on':'off');
+          t.innerHTML=`<span>${s.icon}</span><span>${s.label}</span>`;
+          t.dataset.key = s.key;
+          t.style.cursor='pointer';
+          t.title='Clicca per attivare/disattivare servizio';
+          t.addEventListener('click', ()=>{
+            const set = new Set(it.activated || []);
+            if(set.has(s.key)) set.delete(s.key); else set.add(s.key);
+            it.activated = [...set];
+            it.updatedAt = new Date().toISOString();
+            saveLocal(); saveToGitHub(); render();
+          });
+          svcRow.appendChild(t);
+        });
+        services.appendChild(svcRow);
 
-          const row=document.createElement('div');
-          row.className='svc-radar';
-          const lbl=document.createElement('span');
-          lbl.className='svc-radar-label';
-          lbl.textContent='Profilo servizi:';
-          row.appendChild(lbl);
+        // Storico riparazioni a scomparsa (con pillole stato)
+        const repairs = [];
+        if(Array.isArray(it.acceptanceHistory)) repairs.push(...it.acceptanceHistory);
+        if(it.acceptance) repairs.push(it.acceptance);
 
-          cfg.forEach(c=>{
-            const tag=document.createElement('span');
-            tag.className='svc-radar-tag ' + (c.on?'on':'off');
-            tag.innerHTML = `<span>${c.icon}</span><span>${c.label}</span>`;
-            row.appendChild(tag);
+        if(repairs.length){
+          const headerRep = document.createElement('button');
+          headerRep.type='button';
+          headerRep.className='label';
+          headerRep.style.cursor='pointer';
+          headerRep.textContent='Storico riparazioni ▾';
+
+          const boxRep = document.createElement('div');
+          boxRep.className='r-line';
+          boxRep.style.display='none';
+          boxRep.style.flexDirection='column';
+
+          repairs.forEach((r,idx)=>{
+            const line=document.createElement('div');
+            const d = r.createdAt ? fmt(r.createdAt) : (it.createdAt ? fmt(it.createdAt) : '');
+            const prefix = d ? d+' • ' : '';
+            line.textContent = `${prefix}${r.type||''} ${r.brand||''} ${r.model||''} – ${r.issue||''}`;
+            boxRep.appendChild(line);
+
+            if(idx === repairs.length-1){
+              const chips=document.createElement('div');
+              chips.className='r-line';
+              chips.style.marginTop='4px';
+
+              if(it.quoteStatus){
+                const st = it.quoteStatus==='pending'
+                  ? 'Preventivo in attesa'
+                  : it.quoteStatus==='sent'
+                    ? 'Preventivo inviato'
+                    : 'Preventivo accettato';
+                const chip1=document.createElement('span');
+                chip1.className='label';
+                chip1.textContent=st;
+                chips.appendChild(chip1);
+              }
+              if(it.deliveredAt){
+                const chip2=document.createElement('span');
+                chip2.className='label';
+                chip2.textContent='Prodotto consegnato il '+fmt(it.deliveredAt);
+                chips.appendChild(chip2);
+              }
+              if(chips.children.length){
+                boxRep.appendChild(chips);
+              }
+            }
           });
 
-          svcLine.appendChild(row);
+          headerRep.addEventListener('click', ()=>{
+            const open = boxRep.style.display==='none';
+            boxRep.style.display = open ? 'flex' : 'none';
+            headerRep.textContent = open ? 'Storico riparazioni ▴' : 'Storico riparazioni ▾';
+          });
+
+          services.appendChild(headerRep);
+          services.appendChild(boxRep);
         }
 
-        actions.innerHTML='';
+        const createdInfo=document.createElement('span');
+        createdInfo.className='label';
+        createdInfo.textContent=`Creato il ${fmt(it.createdAt||new Date())}`;
+        services.appendChild(createdInfo);
+
+        if(it.fromPacchi){
+          const pacchiBadge=document.createElement('span');
+          pacchiBadge.className='badge-mini';
+          pacchiBadge.textContent='Da Pacchi';
+          services.appendChild(pacchiBadge);
+        }
+
+        // Radar servizi = proposte
+        appendQuickWA(actions, it);
+
         if(it.acceptance){
-          if(it.repairStatus==='diagnostica'){
-            const ip=document.createElement('input');
-            ip.type='number';
-            ip.step='0.01';
-            ip.min='0';
-            ip.placeholder='Preventivo (€)';
-            if(it.quotePrice!=null) ip.value=it.quotePrice;
+          if(it.quoteStatus==='pending'){
+            actions.append(btn('Invia preventivo', ()=>{
+              it.quoteStatus='sent'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+            }));
+          } else if(it.quoteStatus==='sent'){
+            actions.append(btn('Accetta preventivo', ()=>{
+              it.quoteStatus='accepted'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+            }));
+          }
 
-            const sendWA=aBtn('Invia preventivo WA', ()=>{
-              const val=parseFloat((ip.value||'0').replace(',', '.'));
-              if(!(val>=0)) return alert('Importo non valido');
+          if(it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
+            actions.append(btnOk('Da consegnare (avvisa cliente)', ()=>{
+              it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+              window.open(waPickup(it.name, it.phone),'_blank','noopener');
 
-              it.quotePrice = val;
+              if(dashModal && dashModal.classList.contains('on')) updateDashboard();
+            }));
+          } else if(it.repairStatus==='pronto'){
+            actions.append(btn('Ritirato (chiudi pratica)', ()=>{
+              it.repairStatus='consegnato';
+              it.deliveredAt = new Date().toISOString();
+              it.postReviewAt = addDays(new Date(), 3).toISOString();
+              it.postReviewSent = false;
+
+              const devType = (it.acceptance && it.acceptance.type ? String(it.acceptance.type).toLowerCase() : '');
+              let delta = 0;
+              if(devType === 'computer'){
+                delta = POINTS_REPAIR_PC;
+              }else if(devType === 'smartphone'){
+                delta = POINTS_REPAIR_PHONE;
+              }
+              if(delta > 0){
+                const code  = 'repair-' + (devType || 'altro') + '-delivered';
+                const label = 'Riparazione ' + (devType || 'dispositivo') + ' completata';
+                addFidelityMovement(it, code, label, delta);
+              }
+
               it.updatedAt = new Date().toISOString();
-              saveLocal(); saveToGitHub();
-
-              const price = new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(val||0);
-              const txt =
-`Ciao ${it.name}, sono Alessandro di Re Long (${RELONG_PHONE}).
-Ecco il preventivo per la tua riparazione.
-Dispositivo: ${it?.device?.type||'-'}
-Marca: ${it?.device?.brand||'-'}
-Modello: ${it?.device?.model||'-'}
-Difetto dichiarato: ${it?.device?.issue||'-'}
-
-Totale preventivato: ${price}
-
-Se ACCETTI rispondi “ACCETTO”, altrimenti “RIFIUTO”.
-
-I nostri servizi: ${HUB_URL}`;
-              window.open(`https://wa.me/39${it.phone}?text=${encodeURIComponent(txt)}`,'_blank','noopener');
-            });
-
-            const acc=btn('Preventivo ACCETTATO', ()=>{
-              const val=parseFloat((ip.value||'0').replace(',', '.'));
-              if(!(val>0)) return alert('Inserisci un importo valido prima di accettare');
-
-              it.quotePrice = val;
-              it.quoteStatus = 'accepted';
-              it.repairStatus = 'inriparazione';
-              it.updatedAt = new Date().toISOString();
-              saveLocal(); saveToGitHub();
+              saveLocal();
+              saveToGitHub();
               render();
-            });
+              try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
 
-            const ref=btn('Preventivo RIFIUTATO', ()=>{
-              const val=parseFloat((ip.value||'0').replace(',', '.'));
-              if(val>0) it.quotePrice = val;
-              it.quoteStatus='refused';
-              it.updatedAt=new Date().toISOString();
-              saveLocal(); saveToGitHub();
-              render();
-            });
-
-            actions.append(ip, sendWA, acc, ref, btnDelete(it));
-          } else {
-            if(it.quoteStatus==='accepted' && it.repairStatus!=='pronto' && it.repairStatus!=='consegnato'){
-              actions.append(btnOk('Da consegnare (avvisa cliente)', ()=>{
-                it.repairStatus='pronto'; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
-                window.open(waPickup(it.name, it.phone),'_blank','noopener');
-              }));
-            }
-            if(it.repairStatus==='pronto'){
-              actions.append(btn('Ritirato (chiudi pratica)', ()=>{
-                it.repairStatus='consegnato'; it.deliveredAt=new Date().toISOString();
-                it.postReviewAt = addDays(new Date(), 3).toISOString();
-                it.postReviewSent = false;
-                it.updatedAt=new Date().toISOString();
-                saveLocal(); saveToGitHub(); render();
-                try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
-
-                if(dashModal && dashModal.classList.contains('on')) updateDashboard();
-              }));
-            }
-            actions.append(btnDelete(it));
-            if(it.repairStatus==='consegnato' && it.deliveredAt){
-              const lab=document.createElement('span');
-              lab.className='label';
-              lab.textContent='Ritirato • '+fmt(it.deliveredAt);
-              actions.append(lab);
-            }
+              if(dashModal && dashModal.classList.contains('on')) updateDashboard();
+            }));
           }
         } else {
-          appendQuickWA(actions, it);
-          actions.append(btn('Completato', ()=>{
-            try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
-            it.done=true; it.doneAt=new Date().toISOString(); it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
-          }));
+
+          if(!it.done){
+            actions.append(btn('Completato', ()=>{
+              try{ window.open(waDeliveredConfirm(it.name, it.phone),'_blank','noopener'); }catch{}
+              it.done = true;
+              it.doneAt = new Date().toISOString();
+
+              const acts = new Set(it.activated || []);
+              const isPacchi = !!it.fromPacchi || acts.has('pacchi');
+
+              if(!isPacchi){
+                if(acts.has('sim')){
+                  addFidelityMovement(it, 'sim-done', 'Attivazione SIM completata', POINTS_SIM);
+                }
+                if(acts.has('fisso') || acts.has('fissomobile')){
+                  addFidelityMovement(it, 'fisso-done', 'Attivazione linea fissa completata', POINTS_FISSO);
+                }
+                if(acts.has('energia')){
+                  addFidelityMovement(it, 'energia-done', 'Attivazione energia completata', POINTS_ENERGIA);
+                }
+                if(acts.has('rate')){
+                  addFidelityMovement(it, 'rate-done', 'Pratica smartphone a rate completata', POINTS_RATE);
+                }
+              }
+
+              it.updatedAt = new Date().toISOString();
+              saveLocal();
+              saveToGitHub();
+              render();
+            }));
+          } else {
+            const lab = document.createElement('span');
+            lab.className = 'label';
+            lab.textContent = 'Pratica completata';
+            actions.append(lab);
+          }
+
           actions.append(btnDelete(it));
         }
 
-        if(pointsLine){
-          pointsLine.innerHTML='';
-          const currentPoints2 = Number(it.points || 0);
-          const lbl = document.createElement('span');
-          lbl.className='label';
-          lbl.textContent = `Saldo punti Fidelity: ${isNaN(currentPoints2)?0:currentPoints2}`;
+        // Strumenti Fidelity singolo cliente (moderni)
+        const fidRow = document.createElement('div');
+        fidRow.className = 'r-line fid-actions';
 
-          const add = aBtn('Aggiungi punti', ()=>{
-            const val = prompt('Quanti punti vuoi aggiungere o togliere? (es. 50 oppure -50)','50');
-            if(val===null) return;
-            const delta = parseInt(String(val).replace(',','.'),10);
-            if(!Number.isFinite(delta) || delta===0){
-              alert('Inserisci un numero valido di punti.');
-              return;
-            }
-            let np = Number(it.points || 0) + delta;
-            if(np < 0) np = 0;
-            it.points = np;
-            it.updatedAt = new Date().toISOString();
-            saveLocal(); saveToGitHub(); render();
-            showToast('Saldo Fidelity aggiornato ✅');
+        const bAddPts = document.createElement('button');
+        bAddPts.type='button';
+        bAddPts.className='btn fid-btn-main';
+        bAddPts.textContent='+ Punti Fidelity';
+        bAddPts.addEventListener('click', ()=>{
+          const val = prompt('Quanti punti vuoi aggiungere/sottrarre? (es. 10 o -20)');
+          if(val===null) return;
+          const delta = parseInt(String(val).trim(),10);
+          if(!Number.isFinite(delta) || delta===0){
+            alert('Valore non valido.');
+            return;
+          }
+          addFidelityMovement(it, 'manual-'+Date.now(), 'Movimento manuale Fidelity', delta);
+          it.updatedAt = new Date().toISOString();
+          saveLocal(); saveToGitHub(); render();
+        });
+
+        const bSendCard = document.createElement('button');
+        bSendCard.type='button';
+        bSendCard.className='btn fid-btn-ghost';
+        bSendCard.textContent='Invia Fidelity Card';
+        bSendCard.addEventListener('click', ()=>{
+          try{
+            window.open(waWelcomeWithCard(it),'_blank','noopener');
+          }catch{}
+        });
+
+        const bOpenCard = document.createElement('button');
+        bOpenCard.type='button';
+        bOpenCard.className='btn fid-btn-ghost';
+        bOpenCard.textContent='Apri Fidelity Card';
+        bOpenCard.addEventListener('click', ()=>{
+          const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
+          window.open(url,'_blank','noopener');
+        });
+
+        fidRow.appendChild(bAddPts);
+        fidRow.appendChild(bSendCard);
+        fidRow.appendChild(bOpenCard);
+        actions.appendChild(fidRow);
+
+        // Storico punti a scomparsa
+        if(Array.isArray(it.pointsMovements) && it.pointsMovements.length){
+          const headerPts=document.createElement('button');
+          headerPts.type='button';
+          headerPts.className='label';
+          headerPts.style.cursor='pointer';
+          headerPts.textContent='Storico punti ▾';
+
+          const boxPts=document.createElement('div');
+          boxPts.className='r-line';
+          boxPts.style.display='none';
+          boxPts.style.flexDirection='column';
+
+          const last=it.pointsMovements.slice(-10).reverse();
+          last.forEach(m=>{
+            const t=document.createElement('div');
+            t.className='badge-mini';
+            const sign = m.delta>0?'+':'';
+            t.textContent=`${sign}${m.delta} pt • ${m.label}`;
+            boxPts.appendChild(t);
           });
 
-          const sendCard = aBtn('Invia card', ()=>{
-            const url = `${FIDELITY_URL}?id=${encodeURIComponent(it.id)}`;
-            const txt = `Ciao ${it.name}, questa è la tua Fidelity Card Re Long: ${url}`;
-            window.open(walink(it.phone, txt),'_blank','noopener');
+          headerPts.addEventListener('click',()=>{
+            const open = boxPts.style.display==='none';
+            boxPts.style.display = open ? 'flex' : 'none';
+            headerPts.textContent = open ? 'Storico punti ▴' : 'Storico punti ▾';
           });
 
-          pointsLine.append(lbl, add, sendCard);
+          points.appendChild(headerPts);
+          points.appendChild(boxPts);
         }
 
-        remWrap.innerHTML='';
-
-        if(it.responded){
-          const stopped=document.createElement('span');
-          stopped.className='label';
-          stopped.textContent='Promo stoppata';
-          remWrap.append(stopped);
+        if(it.reminders && it.reminders.length){
+          const today=startOfDay(new Date());
+          const dueToday=it.reminders.filter(r=>{
+            if(r.sent) return false;
+            const d=startOfDay(new Date(r.dueAt));
+            return d.getTime()===today.getTime();
+          });
+          if(dueToday.length){
+            const w=document.createElement('div');
+            w.className='r-line';
+            dueToday.forEach(rem=>{
+              const b=document.createElement('a');
+              b.href=walink(it.phone, 'Ciao '+it.name+', sono Alessandro di Re Long.');
+              b.target='_blank';
+              b.rel='noopener';
+              b.className='wa-btn ok';
+              b.textContent=`Invia reminder ${typeLabel[rem.type]||rem.type}`;
+              b.addEventListener('click',()=>{
+                rem.sent=true; rem.sentAt=new Date().toISOString();
+                it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+              });
+              w.appendChild(b);
+            });
+            reminders.appendChild(w);
+          }
         }
 
-        const mainComplete = isMainCycleComplete(it);
-        if(mainComplete && !it.responded){
-          const addFU=aBtn('+90GG', ()=> addFollowup90(it));
-          const addFUc=aBtn('+PERS.', ()=> addFollowupCustom(it));
-          remWrap.append(addFU, addFUc);
+        if(it.postReviewAt){
+          const should = new Date(it.postReviewAt)<=new Date() && !it.postReviewSent;
+          if(should){
+            const b=document.createElement('a');
+            b.href=waReview(it.name, it.phone);
+            b.target='_blank';
+            b.rel='noopener';
+            b.className='wa-btn';
+            b.textContent='Chiedi recensione Google';
+            b.addEventListener('click',()=>{
+              it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render();
+            });
+            review.appendChild(b);
+          } else if(it.postReviewSent){
+            const lab=document.createElement('span'); lab.className='label'; lab.textContent='Recensione richiesta'; review.appendChild(lab);
+          }
         }
 
-        review.innerHTML='';
-        if(it.postReviewAt && !it.postReviewSent && new Date(it.postReviewAt)<=new Date()){
-          const a=aBtn('WhatsApp: ringrazia + recensione', ()=>{ window.open(waReview(it.name,it.phone),'_blank','noopener'); it.postReviewSent=true; it.updatedAt=new Date().toISOString(); saveLocal(); saveToGitHub(); render(); });
-          review.append(a);
-        }
+        head.addEventListener('click',()=>{
+          details.hidden=!details.hidden;
+        });
 
-        list.append(el);
+        listEl.appendChild(clone);
       });
 
-      if(dashModal && dashModal.classList.contains('on')) updateDashboard();
+      updateDashboard();
     }
 
-    function btn(lbl, fn){ const b=document.createElement('button'); b.className='btn'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function btnOk(lbl, fn){ const b=document.createElement('button'); b.className='btn ok'; b.textContent=lbl; b.addEventListener('click', e=>{ e.stopPropagation(); fn(); }); return b; }
-    function aBtn(lbl, fn){ const a=document.createElement('a'); a.href='#'; a.className='wa-btn ok'; a.textContent=lbl; a.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); }); return a; }
-    function btnDelete(it){ return btn('Elimina', ()=>{ items=items.filter(x=>x.id!==it.id); saveLocal(); saveToGitHub(); render(); }); }
+    const dashModal=document.getElementById('dashModal');
+    const openDashBtn=document.getElementById('openDash');
+    const closeDashBtn=document.getElementById('closeDash');
+    openDashBtn.addEventListener('click',()=>{
+      dashModal.classList.add('on');
+      updateDashboard();
+    });
+    closeDashBtn.addEventListener('click',()=>{
+      dashModal.classList.remove('on');
+    });
 
-    (async function(){
+    function summarize(period){
+      const now=new Date();
+      let fromDate=null, toDate=null;
+
+      if(period==='today'){
+        fromDate=startOfDay(now);
+        toDate=new Date(fromDate); toDate.setDate(toDate.getDate()+1);
+      } else if(period==='month'){
+        fromDate=new Date(now.getFullYear(), now.getMonth(),1);
+        toDate=new Date(now.getFullYear(), now.getMonth()+1,1);
+      } else if(period==='range'){
+        const fromVal=document.getElementById('rangeFrom').value;
+        const toVal=document.getElementById('rangeTo').value;
+        if(fromVal){
+          fromDate=startOfDay(new Date(fromVal));
+        }
+        if(toVal){
+          toDate=startOfDay(new Date(toVal));
+          toDate.setDate(toDate.getDate()+1);
+        }
+      }
+
+      const data=items.filter(it=>{
+        const d=new Date(it.createdAt||it.updatedAt||Date.now());
+        if(fromDate && d<fromDate) return false;
+        if(toDate && d>=toDate) return false;
+        return true;
+      });
+
+      let k_pacchi=0,k_sim=0,k_fisso=0,k_energia=0,k_rate=0,k_rip=0,k_prev=0;
+      let e_pacchi=0,e_sim=0,e_fisso=0,e_energia=0,e_rate=0;
+
+      data.forEach(it=>{
+        if(it.fromPacchi){
+          k_pacchi++; e_pacchi+=GAIN_PACCHI;
+        }
+        const act=new Set(it.activated||[]);
+        if(act.has('sim')){ k_sim++; e_sim+=GAIN_SIM; }
+        if(act.has('fisso') || act.has('fissomobile')){ k_fisso++; e_fisso+=GAIN_FISSO; }
+        if(act.has('energia')){ k_energia++; e_energia+=GAIN_ENERGIA; }
+        if(act.has('rate')){ k_rate++; e_rate+=GAIN_RATE; }
+        if(it.acceptance){ k_rip++; }
+        if(it.quoteStatus==='pending'){ k_prev++; }
+      });
+
+      return {
+        count:data.length,
+        k_pacchi,k_sim,k_fisso,k_energia,k_rate,k_rip,k_prev,
+        e_pacchi,e_sim,e_fisso,e_energia,e_rate
+      };
+    }
+
+    function updateDashboard(){
+      const active = document.querySelector('.dash-period.active');
+      const period = active ? active.dataset.period : 'all';
+      const s=summarize(period);
+
+      document.getElementById('k_pacchi').textContent=s.k_pacchi;
+      document.getElementById('k_sim').textContent=s.k_sim;
+      document.getElementById('k_fisso').textContent=s.k_fisso;
+      document.getElementById('k_energia').textContent=s.k_energia;
+      document.getElementById('k_rate').textContent=s.k_rate;
+      document.getElementById('k_rip').textContent=s.k_rip;
+      document.getElementById('k_prev').textContent=s.k_prev;
+
+      document.getElementById('e_pacchi').textContent=`€ ${s.e_pacchi.toFixed(0)}`;
+      document.getElementById('e_sim').textContent=`€ ${s.e_sim.toFixed(0)}`;
+      document.getElementById('e_fisso').textContent=`€ ${s.e_fisso.toFixed(0)}`;
+      document.getElementById('e_energia').textContent=`€ ${s.e_energia.toFixed(0)}`;
+      document.getElementById('e_rate').textContent=`€ ${s.e_rate.toFixed(0)}`;
+
+      document.getElementById('k_total').textContent=`Totale clienti: ${s.count}`;
+      const gainTotal = s.e_pacchi+s.e_sim+s.e_fisso+s.e_energia+s.e_rate;
+      document.getElementById('k_total_gain').textContent=`Guadagno totale: € ${gainTotal.toFixed(0)}`;
+    }
+
+    $$('.dash-period').forEach(b=>{
+      b.addEventListener('click',()=>{
+        $$('.dash-period').forEach(x=>x.classList.toggle('active', x===b));
+        const period=b.dataset.period;
+        const rangeWrap=document.getElementById('rangeWrap');
+        rangeWrap.style.display = period==='range' ? 'flex':'none';
+        updateDashboard();
+      });
+    });
+
+    document.getElementById('rangeFrom').addEventListener('change',updateDashboard);
+    document.getElementById('rangeTo').addEventListener('change',updateDashboard);
+
+    document.addEventListener('DOMContentLoaded', async ()=>{
       await loadFromGitHubOrLocal();
       render();
-      updateInsertState();
-      showToast('Gestionale pronto + Fidelity auto + Gift + Livelli + Radar ✅');
-    })();
-
-    (function(){
-      const KEY='relong-elenco-hidden';
-      const h2s=[...document.querySelectorAll('section.card > h2')];
-      const elencoH2=h2s.find(h=> (h.textContent||'').trim().toLowerCase()==='elenco');
-      const listEl=document.getElementById('list');
-      if(!elencoH2 || !listEl) return;
-      const btn=document.createElement('button');
-      btn.id='toggleElenco';
-      btn.type='button';
-      btn.className='toggle';
-      const apply=(hide)=>{
-        listEl.style.display = hide ? 'none' : '';
-        btn.textContent = hide ? '👁️ Mostra elenco' : '👁️ Nascondi elenco';
-        try{ localStorage.setItem(KEY, hide ? '1' : '0'); }catch{}
-      };
-      let startHidden=false; try{ startHidden = localStorage.getItem(KEY)==='1'; }catch{}
-      apply(startHidden);
-      btn.addEventListener('click',()=> apply(listEl.style.display!=='none'));
-      elencoH2.appendChild(btn);
-    })();
+    });
   </script>
 </body>
 </html>
